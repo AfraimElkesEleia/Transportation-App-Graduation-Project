@@ -98,6 +98,7 @@ class _PageOfPageViewState extends State<PageOfPageView>
         FadeTransition(
           opacity: doubleAnimation,
           child: Text(
+            textAlign: TextAlign.center,
             widget.pageViewModel.title,
             style: AppStyles.medium32White,
           ),
@@ -112,7 +113,7 @@ class _PageOfPageViewState extends State<PageOfPageView>
               child: Text(
                 widget.pageViewModel.description,
                 textAlign: TextAlign.center,
-                style: AppStyles.regular20CyanBlue,
+                style: AppStyles.regular16CyanBlue,
               ),
             ),
           ),

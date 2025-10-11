@@ -1,9 +1,10 @@
 import 'package:flutter/foundation.dart';
 
-class ResponsoveFont {
+class ResponsiveFont {
   static double responsiveFont(double fontSize) {
     final double scale = getFontScaleFactor();
-    final responsiveFontSize = fontSize * scale;
+    print(scale);
+    final double responsiveFontSize = fontSize * scale;
     final double maxSize = responsiveFontSize * 1.2;
     final double minSize = responsiveFontSize * 0.8;
     return responsiveFontSize.clamp(minSize, maxSize);
@@ -16,9 +17,11 @@ class ResponsoveFont {
     var devicePixelRation = dispatcher.views.first.devicePixelRatio;
     var width = physicalWidth / devicePixelRation;
     if (width < 600) {
-      return width / 550;
+      print("Here Mobile ${width}");
+      return width / 450;
     } else {
-      return width / 1000;
+      print("Here Tablet ${width}");
+      return width / 700;
     }
   }
 }
