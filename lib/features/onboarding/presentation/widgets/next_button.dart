@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:transportation_app/core/helper/spacing.dart';
 import 'package:transportation_app/core/theming/colors.dart';
+import 'package:transportation_app/core/theming/styles.dart';
 
 class NextButton extends StatelessWidget {
   final VoidCallback onPressed;
@@ -27,11 +28,7 @@ class NextButton extends StatelessWidget {
         children: [
           Text(
             isLastPage? "Get Start" : "Continue",
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              color: ColorsManager.darkBlue,
-              fontSize: 18,
-            ),
+            style: AppStyles.bold18DarkBlue
           ),
           horizontalSpace(space: 16),
           Transform.rotate(

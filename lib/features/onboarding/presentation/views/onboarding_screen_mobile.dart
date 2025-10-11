@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:transportation_app/core/helper/extensions.dart';
 import 'package:transportation_app/core/helper/spacing.dart';
 import 'package:transportation_app/core/routing/routes.dart';
+import 'package:transportation_app/core/theming/styles.dart';
 import 'package:transportation_app/core/widgets/basic_container.dart';
 import 'package:transportation_app/features/onboarding/presentation/widgets/next_button.dart';
 import 'package:transportation_app/features/onboarding/presentation/widgets/on_boarding_screen_page_view.dart';
@@ -98,11 +99,7 @@ class _OnboardingScreenMobileState extends State<OnboardingScreenMobile> {
           ),
           child: Text(
             "Skip",
-            style: TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.w600,
-              fontSize: 18,
-            ),
+            style: AppStyles.semiBold18White
           ),
         ),
       ],

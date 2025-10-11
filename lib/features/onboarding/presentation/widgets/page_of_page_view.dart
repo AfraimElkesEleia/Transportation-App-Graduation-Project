@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:transportation_app/core/helper/spacing.dart';
 import 'package:transportation_app/core/theming/colors.dart';
+import 'package:transportation_app/core/theming/styles.dart';
 import 'package:transportation_app/features/onboarding/data/page_view_model.dart';
 import 'package:transportation_app/features/onboarding/presentation/widgets/icon_container_widget.dart';
 
@@ -79,7 +80,6 @@ class _PageOfPageViewState extends State<PageOfPageView>
         ),
         verticalSpace(space: 32),
         SlideTransition(
-          
           position: subtitleAnimation,
           child: FadeTransition(
             opacity: Tween<double>(begin: 0, end: 1).animate(
@@ -90,11 +90,7 @@ class _PageOfPageViewState extends State<PageOfPageView>
             ),
             child: Text(
               widget.pageViewModel.subtitle,
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: ColorsManager.cyanBlue,
-              ),
+              style: AppStyles.bold16CyanBlue,
             ),
           ),
         ),
@@ -103,11 +99,7 @@ class _PageOfPageViewState extends State<PageOfPageView>
           opacity: doubleAnimation,
           child: Text(
             widget.pageViewModel.title,
-            style: TextStyle(
-              fontSize: 32,
-              fontWeight: FontWeight.w500,
-              color: Colors.white,
-            ),
+            style: AppStyles.medium32White,
           ),
         ),
         verticalSpace(space: 8),
@@ -120,11 +112,7 @@ class _PageOfPageViewState extends State<PageOfPageView>
               child: Text(
                 widget.pageViewModel.description,
                 textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontWeight: FontWeight.w400,
-                  color: ColorsManager.cyanBlue,
-                  fontSize: 20,
-                ),
+                style: AppStyles.regular20CyanBlue,
               ),
             ),
           ),
