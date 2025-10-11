@@ -99,7 +99,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           ),
           child: Text(
             "Skip",
-            style: AppStyles.semiBold18White
+            style: AppStyles.semiBold18White(context)
           ),
         ),
       ],

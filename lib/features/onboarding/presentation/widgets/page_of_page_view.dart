@@ -90,7 +90,7 @@ class _PageOfPageViewState extends State<PageOfPageView>
             ),
             child: Text(
               widget.pageViewModel.subtitle,
-              style: AppStyles.bold16CyanBlue,
+              style: AppStyles.bold16CyanBlue(context),
             ),
           ),
         ),
@@ -100,7 +100,7 @@ class _PageOfPageViewState extends State<PageOfPageView>
           child: Text(
             textAlign: TextAlign.center,
             widget.pageViewModel.title,
-            style: AppStyles.medium32White,
+            style: AppStyles.medium32White(context),
           ),
         ),
         verticalSpace(space: 8),
@@ -113,7 +113,7 @@ class _PageOfPageViewState extends State<PageOfPageView>
               child: Text(
                 widget.pageViewModel.description,
                 textAlign: TextAlign.center,
-                style: AppStyles.regular16CyanBlue,
+                style: AppStyles.regular16CyanBlue(context),
               ),
             ),
           ),
