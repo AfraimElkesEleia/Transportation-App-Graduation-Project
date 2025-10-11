@@ -4,29 +4,33 @@ import 'package:transportation_app/core/theming/colors.dart';
 import 'package:transportation_app/core/theming/font_weight_helper.dart';
 
 abstract class AppStyles {
-  static final semiBold18White = TextStyle(
+  static TextStyle semiBold18White(BuildContext context) => TextStyle(
     color: Colors.white,
     fontWeight: FontWeightHelper.semiBold,
-    fontSize: ResponsiveFont.responsiveFont(18),
+    fontSize: ResponsiveFont.responsiveFont(18, context: context),
   );
-  static final bold16CyanBlue = TextStyle(
-    fontSize: ResponsiveFont.responsiveFont(16),
+
+  static TextStyle bold16CyanBlue(BuildContext context) => TextStyle(
+    fontSize: ResponsiveFont.responsiveFont(16, context: context),
     fontWeight: FontWeight.bold,
     color: ColorsManager.cyanBlue,
   );
-  static final medium32White = TextStyle(
-    fontSize: ResponsiveFont.responsiveFont(32),
+
+  static TextStyle medium32White(BuildContext context) => TextStyle(
+    fontSize: ResponsiveFont.responsiveFont(32, context: context),
     fontWeight: FontWeightHelper.medium,
     color: Colors.white,
   );
-  static final regular16CyanBlue = TextStyle(
+
+  static TextStyle regular16CyanBlue(BuildContext context) => TextStyle(
     fontWeight: FontWeightHelper.regular,
     color: ColorsManager.cyanBlue,
-    fontSize: ResponsiveFont.responsiveFont(16),
+    fontSize: ResponsiveFont.responsiveFont(16, context: context),
   );
-  static final bold18DarkBlue = TextStyle(
+
+  static TextStyle bold18DarkBlue(BuildContext context) => TextStyle(
     fontWeight: FontWeight.bold,
     color: ColorsManager.darkBlue,
-    fontSize: ResponsiveFont.responsiveFont(18),
+    fontSize: ResponsiveFont.responsiveFont(18, context: context),
   );
 }

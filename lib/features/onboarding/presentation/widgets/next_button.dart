@@ -30,7 +30,7 @@ class NextButton extends StatelessWidget {
         children: [
           Text(
             isLastPage ? "Get Start" : "Continue",
-            style: AppStyles.bold18DarkBlue,
+            style: AppStyles.bold18DarkBlue(context),
           ),
           horizontalSpace(space: 16),
           Transform.rotate(

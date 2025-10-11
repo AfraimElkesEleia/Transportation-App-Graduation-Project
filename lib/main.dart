@@ -6,7 +6,7 @@ import 'package:transportation_app/core/routing/routes.dart';
 void main() {
   runApp(
     DevicePreview(
-      enabled: false,
+      enabled: true,
       builder: (context) => TransportationApp(appRouter: AppRouter()),
     ),
   );
@@ -19,6 +19,8 @@ class TransportationApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      locale: DevicePreview.locale(context),
+      builder: DevicePreview.appBuilder,
       onGenerateRoute: appRouter.generateRoute,
       initialRoute: AppRoutes.onBoardingScreen,
     );
