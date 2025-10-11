@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:transportation_app/core/helper/spacing.dart';
-import 'package:transportation_app/core/theming/colors.dart';
 import 'package:transportation_app/core/theming/styles.dart';
 
 class NextButton extends StatelessWidget {
   final VoidCallback onPressed;
   const NextButton({
     super.key,
-    required this.onPressed, required this.isLastPage,
-  }) ;
+    required this.onPressed,
+    required this.isLastPage,
+  });
 
   final bool isLastPage;
 
@@ -17,7 +17,8 @@ class NextButton extends StatelessWidget {
     return ElevatedButton(
       onPressed: onPressed,
       style: ElevatedButton.styleFrom(
-        minimumSize: Size(double.infinity, 60),
+        padding: EdgeInsets.all(16),
+        maximumSize: Size(double.infinity, 100),
         backgroundColor: Color(0xFF3fe0d0),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadiusGeometry.circular(16),
@@ -25,10 +26,11 @@ class NextButton extends StatelessWidget {
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Text(
-            isLastPage? "Get Start" : "Continue",
-            style: AppStyles.bold18DarkBlue
+            isLastPage ? "Get Start" : "Continue",
+            style: AppStyles.bold18DarkBlue,
           ),
           horizontalSpace(space: 16),
           Transform.rotate(
