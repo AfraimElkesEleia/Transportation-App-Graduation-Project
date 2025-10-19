@@ -8,21 +8,19 @@ class BasicContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              ColorsManager.darkBlue,
-              ColorsManager.middleColor,
-              ColorsManager.lightColor,
-            ],
-          ),
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            ColorsManager.darkBlue,
+            ColorsManager.middleColor,
+            ColorsManager.lightColor,
+          ],
         ),
-        child: child,
       ),
+      child: child,
     );
   }
 }

@@ -6,7 +6,7 @@ import 'package:transportation_app/core/routing/routes.dart';
 void main() {
   runApp(
     DevicePreview(
-      enabled: true,
+      enabled: false,
       builder: (context) => TransportationApp(appRouter: AppRouter()),
     ),
   );
