@@ -33,4 +33,8 @@ abstract class AppStyles {
     color: ColorsManager.darkBlue,
     fontSize: ResponsiveFont.responsiveFont(18, context: context),
   );
+  static TextStyle regular18white(BuildContext context) => TextStyle(
+    color: Colors.white,
+    fontSize: ResponsiveFont.responsiveFont(18, context: context),
+  );
 }
