@@ -3,7 +3,12 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class DropdownCitiesMenu extends StatelessWidget {
   final String hintText;
-  const DropdownCitiesMenu({super.key, required this.hintText});
+  final TextEditingController controller;
+  const DropdownCitiesMenu({
+    super.key,
+    required this.hintText,
+    required this.controller,
+  });
 
   static final List<String> egyptCities = [
     "Cairo",
@@ -99,6 +104,7 @@ class DropdownCitiesMenu extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DropdownMenu(
+      controller: controller,
       menuStyle: MenuStyle(
         maximumSize: WidgetStatePropertyAll(
           Size(double.infinity, MediaQuery.sizeOf(context).height / 3.5),

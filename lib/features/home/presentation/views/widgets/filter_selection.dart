@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:transportation_app/core/theming/colors.dart';
 import 'package:transportation_app/core/theming/styles.dart';
 
 class FilterSelection extends StatelessWidget {
@@ -26,6 +28,11 @@ class FilterSelection extends StatelessWidget {
         ),
         width: constraints.maxWidth,
         initialSelection: items[0],
+        trailingIcon: Icon(
+          FontAwesomeIcons.caretDown,
+          size: 14,
+          color: ColorsManager.cyanBlue,
+        ),
         textStyle: AppStyles.semiBold18White(context),
         dropdownMenuEntries: items
             .map((type) => DropdownMenuEntry(value: type, label: type))
