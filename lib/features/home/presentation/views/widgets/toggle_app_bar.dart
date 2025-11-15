@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:transportation_app/core/helper/spacing.dart';
@@ -21,7 +20,7 @@ class _ToggleAppBarState extends State<ToggleAppBar> {
   Widget build(BuildContext context) {
     return ToggleButtons(
       constraints: BoxConstraints.expand(
-        width: MediaQuery.of(context).size.width / 3.5,
+        width: MediaQuery.of(context).size.width / 3.6,
         height: 40,
       ),
       borderRadius: BorderRadius.circular(12),
@@ -46,10 +45,16 @@ Widget trainTypeWidget(String name) => Row(
   mainAxisAlignment: MainAxisAlignment.center,
   children: [
     if (name == "Train")
-      Icon(FontAwesomeIcons.train, color: Colors.white)
+      FittedBox(
+        fit: BoxFit.scaleDown,
+        child: Icon(FontAwesomeIcons.train, color: Colors.white),
+      )
     else if (name == "Bus")
-      Icon(FontAwesomeIcons.bus, color: Colors.white),
-    horizontalSpace(space: 8),
+      FittedBox(
+        fit: BoxFit.scaleDown,
+        child: Icon(FontAwesomeIcons.bus, color: Colors.white),
+      ),
+    horizontalSpace(space: 6),
     Text(name, style: TextStyle(color: Colors.white)),
   ],
 );

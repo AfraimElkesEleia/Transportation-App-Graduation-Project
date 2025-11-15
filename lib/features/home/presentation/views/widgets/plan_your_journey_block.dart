@@ -5,6 +5,7 @@ import 'package:transportation_app/core/theming/font_weight_helper.dart';
 import 'package:transportation_app/core/widgets/block_container.dart';
 import 'package:transportation_app/features/home/presentation/views/widgets/date_time_field.dart';
 import 'package:transportation_app/features/home/presentation/views/widgets/dropdown_cities_menu.dart';
+import 'package:transportation_app/features/home/presentation/views/widgets/filter_section.dart';
 import 'package:transportation_app/features/home/presentation/views/widgets/search_trip_button.dart';
 import 'package:transportation_app/features/home/presentation/views/widgets/toggle_app_bar.dart';
 
@@ -29,6 +30,7 @@ class PlanYourJourneyBlock extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlockContainer(
+      isVip: true,
       child: Column(
         children: [
           planYourJourney(),
@@ -39,7 +41,9 @@ class PlanYourJourneyBlock extends StatelessWidget {
           verticalSpace(space: 12),
           DropdownCitiesMenu(hintText: "To (e.g...Luxor,Sohag)"),
           verticalSpace(space: 12),
-          Row(children: [Expanded(child: DateTimeField())]),
+          DateTimeField(),
+          verticalSpace(space: 12),
+          FilterSection(),
           verticalSpace(space: 12),
           SearchTripButton(),
         ],

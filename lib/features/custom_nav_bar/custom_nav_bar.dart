@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:transportation_app/core/helper/extensions.dart';
-import 'package:transportation_app/core/helper/spacing.dart';
-import 'package:transportation_app/core/theming/font_weight_helper.dart';
 import 'package:transportation_app/core/widgets/basic_container.dart';
 import 'package:transportation_app/features/custom_nav_bar/custom_bottom_nav_bar.dart';
 import 'package:transportation_app/features/home/presentation/views/screen/home_screen.dart';

@@ -117,9 +117,7 @@ class DropdownCitiesMenu extends StatelessWidget {
       ),
       inputDecorationTheme: InputDecorationTheme(
         contentPadding: EdgeInsets.all(16),
-        hintStyle: const TextStyle(
-          color: Color(0xFF4f8c9a), // ⭐ Same color as icon
-        ),
+        hintStyle: const TextStyle(color: Color(0xFF4f8c9a)),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(20),
           borderSide: BorderSide(color: Color(0xFF4f8c9a), width: 5),

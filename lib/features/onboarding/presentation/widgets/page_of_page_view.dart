@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:transportation_app/core/helper/spacing.dart';
-import 'package:transportation_app/core/theming/colors.dart';
 import 'package:transportation_app/core/theming/styles.dart';
 import 'package:transportation_app/features/onboarding/data/page_view_model.dart';
 import 'package:transportation_app/features/onboarding/presentation/widgets/icon_container_widget.dart';
