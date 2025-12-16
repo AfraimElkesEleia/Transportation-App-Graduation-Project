@@ -48,7 +48,6 @@ class HomeScreen extends StatelessWidget {
         ),
         SliverToBoxAdapter(child: PrivateCarRidesBlock()),
         SliverToBoxAdapter(child: LatestNewsBlock()),
-        SliverToBoxAdapter(child: verticalSpace(space: 150)),
       ],
     );
   }
