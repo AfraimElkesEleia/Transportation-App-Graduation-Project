@@ -3,6 +3,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:transportation_app/core/widgets/basic_container.dart';
 import 'package:transportation_app/features/custom_nav_bar/custom_bottom_nav_bar.dart';
 import 'package:transportation_app/features/home/presentation/views/screen/home_screen.dart';
+import 'package:transportation_app/features/my_tickets/presentation/views/screen/my_tickets.dart';
 
 class NavItem {
   final IconData icon;
@@ -32,7 +33,7 @@ class CustomNavBarState extends State<CustomNavBar> {
   final List<Widget> _screens = [
     const HomeScreen(),
     const Center(child: Text("Search")),
-    const Center(child: Text("Tickets")),
+    const MyTickets(),
     const Center(child: Text("Profile")),
     const Center(child: Text("More")),
   ];
