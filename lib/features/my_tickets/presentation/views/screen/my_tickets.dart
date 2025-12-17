@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:transportation_app/core/helper/extensions.dart';
+import 'package:transportation_app/core/routing/routes.dart';
 import 'package:transportation_app/core/widgets/basic_container.dart';
 import 'package:transportation_app/features/my_tickets/presentation/views/widgets/action_buttons_row.dart';
 import 'package:transportation_app/features/my_tickets/presentation/views/widgets/custom_ticket_tab.dart';
@@ -20,7 +22,14 @@ class MyTickets extends StatelessWidget {
               const MyTicketsAppBar(),
 
               const SliverToBoxAdapter(child: SizedBox(height: 20)),
-              const ActionButtonsRow(),
+              ActionButtonsRow(
+                marketPlaceButton: () {
+                  context.pushNamed(AppRoutes.marketPlaceScreen);
+                },
+                resellButton: () {
+                  context.pushNamed(AppRoutes.resellTicketsScreen);
+                },
+              ),
 
               const SliverToBoxAdapter(child: SizedBox(height: 24)),
               const SliverToBoxAdapter(child: WalletBalanceCard()),
