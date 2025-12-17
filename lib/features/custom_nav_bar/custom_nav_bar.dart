@@ -4,6 +4,7 @@ import 'package:transportation_app/core/widgets/basic_container.dart';
 import 'package:transportation_app/features/custom_nav_bar/custom_bottom_nav_bar.dart';
 import 'package:transportation_app/features/home/presentation/views/screen/home_screen.dart';
 import 'package:transportation_app/features/my_tickets/presentation/views/screen/my_tickets.dart';
+import 'package:transportation_app/features/profile/presentation/views/screen/profile_screen.dart';
 
 class NavItem {
   final IconData icon;
@@ -24,7 +25,6 @@ class CustomNavBarState extends State<CustomNavBar> {
 
   final List<NavItem> _navItems = [
     NavItem(icon: FontAwesomeIcons.house, label: "Home"),
-    NavItem(icon: FontAwesomeIcons.magnifyingGlass, label: "Search"),
     NavItem(icon: FontAwesomeIcons.ticket, label: "Tickets"),
     NavItem(icon: FontAwesomeIcons.user, label: "Profile"),
     NavItem(icon: FontAwesomeIcons.bell, label: "More"),
@@ -32,9 +32,8 @@ class CustomNavBarState extends State<CustomNavBar> {
 
   final List<Widget> _screens = [
     const HomeScreen(),
-    const Center(child: Text("Search")),
     const MyTickets(),
-    const Center(child: Text("Profile")),
+    const ProfileScreen(),
     const Center(child: Text("More")),
   ];
 
