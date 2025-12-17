@@ -35,7 +35,14 @@ class MyTickets extends StatelessWidget {
               const SliverToBoxAdapter(child: WalletBalanceCard()),
 
               const SliverToBoxAdapter(child: SizedBox(height: 24)),
-              const SliverToBoxAdapter(child: CustomTicketTabs()),
+              SliverToBoxAdapter(
+                child: CustomTicketTabs(
+                  tabLabels: ["Active", "Upcoming", "Past"],
+                  onTabChanged: (index) {
+                    print(index);
+                  },
+                ),
+              ),
 
               const SliverToBoxAdapter(child: SizedBox(height: 16)),
 
