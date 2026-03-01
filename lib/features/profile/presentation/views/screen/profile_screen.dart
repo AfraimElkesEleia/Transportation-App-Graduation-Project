@@ -30,23 +30,21 @@ class _ProfileViewState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
-        child: BasicContainer(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              children: [
-                _buildAppBar(context),
-                const SizedBox(height: 20),
-                _buildProfileCard(),
-                const SizedBox(height: 20),
-                _buildPersonalInfo(),
-                const SizedBox(height: 20),
-                _buildQuickActions(),
-                const SizedBox(height: 30),
-                _buildLogoutButton(),
-              ],
-            ),
+      body: BasicContainer(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            children: [
+              _buildAppBar(context),
+              const SizedBox(height: 20),
+              _buildProfileCard(),
+              const SizedBox(height: 20),
+              _buildPersonalInfo(),
+              const SizedBox(height: 20),
+              _buildQuickActions(),
+              const SizedBox(height: 30),
+              _buildLogoutButton(),
+            ],
           ),
         ),
       ),
@@ -146,12 +144,10 @@ class _ProfileViewState extends State<ProfileScreen> {
           const SizedBox(height: 20),
 
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               _buildStatItem('Total Trips', '12'),
               _buildStatItem('Distance Traveled', '2,450 km'),
-              _buildStatItem('Money Saved', '850 EGP'),
-              _buildStatItem('Rating', '4.8'),
             ],
           ),
         ],
