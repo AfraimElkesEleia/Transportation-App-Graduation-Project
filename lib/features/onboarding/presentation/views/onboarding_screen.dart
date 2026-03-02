@@ -65,7 +65,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 isLastPage: index == 2,
                 onPressed: () {
                   if (index == 2) {
-                    context.pushReplacementNamed(AppRoutes.homeScreen);
+                    context.pushReplacementNamed(AppRoutes.loginScreen);
                   } else {
                     _pageController.animateToPage(
                       index + 1,

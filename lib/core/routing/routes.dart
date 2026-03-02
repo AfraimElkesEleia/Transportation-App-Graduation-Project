@@ -3,4 +3,5 @@ abstract class AppRoutes {
   static const homeScreen = '/home_screen';
   static const marketPlaceScreen = '/market_place_screen';
   static const resellTicketsScreen = '/resell_tickets_screen';
+  static const loginScreen = '/login_screen';
 }
