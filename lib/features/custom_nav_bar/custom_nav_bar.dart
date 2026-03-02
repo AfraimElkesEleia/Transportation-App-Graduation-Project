@@ -30,7 +30,7 @@ class CustomNavBarState extends State<CustomNavBar> {
     NavItem(icon: FontAwesomeIcons.bell, label: "More"),
   ];
 
-  final List<Widget> _screens = [
+  late final List<Widget> _screens = [
     const HomeScreen(),
     const MyTickets(),
     const ProfileScreen(),
@@ -68,17 +68,15 @@ class CustomNavBarState extends State<CustomNavBar> {
               padding: const EdgeInsets.symmetric(vertical: 8.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: _navItems.asMap().entries.map((entry) {
-                  int idx = entry.key;
-                  NavItem item = entry.value;
-
+                children: List.generate(_navItems.length, (idx) {
+                  final item = _navItems[idx];
                   return CustomBottomNavBarItem(
                     isActive: currentIndex == idx,
                     icon: item.icon,
                     label: item.label,
                     onTap: () => _onItemTapped(idx),
                   );
-                }).toList(),
+                }),
               ),
             ),
           ),

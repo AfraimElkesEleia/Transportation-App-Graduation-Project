@@ -32,7 +32,7 @@ class _CustomBottomNavBarItemState extends State<CustomBottomNavBarItem>
       duration: const Duration(milliseconds: 300),
     );
     _scaleAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _animationController, curve: Curves.elasticOut),
+      CurvedAnimation(parent: _animationController, curve: Curves.easeOutBack),
     );
 
     if (widget.isActive) {
@@ -52,79 +52,74 @@ class _CustomBottomNavBarItemState extends State<CustomBottomNavBarItem>
 
   @override
   Widget build(BuildContext context) {
-    return FittedBox(
-      fit: BoxFit.scaleDown,
-      child: InkWell(
-        onTap: widget.onTap,
-        child: Stack(
-          clipBehavior: Clip.none,
-          children: [
-            Container(
-              decoration: ShapeDecoration(
-                color: widget.isActive ? Color(0xFF2c6196) : Colors.transparent,
-                shape: RoundedRectangleBorder(
-                  side: BorderSide(
-                    width: 1,
-                    color: widget.isActive
-                        ? Color(0xFF3180a4)
-                        : Colors.transparent,
-                  ),
-                  borderRadius: BorderRadius.circular(24),
+    return InkWell(
+      onTap: widget.onTap,
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          Container(
+            decoration: ShapeDecoration(
+              color: widget.isActive
+                  ? const Color(0xFF2c6196)
+                  : Colors.transparent,
+              shape: RoundedRectangleBorder(
+                side: BorderSide(
+                  width: 1,
+                  color: widget.isActive
+                      ? const Color(0xFF3180a4)
+                      : Colors.transparent,
                 ),
-              ),
-              padding: EdgeInsets.symmetric(vertical: 10, horizontal: 16),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  AnimatedContainer(
-                    duration: const Duration(milliseconds: 300),
-                    curve: Curves.bounceInOut,
-                    child: Icon(
-                      widget.icon,
-                      color: widget.isActive
-                          ? Color(0xFF40e0d0)
-                          : Colors.white.withOpacity(0.7),
-                      size: widget.isActive ? 25 : 20,
-                    ),
-                  ),
-                  verticalSpace(space: 4),
-                  Text(
-                    widget.label,
-                    style: TextStyle(
-                      color: widget.isActive
-                          ? Colors.white
-                          : Colors.white.withOpacity(0.7),
-                      fontSize: 12,
-                      fontWeight: widget.isActive
-                          ? FontWeightHelper.semiBold
-                          : FontWeightHelper.regular,
-                    ),
-                  ),
-                ],
+                borderRadius: BorderRadius.circular(24),
               ),
             ),
-            if (widget.isActive)
-              Positioned(
-                top: -6,
-                left: 0,
-                right: 0,
-                child: ScaleTransition(
-                  scale: _scaleAnimation,
-                  child: Align(
-                    child: Container(
-                      width: 8,
-                      height: 8,
-                      decoration: ShapeDecoration(
-                        shape: OvalBorder(),
-                        color: Color(0xFF40e0d0),
-                      ),
+            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  widget.icon,
+                  color: widget.isActive
+                      ? const Color(0xFF40e0d0)
+                      : const Color(0xB3FFFFFF),
+                  size: widget.isActive ? 25 : 20,
+                ),
+                verticalSpace(space: 4),
+                Text(
+                  widget.label,
+                  style: TextStyle(
+                    color: widget.isActive
+                        ? Colors.white
+                        : const Color(0xB3FFFFFF),
+                    fontSize: 12,
+                    fontWeight: widget.isActive
+                        ? FontWeightHelper.semiBold
+                        : FontWeightHelper.regular,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          if (widget.isActive)
+            Positioned(
+              top: -6,
+              left: 0,
+              right: 0,
+              child: ScaleTransition(
+                scale: _scaleAnimation,
+                child: Align(
+                  child: Container(
+                    width: 8,
+                    height: 8,
+                    decoration: const ShapeDecoration(
+                      shape: OvalBorder(),
+                      color: Color(0xFF40e0d0),
                     ),
                   ),
                 ),
               ),
-          ],
-        ),
+            ),
+        ],
       ),
     );
   }
