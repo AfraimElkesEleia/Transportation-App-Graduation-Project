@@ -1,9 +1,15 @@
+import 'package:device_preview/device_preview.dart';
 import 'package:flutter/material.dart';
 import 'package:transportation_app/core/routing/app_router.dart';
 import 'package:transportation_app/core/routing/routes.dart';
 
 void main() {
-  runApp(TransportationApp(appRouter: AppRouter(),));
+  runApp(
+    DevicePreview(
+      enabled: false,
+      builder: (context) => TransportationApp(appRouter: AppRouter()),
+    ),
+  );
 }
 
 class TransportationApp extends StatelessWidget {
@@ -13,7 +19,10 @@ class TransportationApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      onGenerateRoute:appRouter.generateRoute ,
+      debugShowCheckedModeBanner: false,
+      locale: DevicePreview.locale(context),
+      builder: DevicePreview.appBuilder,
+      onGenerateRoute: appRouter.generateRoute,
       initialRoute: AppRoutes.onBoardingScreen,
     );
   }
