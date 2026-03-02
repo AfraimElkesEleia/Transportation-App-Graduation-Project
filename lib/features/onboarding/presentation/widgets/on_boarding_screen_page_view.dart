@@ -46,7 +46,6 @@ class OnBoardingScreenPageView extends StatelessWidget {
       onPageChanged: onPageChanged,
       itemCount: 3,
       itemBuilder: (context, index) {
-        print(pageController.position.isScrollingNotifier);
         return PageOfPageView(
           pageViewModel: pageViewModels[index],
           isOut: isOut,

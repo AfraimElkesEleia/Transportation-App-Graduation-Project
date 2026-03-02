@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:transportation_app/core/helper/spacing.dart';
 import 'package:transportation_app/core/theming/font_weight_helper.dart';
@@ -46,10 +45,8 @@ class _CustomBottomNavBarItemState extends State<CustomBottomNavBarItem>
     super.didUpdateWidget(oldWidget);
     if (widget.isActive && !oldWidget.isActive) {
       _animationController.forward(from: 0.0);
-      print("Forward animation ====================");
     } else if (!widget.isActive && oldWidget.isActive) {
       _animationController.reverse();
-      print("Reverse animation ====================");
     }
   }
 

@@ -25,7 +25,6 @@ class _PageOfPageViewState extends State<PageOfPageView>
   late final Animation<Offset> descriptionAnimation;
   @override
   void initState() {
-    print("initState Here");
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 250),
@@ -56,7 +55,6 @@ class _PageOfPageViewState extends State<PageOfPageView>
 
   @override
   void didUpdateWidget(covariant PageOfPageView oldWidget) {
-    print("didUpdateMethod Here");
     super.didUpdateWidget(oldWidget);
     if (widget.isOut) {
       _animationController.reverse();

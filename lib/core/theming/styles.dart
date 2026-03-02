@@ -37,4 +37,62 @@ abstract class AppStyles {
     color: Colors.white,
     fontSize: ResponsiveFont.responsiveFont(18, context: context),
   );
+
+  // Screen titles (e.g. "Profile", "Ticket Marketplace")
+  static TextStyle bold20White(BuildContext context) => TextStyle(
+    color: Colors.white,
+    fontSize: ResponsiveFont.responsiveFont(20, context: context),
+    fontWeight: FontWeight.bold,
+  );
+
+  // Subtitles (e.g. "Manage your account")
+  static TextStyle regular13White70(BuildContext context) => TextStyle(
+    color: Colors.white70,
+    fontSize: ResponsiveFont.responsiveFont(13, context: context),
+  );
+
+  // Card header names
+  static TextStyle bold18White(BuildContext context) => TextStyle(
+    color: Colors.white,
+    fontSize: ResponsiveFont.responsiveFont(18, context: context),
+    fontWeight: FontWeight.bold,
+  );
+
+  // Card secondary text
+  static TextStyle regular14White70(BuildContext context) => TextStyle(
+    color: Colors.white70,
+    fontSize: ResponsiveFont.responsiveFont(14, context: context),
+  );
+
+  // Stat values
+  static TextStyle bold16White(BuildContext context) => TextStyle(
+    color: Colors.white,
+    fontWeight: FontWeight.bold,
+    fontSize: ResponsiveFont.responsiveFont(16, context: context),
+  );
+
+  // Stat / info labels
+  static TextStyle regular12White70(BuildContext context) => TextStyle(
+    color: Colors.white70,
+    fontSize: ResponsiveFont.responsiveFont(12, context: context),
+  );
+
+  // Action tile titles
+  static TextStyle regular15White(BuildContext context) => TextStyle(
+    color: Colors.white,
+    fontSize: ResponsiveFont.responsiveFont(15, context: context),
+  );
+
+  // Discounted prices
+  static TextStyle bold16SuccessGreen(BuildContext context) => TextStyle(
+    color: ColorsManager.successGreen,
+    fontWeight: FontWeight.bold,
+    fontSize: ResponsiveFont.responsiveFont(16, context: context),
+  );
+
+  // Info column labels (e.g. "Seat", "Class")
+  static TextStyle regular12White60(BuildContext context) => TextStyle(
+    color: Colors.white60,
+    fontSize: ResponsiveFont.responsiveFont(12, context: context),
+  );
 }

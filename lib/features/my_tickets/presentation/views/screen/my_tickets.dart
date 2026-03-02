@@ -38,9 +38,7 @@ class MyTickets extends StatelessWidget {
               SliverToBoxAdapter(
                 child: CustomTicketTabs(
                   tabLabels: ["Active", "Upcoming", "Past"],
-                  onTabChanged: (index) {
-                    print(index);
-                  },
+                  onTabChanged: (index) {},
                 ),
               ),
 
