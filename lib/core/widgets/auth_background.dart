@@ -1,16 +1,5 @@
 import 'package:flutter/material.dart';
 
-/// Provides the shared dark-navy gradient background used on all auth screens.
-///
-/// Wrap any auth screen body with this widget instead of repeating the
-/// [Container] + [BoxDecoration] + [LinearGradient] boilerplate.
-///
-/// Usage:
-/// ```dart
-/// AuthBackground(
-///   child: SingleChildScrollView(child: ...),
-/// )
-/// ```
 class AuthBackground extends StatelessWidget {
   const AuthBackground({
     super.key,
@@ -43,7 +32,6 @@ class AuthBackground extends StatelessWidget {
   }
 }
 
-/// The small decorative cyan-to-blue accent bar shown at the top of auth screens.
 class AuthAccentBar extends StatelessWidget {
   const AuthAccentBar({super.key});
 
