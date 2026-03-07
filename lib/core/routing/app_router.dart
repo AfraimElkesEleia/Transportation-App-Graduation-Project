@@ -5,6 +5,7 @@ import 'package:transportation_app/features/login/presentation/screens/login_scr
 import 'package:transportation_app/features/my_tickets/presentation/views/screen/market_place.dart';
 import 'package:transportation_app/features/my_tickets/presentation/views/screen/resell_tickets.dart';
 import 'package:transportation_app/features/onboarding/presentation/views/onboarding_screen.dart';
+import 'package:transportation_app/features/signup/presentation/screen/sign_up_screen.dart';
 
 class AppRouter {
   Route<dynamic>? generateRoute(RouteSettings settings) {
@@ -18,7 +19,9 @@ class AppRouter {
       case AppRoutes.resellTicketsScreen:
         return MaterialPageRoute(builder: (_) => ResellTicketsScreen());
       case AppRoutes.loginScreen:
-        return MaterialPageRoute(builder: (_)=> LoginScreen());
+        return MaterialPageRoute(builder: (_) => LoginScreen());
+      case AppRoutes.signUpScreen:
+        return MaterialPageRoute(builder: (_) => SignupScreen());
       default:
         return null;
     }
