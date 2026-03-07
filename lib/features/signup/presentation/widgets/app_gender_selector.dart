@@ -2,16 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:transportation_app/features/signup/presentation/widgets/gender.dart';
 
-/// A labelled, two-chip gender selector matching the app's dark theme.
-///
-/// Usage:
-/// ```dart
-/// AppGenderSelector(
-///   selected: _gender,
-///   onChanged: (g) => setState(() => _gender = g),
-///   errorText: _genderError,
-/// )
-/// ```
 class AppGenderSelector extends StatelessWidget {
   const AppGenderSelector({
     super.key,
