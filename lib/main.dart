@@ -1,9 +1,13 @@
 import 'package:device_preview/device_preview.dart';
 import 'package:flutter/material.dart';
+import 'package:transportation_app/core/di/injection_container.dart';
 import 'package:transportation_app/core/routing/app_router.dart';
 import 'package:transportation_app/core/routing/routes.dart';
 
-void main() {
+void main() async{
+  WidgetsFlutterBinding.ensureInitialized();
+  
+  await init();
   runApp(
     DevicePreview(
       enabled: false,

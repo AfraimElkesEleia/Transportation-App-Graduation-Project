@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:transportation_app/core/helper/extensions.dart';
 import 'package:transportation_app/core/routing/routes.dart';
 import 'package:transportation_app/core/validators/app_validators.dart';
 import 'package:transportation_app/core/widgets/app_gradient_button.dart';
 import 'package:transportation_app/core/widgets/auth_background.dart';
+import 'package:transportation_app/features/signup/presentation/cubit/signup_cubit.dart';
+import 'package:transportation_app/features/signup/presentation/cubit/signup_state.dart';
 import 'package:transportation_app/features/signup/presentation/widgets/gender.dart';
 import 'package:transportation_app/features/signup/presentation/widgets/section_label.dart';
 import 'package:transportation_app/features/signup/presentation/widgets/signup_contact_section.dart';
@@ -40,7 +43,6 @@ class _SignupScreenState extends State<SignupScreen> {
   String? _countryName;
 
   // ── UI state ──────────────────────────────────────────
-  bool _isLoading = false;
   PasswordStrength _strength = PasswordStrength.none;
 
   // Manual error strings for non-TextFormField widgets
@@ -85,123 +87,153 @@ class _SignupScreenState extends State<SignupScreen> {
     final formOk = _formKey.currentState?.validate() ?? false;
     final customOk = _validateCustomFields();
     if (!formOk || !customOk) return;
-
-    setState(() => _isLoading = true);
-    Future.delayed(const Duration(seconds: 2), () {
-      if (!mounted) return;
-      setState(() => _isLoading = false);
-      context.pushNamed(AppRoutes.homeScreen);
-    });
+    final dob =
+        '${_dateOfBirth?.year}-'
+        '${_dateOfBirth?.month.toString().padLeft(2, '0')}-'
+        '${_dateOfBirth?.day.toString().padLeft(2, '0')}';
+    context.read<SignupCubit>().register(
+      email: _emailController.text.trim(),
+      password: _passwordController.text,
+      confirmPassword: _confirmPasswordController.text,
+      phoneNumber: '+20${_phoneController.text.trim()}',
+      firstName: _firstNameController.text.trim(),
+      lastName: _lastNameController.text.trim(),
+      familyName: _familyNameController.text.trim(),
+      gender: _gender == Gender.male ? 1 : 2,
+      dateOfBirth: dob,
+      countryCode: _countryCode!,
+      nationalIdNumber: _nationalIdController.text.isEmpty
+          ? null
+          : _nationalIdController.text,
+    );
   }
 
   // ── Build ──────────────────────────────────────────────
   @override
   Widget build(BuildContext context) {
     return AuthBackground(
-      child: SingleChildScrollView(
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 20),
-              SignupHeader(),
-              SectionLabel(label: 'Personal Information'),
-              const SizedBox(height: 16),
-              SignupPersonalSection(
-                firstNameController: _firstNameController,
-                lastNameController: _lastNameController,
-                familyNameController: _familyNameController,
-                nationalIdController: _nationalIdController,
-                onGenderChanged: (g) => setState(() {
-                  _gender = g;
-                  _genderError = null;
-                }),
-                gender: _gender,
-                dob: _dateOfBirth,
-                dobError: _dobError,
-                genderError: _genderError,
-                onDobChanged: (d) => setState(() {
-                  _dateOfBirth = d;
-                  _dobError = null;
-                }),
+      child: BlocConsumer<SignupCubit, SignupState>(
+        listener: (context, state) {
+          print('👁 [Screen] state changed to: $state');
+          if (state is SignupSuccess) {
+            Navigator.of(
+              context,
+            ).pushNamedAndRemoveUntil(AppRoutes.homeScreen, (route) => false);
+          } else if (state is SignupFailure) {
+            print('👁 [Screen] showing snackbar: ${state.message}');
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(state.message),
+                backgroundColor: Colors.red,
               ),
-              // ══════════════════════════════
-              // SECTION 2 — Contact
-              // ══════════════════════════════
-              const SizedBox(height: 32),
-              SectionLabel(label: 'Contact Details'),
-              const SizedBox(height: 16),
-
-              SignupContactSection(
-                onCountrySelected: (code, name) => setState(() {
-                  _countryCode = code;
-                  _countryName = name;
-                  _countryError = null;
-                }),
-                emailController: _emailController,
-                phoneController: _phoneController,
-                countryCode: _countryCode,
-                countryName: _countryName,
-                countryError: _countryError,
-              ),
-              // ══════════════════════════════
-              // SECTION 3 — Security
-              // ══════════════════════════════
-              const SizedBox(height: 32),
-              SectionLabel(label: 'Security'),
-              const SizedBox(height: 16),
-              SignupSecuritySection(
-                passwordController: _passwordController,
-                confirmPasswordController: _confirmPasswordController,
-                passwordStrength: _strength,
-                onChanged: (v) => setState(
-                  () => _strength = AppValidators.getPasswordStrength(v),
+            );
+          }
+        },
+        builder: (context, state) => SingleChildScrollView(
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 20),
+                SignupHeader(),
+                SectionLabel(label: 'Personal Information'),
+                const SizedBox(height: 16),
+                SignupPersonalSection(
+                  firstNameController: _firstNameController,
+                  lastNameController: _lastNameController,
+                  familyNameController: _familyNameController,
+                  nationalIdController: _nationalIdController,
+                  onGenderChanged: (g) => setState(() {
+                    _gender = g;
+                    _genderError = null;
+                  }),
+                  gender: _gender,
+                  dob: _dateOfBirth,
+                  dobError: _dobError,
+                  genderError: _genderError,
+                  onDobChanged: (d) => setState(() {
+                    _dateOfBirth = d;
+                    _dobError = null;
+                  }),
                 ),
-                handleSignup: _handleSignup,
-              ),
-              const SizedBox(height: 32),
+                // ══════════════════════════════
+                // SECTION 2 — Contact
+                // ══════════════════════════════
+                const SizedBox(height: 32),
+                SectionLabel(label: 'Contact Details'),
+                const SizedBox(height: 16),
 
-              // ── Create Account button ────────────
-              AppGradientButton(
-                label: 'Create Account',
-                onPressed: _handleSignup,
-                isLoading: _isLoading,
-              ),
-              const SizedBox(height: 16),
+                SignupContactSection(
+                  onCountrySelected: (code, name) => setState(() {
+                    _countryCode = code;
+                    _countryName = name;
+                    _countryError = null;
+                  }),
+                  emailController: _emailController,
+                  phoneController: _phoneController,
+                  countryCode: _countryCode,
+                  countryName: _countryName,
+                  countryError: _countryError,
+                ),
+                // ══════════════════════════════
+                // SECTION 3 — Security
+                // ══════════════════════════════
+                const SizedBox(height: 32),
+                SectionLabel(label: 'Security'),
+                const SizedBox(height: 16),
+                SignupSecuritySection(
+                  passwordController: _passwordController,
+                  confirmPasswordController: _confirmPasswordController,
+                  passwordStrength: _strength,
+                  onChanged: (v) => setState(
+                    () => _strength = AppValidators.getPasswordStrength(v),
+                  ),
+                  handleSignup: _handleSignup,
+                ),
+                const SizedBox(height: 32),
 
-              // ── Sign In redirect ─────────────────
-              Center(
-                child: GestureDetector(
-                  onTap: () => context.pop(),
-                  child: RichText(
-                    text: TextSpan(
-                      children: [
-                        TextSpan(
-                          text: 'Already have an account? ',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w300,
-                            fontFamily: GoogleFonts.poppins().fontFamily,
+                // ── Create Account button ────────────
+                AppGradientButton(
+                  label: 'Create Account',
+                  onPressed: _handleSignup,
+                  isLoading: state is SignupLoading,
+                ),
+                const SizedBox(height: 16),
+
+                // ── Sign In redirect ─────────────────
+                Center(
+                  child: GestureDetector(
+                    onTap: () => context.pop(),
+                    child: RichText(
+                      text: TextSpan(
+                        children: [
+                          TextSpan(
+                            text: 'Already have an account? ',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w300,
+                              fontFamily: GoogleFonts.poppins().fontFamily,
+                            ),
                           ),
-                        ),
-                        TextSpan(
-                          text: 'Sign In',
-                          style: TextStyle(
-                            color: const Color(0xff1AC8E8),
-                            fontSize: 16,
-                            fontWeight: FontWeight.w800,
-                            fontFamily: GoogleFonts.poppins().fontFamily,
+                          TextSpan(
+                            text: 'Sign In',
+                            style: TextStyle(
+                              color: const Color(0xff1AC8E8),
+                              fontSize: 16,
+                              fontWeight: FontWeight.w800,
+                              fontFamily: GoogleFonts.poppins().fontFamily,
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 40),
-            ],
+                const SizedBox(height: 40),
+              ],
+            ),
           ),
         ),
       ),
