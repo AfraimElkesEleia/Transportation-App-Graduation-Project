@@ -2,29 +2,38 @@ import 'package:flutter/material.dart';
 import 'package:transportation_app/core/validators/app_validators.dart';
 import 'package:transportation_app/core/widgets/app_text_form_field.dart';
 import 'package:transportation_app/features/signup/presentation/widgets/app_country_picker_field.dart';
+import 'package:transportation_app/features/signup/presentation/widgets/app_phone_field.dart';
 
 class SignupContactSection extends StatelessWidget {
   final void Function(String code, String name) onCountrySelected;
+
+  final void Function(String dialCode, String countryCode)? onDialCodeChanged;
+
   final TextEditingController emailController;
   final TextEditingController phoneController;
-  String? countryName;
-  String? countryCode;
-  String? countryError;
-  SignupContactSection({
+
+  final String? countryName;
+  final String? countryCode;
+  final String? countryError;
+
+  final String? selectedDialCode;
+
+  const SignupContactSection({
     super.key,
     required this.onCountrySelected,
     required this.emailController,
     required this.phoneController,
+    this.onDialCodeChanged,
     this.countryCode,
     this.countryName,
-    this.countryError
+    this.countryError,
+    this.selectedDialCode,
   });
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        // Email
         AppTextFormField(
           label: 'Email Address',
           hint: 'Enter your email',
@@ -36,19 +45,14 @@ class SignupContactSection extends StatelessWidget {
         ),
         const SizedBox(height: 20),
 
-        // Phone
-        AppTextFormField(
+        AppPhoneField(
           label: 'Phone Number',
-          hint: '+201234567890',
-          prefixIcon: Icons.phone_outlined,
-          keyboardType: TextInputType.phone,
           controller: phoneController,
+          initialDialCode: selectedDialCode ?? '+20',
+          onDialCodeChanged: onDialCodeChanged,
           validator: AppValidators.phoneNumber,
-          textInputAction: TextInputAction.next,
         ),
         const SizedBox(height: 24),
-
-        // Country picker
         AppCountryPickerField(
           label: 'Country',
           selectedCode: countryCode,

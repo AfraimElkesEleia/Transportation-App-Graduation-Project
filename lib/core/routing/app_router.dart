@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:transportation_app/core/di/injection_container.dart';
 import 'package:transportation_app/core/routing/routes.dart';
 import 'package:transportation_app/features/custom_nav_bar/custom_nav_bar.dart';
+import 'package:transportation_app/features/login/presentation/cubit/login_cubit/login_cubit.dart';
 import 'package:transportation_app/features/login/presentation/screens/login_screen.dart';
 import 'package:transportation_app/features/my_tickets/presentation/views/screen/market_place.dart';
 import 'package:transportation_app/features/my_tickets/presentation/views/screen/resell_tickets.dart';
@@ -22,7 +23,9 @@ class AppRouter {
       case AppRoutes.resellTicketsScreen:
         return MaterialPageRoute(builder: (_) => ResellTicketsScreen());
       case AppRoutes.loginScreen:
-        return MaterialPageRoute(builder: (_) => LoginScreen());
+        return MaterialPageRoute(builder: (_) => BlocProvider(
+          create: (context) => sl<LoginCubit>(),
+          child: LoginScreen()));
       case AppRoutes.signUpScreen:
         return MaterialPageRoute(builder: (_) => BlocProvider(
           create:(c)=> sl<SignupCubit>(),

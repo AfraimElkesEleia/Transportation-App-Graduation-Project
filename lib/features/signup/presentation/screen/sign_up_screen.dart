@@ -41,6 +41,8 @@ class _SignupScreenState extends State<SignupScreen> {
   DateTime? _dateOfBirth;
   String? _countryCode;
   String? _countryName;
+  String? _dialCode = '+20';
+  String? _dialCountry = 'EG';
 
   // ── UI state ──────────────────────────────────────────
   PasswordStrength _strength = PasswordStrength.none;
@@ -95,7 +97,7 @@ class _SignupScreenState extends State<SignupScreen> {
       email: _emailController.text.trim(),
       password: _passwordController.text,
       confirmPassword: _confirmPasswordController.text,
-      phoneNumber: '+20${_phoneController.text.trim()}',
+      phoneNumber: _buildPhoneNumber(_phoneController.text.trim()),
       firstName: _firstNameController.text.trim(),
       lastName: _lastNameController.text.trim(),
       familyName: _familyNameController.text.trim(),
@@ -106,6 +108,13 @@ class _SignupScreenState extends State<SignupScreen> {
           ? null
           : _nationalIdController.text,
     );
+  }
+
+  String _buildPhoneNumber(String input) {
+    final trimmed = input.trim();
+    if (trimmed.startsWith('+')) return trimmed;
+    if (trimmed.startsWith('0')) return '$_dialCode${trimmed.substring(1)}';
+    return '$_dialCode$trimmed';
   }
 
   // ── Build ──────────────────────────────────────────────
@@ -170,11 +179,16 @@ class _SignupScreenState extends State<SignupScreen> {
                     _countryName = name;
                     _countryError = null;
                   }),
+                  onDialCodeChanged: (dialCode, countryCode) => setState(() {
+                    _dialCode = dialCode;
+                    _dialCountry = countryCode;
+                  }),
                   emailController: _emailController,
                   phoneController: _phoneController,
                   countryCode: _countryCode,
                   countryName: _countryName,
                   countryError: _countryError,
+                  selectedDialCode: _dialCode,
                 ),
                 // ══════════════════════════════
                 // SECTION 3 — Security
