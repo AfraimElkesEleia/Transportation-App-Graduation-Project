@@ -21,17 +21,20 @@ class LoginRepositoryImp extends LoginRepository {
     required String email,
     required String password,
     String? deviceInfo,
+    required bool rememberMe
   }) async {
     try {
       final result = await remoteDataSource.login(
         email: email,
         password: password,
         deviceInfo: deviceInfo,
+        rememberMe: rememberMe
       );
       await tokenManager.saveTokens(
         accessToken: result.accessToken,
         refreshToken: result.refreshToken,
       );
+      await tokenManager.saveRememberMe(rememberMe);
       return Right(result);
     } on UnauthorizedException catch (e) {
       return Left(UnauthorizedFailure(message: e.message));

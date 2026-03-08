@@ -8,13 +8,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:transportation_app/core/routing/app_router.dart';
+import 'package:transportation_app/core/routing/routes.dart';
 
 import 'package:transportation_app/main.dart';
 
 void main() {
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {
     // Build our app and trigger a frame.
-    await tester.pumpWidget(TransportationApp(appRouter: AppRouter()));
+    await tester.pumpWidget(TransportationApp(appRouter: AppRouter(),initialRoute: AppRoutes.homeScreen,));
 
     // Verify that our counter starts at 0.
     expect(find.text('0'), findsOneWidget);

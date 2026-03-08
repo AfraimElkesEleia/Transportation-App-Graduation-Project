@@ -13,7 +13,8 @@ class LoginUsecase extends Usecase<AuthResponseEntity, LoginParams> {
     return loginRepository.login(
       email: params.email,
       password: params.password,
-      deviceInfo: params.deviceInfo
+      deviceInfo: params.deviceInfo,
+      rememberMe: params.rememberMe
     );
   }
 }
@@ -22,13 +23,15 @@ class LoginParams extends Equatable {
   final String email;
   final String password;
   final String? deviceInfo;
+  final bool rememberMe;
 
   const LoginParams({
     required this.email,
     required this.password,
     this.deviceInfo,
+    required this.rememberMe
   });
 
   @override
-  List<Object?> get props => [email, password];
+  List<Object?> get props => [email, password,rememberMe];
 }

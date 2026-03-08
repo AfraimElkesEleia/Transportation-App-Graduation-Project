@@ -11,11 +11,12 @@ class LoginCubit extends Cubit<LoginState> {
     required String email,
     required String password,
     String? deviceInfo,
+    bool rememberMe = false
   }) async {
     emit(LoginLoading());
 
     final result = await loginUseCase(
-      LoginParams(email: email, password: password, deviceInfo: deviceInfo),
+      LoginParams(email: email, password: password, deviceInfo: deviceInfo,rememberMe:rememberMe),
     );
 
     result.fold(

@@ -6,6 +6,7 @@ abstract class LoginRepository {
     required String email,
     required String password,
     String? deviceInfo,
+    required bool rememberMe,
   });
   ResultVoid forgotPassword({required String email});
   ResultVoid resetPassword({
@@ -14,12 +15,10 @@ abstract class LoginRepository {
     required String newPassword,
     required String confirmPassword,
   });
- ResultVoid changePassword({
+  ResultVoid changePassword({
     required String currentPassword,
     required String newPassword,
     required String confirmPassword,
   });
-  ResultFuture<AuthResponseEntity> refreshToken({
-    required String refreshToken,
-  });
+  ResultFuture<AuthResponseEntity> refreshToken({required String refreshToken});
 }

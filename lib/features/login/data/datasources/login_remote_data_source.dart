@@ -9,6 +9,7 @@ abstract class LoginRemoteDataSource {
     required String email,
     required String password,
     String? deviceInfo,
+    required bool rememberMe
   });
   Future<void> forgotPassword({required String email});
   Future<void> resetPassword({
@@ -86,6 +87,7 @@ class LoginRemoteDataSourceImpl implements LoginRemoteDataSource {
     required String email,
     required String password,
     String? deviceInfo,
+    required bool rememberMe
   }) async {
     try {
       final res = await dio.post(ApiConstants.login, data: {

@@ -40,6 +40,7 @@ class _LoginScreenState extends State<LoginScreen> {
       email:      _emailController.text.trim(),
       password:   _passwordController.text,
       deviceInfo: 'Flutter App',
+      rememberMe:_rememberMe
     );
   }
 
