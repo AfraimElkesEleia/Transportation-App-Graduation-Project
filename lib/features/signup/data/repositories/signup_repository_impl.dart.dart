@@ -48,6 +48,7 @@ class SignupRepositoryImpl implements RegisterRepository {
         accessToken: result.accessToken,
         refreshToken: result.refreshToken,
       );
+      await tokenManager.saveUser(result.user);
       return Right(result);
     } on ServerException catch (e) {
       print('🟠 [Repository] ServerException caught: ${e.message}');

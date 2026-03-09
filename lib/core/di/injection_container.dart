@@ -6,6 +6,13 @@ import 'package:transportation_app/features/login/data/repositories/login_reposi
 import 'package:transportation_app/features/login/domain/repositories/login_repository.dart';
 import 'package:transportation_app/features/login/domain/usecase/login_usecase.dart';
 import 'package:transportation_app/features/login/presentation/cubit/login_cubit/login_cubit.dart';
+import 'package:transportation_app/features/profile/data/datasources/profile_remote_datasource.dart';
+import 'package:transportation_app/features/profile/data/repositories/profile_repository_imp.dart';
+import 'package:transportation_app/features/profile/domain/repositories/profile_repository.dart';
+import 'package:transportation_app/features/profile/domain/usecases/get_profile_usecase.dart';
+import 'package:transportation_app/features/profile/domain/usecases/logout_usecase.dart';
+import 'package:transportation_app/features/profile/presentation/cubit/logout_cubit/logout_cubit.dart';
+import 'package:transportation_app/features/profile/presentation/cubit/profile_cubit/profile_cubit.dart';
 import 'package:transportation_app/features/signup/data/datasources/auth_remote_data_source.dart';
 import 'package:transportation_app/features/signup/data/repositories/signup_repository_impl.dart.dart';
 import 'package:transportation_app/features/signup/domain/repositories/register_repository.dart';
@@ -43,4 +50,18 @@ Future<void> init() async {
   sl.registerLazySingleton<LoginRemoteDataSource>(
     () => LoginRemoteDataSourceImpl(dio: DioClient.getInstance()),
   );
+  sl.registerLazySingleton<ProfileRemoteDatasource>(
+  () => ProfileRemoteDataSourceImp(dio: DioClient.getInstance()),
+);
+
+sl.registerLazySingleton<ProfileRepository>(
+  () => ProfileRepositoryImp(
+    remoteDataSource: sl<ProfileRemoteDatasource>(),
+    tokenManager:     sl<TokenManager>(),
+  ),
+);
+sl.registerLazySingleton(() => GetProfileUseCase(sl<ProfileRepository>()));
+sl.registerLazySingleton(() => LogoutUseCase(sl<ProfileRepository>()));
+sl.registerFactory(() => ProfileCubit(getProfileUseCase: sl<GetProfileUseCase>()));
+sl.registerFactory(() => LogoutCubit(logoutUseCase: sl<LogoutUseCase>()));
 }

@@ -9,14 +9,11 @@ class ProfileCard extends StatelessWidget {
   /// The user's email displayed below the name.
   final String email;
 
-  /// Callback when the edit button is tapped.
-  final VoidCallback? onEditTap;
 
   const ProfileCard({
     super.key,
     required this.fullName,
     required this.email,
-    this.onEditTap,
   });
 
   @override
@@ -70,14 +67,7 @@ class ProfileCard extends StatelessWidget {
                   ),
                 ],
               ),
-              Positioned(
-                top: 0,
-                right: 0,
-                child: IconButton(
-                  icon: const Icon(Icons.edit, color: Colors.white),
-                  onPressed: onEditTap,
-                ),
-              ),
+        
             ],
           ),
           const SizedBox(height: 20),
