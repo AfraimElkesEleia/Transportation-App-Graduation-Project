@@ -11,6 +11,8 @@ import 'package:transportation_app/features/profile/data/repositories/profile_re
 import 'package:transportation_app/features/profile/domain/repositories/profile_repository.dart';
 import 'package:transportation_app/features/profile/domain/usecases/get_profile_usecase.dart';
 import 'package:transportation_app/features/profile/domain/usecases/logout_usecase.dart';
+import 'package:transportation_app/features/profile/domain/usecases/update_profile_picture_usecase.dart';
+import 'package:transportation_app/features/profile/domain/usecases/update_profile_usecase.dart';
 import 'package:transportation_app/features/profile/presentation/cubit/logout_cubit/logout_cubit.dart';
 import 'package:transportation_app/features/profile/presentation/cubit/profile_cubit/profile_cubit.dart';
 import 'package:transportation_app/features/signup/data/datasources/auth_remote_data_source.dart';
@@ -51,7 +53,7 @@ Future<void> init() async {
     () => LoginRemoteDataSourceImpl(dio: DioClient.getInstance()),
   );
   sl.registerLazySingleton<ProfileRemoteDatasource>(
-  () => ProfileRemoteDataSourceImp(dio: DioClient.getInstance()),
+  () => ProfileRemoteDatasourceImpl(dio: DioClient.getInstance()),
 );
 
 sl.registerLazySingleton<ProfileRepository>(
@@ -62,6 +64,12 @@ sl.registerLazySingleton<ProfileRepository>(
 );
 sl.registerLazySingleton(() => GetProfileUseCase(sl<ProfileRepository>()));
 sl.registerLazySingleton(() => LogoutUseCase(sl<ProfileRepository>()));
-sl.registerFactory(() => ProfileCubit(getProfileUseCase: sl<GetProfileUseCase>()));
+sl.registerLazySingleton(() => UpdateProfileUseCase(sl<ProfileRepository>()));
+sl.registerLazySingleton(() => UploadProfilePictureUseCase(sl<ProfileRepository>()));
+sl.registerFactory(() => ProfileCubit(
+  getProfileUseCase:   sl<GetProfileUseCase>(),
+  updateProfileUseCase: sl<UpdateProfileUseCase>(),
+  uploadPictureUseCase: sl<UploadProfilePictureUseCase>(),
+));
 sl.registerFactory(() => LogoutCubit(logoutUseCase: sl<LogoutUseCase>()));
 }

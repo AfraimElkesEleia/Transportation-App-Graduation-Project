@@ -4,10 +4,14 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 class DropdownCitiesMenu extends StatelessWidget {
   final String hintText;
   final TextEditingController controller;
+  final String? errorText;
+  final void Function(String)? onSelected;
   const DropdownCitiesMenu({
     super.key,
     required this.hintText,
     required this.controller,
+    this.errorText,
+    this.onSelected,
   });
 
   static final List<String> egyptCities = [
@@ -103,62 +107,109 @@ class DropdownCitiesMenu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DropdownMenu(
-      controller: controller,
-      menuStyle: MenuStyle(
-        maximumSize: WidgetStatePropertyAll(
-          Size(double.infinity, MediaQuery.sizeOf(context).height / 3.5),
-        ),
-      ),
-      enableFilter: true,
-      enableSearch: true,
-      width: MediaQuery.sizeOf(context).width - 40,
-      hintText: hintText,
-      textStyle: TextStyle(color: Colors.white),
-      leadingIcon: Icon(FontAwesomeIcons.mapLocation, color: Color(0xFF4f8c9a)),
-      trailingIcon: const Icon(
-        Icons.keyboard_arrow_down_rounded,
-        color: Color(0xFF4f8c9a),
-        size: 28,
-      ),
-      inputDecorationTheme: InputDecorationTheme(
-        contentPadding: EdgeInsets.all(16),
-        hintStyle: const TextStyle(color: Color(0xFF4f8c9a)),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(20),
-          borderSide: BorderSide(color: Color(0xFF4f8c9a), width: 5),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(20),
-          borderSide: const BorderSide(color: Color(0xFF4f8c9a), width: 2),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(20),
-          borderSide: const BorderSide(color: Color(0xFF4f8c9a), width: 2.5),
-        ),
-      ),
-      dropdownMenuEntries: egyptCities.map((city) {
-        return DropdownMenuEntry(
-          label: city,
-          value: city,
-          labelWidget: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                city,
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
-                ),
-              ),
-              Text(
-                egyptCitiesArabic[city] ?? "",
-                style: TextStyle(fontSize: 12, color: Colors.blueGrey),
-              ),
-            ],
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        DropdownMenu(
+          controller: controller,
+          onSelected: (value) => onSelected?.call(value ?? ''),
+          menuStyle: MenuStyle(
+            maximumSize: WidgetStatePropertyAll(
+              Size(double.infinity, MediaQuery.sizeOf(context).height / 3.5),
+            ),
           ),
-        );
-      }).toList(),
+          enableFilter: true,
+          enableSearch: true,
+          width: MediaQuery.sizeOf(context).width - 40,
+          hintText: hintText,
+          textStyle: const TextStyle(color: Colors.white),
+          leadingIcon: Icon(
+            FontAwesomeIcons.mapLocation,
+            color: Color(0xFF4f8c9a),
+          ),
+          trailingIcon: const Icon(
+            Icons.keyboard_arrow_down_rounded,
+            color: Color(0xFF4f8c9a),
+            size: 28,
+          ),
+          inputDecorationTheme: InputDecorationTheme(
+            contentPadding: const EdgeInsets.all(16),
+            hintStyle: const TextStyle(color: Color(0xFF4f8c9a)),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(20),
+              borderSide: BorderSide(
+                color: errorText != null
+                    ? Colors.redAccent
+                    : const Color(0xFF4f8c9a),
+                width: 2,
+              ),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(20),
+              borderSide: BorderSide(
+                color: errorText != null
+                    ? Colors.redAccent
+                    : const Color(0xFF4f8c9a),
+                width: 2,
+              ),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(20),
+              borderSide: BorderSide(
+                color: errorText != null
+                    ? Colors.redAccent
+                    : const Color(0xFF4f8c9a),
+                width: 2.5,
+              ),
+            ),
+          ),
+          dropdownMenuEntries: egyptCities.map((city) {
+            return DropdownMenuEntry(
+              label: city,
+              value: city,
+              labelWidget: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    city,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                  ),
+                  Text(
+                    egyptCitiesArabic[city] ?? '',
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: Colors.blueGrey,
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }).toList(),
+        ),
+        if (errorText != null) ...[
+          const SizedBox(height: 6),
+          Padding(
+            padding: const EdgeInsets.only(left: 12),
+            child: Row(
+              children: [
+                const Icon(
+                  Icons.error_outline,
+                  color: Colors.redAccent,
+                  size: 14,
+                ),
+                const SizedBox(width: 4),
+                Text(
+                  errorText!,
+                  style: const TextStyle(color: Colors.redAccent, fontSize: 12),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ],
     );
   }
 }

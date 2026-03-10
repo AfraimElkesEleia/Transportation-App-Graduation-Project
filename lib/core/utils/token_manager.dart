@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:transportation_app/features/profile/domain/entities/profile_entity.dart';
 import 'package:transportation_app/features/signup/domain/entities/user_entity.dart';
 
 class TokenManager {
@@ -33,32 +34,44 @@ class TokenManager {
     return value == 'true';
   }
 
-  Future<void> saveUser(UserEntity user) async {
+  Future<void> saveUser(ProfileEntity user) async {
     final map = {
       'userId': user.userId,
+      'firstName': user.firstName,
+      'lastName': user.lastName,
+      'familyName': user.familyName,
       'email': user.email,
-      'fullName': user.fullName,
       'phoneNumber': user.phoneNumber,
       'gender': user.gender,
       'countryCode': user.countryCode,
       'countryName': user.countryName,
+      'profilePictureUrl': user.profilePictureUrl,
+      'totalTrips': user.totalTrips,
+      'totalDistanceKm': user.totalDistanceKm,
+      'walletBalance': user.walletBalance,
     };
     await _storage.write(key: _cachedUserKey, value: jsonEncode(map));
   }
 
-  Future<UserEntity?> getUser() async {
+  Future<ProfileEntity?> getUser() async {
     final raw = await _storage.read(key: _cachedUserKey);
     if (raw == null) return null;
 
     final map = jsonDecode(raw) as Map<String, dynamic>;
-    return UserEntity(
+    return ProfileEntity(
       userId: map['userId'] as int,
+      firstName: map['firstName'] as String? ?? '',
+      lastName: map['lastName'] as String? ?? '',
+      familyName: map['familyName'] as String? ?? '',
       email: map['email'] as String,
-      fullName: map['fullName'] as String,
       phoneNumber: map['phoneNumber'] as String,
-      gender: map['gender'] as String,
-      countryCode: map['countryCode'] as String,
-      countryName: map['countryName'] as String,
+      gender: map['gender'] as String? ?? '',
+      countryCode: map['countryCode'] as String? ?? '',
+      countryName: map['countryName'] as String? ?? '',
+      profilePictureUrl: map['profilePictureUrl'] as String?,
+      totalTrips: map['totalTrips'] as int?,
+      totalDistanceKm: (map['totalDistanceKm'] as num?)?.toDouble(),
+      walletBalance: (map['walletBalance'] as num?)?.toDouble(),
     );
   }
 

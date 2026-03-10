@@ -35,7 +35,6 @@ class LoginRepositoryImp extends LoginRepository {
         refreshToken: result.refreshToken,
       );
       await tokenManager.saveRememberMe(rememberMe);
-      await tokenManager.saveUser(result.user);
       return Right(result);
     } on UnauthorizedException catch (e) {
       return Left(UnauthorizedFailure(message: e.message));
@@ -114,7 +113,6 @@ class LoginRepositoryImp extends LoginRepository {
         accessToken: result.accessToken,
         refreshToken: result.refreshToken,
       );
-      await tokenManager.saveUser(result.user);
       return Right(result);
     } on ServerException catch (e) {
       return Left(ServerFailure(message: e.message));

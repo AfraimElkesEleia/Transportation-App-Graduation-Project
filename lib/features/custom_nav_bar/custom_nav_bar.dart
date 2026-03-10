@@ -8,6 +8,8 @@ import 'package:transportation_app/features/home/presentation/views/screen/home_
 import 'package:transportation_app/features/my_tickets/presentation/views/screen/my_tickets.dart';
 import 'package:transportation_app/features/profile/domain/usecases/get_profile_usecase.dart';
 import 'package:transportation_app/features/profile/domain/usecases/logout_usecase.dart';
+import 'package:transportation_app/features/profile/domain/usecases/update_profile_picture_usecase.dart';
+import 'package:transportation_app/features/profile/domain/usecases/update_profile_usecase.dart';
 import 'package:transportation_app/features/profile/presentation/cubit/logout_cubit/logout_cubit.dart';
 import 'package:transportation_app/features/profile/presentation/cubit/profile_cubit/profile_cubit.dart';
 import 'package:transportation_app/features/profile/presentation/views/screen/profile_screen.dart';
@@ -45,9 +47,11 @@ class CustomNavBarState extends State<CustomNavBar> {
           create: (context) => LogoutCubit(logoutUseCase: sl<LogoutUseCase>()),
         ),
         BlocProvider(
-          create: (context) =>
-              ProfileCubit(getProfileUseCase: sl<GetProfileUseCase>())
-                ..loadProfile(),
+          create: (context) => ProfileCubit(
+            getProfileUseCase: sl<GetProfileUseCase>(),
+            updateProfileUseCase: sl<UpdateProfileUseCase>(),
+            uploadPictureUseCase: sl<UploadProfilePictureUseCase>(),
+          )..loadProfile(),
         ),
       ],
       child: const ProfileScreen(),

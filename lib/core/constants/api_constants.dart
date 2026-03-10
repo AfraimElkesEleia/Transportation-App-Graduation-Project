@@ -13,4 +13,6 @@ class ApiConstants {
   static const String resetPassword = '/Auth/reset-password';
   static const String changePassword = '/Auth/change-password';
   static const String countries = '/Countries';
+  static const String userMe = '/Users/me';
+  static const String userProfilePicture = '/Users/me/profile-picture';
 }

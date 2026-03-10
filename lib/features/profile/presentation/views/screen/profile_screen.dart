@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:transportation_app/core/helper/extensions.dart';
 import 'package:transportation_app/core/routing/routes.dart';
 import 'package:transportation_app/core/widgets/basic_container.dart';
 import 'package:transportation_app/features/profile/presentation/cubit/logout_cubit/logout_cubit.dart';
@@ -25,12 +26,10 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileViewState extends State<ProfileScreen> {
-  bool _isEditing = false;
   final fullNameController = TextEditingController(text: 'Abdelrhman Emad');
   final emailController = TextEditingController(text: 'Abdoemad@gmail.com');
   final phoneController = TextEditingController(text: '+20 1147736580');
   final locationController = TextEditingController(text: 'Cairo, Egypt');
-  final memberSinceController = TextEditingController(text: 'Jan 2024');
 
   @override
   void dispose() {
@@ -38,7 +37,6 @@ class _ProfileViewState extends State<ProfileScreen> {
     emailController.dispose();
     phoneController.dispose();
     locationController.dispose();
-    memberSinceController.dispose();
     super.dispose();
   }
 
@@ -47,7 +45,6 @@ class _ProfileViewState extends State<ProfileScreen> {
     emailController.text = state.profile.email;
     phoneController.text = state.profile.phoneNumber;
     locationController.text = state.profile.countryName;
-    memberSinceController.text = ''; // fill when backend provides it
   }
 
   // ── Logout confirmation dialog ───────────────────────────────
@@ -145,7 +142,11 @@ class _ProfileViewState extends State<ProfileScreen> {
                   ),
                 );
               }
-              final profile = state is ProfileLoaded ? state.profile : null;
+              final profile = state is ProfileLoaded
+                  ? state.profile
+                  : state is ProfileUpdateSuccess
+                  ? state.profile
+                  : null;
               return SingleChildScrollView(
                 padding: const EdgeInsets.all(16),
                 child: Column(
@@ -155,6 +156,15 @@ class _ProfileViewState extends State<ProfileScreen> {
                     ProfileCard(
                       fullName: profile?.fullName ?? '',
                       email: profile?.email ?? '',
+                      onEditTap: () {
+                        context.pushNamed(
+                          AppRoutes.editProfile,
+                          arguments: {
+                            'profile': profile,
+                            'cubit': context.read<ProfileCubit>(),
+                          },
+                        );
+                      },
                     ),
                     const SizedBox(height: 20),
                     PersonalInfoSection(
@@ -162,22 +172,6 @@ class _ProfileViewState extends State<ProfileScreen> {
                       emailController: emailController,
                       phoneController: phoneController,
                       locationController: locationController,
-                      memberSinceController: memberSinceController,
-                      isEditing: _isEditing,
-                      onSave: () {
-                        setState(() => _isEditing = false);
-                      },
-                      onEditTap: () => setState(() {
-                        _isEditing = true;
-                      }),
-                      onCancel: () {
-                        setState(() {
-                          _isEditing = false;
-                        });
-                        _fillControllers(
-                          context.read<ProfileCubit>().state as ProfileLoaded,
-                        );
-                      },
                     ),
                     const SizedBox(height: 20),
                     const QuickActionsSection(),
