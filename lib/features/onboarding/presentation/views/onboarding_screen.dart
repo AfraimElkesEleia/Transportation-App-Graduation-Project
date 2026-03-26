@@ -91,16 +91,16 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       children: [
         TextButton(
           onPressed: () {
-            context.pushReplacementNamed(AppRoutes.homeScreen);
+            context.pushNamedAndRemoveuntil(
+              AppRoutes.loginScreen,
+              predicate: (route) => false,
+            );
           },
           style: TextButton.styleFrom(
             backgroundColor: Colors.transparent,
             elevation: 0,
           ),
-          child: Text(
-            "Skip",
-            style: AppStyles.semiBold18White(context)
-          ),
+          child: Text("Skip", style: AppStyles.semiBold18White(context)),
         ),
       ],
     );

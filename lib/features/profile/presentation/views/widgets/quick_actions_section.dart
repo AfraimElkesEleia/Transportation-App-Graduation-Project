@@ -11,10 +11,7 @@ class QuickActionsSection extends StatelessWidget {
       title: 'Quick Actions',
       icon: Icons.flash_on,
       children: [
-        _buildActionTile(Icons.train, 'My Trips'),
         _buildActionTile(Icons.history, 'Booking History'),
-        _buildActionTile(Icons.timeline, 'Live Train Status'),
-        _buildActionTile(Icons.credit_card, 'Payment Methods'),
         _buildActionTile(Icons.lock, 'Privacy & Security'),
       ],
     );

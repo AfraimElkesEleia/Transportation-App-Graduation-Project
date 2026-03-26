@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:transportation_app/core/helper/extensions.dart';
 import 'package:transportation_app/core/helper/spacing.dart';
+import 'package:transportation_app/core/routing/routes.dart';
 import 'package:transportation_app/core/theming/colors.dart';
 import 'package:transportation_app/core/theming/font_weight_helper.dart';
 import 'package:transportation_app/core/widgets/block_container.dart';
@@ -21,6 +23,7 @@ class _PlanYourJourneyBlockState extends State<PlanYourJourneyBlock>
     with SingleTickerProviderStateMixin {
   late final TextEditingController toController;
   late final TextEditingController fromController;
+  late final TextEditingController dateController;
   late final Animation<double> swapAnimation;
   late final AnimationController animationController;
   Row planYourJourney() {
@@ -39,10 +42,14 @@ class _PlanYourJourneyBlockState extends State<PlanYourJourneyBlock>
     );
   }
 
+  String? _fromError;
+  String? _toError;
+  String? _dateError;
   @override
   void initState() {
     toController = TextEditingController();
     fromController = TextEditingController();
+    dateController = TextEditingController();
     animationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 300),
@@ -57,7 +64,43 @@ class _PlanYourJourneyBlockState extends State<PlanYourJourneyBlock>
   void dispose() {
     fromController.dispose();
     toController.dispose();
+    dateController.dispose();
     super.dispose();
+  }
+
+  bool _validate() {
+    String? fromErr;
+    String? toErr;
+    String? dateErr;
+
+    if (fromController.text.trim().isEmpty) {
+      fromErr = 'Please select a departure city';
+    }
+    if (toController.text.trim().isEmpty) {
+      toErr = 'Please select a destination city';
+    }
+    if (fromController.text.trim().isNotEmpty &&
+        toController.text.trim().isNotEmpty &&
+        fromController.text.trim() == toController.text.trim()) {
+      toErr = 'Destination must differ from departure';
+    }
+    if (dateController.text.trim().isEmpty) {
+      dateErr = 'Please select a travel date';
+    }
+
+    setState(() {
+      _fromError = fromErr;
+      _toError = toErr;
+      _dateError = dateErr;
+    });
+
+    return fromErr == null && toErr == null && dateErr == null;
+  }
+
+  void _onSearch() {
+    if (!_validate()) return;
+    // // TODO: navigate to search results screen
+    context.pushNamed(AppRoutes.searchScreen);
   }
 
   @override
@@ -73,6 +116,8 @@ class _PlanYourJourneyBlockState extends State<PlanYourJourneyBlock>
           DropdownCitiesMenu(
             hintText: "From (e.g...Cairo,Alex)",
             controller: toController,
+            errorText: _fromError,
+            onSelected: (_) => setState(() => _fromError = null),
           ),
           verticalSpace(space: 12),
           Center(
@@ -109,13 +154,15 @@ class _PlanYourJourneyBlockState extends State<PlanYourJourneyBlock>
           DropdownCitiesMenu(
             hintText: "To (e.g...Luxor,Sohag)",
             controller: fromController,
+            errorText: _toError,
+            onSelected: (_) => setState(() => _toError = null),
           ),
           verticalSpace(space: 12),
-          DateTimeField(),
+          DateTimeField(controller: dateController, errorText: _dateError),
           verticalSpace(space: 12),
           FilterSection(),
           verticalSpace(space: 12),
-          SearchTripButton(),
+          SearchTripButton(onPressed: _onSearch),
         ],
       ),
     );

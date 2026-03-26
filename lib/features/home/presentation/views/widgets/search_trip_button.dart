@@ -1,9 +1,9 @@
-
 import 'package:flutter/material.dart';
 import 'package:transportation_app/core/helper/spacing.dart';
 
 class SearchTripButton extends StatelessWidget {
-  const SearchTripButton({super.key});
+  final VoidCallback onPressed;
+  const SearchTripButton({super.key, required this.onPressed});
 
   @override
   Widget build(BuildContext context) {
@@ -15,7 +15,7 @@ class SearchTripButton extends StatelessWidget {
           borderRadius: BorderRadiusGeometry.circular(16),
         ),
       ),
-      onPressed: () {},
+      onPressed: onPressed,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
