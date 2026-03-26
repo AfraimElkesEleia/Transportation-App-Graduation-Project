@@ -6,6 +6,7 @@ import 'package:transportation_app/core/routing/routes.dart';
 import 'package:transportation_app/core/validators/app_validators.dart';
 import 'package:transportation_app/core/widgets/app_gradient_button.dart';
 import 'package:transportation_app/core/widgets/auth_background.dart';
+import 'package:transportation_app/core/widgets/profile_picture_picker.dart';
 import 'package:transportation_app/features/signup/presentation/cubit/signup_cubit.dart';
 import 'package:transportation_app/features/signup/presentation/cubit/signup_state.dart';
 import 'package:transportation_app/features/signup/presentation/widgets/gender.dart';
@@ -51,7 +52,7 @@ class _SignupScreenState extends State<SignupScreen> {
   String? _genderError;
   String? _dobError;
   String? _countryError;
-
+  String? _imagePath;
   @override
   void dispose() {
     _firstNameController.dispose();
@@ -107,6 +108,7 @@ class _SignupScreenState extends State<SignupScreen> {
       nationalIdNumber: _nationalIdController.text.isEmpty
           ? null
           : _nationalIdController.text,
+      imagePath: _imagePath,
     );
   }
 
@@ -146,6 +148,15 @@ class _SignupScreenState extends State<SignupScreen> {
               children: [
                 const SizedBox(height: 20),
                 SignupHeader(),
+                Center(
+                  child: ProfilePicturePicker(
+                    initials: _firstNameController.text.isNotEmpty
+                        ? _firstNameController.text[0].toUpperCase()
+                        : null,
+                    onImagePicked: (path) => setState(() => _imagePath = path),
+                  ),
+                ),
+                const SizedBox(height: 20),
                 SectionLabel(label: 'Personal Information'),
                 const SizedBox(height: 16),
                 SignupPersonalSection(

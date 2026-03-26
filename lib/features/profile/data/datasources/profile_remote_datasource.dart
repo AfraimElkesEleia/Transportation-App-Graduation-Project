@@ -36,40 +36,42 @@ class ProfileRemoteDatasourceImpl implements ProfileRemoteDatasource {
     }
   }
 
- @override
-Future<ProfileModel> updateProfile({
-  required String firstName,
-  required String lastName,
-  required String familyName,
-  required String email,
-  required String phoneNumber,
-}) async {
-  try {
-    final res = await dio.put(
-      ApiConstants.userMe,
-      data: {
-        'firstName':   firstName,
-        'lastName':    lastName,
-        'familyName':  familyName,
-        'email':       email,
-        'phoneNumber': phoneNumber,
-      },
-    );
-    final body = res.data as Map<String, dynamic>;
-    if (body['success'] != true) {
-      final errors = (body['errors'] as List<dynamic>?)
-              ?.map((e) => e.toString())
-              .toList() ?? [];
-      throw ServerException(
-        message: body['message'] ?? 'Update failed',
-        errors:  errors,
+  @override
+  Future<ProfileModel> updateProfile({
+    required String firstName,
+    required String lastName,
+    required String familyName,
+    required String email,
+    required String phoneNumber,
+  }) async {
+    try {
+      final res = await dio.put(
+        ApiConstants.userMe,
+        data: {
+          'firstName': firstName,
+          'lastName': lastName,
+          'familyName': familyName,
+          'email': email,
+          'phoneNumber': phoneNumber,
+        },
       );
+      final body = res.data as Map<String, dynamic>;
+      if (body['success'] != true) {
+        final errors =
+            (body['errors'] as List<dynamic>?)
+                ?.map((e) => e.toString())
+                .toList() ??
+            [];
+        throw ServerException(
+          message: body['message'] ?? 'Update failed',
+          errors: errors,
+        );
+      }
+      return await getProfile();
+    } on DioException catch (e) {
+      _handleDio(e);
     }
-    return await getProfile();
-  } on DioException catch (e) {
-    _handleDio(e);
   }
-}
 
   @override
   Future<String> uploadProfilePicture({required String filePath}) async {
@@ -92,7 +94,11 @@ Future<ProfileModel> updateProfile({
       }
 
       final data = body['data'] as Map<String, dynamic>;
-      return data['profilePictureUrl'] as String;
+      final rawUrl = data['profilePictureUrl'] as String;
+      final fullUrl = rawUrl.startsWith('http')
+          ? rawUrl
+          : 'http://rehlabussines-001-site1.anytempurl.com/$rawUrl';
+      return fullUrl;
     } on DioException catch (e) {
       _handleDio(e);
     }

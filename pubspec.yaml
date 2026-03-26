@@ -44,6 +44,7 @@ dependencies:
   dio: ^5.9.2
   get_it: ^9.2.1
   equatable: ^2.0.8
+  image_picker: ^1.2.1
 
 dev_dependencies:
   flutter_test:

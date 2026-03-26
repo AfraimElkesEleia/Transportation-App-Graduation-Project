@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:transportation_app/core/constants/api_constants.dart';
 import 'package:transportation_app/core/helper/extensions.dart';
 import 'package:transportation_app/core/routing/routes.dart';
 import 'package:transportation_app/core/widgets/basic_container.dart';
@@ -156,6 +157,9 @@ class _ProfileViewState extends State<ProfileScreen> {
                     ProfileCard(
                       fullName: profile?.fullName ?? '',
                       email: profile?.email ?? '',
+                      profilePictureUrl: ApiConstants.mediaUrl(
+                        profile?.profilePictureUrl,
+                      ),
                       onEditTap: () {
                         context.pushNamed(
                           AppRoutes.editProfile,

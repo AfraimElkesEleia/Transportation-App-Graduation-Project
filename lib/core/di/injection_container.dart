@@ -35,7 +35,12 @@ Future<void> init() async {
     ),
   );
   sl.registerLazySingleton(() => RegisterUseCase(sl<RegisterRepository>()));
-  sl.registerFactory(() => SignupCubit(registerUseCase: sl<RegisterUseCase>()));
+  sl.registerFactory(
+    () => SignupCubit(
+      registerUseCase: sl<RegisterUseCase>(),
+      uploadPictureUseCase: sl<UploadProfilePictureUseCase>(),
+    ),
+  );
 
   sl.registerFactory<LoginCubit>(
     () => LoginCubit(loginUseCase: sl<LoginUsecase>()),
@@ -53,23 +58,27 @@ Future<void> init() async {
     () => LoginRemoteDataSourceImpl(dio: DioClient.getInstance()),
   );
   sl.registerLazySingleton<ProfileRemoteDatasource>(
-  () => ProfileRemoteDatasourceImpl(dio: DioClient.getInstance()),
-);
+    () => ProfileRemoteDatasourceImpl(dio: DioClient.getInstance()),
+  );
 
-sl.registerLazySingleton<ProfileRepository>(
-  () => ProfileRepositoryImp(
-    remoteDataSource: sl<ProfileRemoteDatasource>(),
-    tokenManager:     sl<TokenManager>(),
-  ),
-);
-sl.registerLazySingleton(() => GetProfileUseCase(sl<ProfileRepository>()));
-sl.registerLazySingleton(() => LogoutUseCase(sl<ProfileRepository>()));
-sl.registerLazySingleton(() => UpdateProfileUseCase(sl<ProfileRepository>()));
-sl.registerLazySingleton(() => UploadProfilePictureUseCase(sl<ProfileRepository>()));
-sl.registerFactory(() => ProfileCubit(
-  getProfileUseCase:   sl<GetProfileUseCase>(),
-  updateProfileUseCase: sl<UpdateProfileUseCase>(),
-  uploadPictureUseCase: sl<UploadProfilePictureUseCase>(),
-));
-sl.registerFactory(() => LogoutCubit(logoutUseCase: sl<LogoutUseCase>()));
+  sl.registerLazySingleton<ProfileRepository>(
+    () => ProfileRepositoryImp(
+      remoteDataSource: sl<ProfileRemoteDatasource>(),
+      tokenManager: sl<TokenManager>(),
+    ),
+  );
+  sl.registerLazySingleton(() => GetProfileUseCase(sl<ProfileRepository>()));
+  sl.registerLazySingleton(() => LogoutUseCase(sl<ProfileRepository>()));
+  sl.registerLazySingleton(() => UpdateProfileUseCase(sl<ProfileRepository>()));
+  sl.registerLazySingleton(
+    () => UploadProfilePictureUseCase(sl<ProfileRepository>()),
+  );
+  sl.registerFactory(
+    () => ProfileCubit(
+      getProfileUseCase: sl<GetProfileUseCase>(),
+      updateProfileUseCase: sl<UpdateProfileUseCase>(),
+      uploadPictureUseCase: sl<UploadProfilePictureUseCase>(),
+    ),
+  );
+  sl.registerFactory(() => LogoutCubit(logoutUseCase: sl<LogoutUseCase>()));
 }

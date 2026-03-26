@@ -16,6 +16,11 @@ class ProfileModel extends ProfileEntity {
     super.totalDistanceKm,
     super.walletBalance,
   });
+  static String? _buildImageUrl(String? path) {
+  if (path == null || path.isEmpty) return null;
+  if (path.startsWith('http')) return path;  // already full URL
+  return 'http://rehlabussines-001-site1.anytempurl.com/$path';
+}
 
   factory ProfileModel.fromJson(Map<String, dynamic> json) {
     return ProfileModel(
