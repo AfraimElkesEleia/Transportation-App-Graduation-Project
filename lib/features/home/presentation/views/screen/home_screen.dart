@@ -8,7 +8,6 @@ import 'package:transportation_app/features/home/presentation/views/widgets/app_
 import 'package:transportation_app/features/home/presentation/views/widgets/latest_news_block.dart';
 import 'package:transportation_app/features/home/presentation/views/widgets/plan_your_journey_block.dart';
 import 'package:transportation_app/features/home/presentation/views/widgets/popular_trip_block.dart';
-import 'package:transportation_app/features/home/presentation/views/widgets/private_car_rides_block.dart';
 import 'package:transportation_app/features/home/presentation/views/widgets/recent_searches_block.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -46,7 +45,6 @@ class HomeScreen extends StatelessWidget {
             ),
           ),
         ),
-        SliverToBoxAdapter(child: PrivateCarRidesBlock()),
         SliverToBoxAdapter(child: LatestNewsBlock()),
       ],
     );

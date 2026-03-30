@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:transportation_app/features/profile/domain/entities/profile_entity.dart';
-import 'package:transportation_app/features/signup/domain/entities/user_entity.dart';
 
 class TokenManager {
   static const _storage = FlutterSecureStorage();

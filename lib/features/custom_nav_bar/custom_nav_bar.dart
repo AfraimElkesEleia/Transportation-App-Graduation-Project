@@ -35,7 +35,7 @@ class CustomNavBarState extends State<CustomNavBar> {
     NavItem(icon: FontAwesomeIcons.house, label: "Home"),
     NavItem(icon: FontAwesomeIcons.ticket, label: "Tickets"),
     NavItem(icon: FontAwesomeIcons.user, label: "Profile"),
-    NavItem(icon: FontAwesomeIcons.bell, label: "More"),
+    NavItem(icon: FontAwesomeIcons.car, label: "Carpool"),
   ];
 
   late final List<Widget> _screens = [
