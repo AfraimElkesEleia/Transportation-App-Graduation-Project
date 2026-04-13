@@ -62,8 +62,8 @@ class AppRouter {
             create: (_) => SearchCubit(
               searchTripsUseCase: sl<SearchTripsUseCase>(),
               searchIndirectTripsUseCase: sl<SearchIndirectTripsUseCase>(),
-            )..search(params), 
-            child: const TransportSearchScreen(),
+            )..search(params),
+            child: TransportSearchScreen(searchParams: params),
           ),
         );
       case AppRoutes.resultScreen:

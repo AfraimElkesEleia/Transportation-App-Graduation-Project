@@ -17,6 +17,7 @@ class SearchCubit extends Cubit<SearchState> {
   }) : super(SearchInitial());
 
   Future<void> search(SearchParams params) async {
+    if (isClosed) return;
     emit(SearchLoading());
 
     // Both endpoints in parallel
@@ -24,7 +25,7 @@ class SearchCubit extends Cubit<SearchState> {
       searchTripsUseCase(params),
       searchIndirectTripsUseCase(params),
     ]);
-
+    if (isClosed) return;
     final directResult = results[0];
     final indirectResult = results[1];
 
@@ -63,6 +64,7 @@ class SearchCubit extends Cubit<SearchState> {
   }
 
   Future<void> applyFilters(SearchParams newParams) async {
+    if (isClosed) return;
     final current = state;
     if (current is! SearchLoaded) return;
 
@@ -74,6 +76,7 @@ class SearchCubit extends Cubit<SearchState> {
 
     if (serverParamsChanged) {
       await search(newParams);
+      if (isClosed) return;
     } else {
       final filtered = _applyClientFilters(
         directTrips: current.directTrips,

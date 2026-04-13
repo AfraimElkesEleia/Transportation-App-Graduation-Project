@@ -13,7 +13,8 @@ import 'package:transportation_app/features/search/presentation/views/widgets/se
 import 'package:transportation_app/features/search/presentation/views/widgets/search_tab_bar.dart';
 
 class TransportSearchScreen extends StatefulWidget {
-  const TransportSearchScreen({super.key});
+  final SearchParams searchParams;
+  const TransportSearchScreen({super.key,required this.searchParams});
 
   @override
   State<TransportSearchScreen> createState() => _TransportSearchScreenState();
@@ -49,7 +50,6 @@ class _TransportSearchScreenState extends State<TransportSearchScreen>
 
   @override
   Widget build(BuildContext context) {
-    final params = ModalRoute.of(context)?.settings.arguments as SearchParams?;
     return Scaffold(
       backgroundColor: ColorsManager.searchBg,
       body: SafeArea(
@@ -69,7 +69,7 @@ class _TransportSearchScreenState extends State<TransportSearchScreen>
               children: [
                 // ── Header ─────────────────────────────
                 SearchHeader(
-                  params: state is SearchLoaded ? state.activeParams : null,
+                  params: widget.searchParams,
                   filterCount: filterCount,
                   onFilter: state is SearchLoaded
                       ? () => _openFilter(context, state)
@@ -85,7 +85,7 @@ class _TransportSearchScreenState extends State<TransportSearchScreen>
                 const SizedBox(height: 8),
 
                 // ── Content ────────────────────────────
-                Expanded(child: _buildContent(context, state, params)),
+                Expanded(child: _buildContent(context, state, widget.searchParams)),
               ],
             );
           },
