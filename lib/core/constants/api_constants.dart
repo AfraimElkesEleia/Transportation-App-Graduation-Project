@@ -17,6 +17,9 @@ class ApiConstants {
   static const String countries = '/Countries';
   static const String userMe = '/Users/me';
   static const String userProfilePicture = '/Users/me/profile-picture';
+  static const String stations = '/Stations';
+  static const String search = '/Search';
+  static const String searchIndirect = '/Search/indirect';
   static String? mediaUrl(String? path) {
     if (path == null || path.isEmpty) return null;
     if (path.startsWith('http')) return path;

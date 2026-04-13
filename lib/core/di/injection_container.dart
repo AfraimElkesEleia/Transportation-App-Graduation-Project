@@ -1,6 +1,11 @@
 import 'package:get_it/get_it.dart';
 import 'package:transportation_app/core/networking/dio_client.dart';
 import 'package:transportation_app/core/utils/token_manager.dart';
+import 'package:transportation_app/features/home/data/datasource/stations_remote_datasource.dart';
+import 'package:transportation_app/features/home/data/repositories/stations_repository_imp.dart';
+import 'package:transportation_app/features/home/domain/repositories/station_repository.dart';
+import 'package:transportation_app/features/home/domain/usecases/get_stations_use_case.dart';
+import 'package:transportation_app/features/home/presentation/cubit/stations_cubit.dart';
 import 'package:transportation_app/features/login/data/datasources/login_remote_data_source.dart';
 import 'package:transportation_app/features/login/data/repositories/login_repository_imp.dart';
 import 'package:transportation_app/features/login/domain/repositories/login_repository.dart';
@@ -15,6 +20,12 @@ import 'package:transportation_app/features/profile/domain/usecases/update_profi
 import 'package:transportation_app/features/profile/domain/usecases/update_profile_usecase.dart';
 import 'package:transportation_app/features/profile/presentation/cubit/logout_cubit/logout_cubit.dart';
 import 'package:transportation_app/features/profile/presentation/cubit/profile_cubit/profile_cubit.dart';
+import 'package:transportation_app/features/search/data/datasources/search_remote_datasource.dart';
+import 'package:transportation_app/features/search/data/repositories/search_repository_imp.dart';
+import 'package:transportation_app/features/search/domain/repository/search_repository.dart';
+import 'package:transportation_app/features/search/domain/usecases/search_indirect_trips_usecase.dart';
+import 'package:transportation_app/features/search/domain/usecases/search_trips_usecase.dart';
+import 'package:transportation_app/features/search/presentation/cubit/search_cubit.dart';
 import 'package:transportation_app/features/signup/data/datasources/auth_remote_data_source.dart';
 import 'package:transportation_app/features/signup/data/repositories/signup_repository_impl.dart.dart';
 import 'package:transportation_app/features/signup/domain/repositories/register_repository.dart';
@@ -81,4 +92,25 @@ Future<void> init() async {
     ),
   );
   sl.registerFactory(() => LogoutCubit(logoutUseCase: sl<LogoutUseCase>()));
+  sl.registerLazySingleton<StationsRemoteDatasource>(
+  () => StationsRemoteDatasourceImpl(dio: DioClient.getInstance()),
+);
+sl.registerLazySingleton<StationsRepository>(
+  () => StationsRepositoryImpl(remoteDataSource: sl()),
+);
+sl.registerLazySingleton(() => GetStationsUseCase(sl<StationsRepository>()));
+sl.registerFactory(() => StationsCubit(getStationsUseCase: sl()));
+sl.registerLazySingleton<SearchRemoteDatasource>(
+  () => SearchRemoteDatasourceImpl(dio: DioClient.getInstance()),
+);
+sl.registerLazySingleton<SearchRepository>(
+  () => SearchRepositoryImpl(remoteDataSource: sl()),
+);
+sl.registerLazySingleton(() => SearchTripsUseCase(sl<SearchRepository>()));
+sl.registerLazySingleton(
+    () => SearchIndirectTripsUseCase(sl<SearchRepository>()));
+sl.registerFactory(() => SearchCubit(
+  searchTripsUseCase:         sl(),
+  searchIndirectTripsUseCase: sl(),
+));
 }

@@ -1,5 +1,5 @@
-
 import 'package:flutter/material.dart';
+import 'package:transportation_app/core/theming/colors.dart';
 
 enum SeatStatus { available, selected, taken }
 
@@ -20,7 +20,6 @@ class SeatSelectionScreen extends StatefulWidget {
 class _SeatSelectionScreenState extends State<SeatSelectionScreen> {
   final int pricePerSeat = 250;
 
-  // 4 rows x 4 cols: A, B, C, D
   late List<List<Seat>> seats;
 
   @override
@@ -54,14 +53,17 @@ class _SeatSelectionScreenState extends State<SeatSelectionScreen> {
     ];
   }
 
-  List<Seat> get selectedSeats =>
-      seats.expand((row) => row).where((s) => s.status == SeatStatus.selected).toList();
+  List<Seat> get selectedSeats => seats
+      .expand((row) => row)
+      .where((s) => s.status == SeatStatus.selected)
+      .toList();
 
   void _onSeatTap(Seat seat) {
     if (seat.status == SeatStatus.taken) return;
     setState(() {
-      seat.status =
-          seat.status == SeatStatus.selected ? SeatStatus.available : SeatStatus.selected;
+      seat.status = seat.status == SeatStatus.selected
+          ? SeatStatus.available
+          : SeatStatus.selected;
     });
   }
 
@@ -71,7 +73,7 @@ class _SeatSelectionScreenState extends State<SeatSelectionScreen> {
     final total = selected.length * pricePerSeat;
 
     return Scaffold(
-      backgroundColor: const Color(0xFF0A0E1A),
+      backgroundColor: ColorsManager.seatBg,
       body: SafeArea(
         child: Column(
           children: [
@@ -99,10 +101,14 @@ class _SeatSelectionScreenState extends State<SeatSelectionScreen> {
               width: 42,
               height: 42,
               decoration: BoxDecoration(
-                color: const Color(0xFF1A2535),
+                color: ColorsManager.seatContainerBg,
                 borderRadius: BorderRadius.circular(21),
               ),
-              child: const Icon(Icons.arrow_back, color: Colors.white, size: 20),
+              child: const Icon(
+                Icons.arrow_back,
+                color: Colors.white,
+                size: 20,
+              ),
             ),
           ),
           const Expanded(
@@ -119,7 +125,10 @@ class _SeatSelectionScreenState extends State<SeatSelectionScreen> {
                 SizedBox(height: 2),
                 Text(
                   'Sat, 24 Oct • GoBus VIP',
-                  style: TextStyle(color: Color(0xFF8BA0B8), fontSize: 13),
+                  style: TextStyle(
+                    color: ColorsManager.textMuted,
+                    fontSize: 13,
+                  ),
                 ),
               ],
             ),
@@ -128,10 +137,14 @@ class _SeatSelectionScreenState extends State<SeatSelectionScreen> {
             width: 42,
             height: 42,
             decoration: BoxDecoration(
-              color: const Color(0xFF1A2535),
+              color: ColorsManager.seatContainerBg,
               borderRadius: BorderRadius.circular(21),
             ),
-            child: const Icon(Icons.info_outline, color: Colors.white, size: 20),
+            child: const Icon(
+              Icons.info_outline,
+              color: Colors.white,
+              size: 20,
+            ),
           ),
         ],
       ),
@@ -172,12 +185,12 @@ class _SeatSelectionScreenState extends State<SeatSelectionScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 32),
       child: Container(
         decoration: BoxDecoration(
-          color: const Color(0xFF0F1B2D),
+          color: ColorsManager.surfaceDark,
           borderRadius: BorderRadius.circular(28),
-          border: Border.all(color: const Color(0xFF1E3050), width: 1.5),
+          border: Border.all(color: ColorsManager.borderDim, width: 1.5),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFF00E5FF).withOpacity(0.04),
+              color: ColorsManager.accentCyan.withOpacity(0.04),
               blurRadius: 30,
               spreadRadius: 2,
             ),
@@ -186,17 +199,21 @@ class _SeatSelectionScreenState extends State<SeatSelectionScreen> {
         child: Column(
           children: [
             // Bus top bar
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Icon(Icons.directions_bus_outlined, color: Colors.white38, size: 28),
+                  Icon(
+                    Icons.directions_bus_outlined,
+                    color: Colors.white38,
+                    size: 28,
+                  ),
                   Icon(Icons.navigation, color: Colors.white38, size: 26),
                 ],
               ),
             ),
-            Divider(color: Colors.white12, height: 1),
+            const Divider(color: Colors.white12, height: 1),
             const SizedBox(height: 20),
             // Seat grid
             Padding(
@@ -239,12 +256,12 @@ class _SeatSelectionScreenState extends State<SeatSelectionScreen> {
 
     switch (status) {
       case SeatStatus.selected:
-        bgColor = const Color(0xFF00BFFF);
-        borderColor = const Color(0xFF00E5FF);
+        bgColor = ColorsManager.seatSelected;
+        borderColor = ColorsManager.accentCyan;
         textColor = Colors.white;
         shadows = [
           BoxShadow(
-            color: const Color(0xFF00BFFF).withOpacity(0.6),
+            color: ColorsManager.seatSelected.withOpacity(0.6),
             blurRadius: 14,
             spreadRadius: 2,
           ),
@@ -252,12 +269,12 @@ class _SeatSelectionScreenState extends State<SeatSelectionScreen> {
         break;
       case SeatStatus.available:
         bgColor = Colors.transparent;
-        borderColor = const Color(0xFF1E8A8A);
-        textColor = const Color(0xFF00E5FF);
+        borderColor = ColorsManager.seatBorderAvail;
+        textColor = ColorsManager.accentCyan;
         break;
       case SeatStatus.taken:
-        bgColor = const Color(0xFF1A2535);
-        borderColor = const Color(0xFF2A3545);
+        bgColor = ColorsManager.seatContainerBg;
+        borderColor = ColorsManager.seatBorderTaken;
         textColor = Colors.white24;
         break;
     }
@@ -302,7 +319,10 @@ class _SeatSelectionScreenState extends State<SeatSelectionScreen> {
                   RichText(
                     text: TextSpan(
                       text: 'Selected: ',
-                      style: const TextStyle(color: Colors.white70, fontSize: 15),
+                      style: const TextStyle(
+                        color: Colors.white70,
+                        fontSize: 15,
+                      ),
                       children: [
                         TextSpan(
                           text: '${selected.length} Seats',
@@ -318,7 +338,7 @@ class _SeatSelectionScreenState extends State<SeatSelectionScreen> {
                   Text(
                     seatLabels.isEmpty ? 'No seats selected' : seatLabels,
                     style: const TextStyle(
-                      color: Color(0xFF00E5FF),
+                      color: ColorsManager.accentCyan,
                       fontSize: 13,
                       fontWeight: FontWeight.w500,
                     ),
@@ -365,10 +385,16 @@ class _SeatSelectionScreenState extends State<SeatSelectionScreen> {
                 decoration: BoxDecoration(
                   gradient: selected.isEmpty
                       ? const LinearGradient(
-                          colors: [Color(0xFF1A2535), Color(0xFF1A2535)],
+                          colors: [
+                            ColorsManager.seatContainerBg,
+                            ColorsManager.seatContainerBg,
+                          ],
                         )
                       : const LinearGradient(
-                          colors: [Color(0xFF00BFFF), Color(0xFF00E5FF)],
+                          colors: [
+                            ColorsManager.seatSelected,
+                            ColorsManager.accentCyan,
+                          ],
                           begin: Alignment.centerLeft,
                           end: Alignment.centerRight,
                         ),
@@ -379,7 +405,9 @@ class _SeatSelectionScreenState extends State<SeatSelectionScreen> {
                   child: Text(
                     'Confirm Seats',
                     style: TextStyle(
-                      color: selected.isEmpty ? Colors.white38 : const Color(0xFF0A0E1A),
+                      color: selected.isEmpty
+                          ? Colors.white38
+                          : ColorsManager.seatBg,
                       fontSize: 17,
                       fontWeight: FontWeight.bold,
                     ),

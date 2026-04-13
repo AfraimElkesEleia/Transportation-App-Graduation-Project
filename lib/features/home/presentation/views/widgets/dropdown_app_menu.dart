@@ -1,7 +1,8 @@
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
-import 'package:transportation_app/core/constants/cities.dart';
 import 'package:transportation_app/core/theming/colors.dart';
+import 'package:transportation_app/features/home/domain/entities/station_entity.dart';
+import 'package:transportation_app/features/home/domain/entities/station_group_entity.dart';
 
 class DropdownAppMenu<T> extends StatelessWidget {
   final String hintText;
@@ -13,8 +14,6 @@ class DropdownAppMenu<T> extends StatelessWidget {
   final bool showSearchBox;
   final IconData? prefixIcon;
   final T? selectedItem;
-
-  // When true, a null "Any station" row is prepended (used for sub-city).
   final bool allowClearSelection;
 
   const DropdownAppMenu({
@@ -31,17 +30,17 @@ class DropdownAppMenu<T> extends StatelessWidget {
     this.allowClearSelection = false,
   });
 
-  // ── helpers ──────────────────────────────────────────────────────────────
+  // ── Helpers ───────────────────────────────────────────────────
 
   String _nameEn(T item) {
-    if (item is Governorate) return item.nameEn;
-    if (item is SubCity) return item.nameEn;
+    if (item is StationGroupEntity) return item.governorate;
+    if (item is StationEntity) return item.englishName;
     return item.toString();
   }
 
   String _nameAr(T item) {
-    if (item is Governorate) return item.nameAr;
-    if (item is SubCity) return item.nameAr;
+    if (item is StationGroupEntity) return ''; 
+    if (item is StationEntity) return item.arabicName;
     return '';
   }
 
@@ -54,7 +53,13 @@ class DropdownAppMenu<T> extends StatelessWidget {
     final query = filter.trim().toLowerCase();
     final filtered = query.isEmpty
         ? items
-        : items.where((i) => _nameEn(i).toLowerCase().contains(query)).toList();
+        : items
+              .where(
+                (i) =>
+                    _nameEn(i).toLowerCase().contains(query) ||
+                    _nameAr(i).toLowerCase().contains(query),
+              )
+              .toList();
 
     if (allowClearSelection && query.isEmpty) {
       return <T?>[null, ...filtered];
@@ -65,37 +70,37 @@ class DropdownAppMenu<T> extends StatelessWidget {
   bool _compare(T? a, T? b) {
     if (a == null && b == null) return true;
     if (a == null || b == null) return false;
-    if (a is Governorate && b is Governorate) return a.slug == b.slug;
-    if (a is SubCity && b is SubCity) return a.slug == b.slug;
+    if (a is StationGroupEntity && b is StationGroupEntity) {
+      return a.governorate == b.governorate;
+    }
+    if (a is StationEntity && b is StationEntity) {
+      return a.id == b.id;
+    }
     return a == b;
   }
 
-  // ── build ────────────────────────────────────────────────────────────────
+  // ── Build ─────────────────────────────────────────────────────
 
   @override
   Widget build(BuildContext context) {
     final popupMaxH = MediaQuery.of(context).size.height * 0.45;
-
     const popupBg = Color(0xFF0F2035);
     const dividerColor = Color(0xFF1E3A52);
 
     return DropdownSearch<T?>(
       items: (filter, _) => _buildList(filter),
-
       compareFn: (a, b) => _compare(a, b),
-
       itemAsString: (item) => _displayValue(item),
-
       selectedItem: selectedItem,
 
       onChanged: (value) {
         controller.text = value != null ? _nameEn(value) : '';
         onSelected?.call(value);
       },
+
       dropdownBuilder: (context, selectedItem) {
-        final label = _displayValue(selectedItem);
         return Text(
-          label,
+          _displayValue(selectedItem),
           style: TextStyle(
             color: selectedItem != null ? Colors.white : Colors.white38,
             fontSize: 14,
@@ -106,6 +111,7 @@ class DropdownAppMenu<T> extends StatelessWidget {
           overflow: TextOverflow.ellipsis,
         );
       },
+
       decoratorProps: DropDownDecoratorProps(
         decoration: InputDecoration(
           hintStyle: const TextStyle(color: Colors.white38, fontSize: 14),
@@ -155,6 +161,7 @@ class DropdownAppMenu<T> extends StatelessWidget {
           ),
         ),
       ),
+
       popupProps: PopupProps.menu(
         showSearchBox: showSearchBox,
         fit: FlexFit.loose,
@@ -188,6 +195,7 @@ class DropdownAppMenu<T> extends StatelessWidget {
         ),
 
         itemBuilder: (context, item, isDisabled, isSelected) {
+          // ── Null row — "Any station" clear option ──────────
           if (item == null) {
             return Column(
               mainAxisSize: MainAxisSize.min,
@@ -227,9 +235,11 @@ class DropdownAppMenu<T> extends StatelessWidget {
 
           final en = _nameEn(item);
           final ar = _nameAr(item);
+
+          // ── Trailing badge — station count for groups ───────
           Widget? trailing;
-          if (item is Governorate) {
-            final count = item.subCities.length;
+          if (item is StationGroupEntity) {
+            final count = item.stations.length;
             trailing = Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
               decoration: BoxDecoration(
@@ -253,7 +263,9 @@ class DropdownAppMenu<T> extends StatelessWidget {
             selected: isSelected,
             selectedTileColor: ColorsManager.cyanBlue.withValues(alpha: 0.08),
             leading: Icon(
-              Icons.train_outlined,
+              item is StationGroupEntity
+                  ? Icons.location_city_outlined
+                  : Icons.train_outlined,
               size: 18,
               color: isSelected ? ColorsManager.cyanBlue : Colors.white38,
             ),
@@ -265,13 +277,13 @@ class DropdownAppMenu<T> extends StatelessWidget {
                 color: isSelected ? ColorsManager.cyanBlue : Colors.white,
               ),
             ),
+            // Arabic name — only StationEntity has it
             subtitle: ar.isNotEmpty
                 ? Text(
                     ar,
                     style: const TextStyle(
                       fontSize: 12,
                       color: Colors.white54,
-                      // Right-to-left Arabic text
                       letterSpacing: 0.2,
                     ),
                     textDirection: TextDirection.rtl,
@@ -280,6 +292,7 @@ class DropdownAppMenu<T> extends StatelessWidget {
             trailing: trailing,
           );
         },
+
         menuProps: MenuProps(
           elevation: 12,
           backgroundColor: popupBg,

@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:transportation_app/core/di/injection_container.dart';
 import 'package:transportation_app/core/routing/routes.dart';
 import 'package:transportation_app/features/custom_nav_bar/custom_nav_bar.dart';
+import 'package:transportation_app/features/home/domain/entities/search_params.dart';
 import 'package:transportation_app/features/login/presentation/cubit/login_cubit/login_cubit.dart';
 import 'package:transportation_app/features/login/presentation/screens/login_screen.dart';
 import 'package:transportation_app/features/my_tickets/presentation/views/screen/market_place.dart';
@@ -11,6 +12,9 @@ import 'package:transportation_app/features/onboarding/presentation/views/onboar
 import 'package:transportation_app/features/profile/domain/entities/profile_entity.dart';
 import 'package:transportation_app/features/profile/presentation/cubit/profile_cubit/profile_cubit.dart';
 import 'package:transportation_app/features/profile/presentation/views/screen/edit_profile_screen.dart';
+import 'package:transportation_app/features/search/domain/usecases/search_indirect_trips_usecase.dart';
+import 'package:transportation_app/features/search/domain/usecases/search_trips_usecase.dart';
+import 'package:transportation_app/features/search/presentation/cubit/search_cubit.dart';
 import 'package:transportation_app/features/search/presentation/views/result_view.dart';
 import 'package:transportation_app/features/search/presentation/views/search_view.dart';
 import 'package:transportation_app/features/signup/presentation/cubit/signup_cubit.dart';
@@ -52,7 +56,16 @@ class AppRouter {
           ),
         );
       case AppRoutes.searchScreen:
-        return MaterialPageRoute(builder: (_) => TransportSearchScreen());
+        final SearchParams params = settings.arguments as SearchParams;
+        return MaterialPageRoute(
+          builder: (_) => BlocProvider(
+            create: (_) => SearchCubit(
+              searchTripsUseCase: sl<SearchTripsUseCase>(),
+              searchIndirectTripsUseCase: sl<SearchIndirectTripsUseCase>(),
+            )..search(params), 
+            child: const TransportSearchScreen(),
+          ),
+        );
       case AppRoutes.resultScreen:
         return MaterialPageRoute(builder: (_) => SeatSelectionScreen());
       default:
