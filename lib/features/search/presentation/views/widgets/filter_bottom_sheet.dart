@@ -206,6 +206,10 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
                 thumbColor: ColorsManager.accentCyan,
                 overlayColor: ColorsManager.accentCyan.withOpacity(0.15),
                 valueIndicatorColor: ColorsManager.accentCyan,
+                valueIndicatorTextStyle: TextStyle(
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               child: Slider(
                 value: _maxPriceSlider,
