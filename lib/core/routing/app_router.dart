@@ -12,6 +12,8 @@ import 'package:transportation_app/features/onboarding/presentation/views/onboar
 import 'package:transportation_app/features/profile/domain/entities/profile_entity.dart';
 import 'package:transportation_app/features/profile/presentation/cubit/profile_cubit/profile_cubit.dart';
 import 'package:transportation_app/features/profile/presentation/views/screen/edit_profile_screen.dart';
+import 'package:transportation_app/features/search/domain/entities/coach_class_entity.dart';
+import 'package:transportation_app/features/search/domain/entities/trip_result_entity.dart';
 import 'package:transportation_app/features/search/domain/usecases/search_indirect_trips_usecase.dart';
 import 'package:transportation_app/features/search/domain/usecases/search_trips_usecase.dart';
 import 'package:transportation_app/features/search/presentation/cubit/search_cubit.dart';
@@ -67,7 +69,13 @@ class AppRouter {
           ),
         );
       case AppRoutes.resultScreen:
-        return MaterialPageRoute(builder: (_) => SeatSelectionScreen());
+        final args = settings.arguments as Map<String, dynamic>;
+        final trip = args['trip'] as TripResultEntity;
+        final coachClass = args['coachClass'] as CoachClassEntity;
+        return MaterialPageRoute(
+          builder: (_) =>
+              SeatSelectionScreen(trip: trip, coachClass: coachClass),
+        );
       default:
         return null;
     }

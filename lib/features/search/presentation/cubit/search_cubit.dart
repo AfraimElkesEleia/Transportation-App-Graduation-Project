@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:transportation_app/features/home/domain/entities/page_result_entity.dart';
 import 'package:transportation_app/features/home/domain/entities/search_params.dart';
 import 'package:transportation_app/features/search/domain/entities/indirect_trips_enitity.dart';
 import 'package:transportation_app/features/search/domain/entities/trip_result_entity.dart';
@@ -19,47 +22,150 @@ class SearchCubit extends Cubit<SearchState> {
   Future<void> search(SearchParams params) async {
     if (isClosed) return;
     emit(SearchLoading());
-
-    // Both endpoints in parallel
-    final results = await Future.wait([
-      searchTripsUseCase(params),
-      searchIndirectTripsUseCase(params),
-    ]);
+    final firstPageParams = params.copyWith(newPage: 1);
+    final result = await searchTripsUseCase(firstPageParams);
     if (isClosed) return;
-    final directResult = results[0];
-    final indirectResult = results[1];
 
-    if (directResult.isLeft() && indirectResult.isLeft()) {
-      directResult.fold(
-        (failure) => emit(SearchError(failure.message)),
-        (_) {},
+    result.fold((failure) => emit(SearchError(failure.message)), (paged) {
+      // Apply client-side time filters
+      final filtered = _applyTimeFilters(paged.items, params);
+
+      emit(
+        SearchLoaded(
+          directItems: filtered,
+          directCurrentPage: paged.currentPage,
+          directTotalPages: paged.totalPages,
+          activeParams: firstPageParams,
+        ),
       );
-      return;
-    }
+    });
+  }
 
-    final directTrips = directResult.fold(
-      (_) => <TripResultEntity>[],
-      (trips) => trips as List<TripResultEntity>,
-    );
-    final indirectTrips = indirectResult.fold(
-      (_) => <IndirectTripEntity>[],
-      (trips) => trips as List<IndirectTripEntity>,
-    );
+  Future<void> loadMoreDirectTrips() async {
+    if (isClosed) return;
+    final current = state;
+    if (current is! SearchLoaded) return;
+    if (current.isFetchingMoreDirect) return; // already loading
+    if (!current.hasMoreDirectPages) return; // no more pages
 
-    final filtered = _applyClientFilters(
-      directTrips: directTrips,
-      indirectTrips: indirectTrips,
-      params: params,
+    // Show bottom spinner
+    emit(current.copyWith(isFetchingMoreDirect: true));
+
+    final nextPage = current.directCurrentPage + 1;
+    final nextParams = current.activeParams.copyWith(newPage: nextPage);
+    final result = await searchTripsUseCase(nextParams);
+    if (isClosed) return;
+
+    result.fold(
+      (failure) {
+        // Hide spinner — don't break the existing list
+        emit(current.copyWith(isFetchingMoreDirect: false));
+      },
+      (paged) {
+        // Deduplicate by tripOccurrenceId before appending
+        final existingIds = current.directItems
+            .map((t) => t.tripOccurrenceId)
+            .toSet();
+        final newItems = paged.items
+            .where((t) => !existingIds.contains(t.tripOccurrenceId))
+            .toList();
+
+        // Apply time filters to new items only, then combine
+        final filteredNew = _applyTimeFilters(newItems, current.activeParams);
+        final combined = [...current.directItems, ...filteredNew];
+
+        emit(
+          current.copyWith(
+            directItems: combined,
+            directCurrentPage: paged.currentPage,
+            directTotalPages: paged.totalPages,
+            isFetchingMoreDirect: false,
+            activeParams: nextParams,
+          ),
+        );
+      },
     );
+  }
+
+  Future<void> searchIndirect() async {
+    if (isClosed) return;
+    final current = state;
+    if (current is! SearchLoaded) return;
+    if (current.indirectSearched) return; // never call again
 
     emit(
-      SearchLoaded(
-        directTrips: directTrips,
-        indirectTrips: indirectTrips,
-        filteredDirect: filtered.$1,
-        filteredIndirect: filtered.$2,
-        activeParams: params,
+      current.copyWith(
+        indirectSearched: true,
+        indirectLoading: true,
+        clearIndirectError: true,
       ),
+    );
+
+    final firstPageParams = current.activeParams.copyWith(newPage: 1);
+    final result = await searchIndirectTripsUseCase(firstPageParams);
+    if (isClosed) return;
+    final latestState = state as SearchLoaded;
+    result.fold(
+      (failure) => emit(
+        latestState.copyWith(
+          indirectLoading: false,
+          indirectError: failure.message,
+        ),
+      ),
+      (paged) {
+        emit(
+          latestState.copyWith(
+            indirectItems: paged.items,
+            indirectCurrentPage: paged.currentPage,
+            indirectTotalPages: paged.totalPages,
+            indirectLoading: false,
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> loadMoreIndirectTrips() async {
+    if (isClosed) return;
+    final current = state;
+    if (current is! SearchLoaded) return;
+    if (current.isFetchingMoreIndirect) return;
+    if (!current.hasMoreIndirectPages) return;
+
+    emit(current.copyWith(isFetchingMoreIndirect: true));
+
+    final nextPage = current.indirectCurrentPage + 1;
+    final nextParams = current.activeParams.copyWith(newPage: nextPage);
+    final result = await searchIndirectTripsUseCase(nextParams);
+    if (isClosed) return;
+
+    result.fold(
+      (failure) => emit(current.copyWith(isFetchingMoreIndirect: false)),
+      (paged) {
+        // Deduplicate
+        final existingIds = current.indirectItems
+            .map(
+              (t) =>
+                  '${t.firstLeg.tripOccurrenceId}_${t.secondLeg.tripOccurrenceId}',
+            )
+            .toSet();
+        final newItems = paged.items
+            .where(
+              (t) => !existingIds.contains(
+                '${t.firstLeg.tripOccurrenceId}_${t.secondLeg.tripOccurrenceId}',
+              ),
+            )
+            .toList();
+
+        emit(
+          current.copyWith(
+            indirectItems: [...current.indirectItems, ...newItems],
+            indirectCurrentPage: paged.currentPage,
+            indirectTotalPages: paged.totalPages,
+            isFetchingMoreIndirect: false,
+          ),
+        );
+      },
     );
   }
 
@@ -75,88 +181,50 @@ class SearchCubit extends Cubit<SearchState> {
         newParams.preferredAgencies != current.activeParams.preferredAgencies;
 
     if (serverParamsChanged) {
-      await search(newParams);
-      if (isClosed) return;
+      // ── Full reset — new server query from page 1 ──────────
+      // We do NOT call search() here to avoid emitting SearchLoading
+      // which would cause a full-screen flash. Instead emit a fresh
+      // SearchLoaded state while keeping the old list visible briefly.
+      if (!isClosed) emit(SearchLoading());
+      await search(newParams.copyWith(newPage: 1));
     } else {
-      final filtered = _applyClientFilters(
-        directTrips: current.directTrips,
-        indirectTrips: current.indirectTrips,
-        params: newParams,
-      );
-      emit(
-        SearchLoaded(
-          directTrips: current.directTrips,
-          indirectTrips: current.indirectTrips,
-          filteredDirect: filtered.$1,
-          filteredIndirect: filtered.$2,
-          activeParams: newParams,
-        ),
-      );
+      // ── Time filter only — filter current in-memory list ───
+      final filtered = _applyTimeFilters(current.directItems, newParams);
+      emit(current.copyWith(directItems: filtered, activeParams: newParams));
+      // Note: we filter the already-accumulated directItems.
+      // When user loads more pages, new items also get filtered via loadMore.
     }
   }
 
-  (List<TripResultEntity>, List<IndirectTripEntity>) _applyClientFilters({
-    required List<TripResultEntity> directTrips,
-    required List<IndirectTripEntity> indirectTrips,
-    required SearchParams params,
-  }) {
-    List<TripResultEntity> direct = directTrips;
-    List<IndirectTripEntity> indirect = indirectTrips;
+  List<TripResultEntity> _applyTimeFilters(
+    List<TripResultEntity> trips,
+    SearchParams params,
+  ) {
+    if (!params.hasTimeFilters) return trips;
 
-    if (params.departureFrom != null || params.departureTo != null) {
-      direct = direct.where((t) {
+    return trips.where((t) {
+      // Departure range
+      if (params.departureFrom != null || params.departureTo != null) {
         final dep = TimeOfDay.fromDateTime(t.departureTime);
+        final depMins = _mins(dep);
         if (params.departureFrom != null &&
-            _mins(dep) < _mins(params.departureFrom!))
+            depMins < _mins(params.departureFrom!))
           return false;
-        if (params.departureTo != null &&
-            _mins(dep) > _mins(params.departureTo!))
+        if (params.departureTo != null && depMins > _mins(params.departureTo!))
           return false;
-        return true;
-      }).toList();
-
-      indirect = indirect.where((t) {
-        final dep = TimeOfDay.fromDateTime(t.firstLeg.departureTime);
-        if (params.departureFrom != null &&
-            _mins(dep) < _mins(params.departureFrom!))
-          return false;
-        if (params.departureTo != null &&
-            _mins(dep) > _mins(params.departureTo!))
-          return false;
-        return true;
-      }).toList();
-    }
-    // ... inside _applyClientFilters ...
-
-    if (params.arrivalFrom != null || params.arrivalTo != null) {
-      direct = direct.where((t) {
-        // FIX: If there is no arrival time, it can't match a time-range filter
+      }
+      // Arrival range
+      if (params.arrivalFrom != null || params.arrivalTo != null) {
         if (t.arrivalTime == null) return false;
-
-        final arr = TimeOfDay.fromDateTime(
-          t.arrivalTime!,
-        ); // Added ! after check
-        if (params.arrivalFrom != null &&
-            _mins(arr) < _mins(params.arrivalFrom!))
+        final arr = TimeOfDay.fromDateTime(t.arrivalTime!);
+        final arrMins = _mins(arr);
+        if (params.arrivalFrom != null && arrMins < _mins(params.arrivalFrom!))
           return false;
-        if (params.arrivalTo != null && _mins(arr) > _mins(params.arrivalTo!))
+        if (params.arrivalTo != null && arrMins > _mins(params.arrivalTo!))
           return false;
-        return true;
-      }).toList();
-
-      indirect = indirect.where((t) {
-        if (t.secondLeg.arrivalTime == null) return false;
-
-        final arr = TimeOfDay.fromDateTime(t.secondLeg.arrivalTime!);
-        if (params.arrivalFrom != null &&
-            _mins(arr) < _mins(params.arrivalFrom!))
-          return false;
-        if (params.arrivalTo != null && _mins(arr) > _mins(params.arrivalTo!))
-          return false;
-        return true;
-      }).toList();
-    }
-    return (direct, indirect);
+      }
+      return true;
+    }).toList();
   }
 
   int _mins(TimeOfDay t) => t.hour * 60 + t.minute;

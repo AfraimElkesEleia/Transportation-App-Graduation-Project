@@ -18,8 +18,12 @@ class ApiConstants {
   static const String userMe = '/Users/me';
   static const String userProfilePicture = '/Users/me/profile-picture';
   static const String stations = '/Stations';
-  static const String search = '/Search';
-  static const String searchIndirect = '/Search/indirect';
+  static const String search = '/trips/search';
+  static const String searchIndirect = '/trips/search/indirect';
+  static String seatMap(int occurrenceId) => '/occurrences/$occurrenceId/seats';
+  static const String cartAdd = '/Bookings/cart';
+  static const String checkout = '/Bookings/checkout';
+  static const String myTickets = '/Bookings/my-tickets';
   static String? mediaUrl(String? path) {
     if (path == null || path.isEmpty) return null;
     if (path.startsWith('http')) return path;

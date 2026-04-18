@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:transportation_app/core/routing/routes.dart';
 import 'package:transportation_app/core/theming/colors.dart';
 import 'package:transportation_app/features/search/domain/entities/coach_class_entity.dart';
 import 'package:transportation_app/features/search/domain/entities/floor_group.dart';

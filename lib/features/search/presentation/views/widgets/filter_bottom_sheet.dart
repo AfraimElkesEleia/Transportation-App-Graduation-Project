@@ -45,6 +45,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
       departureTo: _departureTo,
       arrivalFrom: _arrivalFrom,
       arrivalTo: _arrivalTo,
+      newPage: 1,
     );
     context.read<SearchCubit>().applyFilters(newParams);
     Navigator.pop(context);
@@ -56,6 +57,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
       sortBy: SortBy.departureTime,
       clearMaxPrice: true,
       clearTimeFilters: true,
+      newPage: 1,
     );
     context.read<SearchCubit>().applyFilters(reset);
     Navigator.pop(context);

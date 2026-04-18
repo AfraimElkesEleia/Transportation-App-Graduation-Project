@@ -37,7 +37,7 @@ extension SortByExt on SortBy {
 class SearchParams extends Equatable {
   final String travelDate;
   final int passengers;
-  final String fromDisplayName; 
+  final String fromDisplayName;
   final String toDisplayName;
   final String? fromGovernorate;
   final int? fromStationId;
@@ -54,7 +54,8 @@ class SearchParams extends Equatable {
   final TimeOfDay? departureTo;
   final TimeOfDay? arrivalFrom;
   final TimeOfDay? arrivalTo;
-
+  final int pageNumber;
+  final int pageSize;
   const SearchParams({
     required this.travelDate,
     required this.passengers,
@@ -72,12 +73,16 @@ class SearchParams extends Equatable {
     this.departureTo,
     this.arrivalFrom,
     this.arrivalTo,
+    this.pageNumber = 1,
+    this.pageSize = 10,
   });
 
   Map<String, dynamic> toQueryParams() {
     return {
       'travelDate': travelDate,
       'passengers': passengers,
+      'pageNumber': pageNumber,
+      'pageSize': pageSize,
       // Station ID takes priority over governorate name
       if (fromStationId != null)
         'fromStationId': fromStationId
@@ -124,6 +129,7 @@ class SearchParams extends Equatable {
     TimeOfDay? arrivalFrom,
     TimeOfDay? arrivalTo,
     bool clearTimeFilters = false,
+    int? newPage,
   }) {
     return SearchParams(
       travelDate: travelDate,
@@ -144,6 +150,8 @@ class SearchParams extends Equatable {
       departureTo: clearTimeFilters ? null : departureTo ?? this.departureTo,
       arrivalFrom: clearTimeFilters ? null : arrivalFrom ?? this.arrivalFrom,
       arrivalTo: clearTimeFilters ? null : arrivalTo ?? this.arrivalTo,
+      pageNumber: newPage ?? pageNumber, 
+      pageSize: pageSize,
     );
   }
 
