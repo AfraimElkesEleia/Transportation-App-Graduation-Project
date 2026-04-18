@@ -16,10 +16,9 @@ class SearchHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final from = params?.fromLabel ?? '—';
+    final from = params?.fromGovernorate ?? '—';
     final to = params?.toLabel ?? '—';
     final date = params?.travelDate ?? '';
-    final pax = params?.passengers ?? 1;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -73,7 +72,7 @@ class SearchHeader extends StatelessWidget {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  '$date • $pax ${pax == 1 ? 'PASSENGER' : 'PASSENGERS'}',
+                  date,
                   style: const TextStyle(
                     color: ColorsManager.textMuted,
                     fontSize: 12,
