@@ -183,9 +183,16 @@ class _PlanYourJourneyBlockState extends State<PlanYourJourneyBlock>
   }
 
   SearchParams _buildSearchParams() {
+    final fromDisplay =
+        _selectedFromStation?.englishName ?? _selectedFromGroup!.governorate;
+    final toDisplay =
+        _selectedToStation?.englishName ?? _selectedToGroup!.governorate;
+
     return SearchParams(
       travelDate: _formatDateForApi(dateController.text),
       passengers: 1,
+      fromDisplayName: fromDisplay,
+      toDisplayName: toDisplay,
       // Station ID if specific station picked — else governorate name
       fromStationId: _selectedFromStation?.id,
       fromGovernorate: _selectedFromStation == null

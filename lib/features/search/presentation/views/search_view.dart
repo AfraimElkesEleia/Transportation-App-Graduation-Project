@@ -14,7 +14,7 @@ import 'package:transportation_app/features/search/presentation/views/widgets/se
 
 class TransportSearchScreen extends StatefulWidget {
   final SearchParams searchParams;
-  const TransportSearchScreen({super.key,required this.searchParams});
+  const TransportSearchScreen({super.key, required this.searchParams});
 
   @override
   State<TransportSearchScreen> createState() => _TransportSearchScreenState();
@@ -85,7 +85,9 @@ class _TransportSearchScreenState extends State<TransportSearchScreen>
                 const SizedBox(height: 8),
 
                 // ── Content ────────────────────────────
-                Expanded(child: _buildContent(context, state, widget.searchParams)),
+                Expanded(
+                  child: _buildContent(context, state, widget.searchParams),
+                ),
               ],
             );
           },

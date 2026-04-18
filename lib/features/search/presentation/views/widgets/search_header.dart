@@ -16,8 +16,8 @@ class SearchHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final from = params?.fromGovernorate ?? '—';
-    final to = params?.toLabel ?? '—';
+    final from = params?.fromDisplayName ?? '—';
+    final to = params?.toDisplayName ?? '—';
     final date = params?.travelDate ?? '';
 
     return Padding(
