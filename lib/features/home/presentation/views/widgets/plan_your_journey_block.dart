@@ -34,6 +34,18 @@ class _PlanYourJourneyBlockState extends State<PlanYourJourneyBlock>
 
   late final AnimationController animationController;
   late final Animation<double> swapAnimation;
+  int _selectedToggleIndex = 0; // 0=All, 1=Train, 2=Bus
+
+  TransportType get _apiTransportValue {
+    switch (_selectedToggleIndex) {
+      case 1:
+        return TransportType.train; // Train
+      case 2:
+        return TransportType.bus; // Bus
+      default:
+        return TransportType.all; // All
+    }
+  }
 
   StationGroupEntity? _selectedFromGroup;
   StationEntity? _selectedFromStation;
@@ -191,6 +203,7 @@ class _PlanYourJourneyBlockState extends State<PlanYourJourneyBlock>
     return SearchParams(
       travelDate: _formatDateForApi(dateController.text),
       passengers: 1,
+      transport: _apiTransportValue,
       fromDisplayName: fromDisplay,
       toDisplayName: toDisplay,
       // Station ID if specific station picked — else governorate name
@@ -286,7 +299,14 @@ class _PlanYourJourneyBlockState extends State<PlanYourJourneyBlock>
             children: [
               const PlanYourJourneyHeader(),
               verticalSpace(space: 24),
-              const ToggleAppBar(),
+              ToggleAppBar(
+                selectedType: _selectedToggleIndex,
+                onTypeChanged: (index) {
+                  setState(() {
+                    _selectedToggleIndex = index;
+                  });
+                },
+              ),
               verticalSpace(space: 16),
               TripTypeToggle(
                 isRoundTrip: _isRoundTrip,
