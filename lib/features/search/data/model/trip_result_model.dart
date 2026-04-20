@@ -38,9 +38,9 @@ class TripResultModel extends TripResultEntity {
       tripOccurrenceId: json['tripOccurrenceId'] as int,
       tripId: json['tripId'] as int,
       agencyName: json['agencyName'] as String? ?? '',
-      departureTime: DateTime.parse(json['departureTime'] as String),
+      departureTime: DateTime.parse(json['boardingTime'] as String),
       arrivalTime: json['arrivalTime'] != null
-          ? DateTime.parse(json['arrivalTime'] as String)
+          ? DateTime.parse(json['dropoffTime'] as String)
           : null,
       totalDurationMinutes: json['totalDurationMinutes'] as int?,
       originStationId: json['originStationId'] as int,

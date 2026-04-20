@@ -8,4 +8,10 @@ abstract class AppRoutes {
   static const editProfile = '/edit_profile';
   static const searchScreen = '/search_screen';
   static const resultScreen = '/result_screen';
+  static const passengerFormScreen = '/passenger_form_screen';
+  static const cartScreen = '/cart_screen';
+  static const indirectBookingScreen = '/indirect_booking_screen';
+  static const indirectPassengerFormScreen = '/indirect_passenger_form_screen';
+  static const roundTripBookingScreen = '/round_trip_booking_screen';
+  static const roundTripPassengerFormScreen = '/round_trip_passenger_form_screen';
 }

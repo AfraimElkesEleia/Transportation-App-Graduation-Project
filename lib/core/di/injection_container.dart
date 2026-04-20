@@ -1,6 +1,8 @@
 import 'package:get_it/get_it.dart';
 import 'package:transportation_app/core/networking/dio_client.dart';
 import 'package:transportation_app/core/utils/token_manager.dart';
+import 'package:transportation_app/features/booking/data/datasources/booking_remote_datasource.dart';
+import 'package:transportation_app/features/booking/presentation/cubit/seat_map_cubit.dart';
 import 'package:transportation_app/features/home/data/datasource/stations_remote_datasource.dart';
 import 'package:transportation_app/features/home/data/repositories/stations_repository_imp.dart';
 import 'package:transportation_app/features/home/domain/repositories/station_repository.dart';
@@ -93,24 +95,29 @@ Future<void> init() async {
   );
   sl.registerFactory(() => LogoutCubit(logoutUseCase: sl<LogoutUseCase>()));
   sl.registerLazySingleton<StationsRemoteDatasource>(
-  () => StationsRemoteDatasourceImpl(dio: DioClient.getInstance()),
-);
-sl.registerLazySingleton<StationsRepository>(
-  () => StationsRepositoryImpl(remoteDataSource: sl()),
-);
-sl.registerLazySingleton(() => GetStationsUseCase(sl<StationsRepository>()));
-sl.registerFactory(() => StationsCubit(getStationsUseCase: sl()));
-sl.registerLazySingleton<SearchRemoteDatasource>(
-  () => SearchRemoteDatasourceImpl(dio: DioClient.getInstance()),
-);
-sl.registerLazySingleton<SearchRepository>(
-  () => SearchRepositoryImpl(remoteDataSource: sl()),
-);
-sl.registerLazySingleton(() => SearchTripsUseCase(sl<SearchRepository>()));
-sl.registerLazySingleton(
-    () => SearchIndirectTripsUseCase(sl<SearchRepository>()));
-sl.registerFactory(() => SearchCubit(
-  searchTripsUseCase:         sl(),
-  searchIndirectTripsUseCase: sl(),
-));
+    () => StationsRemoteDatasourceImpl(dio: DioClient.getInstance()),
+  );
+  sl.registerLazySingleton<StationsRepository>(
+    () => StationsRepositoryImpl(remoteDataSource: sl()),
+  );
+  sl.registerLazySingleton(() => GetStationsUseCase(sl<StationsRepository>()));
+  sl.registerFactory(() => StationsCubit(getStationsUseCase: sl()));
+  sl.registerLazySingleton<SearchRemoteDatasource>(
+    () => SearchRemoteDatasourceImpl(dio: DioClient.getInstance()),
+  );
+  sl.registerLazySingleton<SearchRepository>(
+    () => SearchRepositoryImpl(remoteDataSource: sl()),
+  );
+  sl.registerLazySingleton(() => SearchTripsUseCase(sl<SearchRepository>()));
+  sl.registerLazySingleton(
+    () => SearchIndirectTripsUseCase(sl<SearchRepository>()),
+  );
+  sl.registerFactory(
+    () =>
+        SearchCubit(searchTripsUseCase: sl(), searchIndirectTripsUseCase: sl()),
+  );
+  sl.registerLazySingleton<BookingRemoteDatasource>(
+    () => BookingRemoteDatasourceImpl(dio: DioClient.getInstance()),
+  );
+  sl.registerFactory(() => SeatMapCubit(datasource: sl()));
 }

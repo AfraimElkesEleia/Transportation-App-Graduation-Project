@@ -144,7 +144,7 @@ class _StopRow extends StatelessWidget {
             height: 10,
             decoration: BoxDecoration(
               color: stop.isOrigin || stop.isDestination
-                  ? ColorsManager.accentCyan.withOpacity(0.8)
+                  ? ColorsManager.accentCyan.withValues(alpha: 0.8)
                   : ColorsManager.accentCyan,
               shape: BoxShape.circle,
               border: Border.all(color: ColorsManager.cardBg, width: 2),

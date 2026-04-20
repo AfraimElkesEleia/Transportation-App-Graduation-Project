@@ -6,8 +6,15 @@ import 'package:transportation_app/features/search/presentation/cubit/search_cub
 
 class FilterBottomSheet extends StatefulWidget {
   final SearchParams activeParams;
+  final void Function(SearchParams) onApply;
+  final VoidCallback onReset;
 
-  const FilterBottomSheet({super.key, required this.activeParams});
+  const FilterBottomSheet({
+    super.key,
+    required this.activeParams,
+    required this.onApply,
+    required this.onReset,
+  });
 
   @override
   State<FilterBottomSheet> createState() => _FilterBottomSheetState();
@@ -47,19 +54,12 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
       arrivalTo: _arrivalTo,
       newPage: 1,
     );
-    context.read<SearchCubit>().applyFilters(newParams);
+    widget.onApply(newParams);
     Navigator.pop(context);
   }
 
   void _reset() {
-    final reset = widget.activeParams.copyWith(
-      transport: TransportType.all,
-      sortBy: SortBy.departureTime,
-      clearMaxPrice: true,
-      clearTimeFilters: true,
-      newPage: 1,
-    );
-    context.read<SearchCubit>().applyFilters(reset);
+    widget.onReset();
     Navigator.pop(context);
   }
 

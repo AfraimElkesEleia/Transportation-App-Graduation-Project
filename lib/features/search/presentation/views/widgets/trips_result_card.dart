@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:transportation_app/core/helper/extensions.dart';
+import 'package:transportation_app/core/routing/routes.dart';
 import 'package:transportation_app/core/theming/colors.dart';
 import 'package:transportation_app/features/search/domain/entities/coach_class_entity.dart';
 import 'package:transportation_app/features/search/domain/entities/floor_group.dart';
@@ -7,7 +9,9 @@ import 'package:transportation_app/features/search/presentation/views/widgets/tr
 
 class TripResultCard extends StatelessWidget {
   final TripResultEntity trip;
-  const TripResultCard({super.key, required this.trip});
+  final void Function(TripResultEntity, CoachClassEntity)? onBookOverride;
+
+  const TripResultCard({super.key, required this.trip, this.onBookOverride});
 
   Color _agencyColor(String name) {
     final l = name.toLowerCase();
@@ -77,7 +81,19 @@ class TripResultCard extends StatelessWidget {
             const Divider(color: ColorsManager.borderSubtle),
             const SizedBox(height: 8),
             ...trip.floorGroups.map(
-              (group) => _FloorGroupTile(floor: group, onBook: (c) {}),
+              (group) => _FloorGroupTile(
+                floor: group,
+                onBook: (c) {
+                  if (onBookOverride != null) {
+                    onBookOverride!(trip, c);
+                  } else {
+                    context.pushNamed(
+                      AppRoutes.resultScreen,
+                      arguments: {"coachClass": c, "trip": trip},
+                    );
+                  }
+                },
+              ),
             ),
           ],
           if (trip.hasRouteStops) ...[
@@ -269,7 +285,7 @@ class _TimesRow extends StatelessWidget {
               fmt(trip.arrivalTime),
               style: TextStyle(
                 color: trip.arrivalTime == null
-                    ? Colors.white.withOpacity(0.2)
+                    ? Colors.white.withValues(alpha: 0.2)
                     : Colors.white,
                 fontWeight: FontWeight.bold,
                 fontSize: 28,
@@ -314,6 +330,7 @@ class _TimesRow extends StatelessWidget {
     );
   }
 }
+
 class _FloorGroupTile extends StatelessWidget {
   final FloorGroup floor;
   final void Function(CoachClassEntity) onBook;
@@ -327,45 +344,48 @@ class _FloorGroupTile extends StatelessWidget {
       child: Row(
         children: [
           // ── Class name + floor label ─────────────────
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 120),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
 
-            children: [
-              // "Horus - Prestige"
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 4,
-                ),
-                decoration: BoxDecoration(
-                  color: ColorsManager.surfaceChip,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      floor.groupName,
-                      style: const TextStyle(
-                        color: Colors.white70,
-                        fontSize: 13,
-                        height: 1.3,
-                      ),
-                    ),
-                    if (floor.floorNumber != null) ...[
-                      const SizedBox(height: 2),
+              children: [
+                // "Horus - Prestige"
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: ColorsManager.surfaceChip,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
                       Text(
-                        floor.label,
+                        floor.groupName,
                         style: const TextStyle(
-                          color: ColorsManager.accentCyan,
-                          fontSize: 11,
+                          color: Colors.white70,
+                          fontSize: 13,
+                          height: 1.3,
                         ),
                       ),
+                      if (floor.floorNumber != null) ...[
+                        const SizedBox(height: 2),
+                        Text(
+                          floor.label,
+                          style: const TextStyle(
+                            color: ColorsManager.accentCyan,
+                            fontSize: 11,
+                          ),
+                        ),
+                      ],
                     ],
-                  ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
           const SizedBox(width: 8),
 

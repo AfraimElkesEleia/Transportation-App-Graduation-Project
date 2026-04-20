@@ -201,21 +201,22 @@ class _PlanYourJourneyBlockState extends State<PlanYourJourneyBlock>
         _selectedToStation?.englishName ?? _selectedToGroup!.governorate;
 
     return SearchParams(
+      isRoundTrip: _isRoundTrip,
       travelDate: _formatDateForApi(dateController.text),
+      returnDate: _isRoundTrip ? _formatDateForApi(returnDateController.text) : null,
       passengers: 1,
       transport: _apiTransportValue,
       fromDisplayName: fromDisplay,
       toDisplayName: toDisplay,
-      // Station ID if specific station picked — else governorate name
       fromStationId: _selectedFromStation?.id,
       fromGovernorate: _selectedFromStation == null
           ? _selectedFromGroup!
-                .governorate // exact API string
+                .governorate 
           : null,
       toStationId: _selectedToStation?.id,
       toGovernorate: _selectedToStation == null
           ? _selectedToGroup!
-                .governorate // exact API string
+                .governorate 
           : null,
     );
   }
@@ -230,11 +231,19 @@ class _PlanYourJourneyBlockState extends State<PlanYourJourneyBlock>
 
   void _onSearch() {
     if (!_validate()) return;
-    Navigator.pushNamed(
-      context,
-      AppRoutes.searchScreen,
-      arguments: _buildSearchParams(),
-    );
+    if (_isRoundTrip) {
+      Navigator.pushNamed(
+        context,
+        AppRoutes.roundTripBookingScreen,
+        arguments: _buildSearchParams(),
+      );
+    } else {
+      Navigator.pushNamed(
+        context,
+        AppRoutes.searchScreen,
+        arguments: _buildSearchParams(),
+      );
+    }
   }
 
   @override

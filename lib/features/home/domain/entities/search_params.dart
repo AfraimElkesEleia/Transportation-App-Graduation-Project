@@ -35,7 +35,9 @@ extension SortByExt on SortBy {
 }
 
 class SearchParams extends Equatable {
+  final bool isRoundTrip;
   final String travelDate;
+  final String? returnDate;
   final int passengers;
   final String fromDisplayName;
   final String toDisplayName;
@@ -57,7 +59,9 @@ class SearchParams extends Equatable {
   final int pageNumber;
   final int pageSize;
   const SearchParams({
+    this.isRoundTrip = false,
     required this.travelDate,
+    this.returnDate,
     required this.passengers,
     required this.toDisplayName,
     required this.fromDisplayName,
@@ -80,6 +84,7 @@ class SearchParams extends Equatable {
   Map<String, dynamic> toQueryParams() {
     return {
       'travelDate': travelDate,
+      if (isRoundTrip && returnDate != null) 'returnDate': returnDate,
       'passengers': passengers,
       'pageNumber': pageNumber,
       'pageSize': pageSize,
@@ -119,6 +124,10 @@ class SearchParams extends Equatable {
   }
 
   SearchParams copyWith({
+    bool? isRoundTrip,
+    String? travelDate,
+    String? returnDate,
+    int? passengers,
     TransportType? transport,
     SortBy? sortBy,
     double? maxPrice,
@@ -132,8 +141,10 @@ class SearchParams extends Equatable {
     int? newPage,
   }) {
     return SearchParams(
-      travelDate: travelDate,
-      passengers: passengers,
+      isRoundTrip: isRoundTrip ?? this.isRoundTrip,
+      travelDate: travelDate ?? this.travelDate,
+      returnDate: returnDate ?? this.returnDate,
+      passengers: passengers ?? this.passengers,
       toDisplayName: toDisplayName,
       fromDisplayName: fromDisplayName,
       fromGovernorate: fromGovernorate,
@@ -157,7 +168,9 @@ class SearchParams extends Equatable {
 
   @override
   List<Object?> get props => [
+    isRoundTrip,
     travelDate,
+    returnDate,
     passengers,
     fromGovernorate,
     fromStationId,

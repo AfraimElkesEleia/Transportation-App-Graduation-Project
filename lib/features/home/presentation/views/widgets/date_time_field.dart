@@ -5,14 +5,22 @@ import 'package:transportation_app/core/theming/styles.dart';
 class DateTimeField extends StatefulWidget {
   final TextEditingController? controller;
   final String? errorText;
+  final DateTime? minimumDate;
+  final ValueChanged<DateTime>? onDateSelected;
 
-  const DateTimeField({super.key, this.controller, this.errorText});
+  const DateTimeField({
+    super.key, 
+    this.controller, 
+    this.errorText,
+    this.minimumDate,
+    this.onDateSelected,
+  });
 
   @override
-  State<DateTimeField> createState() => _DateTimeFieldState();
+  State<DateTimeField> createState() => DateTimeFieldState();
 }
 
-class _DateTimeFieldState extends State<DateTimeField> {
+class DateTimeFieldState extends State<DateTimeField> {
   late final TextEditingController _controller;
 
   @override
@@ -64,20 +72,20 @@ class _DateTimeFieldState extends State<DateTimeField> {
           borderSide: const BorderSide(color: Colors.redAccent, width: 2),
         ),
       ),
-      onTap: () => _selectDate(context),
+      onTap: () => selectDate(),
     );
   }
 
-  Future<void> _selectDate(BuildContext context) async {
+  Future<void> selectDate() async {
     final pickedDate = await showDatePicker(
       context: context,
-      firstDate: DateTime.now(),
+      firstDate: widget.minimumDate ?? DateTime.now(),
       lastDate: DateTime(2100),
     );
     if (pickedDate != null) {
       _controller.text =
           '${pickedDate.day}/${pickedDate.month}/${pickedDate.year}';
-      // widget.onDateSelected?.call(pickedDate);
+      widget.onDateSelected?.call(pickedDate);
     }
   }
 }

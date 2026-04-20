@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:transportation_app/core/di/injection_container.dart';
 import 'package:transportation_app/core/routing/routes.dart';
+import 'package:transportation_app/features/booking/data/datasources/booking_remote_datasource.dart';
+import 'package:transportation_app/features/booking/presentation/cubit/seat_map_cubit.dart';
 import 'package:transportation_app/features/custom_nav_bar/custom_nav_bar.dart';
 import 'package:transportation_app/features/home/domain/entities/search_params.dart';
 import 'package:transportation_app/features/login/presentation/cubit/login_cubit/login_cubit.dart';
@@ -17,8 +19,18 @@ import 'package:transportation_app/features/search/domain/entities/trip_result_e
 import 'package:transportation_app/features/search/domain/usecases/search_indirect_trips_usecase.dart';
 import 'package:transportation_app/features/search/domain/usecases/search_trips_usecase.dart';
 import 'package:transportation_app/features/search/presentation/cubit/search_cubit.dart';
-import 'package:transportation_app/features/search/presentation/views/result_view.dart';
+import 'package:transportation_app/features/booking/presentation/views/passenger_form_screen.dart';
+import 'package:transportation_app/features/booking/presentation/views/result_view.dart';
+import 'package:transportation_app/features/booking/presentation/views/cart_screen.dart';
+import 'package:transportation_app/features/booking/presentation/cubit/cart_cubit.dart';
+import 'package:transportation_app/features/booking/presentation/views/indirect_booking_screen.dart';
+import 'package:transportation_app/features/booking/presentation/cubit/indirect_booking_cubit.dart';
+import 'package:transportation_app/features/booking/presentation/views/indirect_passenger_form_screen.dart';
+import 'package:transportation_app/features/search/domain/usecases/search_trips_usecase.dart';
 import 'package:transportation_app/features/search/presentation/views/search_view.dart';
+import 'package:transportation_app/features/booking/presentation/cubit/round_trip_booking_cubit.dart';
+import 'package:transportation_app/features/booking/presentation/views/round_trip_booking_screen.dart';
+import 'package:transportation_app/features/booking/presentation/views/round_trip_passenger_form_screen.dart';
 import 'package:transportation_app/features/signup/presentation/cubit/signup_cubit.dart';
 import 'package:transportation_app/features/signup/presentation/screen/sign_up_screen.dart';
 
@@ -68,13 +80,91 @@ class AppRouter {
             child: TransportSearchScreen(searchParams: params),
           ),
         );
+      // AppRouter — resultScreen case
       case AppRoutes.resultScreen:
         final args = settings.arguments as Map<String, dynamic>;
         final trip = args['trip'] as TripResultEntity;
         final coachClass = args['coachClass'] as CoachClassEntity;
         return MaterialPageRoute(
-          builder: (_) =>
-              SeatSelectionScreen(trip: trip, coachClass: coachClass),
+          builder: (_) => BlocProvider(
+            create: (_) =>
+                SeatMapCubit(datasource: sl<BookingRemoteDatasource>())
+                  ..loadSeatMap(trip.tripOccurrenceId, coachClass.coachClassId),
+            child: SeatSelectionScreen(trip: trip, coachClass: coachClass),
+          ),
+        );
+      case AppRoutes.passengerFormScreen:
+        final args = settings.arguments as Map<String, dynamic>;
+        final trip = args['trip'] as TripResultEntity;
+        final coachClass = args['coachClass'] as CoachClassEntity;
+        final seats = args['seats'] as List<String>;
+        final isTrain = args['isTrain'] as bool;
+        return MaterialPageRoute(
+          builder: (_) => BlocProvider(
+            create: (_) =>
+                SeatMapCubit(datasource: sl<BookingRemoteDatasource>()),
+            child: PassengerFormScreen(
+              trip: trip,
+              coachClass: coachClass,
+              selectedSeats: seats,
+              isTrain: isTrain,
+            ),
+          ),
+        );
+      case AppRoutes.cartScreen:
+        return MaterialPageRoute(
+          builder: (_) => BlocProvider(
+            create: (_) => CartCubit(datasource: sl<BookingRemoteDatasource>()),
+            child: const CartScreen(),
+          ),
+        );
+      case AppRoutes.indirectBookingScreen:
+        final args = settings.arguments as Map<String, dynamic>;
+        final trip = args['indirectTrip'] as dynamic;
+        final d1 = args['dateLeg1'] as DateTime;
+        final d2 = args['dateLeg2'] as DateTime;
+        final params = args['activeParams'] as dynamic; // SearchParams
+        return MaterialPageRoute(
+          builder: (_) => BlocProvider(
+            create: (_) => IndirectBookingCubit(
+              searchTripsUseCase: sl<SearchTripsUseCase>(),
+            ),
+            child: IndirectBookingScreen(
+              indirectTrip: trip,
+              dateLeg1: d1,
+              dateLeg2: d2,
+              activeParams: params,
+            ),
+          ),
+        );
+      case AppRoutes.indirectPassengerFormScreen:
+        final args = settings.arguments as Map<String, dynamic>;
+        final state = args['state'] as dynamic;
+        return MaterialPageRoute(
+          builder: (_) => BlocProvider(
+            create: (_) =>
+                SeatMapCubit(datasource: sl<BookingRemoteDatasource>()),
+            child: IndirectPassengerFormScreen(bookingState: state),
+          ),
+        );
+      case AppRoutes.roundTripBookingScreen:
+        final SearchParams params = settings.arguments as SearchParams;
+        return MaterialPageRoute(
+          builder: (_) => BlocProvider(
+            create: (_) => RoundTripBookingCubit(
+              searchTripsUseCase: sl<SearchTripsUseCase>(),
+              bookingRemoteDatasource: sl<BookingRemoteDatasource>(),
+            ),
+            child: RoundTripBookingScreen(activeParams: params),
+          ),
+        );
+      case AppRoutes.roundTripPassengerFormScreen:
+        final cubit = settings.arguments as RoundTripBookingCubit;
+        return MaterialPageRoute(
+          builder: (_) => BlocProvider.value(
+            value: cubit,
+            child: const RoundTripPassengerFormScreen(),
+          ),
         );
       default:
         return null;

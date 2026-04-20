@@ -28,7 +28,7 @@ class SearchTabBar extends StatelessWidget {
         unselectedLabelColor: Colors.white54,
         indicatorSize: TabBarIndicatorSize.tab,
         indicator: BoxDecoration(
-          color: ColorsManager.accentCyan.withOpacity(0.15),
+          color: ColorsManager.accentCyan.withValues(alpha: 0.15),
           borderRadius: BorderRadius.circular(10),
           border: Border.all(color: ColorsManager.accentCyan, width: 1),
         ),
