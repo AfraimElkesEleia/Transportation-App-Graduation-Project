@@ -2,27 +2,34 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:transportation_app/features/home/domain/entities/page_result_entity.dart';
 import 'package:transportation_app/features/home/domain/entities/search_params.dart';
-import 'package:transportation_app/features/search/domain/entities/indirect_trips_enitity.dart';
 import 'package:transportation_app/features/search/domain/entities/trip_result_entity.dart';
+import 'package:transportation_app/features/search/data/datasources/recent_search_local_data_source.dart';
+import 'package:transportation_app/features/search/data/models/recent_search_model.dart';
 import 'package:transportation_app/features/search/domain/usecases/search_indirect_trips_usecase.dart';
 import 'package:transportation_app/features/search/domain/usecases/search_trips_usecase.dart';
 import 'package:transportation_app/features/search/presentation/cubit/search_states.dart';
+import 'package:uuid/uuid.dart';
 
 class SearchCubit extends Cubit<SearchState> {
   final SearchTripsUseCase searchTripsUseCase;
   final SearchIndirectTripsUseCase searchIndirectTripsUseCase;
+  final RecentSearchLocalDataSource recentSearchLocalDataSource;
 
   SearchCubit({
     required this.searchTripsUseCase,
     required this.searchIndirectTripsUseCase,
+    required this.recentSearchLocalDataSource,
   }) : super(SearchInitial());
 
   Future<void> search(SearchParams params) async {
     if (isClosed) return;
     emit(SearchLoading());
     final firstPageParams = params.copyWith(newPage: 1);
+    
+    // Save to recent searches
+    _saveToRecentSearches(firstPageParams);
+    
     final result = await searchTripsUseCase(firstPageParams);
     if (isClosed) return;
 
@@ -228,4 +235,26 @@ class SearchCubit extends Cubit<SearchState> {
   }
 
   int _mins(TimeOfDay t) => t.hour * 60 + t.minute;
+
+  Future<void> _saveToRecentSearches(SearchParams params) async {
+    try {
+      final model = RecentSearchModel(
+        id: const Uuid().v4(),
+        fromDisplayName: params.fromDisplayName,
+        toDisplayName: params.toDisplayName,
+        fromGovernorate: params.fromGovernorate,
+        fromStationId: params.fromStationId,
+        toGovernorate: params.toGovernorate,
+        toStationId: params.toStationId,
+        travelDate: params.travelDate,
+        isRoundTrip: params.isRoundTrip,
+        returnDate: params.returnDate,
+        passengers: params.passengers,
+        createdAt: DateTime.now(),
+      );
+      await recentSearchLocalDataSource.saveSearch(model);
+    } catch (e) {
+      debugPrint('Failed to save recent search: $e');
+    }
+  }
 }

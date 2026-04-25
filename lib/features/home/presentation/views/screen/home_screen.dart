@@ -58,7 +58,7 @@ class _HomeContent extends StatelessWidget {
                   ],
                 ),
                 verticalSpace(space: 16),
-                Column(children: [RecentSearchItem(), RecentSearchItem()]),
+                const RecentSearchesList(),
               ],
             ),
           ),

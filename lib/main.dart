@@ -1,13 +1,19 @@
 import 'package:device_preview/device_preview.dart';
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:transportation_app/core/di/injection_container.dart';
 import 'package:transportation_app/core/routing/app_router.dart';
 import 'package:transportation_app/core/routing/routes.dart';
 import 'package:transportation_app/core/utils/app_startup.dart';
 import 'package:transportation_app/core/utils/token_manager.dart';
+import 'package:transportation_app/features/search/data/models/recent_search_model.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  
+  await Hive.initFlutter();
+  Hive.registerAdapter(RecentSearchModelAdapter());
+  await Hive.openBox<RecentSearchModel>('recent_searches_box');
 
   await init();
   final tokenManager = sl<TokenManager>();

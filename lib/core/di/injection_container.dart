@@ -22,6 +22,7 @@ import 'package:transportation_app/features/profile/domain/usecases/update_profi
 import 'package:transportation_app/features/profile/domain/usecases/update_profile_usecase.dart';
 import 'package:transportation_app/features/profile/presentation/cubit/logout_cubit/logout_cubit.dart';
 import 'package:transportation_app/features/profile/presentation/cubit/profile_cubit/profile_cubit.dart';
+import 'package:transportation_app/features/search/data/datasources/recent_search_local_data_source.dart';
 import 'package:transportation_app/features/search/data/datasources/search_remote_datasource.dart';
 import 'package:transportation_app/features/search/data/repositories/search_repository_imp.dart';
 import 'package:transportation_app/features/search/domain/repository/search_repository.dart';
@@ -108,13 +109,16 @@ Future<void> init() async {
   sl.registerLazySingleton<SearchRepository>(
     () => SearchRepositoryImpl(remoteDataSource: sl()),
   );
+  sl.registerLazySingleton<RecentSearchLocalDataSource>(
+    () => RecentSearchLocalDataSourceImpl(),
+  );
   sl.registerLazySingleton(() => SearchTripsUseCase(sl<SearchRepository>()));
   sl.registerLazySingleton(
     () => SearchIndirectTripsUseCase(sl<SearchRepository>()),
   );
   sl.registerFactory(
     () =>
-        SearchCubit(searchTripsUseCase: sl(), searchIndirectTripsUseCase: sl()),
+        SearchCubit(searchTripsUseCase: sl(), searchIndirectTripsUseCase: sl(),recentSearchLocalDataSource: sl()),
   );
   sl.registerLazySingleton<BookingRemoteDatasource>(
     () => BookingRemoteDatasourceImpl(dio: DioClient.getInstance()),
