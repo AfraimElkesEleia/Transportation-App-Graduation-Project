@@ -6,8 +6,15 @@ import 'package:transportation_app/features/booking/data/datasources/booking_rem
 import 'package:transportation_app/features/booking/presentation/cubit/seat_map_cubit.dart';
 import 'package:transportation_app/features/custom_nav_bar/custom_nav_bar.dart';
 import 'package:transportation_app/features/home/domain/entities/search_params.dart';
+import 'package:transportation_app/features/home/domain/usecases/get_stations_use_case.dart';
+import 'package:transportation_app/features/home/presentation/cubit/stations_cubit.dart';
 import 'package:transportation_app/features/login/presentation/cubit/login_cubit/login_cubit.dart';
 import 'package:transportation_app/features/login/presentation/screens/login_screen.dart';
+import 'package:transportation_app/features/multidestination/presentation/screens/multidestination_screen.dart';
+import 'package:transportation_app/features/multidestination/presentation/screens/multidestination_summary_screen.dart';
+import 'package:transportation_app/features/multidestination/presentation/cubit/multi_destination_booking_cubit.dart';
+import 'package:transportation_app/features/multidestination/presentation/screens/multi_destination_booking_screen.dart';
+import 'package:transportation_app/features/multidestination/presentation/screens/multi_destination_passenger_form_screen.dart';
 import 'package:transportation_app/features/my_tickets/presentation/views/screen/market_place.dart';
 import 'package:transportation_app/features/my_tickets/presentation/views/screen/resell_tickets.dart';
 import 'package:transportation_app/features/onboarding/presentation/views/onboarding_screen.dart';
@@ -27,14 +34,12 @@ import 'package:transportation_app/features/booking/presentation/cubit/cart_cubi
 import 'package:transportation_app/features/booking/presentation/views/indirect_booking_screen.dart';
 import 'package:transportation_app/features/booking/presentation/cubit/indirect_booking_cubit.dart';
 import 'package:transportation_app/features/booking/presentation/views/indirect_passenger_form_screen.dart';
-import 'package:transportation_app/features/search/domain/usecases/search_trips_usecase.dart';
 import 'package:transportation_app/features/search/presentation/views/search_view.dart';
 import 'package:transportation_app/features/booking/presentation/cubit/round_trip_booking_cubit.dart';
 import 'package:transportation_app/features/booking/presentation/views/round_trip_booking_screen.dart';
 import 'package:transportation_app/features/booking/presentation/views/round_trip_passenger_form_screen.dart';
 import 'package:transportation_app/features/signup/presentation/cubit/signup_cubit.dart';
 import 'package:transportation_app/features/signup/presentation/screen/sign_up_screen.dart';
-
 class AppRouter {
   Route<dynamic>? generateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -42,6 +47,40 @@ class AppRouter {
         return MaterialPageRoute(builder: (_) => OnboardingScreen());
       case AppRoutes.homeScreen:
         return MaterialPageRoute(builder: (_) => CustomNavBar());
+      case AppRoutes.multidestinationScreen:
+        return MaterialPageRoute(
+          builder: (_) => BlocProvider(
+            create: (_) => StationsCubit(
+              getStationsUseCase: sl<GetStationsUseCase>(),
+            )..loadStations(),
+            child: const MultidestinationScreen(),
+          ),
+        );
+      case AppRoutes.multidestinationSummaryScreen:
+        final legs = settings.arguments as List<MultiDestinationLegSummary>;
+        return MaterialPageRoute(
+          builder: (_) => MultidestinationSummaryScreen(legs: legs),
+        );
+      case AppRoutes.multidestinationBookingScreen:
+        final legs = settings.arguments as List<MultiDestinationLegSummary>;
+        return MaterialPageRoute(
+          builder: (_) => BlocProvider(
+            create: (_) => MultiDestinationBookingCubit(
+              legs: legs,
+              searchTripsUseCase: sl(),
+              bookingRemoteDatasource: sl(),
+            ),
+            child: const MultiDestinationBookingScreen(),
+          ),
+        );
+      case AppRoutes.multidestinationPassengerFormScreen:
+        final cubit = settings.arguments as MultiDestinationBookingCubit;
+        return MaterialPageRoute(
+          builder: (_) => BlocProvider.value(
+            value: cubit,
+            child: const MultiDestinationPassengerFormScreen(),
+          ),
+        );
       case AppRoutes.marketPlaceScreen:
         return MaterialPageRoute(builder: (_) => MarketplaceScreen());
       case AppRoutes.resellTicketsScreen:
@@ -166,6 +205,18 @@ class AppRouter {
           builder: (_) => BlocProvider.value(
             value: cubit,
             child: const RoundTripPassengerFormScreen(),
+          ),
+        );
+      case AppRoutes.multidestinationScreen:
+        return MaterialPageRoute(
+          builder: (_) => MultiBlocProvider(
+            providers: [
+              BlocProvider(
+                create: (c) =>
+                    StationsCubit(getStationsUseCase: sl<GetStationsUseCase>())..loadStations(),
+              ),
+            ],
+            child: MultidestinationScreen(),
           ),
         );
       default:

@@ -5,7 +5,9 @@ import 'package:transportation_app/core/di/injection_container.dart';
 import 'package:transportation_app/core/widgets/basic_container.dart';
 import 'package:transportation_app/features/custom_nav_bar/custom_bottom_nav_bar.dart';
 import 'package:transportation_app/features/home/presentation/views/screen/home_screen.dart';
+import 'package:transportation_app/features/my_tickets/presentation/cubit/my_tickets_cubit.dart';
 import 'package:transportation_app/features/my_tickets/presentation/views/screen/my_tickets.dart';
+import 'package:transportation_app/features/profile/domain/usecases/deposit_wallet_usecase.dart';
 import 'package:transportation_app/features/profile/domain/usecases/get_profile_usecase.dart';
 import 'package:transportation_app/features/profile/domain/usecases/logout_usecase.dart';
 import 'package:transportation_app/features/profile/domain/usecases/update_profile_picture_usecase.dart';
@@ -40,7 +42,10 @@ class CustomNavBarState extends State<CustomNavBar> {
 
   late final List<Widget> _screens = [
     const HomeScreen(),
-    const MyTickets(),
+    BlocProvider(
+      create: (_) => sl<MyTicketsCubit>(),
+      child: const MyTickets(),
+    ),
     MultiBlocProvider(
       providers: [
         BlocProvider(
@@ -51,6 +56,8 @@ class CustomNavBarState extends State<CustomNavBar> {
             getProfileUseCase: sl<GetProfileUseCase>(),
             updateProfileUseCase: sl<UpdateProfileUseCase>(),
             uploadPictureUseCase: sl<UploadProfilePictureUseCase>(),
+            depositWalletUseCase: sl<DepositWalletUseCase>(),
+            profileRepository: sl(),
           )..loadProfile(),
         ),
       ],

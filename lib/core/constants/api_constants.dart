@@ -24,6 +24,7 @@ class ApiConstants {
   static const String cartAdd = '/Bookings/cart';
   static const String checkout = '/Bookings/checkout';
   static const String myTickets = '/Bookings/my-tickets';
+  static const String walletDeposit = '/Wallet/deposit';
   static String? mediaUrl(String? path) {
     if (path == null || path.isEmpty) return null;
     if (path.startsWith('http')) return path;

@@ -3,6 +3,10 @@ import 'package:transportation_app/core/networking/dio_client.dart';
 import 'package:transportation_app/core/utils/token_manager.dart';
 import 'package:transportation_app/features/booking/data/datasources/booking_remote_datasource.dart';
 import 'package:transportation_app/features/booking/presentation/cubit/seat_map_cubit.dart';
+import 'package:transportation_app/features/my_tickets/data/datasources/my_tickets_remote_datasource.dart';
+import 'package:transportation_app/features/my_tickets/data/repositories/my_tickets_repository_impl.dart';
+import 'package:transportation_app/features/my_tickets/domain/repositories/my_tickets_repository.dart';
+import 'package:transportation_app/features/my_tickets/presentation/cubit/my_tickets_cubit.dart';
 import 'package:transportation_app/features/home/data/datasource/stations_remote_datasource.dart';
 import 'package:transportation_app/features/home/data/repositories/stations_repository_imp.dart';
 import 'package:transportation_app/features/home/domain/repositories/station_repository.dart';
@@ -16,6 +20,7 @@ import 'package:transportation_app/features/login/presentation/cubit/login_cubit
 import 'package:transportation_app/features/profile/data/datasources/profile_remote_datasource.dart';
 import 'package:transportation_app/features/profile/data/repositories/profile_repository_imp.dart';
 import 'package:transportation_app/features/profile/domain/repositories/profile_repository.dart';
+import 'package:transportation_app/features/profile/domain/usecases/deposit_wallet_usecase.dart';
 import 'package:transportation_app/features/profile/domain/usecases/get_profile_usecase.dart';
 import 'package:transportation_app/features/profile/domain/usecases/logout_usecase.dart';
 import 'package:transportation_app/features/profile/domain/usecases/update_profile_picture_usecase.dart';
@@ -87,11 +92,14 @@ Future<void> init() async {
   sl.registerLazySingleton(
     () => UploadProfilePictureUseCase(sl<ProfileRepository>()),
   );
+  sl.registerLazySingleton(() => DepositWalletUseCase(sl<ProfileRepository>()));
   sl.registerFactory(
     () => ProfileCubit(
       getProfileUseCase: sl<GetProfileUseCase>(),
       updateProfileUseCase: sl<UpdateProfileUseCase>(),
       uploadPictureUseCase: sl<UploadProfilePictureUseCase>(),
+      depositWalletUseCase: sl<DepositWalletUseCase>(),
+      profileRepository: sl<ProfileRepository>(),
     ),
   );
   sl.registerFactory(() => LogoutCubit(logoutUseCase: sl<LogoutUseCase>()));
@@ -124,4 +132,15 @@ Future<void> init() async {
     () => BookingRemoteDatasourceImpl(dio: DioClient.getInstance()),
   );
   sl.registerFactory(() => SeatMapCubit(datasource: sl()));
+
+  // ── My Tickets feature ─────────────────────────────────────────────
+  sl.registerLazySingleton<MyTicketsRemoteDatasource>(
+    () => MyTicketsRemoteDatasourceImpl(dio: DioClient.getInstance()),
+  );
+  sl.registerLazySingleton<MyTicketsRepository>(
+    () => MyTicketsRepositoryImpl(remoteDatasource: sl()),
+  );
+  sl.registerFactory(
+    () => MyTicketsCubit(repository: sl<MyTicketsRepository>()),
+  );
 }

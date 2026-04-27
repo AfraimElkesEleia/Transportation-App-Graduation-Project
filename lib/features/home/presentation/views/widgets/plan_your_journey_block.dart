@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:transportation_app/core/helper/extensions.dart';
 import 'package:transportation_app/core/helper/spacing.dart';
 import 'package:transportation_app/core/routing/routes.dart';
 import 'package:transportation_app/core/widgets/block_container.dart';
@@ -203,20 +204,20 @@ class _PlanYourJourneyBlockState extends State<PlanYourJourneyBlock>
     return SearchParams(
       isRoundTrip: _isRoundTrip,
       travelDate: _formatDateForApi(dateController.text),
-      returnDate: _isRoundTrip ? _formatDateForApi(returnDateController.text) : null,
+      returnDate: _isRoundTrip
+          ? _formatDateForApi(returnDateController.text)
+          : null,
       passengers: 1,
       transport: _apiTransportValue,
       fromDisplayName: fromDisplay,
       toDisplayName: toDisplay,
       fromStationId: _selectedFromStation?.id,
       fromGovernorate: _selectedFromStation == null
-          ? _selectedFromGroup!
-                .governorate 
+          ? _selectedFromGroup!.governorate
           : null,
       toStationId: _selectedToStation?.id,
       toGovernorate: _selectedToStation == null
-          ? _selectedToGroup!
-                .governorate 
+          ? _selectedToGroup!.governorate
           : null,
     );
   }
@@ -361,6 +362,13 @@ class _PlanYourJourneyBlockState extends State<PlanYourJourneyBlock>
               // verticalSpace(space: 12),
               SearchTripButton(onPressed: _onSearch),
               verticalSpace(space: 12),
+              SearchTripButton(
+                onPressed: () {
+                  context.pushNamed(AppRoutes.multidestinationScreen);
+                },
+                label: "Multi-Destination",
+                backgroundColor: Colors.blueAccent,
+              ),
             ],
           ),
         );
