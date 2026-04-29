@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:transportation_app/core/constants/api_constants.dart';
 import 'package:transportation_app/core/helper/extensions.dart';
 import 'package:transportation_app/core/routing/routes.dart';
+import 'package:transportation_app/core/widgets/app_shimmer.dart';
 import 'package:transportation_app/core/widgets/basic_container.dart';
 import 'package:transportation_app/features/profile/presentation/cubit/logout_cubit/logout_cubit.dart';
 import 'package:transportation_app/features/profile/presentation/cubit/logout_cubit/logout_states.dart';
@@ -108,8 +109,7 @@ class _ProfileViewState extends State<ProfileScreen> {
                 c is ProfileUpdateSuccess,
             builder: (context, state) {
               if (state is ProfileLoading) {
-                return const Center(
-                    child: CircularProgressIndicator(color: Colors.cyan));
+                return const SafeArea(child: ProfileShimmer());
               }
               if (state is ProfileError) {
                 return Center(

@@ -43,9 +43,15 @@ class RoundTripBookingState extends Equatable {
   final String? cartError;
   final bool cartSuccess;
 
+  /// Number of passengers = each leg can have its own count.
+  /// Exposed per-leg so the form can generate correct cards.
+  int get outboundSeatCount => selectedOutboundSeats.length;
+  int get returnSeatCount   => selectedReturnSeats.length;
+
+  /// Total unique passengers = max of both legs (both legs are filled independently).
   int get requiredSeatCount {
-    if (selectedOutboundSeats.isNotEmpty) {
-      return selectedOutboundSeats.length;
+    if (selectedOutboundSeats.isNotEmpty || selectedReturnSeats.isNotEmpty) {
+      return 0; // not used as a hard constraint anymore
     }
     return activeParams?.passengers ?? 1;
   }

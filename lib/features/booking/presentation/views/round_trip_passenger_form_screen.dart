@@ -14,23 +14,29 @@ class RoundTripPassengerFormScreen extends StatefulWidget {
 
 class _RoundTripPassengerFormScreenState extends State<RoundTripPassengerFormScreen> {
   final _formKey = GlobalKey<FormState>();
-  late final List<_PassengerControllers> _controllers;
+
+  // Separate passenger controller lists per leg
+  late final List<_PassengerControllers> _outboundControllers;
+  late final List<_PassengerControllers> _returnControllers;
+
+  late final int _outboundCount;
+  late final int _returnCount;
 
   @override
   void initState() {
     super.initState();
     final state = context.read<RoundTripBookingCubit>().state;
-    _controllers = List.generate(
-      state.requiredSeatCount,
-      (_) => _PassengerControllers(),
-    );
+    _outboundCount = state.selectedOutboundSeats.length;
+    _returnCount   = state.selectedReturnSeats.length;
+
+    _outboundControllers = List.generate(_outboundCount, (_) => _PassengerControllers());
+    _returnControllers   = List.generate(_returnCount,   (_) => _PassengerControllers());
   }
 
   @override
   void dispose() {
-    for (final c in _controllers) {
-      c.dispose();
-    }
+    for (final c in _outboundControllers) { c.dispose(); }
+    for (final c in _returnControllers)   { c.dispose(); }
     super.dispose();
   }
 
@@ -41,28 +47,29 @@ class _RoundTripPassengerFormScreenState extends State<RoundTripPassengerFormScr
     final state = cubit.state;
 
     final List<Map<String, dynamic>> outboundPassengers = [];
-    final List<Map<String, dynamic>> returnPassengers = [];
-
-    for (int i = 0; i < state.requiredSeatCount; i++) {
-      final c = _controllers[i];
-      
-      final basePayload = {
+    for (int i = 0; i < _outboundCount; i++) {
+      final c = _outboundControllers[i];
+      outboundPassengers.add({
         'name': c.nameController.text.trim(),
         'age': 25,
         'idNumber': c.idController.text.trim().isEmpty ? 'N/A' : c.idController.text.trim(),
         'phoneNumber': c.phoneController.text.trim(),
-        'idType': 5, // Default/Other
-      };
+        'idType': 5,
+        'seatNumber': state.selectedOutboundSeats[i],
+      });
+    }
 
-      // Outbound
-      final outP = Map<String, dynamic>.from(basePayload);
-      outP['seatNumber'] = state.selectedOutboundSeats[i];
-      outboundPassengers.add(outP);
-
-      // Return
-      final retP = Map<String, dynamic>.from(basePayload);
-      retP['seatNumber'] = state.selectedReturnSeats[i];
-      returnPassengers.add(retP);
+    final List<Map<String, dynamic>> returnPassengers = [];
+    for (int i = 0; i < _returnCount; i++) {
+      final c = _returnControllers[i];
+      returnPassengers.add({
+        'name': c.nameController.text.trim(),
+        'age': 25,
+        'idNumber': c.idController.text.trim().isEmpty ? 'N/A' : c.idController.text.trim(),
+        'phoneNumber': c.phoneController.text.trim(),
+        'idType': 5,
+        'seatNumber': state.selectedReturnSeats[i],
+      });
     }
 
     cubit.submitRoundTrip(outboundPassengers, returnPassengers);
@@ -74,18 +81,29 @@ class _RoundTripPassengerFormScreenState extends State<RoundTripPassengerFormScr
       backgroundColor: ColorsManager.seatBg,
       body: SafeArea(
         child: BlocConsumer<RoundTripBookingCubit, RoundTripBookingState>(
-          listenWhen: (prev, current) => prev.cartError != current.cartError || prev.cartSuccess != current.cartSuccess,
+          listenWhen: (prev, current) =>
+              prev.cartError != current.cartError ||
+              prev.cartSuccess != current.cartSuccess,
           listener: (context, state) {
             if (state.cartSuccess) {
-              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Journey added to cart successfully!'), backgroundColor: Colors.green));
-              // Navigate to cart
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Journey added to cart successfully!'),
+                  backgroundColor: Colors.green,
+                ),
+              );
               Navigator.pushNamedAndRemoveUntil(
                 context,
                 AppRoutes.cartScreen,
                 (route) => route.isFirst,
               );
             } else if (state.cartError != null) {
-              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(state.cartError!), backgroundColor: Colors.red));
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(state.cartError!),
+                  backgroundColor: Colors.red,
+                ),
+              );
             }
           },
           builder: (context, state) {
@@ -95,17 +113,41 @@ class _RoundTripPassengerFormScreenState extends State<RoundTripPassengerFormScr
                 Expanded(
                   child: Form(
                     key: _formKey,
-                    child: ListView.builder(
+                    child: ListView(
                       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-                      itemCount: state.requiredSeatCount,
-                      itemBuilder: (_, index) {
-                        return _PassengerCard(
-                          index: index + 1,
-                          outboundSeat: state.selectedOutboundSeats[index],
-                          returnSeat: state.selectedReturnSeats[index],
-                          controllers: _controllers[index],
-                        );
-                      },
+                      children: [
+                        // ── Outbound Leg Passengers ──────────────────────
+                        _LegHeader(
+                          label: 'Outbound',
+                          seatCount: _outboundCount,
+                          icon: Icons.flight_takeoff,
+                          color: ColorsManager.accentCyan,
+                        ),
+                        const SizedBox(height: 8),
+                        for (int i = 0; i < _outboundCount; i++)
+                          _PassengerCard(
+                            index: i + 1,
+                            seatLabel: 'Seat: ${state.selectedOutboundSeats[i]}',
+                            controllers: _outboundControllers[i],
+                          ),
+
+                        const SizedBox(height: 16),
+
+                        // ── Return Leg Passengers ────────────────────────
+                        _LegHeader(
+                          label: 'Return',
+                          seatCount: _returnCount,
+                          icon: Icons.flight_land,
+                          color: ColorsManager.turquoise,
+                        ),
+                        const SizedBox(height: 8),
+                        for (int i = 0; i < _returnCount; i++)
+                          _PassengerCard(
+                            index: i + 1,
+                            seatLabel: 'Seat: ${state.selectedReturnSeats[i]}',
+                            controllers: _returnControllers[i],
+                          ),
+                      ],
                     ),
                   ),
                 ),
@@ -122,9 +164,47 @@ class _RoundTripPassengerFormScreenState extends State<RoundTripPassengerFormScr
   }
 }
 
+// ── Leg section header ────────────────────────────────────────────────────────
+class _LegHeader extends StatelessWidget {
+  final String label;
+  final int seatCount;
+  final IconData icon;
+  final Color color;
+
+  const _LegHeader({
+    required this.label,
+    required this.seatCount,
+    required this.icon,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.12),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: color.withOpacity(0.4)),
+      ),
+      child: Row(
+        children: [
+          Icon(icon, color: color, size: 20),
+          const SizedBox(width: 10),
+          Text(
+            '$label — $seatCount Passenger${seatCount != 1 ? 's' : ''}',
+            style: TextStyle(color: color, fontSize: 14, fontWeight: FontWeight.bold),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ── Per-passenger controllers ─────────────────────────────────────────────────
 class _PassengerControllers {
-  final nameController = TextEditingController();
-  final idController = TextEditingController();
+  final nameController  = TextEditingController();
+  final idController    = TextEditingController();
   final phoneController = TextEditingController();
 
   void dispose() {
@@ -134,6 +214,7 @@ class _PassengerControllers {
   }
 }
 
+// ── App bar ───────────────────────────────────────────────────────────────────
 class _FormAppBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -146,11 +227,20 @@ class _FormAppBar extends StatelessWidget {
             child: Container(
               width: 42,
               height: 42,
-              decoration: BoxDecoration(color: ColorsManager.seatContainerBg, borderRadius: BorderRadius.circular(21)),
+              decoration: BoxDecoration(
+                color: ColorsManager.seatContainerBg,
+                borderRadius: BorderRadius.circular(21),
+              ),
               child: const Icon(Icons.arrow_back, color: Colors.white, size: 20),
             ),
           ),
-          const Expanded(child: Text('Passenger Details', style: TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.bold), textAlign: TextAlign.center)),
+          const Expanded(
+            child: Text(
+              'Passenger Details',
+              style: TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.bold),
+              textAlign: TextAlign.center,
+            ),
+          ),
           const SizedBox(width: 42),
         ],
       ),
@@ -158,16 +248,15 @@ class _FormAppBar extends StatelessWidget {
   }
 }
 
+// ── Single passenger card ─────────────────────────────────────────────────────
 class _PassengerCard extends StatelessWidget {
   final int index;
-  final String outboundSeat;
-  final String returnSeat;
+  final String seatLabel;
   final _PassengerControllers controllers;
 
   const _PassengerCard({
     required this.index,
-    required this.outboundSeat,
-    required this.returnSeat,
+    required this.seatLabel,
     required this.controllers,
   });
 
@@ -176,15 +265,29 @@ class _PassengerCard extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(color: ColorsManager.surfaceDark, borderRadius: BorderRadius.circular(16), border: Border.all(color: ColorsManager.borderDim, width: 1)),
+      decoration: BoxDecoration(
+        color: ColorsManager.surfaceDark,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: ColorsManager.borderDim, width: 1),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('Passenger $index', style: const TextStyle(color: ColorsManager.accentCyan, fontSize: 14, fontWeight: FontWeight.bold)),
-              Text('Out: $outboundSeat | Ret: $returnSeat', style: const TextStyle(color: Colors.white70, fontSize: 12)),
+              Text(
+                'Passenger $index',
+                style: const TextStyle(
+                  color: ColorsManager.accentCyan,
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              Text(
+                seatLabel,
+                style: const TextStyle(color: Colors.white70, fontSize: 12),
+              ),
             ],
           ),
           const SizedBox(height: 12),
@@ -233,15 +336,25 @@ class _PassengerCard extends StatelessWidget {
         prefixIcon: Icon(icon, color: ColorsManager.textMuted, size: 20),
         filled: true,
         fillColor: ColorsManager.seatContainerBg,
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
-        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: ColorsManager.accentCyan)),
-        errorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Colors.redAccent)),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide.none,
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: ColorsManager.accentCyan),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Colors.redAccent),
+        ),
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       ),
     );
   }
 }
 
+// ── Bottom submit bar ─────────────────────────────────────────────────────────
 class _FormBottomButtons extends StatelessWidget {
   final bool isAdding;
   final VoidCallback onAddToCart;
@@ -263,11 +376,20 @@ class _FormBottomButtons extends StatelessWidget {
           onPressed: isAdding ? null : onAddToCart,
           style: ElevatedButton.styleFrom(
             backgroundColor: ColorsManager.accentCyan,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(26)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(26),
+            ),
           ),
           child: isAdding
               ? const CircularProgressIndicator(color: Colors.white)
-              : const Text('Add Journey to Cart', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+              : const Text(
+                  'Add Journey to Cart',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
         ),
       ),
     );

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
 import 'package:transportation_app/core/helper/extensions.dart';
 import 'package:transportation_app/core/helper/spacing.dart';
 import 'package:transportation_app/core/routing/routes.dart';
@@ -176,9 +177,21 @@ class _PlanYourJourneyBlockState extends State<PlanYourJourneyBlock>
     if (_isRoundTrip) {
       if (returnDateController.text.trim().isEmpty) {
         returnDateErr = 'Please select a return date';
-      } else if (returnDateController.text.compareTo(dateController.text) <=
-          0) {
-        returnDateErr = 'Return date must be after departure';
+      } else {
+        final depDate = DateFormat(
+          'dd/MM/yyyy',
+        ).parseStrict(dateController.text);
+        final retDate = DateFormat(
+          'dd/MM/yyyy',
+        ).parseStrict(returnDateController.text);
+
+        // Stripping time is usually safe if you just want to compare calendar days
+        final depDay = DateTime(depDate.year, depDate.month, depDate.day);
+        final retDay = DateTime(retDate.year, retDate.month, retDate.day);
+
+        if (retDay.isBefore(depDay)) {
+          returnDateErr = 'Return date cannot be before departure';
+        }
       }
     }
 

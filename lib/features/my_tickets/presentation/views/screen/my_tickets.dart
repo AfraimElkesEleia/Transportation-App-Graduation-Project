@@ -3,11 +3,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:transportation_app/core/helper/extensions.dart';
 import 'package:transportation_app/core/routing/routes.dart';
 import 'package:transportation_app/core/theming/colors.dart';
+import 'package:transportation_app/core/widgets/app_shimmer.dart';
 import 'package:transportation_app/core/widgets/basic_container.dart';
 import 'package:transportation_app/features/my_tickets/presentation/cubit/my_tickets_cubit.dart';
 import 'package:transportation_app/features/my_tickets/presentation/cubit/my_tickets_states.dart';
 import 'package:transportation_app/features/my_tickets/presentation/views/widgets/ticket_detail_card.dart';
-import 'package:transportation_app/features/my_tickets/presentation/views/widgets/wallet_card.dart';
 import 'package:transportation_app/features/my_tickets/presentation/views/widgets/action_buttons_row.dart';
 import 'package:transportation_app/features/profile/domain/entities/ticket_entity.dart';
 
@@ -79,13 +79,7 @@ class _MyTicketsState extends State<MyTickets>
 
                 const SliverToBoxAdapter(child: SizedBox(height: 16)),
 
-                // ── Wallet Card ───────────────────────────────────
-                const SliverPadding(
-                  padding: EdgeInsets.symmetric(horizontal: 16),
-                  sliver: SliverToBoxAdapter(child: WalletCard()),
-                ),
 
-                const SliverToBoxAdapter(child: SizedBox(height: 16)),
 
                 // ── Marketplace / Resell actions ───────────────────
                 ActionButtonsRow(
@@ -142,9 +136,10 @@ class _MyTicketsState extends State<MyTickets>
                         c is TicketsErrorState,
                     builder: (context, state) {
                       if (state is TicketsLoadingState) {
-                        return const Center(
-                          child: CircularProgressIndicator(
-                              color: ColorsManager.accentCyan),
+                        return ListView.builder(
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                          itemCount: 4,
+                          itemBuilder: (_, __) => const AppShimmerCard(),
                         );
                       }
                       if (state is TicketsErrorState) {

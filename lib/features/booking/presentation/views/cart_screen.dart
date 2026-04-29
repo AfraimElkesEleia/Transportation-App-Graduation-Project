@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:transportation_app/core/routing/routes.dart';
 import 'package:transportation_app/core/theming/colors.dart';
+import 'package:transportation_app/core/widgets/app_shimmer.dart';
 import 'package:transportation_app/features/booking/presentation/cubit/cart_cubit.dart';
 import 'package:transportation_app/features/booking/presentation/cubit/cart_state.dart';
 import 'package:transportation_app/features/booking/presentation/views/widgets/cart_item_card.dart';
@@ -48,7 +49,11 @@ class _CartScreenState extends State<CartScreen> {
         },
         builder: (context, state) {
           if (state is CartLoading || state is CheckoutLoading) {
-            return const Center(child: CircularProgressIndicator(color: ColorsManager.accentCyan));
+            return ListView.builder(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              itemCount: 3,
+              itemBuilder: (_, __) => const AppShimmerCard(),
+            );
           }
           if (state is CartEmpty) {
             return _buildEmptyCart();

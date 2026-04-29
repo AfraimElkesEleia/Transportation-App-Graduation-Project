@@ -55,6 +55,7 @@ class SearchSection extends StatefulWidget {
 class _SearchSectionState extends State<SearchSection> {
   final List<TripLegState> _legs = [TripLegState()];
   bool _showAutoButtons = true;
+  int _preAutoLegCount = 0;
 
   @override
   void dispose() {
@@ -91,6 +92,7 @@ class _SearchSectionState extends State<SearchSection> {
       return;
     }
     setState(() {
+      _preAutoLegCount = _legs.length;
       final int initialCount = _legs.length;
       for (int i = initialCount - 1; i >= 0; i--) {
         final currentLeg = _legs[i];
@@ -127,6 +129,7 @@ class _SearchSectionState extends State<SearchSection> {
       return;
     }
     setState(() {
+      _preAutoLegCount = _legs.length;
       final firstLeg = _legs.first;
       final lastLeg = _legs.last;
 
@@ -156,6 +159,20 @@ class _SearchSectionState extends State<SearchSection> {
         removedLeg.dispose();
       });
     }
+  }
+
+  void _undoAutoAction() {
+    setState(() {
+      if (_preAutoLegCount > 0 && _preAutoLegCount < _legs.length) {
+        final toRemove = _legs.sublist(_preAutoLegCount);
+        _legs.removeRange(_preAutoLegCount, _legs.length);
+        for (var leg in toRemove) {
+          leg.dispose();
+        }
+      }
+      _preAutoLegCount = 0;
+      _showAutoButtons = true;
+    });
   }
 
   bool _validateAll() {
@@ -471,6 +488,15 @@ class _SearchSectionState extends State<SearchSection> {
                     ),
                   ),
                 ],
+              )
+            else
+              TextButton.icon(
+                onPressed: _undoAutoAction,
+                icon: const Icon(Icons.undo, color: Colors.redAccent),
+                label: const Text(
+                  'Undo Auto-Generated Trips',
+                  style: TextStyle(color: Colors.redAccent),
+                ),
               ),
 
             verticalSpace(space: 16),

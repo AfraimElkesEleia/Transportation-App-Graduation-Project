@@ -4,6 +4,7 @@ import 'package:transportation_app/core/di/injection_container.dart';
 import 'package:transportation_app/core/routing/routes.dart';
 import 'package:transportation_app/core/theming/colors.dart';
 import 'package:transportation_app/features/booking/data/datasources/booking_remote_datasource.dart';
+import 'package:transportation_app/features/home/domain/entities/search_params.dart';
 import 'package:transportation_app/features/multidestination/presentation/cubit/multi_destination_booking_cubit.dart';
 import 'package:transportation_app/features/multidestination/presentation/cubit/multi_destination_booking_state.dart';
 import 'package:transportation_app/features/booking/presentation/cubit/seat_map_cubit.dart';
@@ -159,7 +160,14 @@ class _MultiDestinationBookingScreenState extends State<MultiDestinationBookingS
                               context.read<MultiDestinationBookingCubit>().applyFilters(newParams);
                             },
                             onReset: () {
-                              // Reset
+                              final resetParams = state.currentActiveParams!.copyWith(
+                                transport: TransportType.all,
+                                sortBy: SortBy.departureTime,
+                                clearMaxPrice: true,
+                                clearTimeFilters: true,
+                                newPage: 1,
+                              );
+                              context.read<MultiDestinationBookingCubit>().applyFilters(resetParams);
                             },
                           ),
                         );
@@ -202,7 +210,6 @@ class _MultiDestinationBookingScreenState extends State<MultiDestinationBookingS
     final legIndex = state.currentSeatLegIndex;
     final trip = state.selectedTrips[legIndex]!;
     final cClass = state.selectedClasses[legIndex]!;
-    final enforcedSeatCount = legIndex > 0 ? state.requiredSeatCount : null;
 
     return CustomScrollView(
       slivers: [
@@ -224,7 +231,7 @@ class _MultiDestinationBookingScreenState extends State<MultiDestinationBookingS
               child: EmbeddedSeatSelection(
                 trip: trip,
                 coachClass: cClass,
-                enforcedSeatCount: enforcedSeatCount,
+                enforcedSeatCount: null,   // ← no restriction per leg
                 initialSeats: state.selectedSeats[legIndex] ?? [],
                 onCancel: () => context.read<MultiDestinationBookingCubit>().goBack(),
                 onProceed: (seats) {

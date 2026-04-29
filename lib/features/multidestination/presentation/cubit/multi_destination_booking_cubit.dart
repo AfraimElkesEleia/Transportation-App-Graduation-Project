@@ -24,16 +24,26 @@ class MultiDestinationBookingCubit extends Cubit<MultiDestinationBookingState> {
   Future<void> _searchCurrentLeg() async {
     final leg = state.legSummaries[state.currentSearchLegIndex];
 
-    // Build params for this leg
-    final params = SearchParams(
-      isRoundTrip: false,
-      travelDate: leg.apiDate,
-      passengers: 1,   
-      fromDisplayName: leg.from,
-      toDisplayName: leg.to,
-      fromGovernorate: leg.from, // Approximating since we only have names
-      toGovernorate: leg.to,
-    );
+    SearchParams params;
+
+    // Reuse existing params if we are just refreshing/filtering the same leg
+    if (state.currentActiveParams != null &&
+        state.currentActiveParams!.travelDate == leg.apiDate &&
+        state.currentActiveParams!.fromDisplayName == leg.from &&
+        state.currentActiveParams!.toDisplayName == leg.to) {
+      params = state.currentActiveParams!.copyWith(newPage: 1);
+    } else {
+      // Build fresh params for a new leg
+      params = SearchParams(
+        isRoundTrip: false,
+        travelDate: leg.apiDate,
+        passengers: 1,   
+        fromDisplayName: leg.from,
+        toDisplayName: leg.to,
+        fromGovernorate: leg.from, 
+        toGovernorate: leg.to,
+      );
+    }
 
     emit(state.copyWith(
       isSearching: true,
@@ -124,11 +134,6 @@ class MultiDestinationBookingCubit extends Cubit<MultiDestinationBookingState> {
 
   void saveSeatsForCurrentLeg(List<String> seats) {
     if (seats.isEmpty) return;
-    
-    // Ensure seat count matches leg 0 if this is subsequent leg
-    if (state.currentSeatLegIndex > 0 && seats.length != state.selectedSeats[0]?.length) {
-      return;
-    }
 
     final updatedSeats = Map<int, List<String>>.from(state.selectedSeats);
     updatedSeats[state.currentSeatLegIndex] = seats;

@@ -1,8 +1,8 @@
 class ApiConstants {
   static const String baseUrl =
-      'http://rehlabussines-001-site1.anytempurl.com/api';
+      'http://rehlabussines2-001-site1.anytempurl.com/api';
   static const String mediaBase =
-      'http://rehlabussines-001-site1.anytempurl.com';
+      'http://rehlabussines2-001-site1.anytempurl.com';
   static const String register = '/Auth/register';
   static const String login = '/Auth/login';
   static const String refresh = '/Auth/refresh';

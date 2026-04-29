@@ -221,9 +221,8 @@ class RoundTripBookingCubit extends Cubit<RoundTripBookingState> {
   }
 
   void saveUnifiedSeats(List<String> outboundSeats, List<String> returnSeats) {
-    if (outboundSeats.isEmpty || outboundSeats.length != returnSeats.length) {
-      return;
-    }
+    // Each leg only needs at least one seat — counts can differ.
+    if (outboundSeats.isEmpty || returnSeats.isEmpty) return;
     emit(state.copyWith(
       selectedOutboundSeats: outboundSeats,
       selectedReturnSeats: returnSeats,

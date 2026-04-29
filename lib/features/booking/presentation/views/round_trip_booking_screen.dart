@@ -693,12 +693,12 @@ class _UnifiedSeatSelectionLayerState
                 child: EmbeddedSeatSelection(
                   trip: widget.returnTrip,
                   coachClass: widget.returnClass,
-                  enforcedSeatCount: _selectedOutbound.length,
+                  enforcedSeatCount: null,          // ← no restriction
                   initialSeats: _selectedReturn,
                   onCancel: () => setState(() => _returnMapVisible = false),
                   onProceed: (seats) {
                     _onReturnSeatsChanged(seats);
-                    widget.onProceed(_selectedOutbound, _selectedReturn);
+                    widget.onProceed(_selectedOutbound, seats);
                   },
                 ),
               ),
