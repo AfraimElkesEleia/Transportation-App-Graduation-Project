@@ -185,7 +185,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                             ProfilePicturePicker(
                               currentImageUrl:
                                   ApiConstants.mediaUrl(_uploadedImageUrl) ??
-                                  ApiConstants.mediaUrl(widget.profile.profilePictureUrl),
+                                  ApiConstants.mediaUrl(
+                                    widget.profile.profilePictureUrl,
+                                  ),
                               initials: _initials,
                               onImagePicked: (path) {
                                 setState(() => _newImagePath = path);
@@ -288,7 +290,52 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                             ),
                             const SizedBox(height: 20),
 
-                            // ── Fixed fields ─────────────────
+                            // ── Points Section ─────────────────
+                            ProfileSectionContainer(
+                              title: 'Loyalty Points',
+                              icon: Icons.stars_rounded,
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(16),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFF1A2A3A),
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: const Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'Earned points are pending until departure and expire 4 months after departure.',
+                                        style: TextStyle(
+                                          color: Colors.white70,
+                                          fontSize: 14,
+                                        ),
+                                      ),
+                                      SizedBox(height: 12),
+                                      Text(
+                                        'Points Balance: 480',
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      SizedBox(height: 4),
+                                      Text(
+                                        'Expiring Soon: 120 pts (May 31, 2026)',
+                                        style: TextStyle(
+                                          color: Colors.orangeAccent,
+                                          fontSize: 14,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+
+                            const SizedBox(height: 20),
                             ProfileSectionContainer(
                               title: 'Fixed Details',
                               icon: Icons.lock_outline,

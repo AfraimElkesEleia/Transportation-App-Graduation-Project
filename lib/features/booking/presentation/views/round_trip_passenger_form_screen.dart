@@ -50,11 +50,9 @@ class _RoundTripPassengerFormScreenState extends State<RoundTripPassengerFormScr
     for (int i = 0; i < _outboundCount; i++) {
       final c = _outboundControllers[i];
       outboundPassengers.add({
-        'name': c.nameController.text.trim(),
-        'age': 25,
+        'passengerName': c.nameController.text.trim(),
         'idNumber': c.idController.text.trim().isEmpty ? 'N/A' : c.idController.text.trim(),
-        'phoneNumber': c.phoneController.text.trim(),
-        'idType': 5,
+        'idType': 'NationalId',
         'seatNumber': state.selectedOutboundSeats[i],
       });
     }
@@ -63,16 +61,24 @@ class _RoundTripPassengerFormScreenState extends State<RoundTripPassengerFormScr
     for (int i = 0; i < _returnCount; i++) {
       final c = _returnControllers[i];
       returnPassengers.add({
-        'name': c.nameController.text.trim(),
-        'age': 25,
+        'passengerName': c.nameController.text.trim(),
         'idNumber': c.idController.text.trim().isEmpty ? 'N/A' : c.idController.text.trim(),
-        'phoneNumber': c.phoneController.text.trim(),
-        'idType': 5,
+        'idType': 'NationalId',
         'seatNumber': state.selectedReturnSeats[i],
       });
     }
 
-    cubit.submitRoundTrip(outboundPassengers, returnPassengers);
+    final contactName = _outboundControllers.isNotEmpty ? _outboundControllers.first.nameController.text.trim() : 'Unknown';
+    final contactPhone = _outboundControllers.isNotEmpty ? _outboundControllers.first.phoneController.text.trim() : 'Unknown';
+    final contactEmail = _outboundControllers.isNotEmpty ? _outboundControllers.first.emailController.text.trim() : '';
+
+    cubit.submitRoundTrip(
+      contactName: contactName,
+      contactPhone: contactPhone,
+      contactEmail: contactEmail.isEmpty ? 'user@example.com' : contactEmail,
+      outboundPassengers: outboundPassengers,
+      returnPassengers: returnPassengers,
+    );
   }
 
   @override
@@ -206,11 +212,13 @@ class _PassengerControllers {
   final nameController  = TextEditingController();
   final idController    = TextEditingController();
   final phoneController = TextEditingController();
+  final emailController = TextEditingController();
 
   void dispose() {
     nameController.dispose();
     idController.dispose();
     phoneController.dispose();
+    emailController.dispose();
   }
 }
 
@@ -312,6 +320,13 @@ class _PassengerCard extends StatelessWidget {
             icon: Icons.phone_outlined,
             keyboardType: TextInputType.phone,
             validator: (v) => (v == null || v.trim().isEmpty) ? 'Required' : null,
+          ),
+          const SizedBox(height: 12),
+          _buildTextField(
+            controller: controllers.emailController,
+            label: 'Email Address (Optional)',
+            icon: Icons.email_outlined,
+            keyboardType: TextInputType.emailAddress,
           ),
         ],
       ),

@@ -31,6 +31,9 @@ class SeatMapCubit extends Cubit<SeatMapState> {
     required int coachClassId,
     required int originStationId,
     required int destinationStationId,
+    required String contactName,
+    required String contactPhone,
+    required String contactEmail,
     required List<Map<String, dynamic>> passengers,
   }) async {
     emit(SeatMapLoading());
@@ -40,6 +43,9 @@ class SeatMapCubit extends Cubit<SeatMapState> {
         'coachClassId': coachClassId,
         'originStationId': originStationId,
         'destinationStationId': destinationStationId,
+        'contactName': contactName,
+        'contactPhone': contactPhone,
+        'contactEmail': contactEmail,
         'passengers': passengers,
       });
       emit(CartSuccess());
@@ -71,7 +77,11 @@ class SeatMapCubit extends Cubit<SeatMapState> {
     required int    coachClassId,
     required int    originStationId,
     required int    destinationStationId,
+    required String contactName,
+    required String contactPhone,
+    required String contactEmail,
     required List<Map<String, dynamic>> passengers,
+    int pointsToRedeem = 0,
   }) async {
     if (isClosed) return;
     emit(CartAdding());
@@ -81,10 +91,17 @@ class SeatMapCubit extends Cubit<SeatMapState> {
         'coachClassId':        coachClassId,
         'originStationId':     originStationId,
         'destinationStationId': destinationStationId,
+        'contactName':         contactName,
+        'contactPhone':        contactPhone,
+        'contactEmail':        contactEmail,
         'passengers':          passengers,
       });
-      await datasource.checkout();
-      if (!isClosed) emit(CartSuccess());
+      try {
+        await datasource.checkout(pointsToRedeem: pointsToRedeem);
+        if (!isClosed) emit(CartSuccess());
+      } on ServerException catch (e) {
+        if (!isClosed) emit(CartAddedButCheckoutFailed(e.message));
+      }
     } on ServerException catch (e) {
       if (!isClosed) emit(CartError(e.message));
     } on NetworkException {

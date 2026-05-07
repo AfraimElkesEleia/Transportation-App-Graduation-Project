@@ -14,6 +14,7 @@ import 'package:transportation_app/features/profile/presentation/views/widgets/p
 import 'package:transportation_app/features/profile/presentation/views/widgets/profile_card.dart';
 import 'package:transportation_app/features/profile/presentation/views/widgets/profile_logout_button.dart';
 import 'package:transportation_app/features/profile/presentation/views/widgets/quick_actions_section.dart';
+import 'package:transportation_app/features/profile/presentation/views/widgets/loyalty_points_card.dart';
 import 'package:transportation_app/features/profile/presentation/views/widgets/wallet_section.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -55,31 +56,37 @@ class _ProfileViewState extends State<ProfileScreen> {
       builder: (_) => AlertDialog(
         backgroundColor: const Color(0xFF1A2A3A),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text('Sign Out?',
-            style:
-                TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        title: const Text(
+          'Sign Out?',
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        ),
         content: const Text(
-            'You will need to sign in again to access your account.',
-            style: TextStyle(color: Colors.white60)),
+          'You will need to sign in again to access your account.',
+          style: TextStyle(color: Colors.white60),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child:
-                const Text('Cancel', style: TextStyle(color: Colors.white54)),
+            child: const Text(
+              'Cancel',
+              style: TextStyle(color: Colors.white54),
+            ),
           ),
           TextButton(
             onPressed: () {
               Navigator.pop(context);
               context.read<LogoutCubit>().logout();
             },
-            child: const Text('Sign Out',
-                style: TextStyle(
-                    color: Colors.red, fontWeight: FontWeight.bold)),
+            child: const Text(
+              'Sign Out',
+              style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+            ),
           ),
         ],
       ),
     );
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -91,7 +98,9 @@ class _ProfileViewState extends State<ProfileScreen> {
               listener: (context, state) {
                 if (state is LogoutSuccess) {
                   Navigator.of(context).pushNamedAndRemoveUntil(
-                      AppRoutes.loginScreen, (_) => false);
+                    AppRoutes.loginScreen,
+                    (_) => false,
+                  );
                 }
               },
             ),
@@ -116,12 +125,17 @@ class _ProfileViewState extends State<ProfileScreen> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Icon(Icons.error_outline,
-                          color: Colors.red, size: 56),
+                      const Icon(
+                        Icons.error_outline,
+                        color: Colors.red,
+                        size: 56,
+                      ),
                       const SizedBox(height: 16),
-                      Text(state.message,
-                          style: const TextStyle(color: Colors.white),
-                          textAlign: TextAlign.center),
+                      Text(
+                        state.message,
+                        style: const TextStyle(color: Colors.white),
+                        textAlign: TextAlign.center,
+                      ),
                       const SizedBox(height: 24),
                       ElevatedButton(
                         onPressed: () =>
@@ -135,8 +149,8 @@ class _ProfileViewState extends State<ProfileScreen> {
               final profile = state is ProfileLoaded
                   ? state.profile
                   : state is ProfileUpdateSuccess
-                      ? state.profile
-                      : null;
+                  ? state.profile
+                  : null;
 
               return RefreshIndicator(
                 color: Colors.cyan,
@@ -154,9 +168,8 @@ class _ProfileViewState extends State<ProfileScreen> {
                         fullName: profile?.fullName ?? '',
                         email: profile?.email ?? '',
                         profilePictureUrl: ApiConstants.mediaUrl(
-                            profile?.profilePictureUrl),
-                        totalTrips: profile?.totalTrips,
-                        totalDistanceKm: profile?.totalDistanceKm,
+                          profile?.profilePictureUrl,
+                        ),
                         onEditTap: () {
                           context.pushNamed(
                             AppRoutes.editProfile,
@@ -169,6 +182,10 @@ class _ProfileViewState extends State<ProfileScreen> {
                       ),
                       const SizedBox(height: 20),
                       WalletSection(balance: profile?.walletBalance),
+                      const SizedBox(height: 20),
+                      LoyaltyPointsCard(
+                        profile: profile,
+                      ),
                       const SizedBox(height: 20),
                       PersonalInfoSection(
                         fullNameController: fullNameController,
@@ -184,9 +201,12 @@ class _ProfileViewState extends State<ProfileScreen> {
                           return logoutState is LogoutLoading
                               ? const Center(
                                   child: CircularProgressIndicator(
-                                      color: Colors.red))
+                                    color: Colors.red,
+                                  ),
+                                )
                               : ProfileLogoutButton(
-                                  onPressed: _showLogoutDialog);
+                                  onPressed: _showLogoutDialog,
+                                );
                         },
                       ),
                     ],

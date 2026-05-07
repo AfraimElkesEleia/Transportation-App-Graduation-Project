@@ -1,5 +1,33 @@
 import 'package:equatable/equatable.dart';
 
+class ChallengeEntity extends Equatable {
+  final int challengeId;
+  final String title;
+  final int type;
+  final int currentProgress;
+  final int goalValue;
+  final int rewardPoints;
+
+  const ChallengeEntity({
+    required this.challengeId,
+    required this.title,
+    required this.type,
+    required this.currentProgress,
+    required this.goalValue,
+    required this.rewardPoints,
+  });
+
+  @override
+  List<Object?> get props => [
+    challengeId,
+    title,
+    type,
+    currentProgress,
+    goalValue,
+    rewardPoints,
+  ];
+}
+
 class ProfileEntity extends Equatable {
   final int userId;
   final String firstName;
@@ -14,6 +42,10 @@ class ProfileEntity extends Equatable {
   final int? totalTrips;
   final double? totalDistanceKm;
   final double? walletBalance;
+  final int? loyaltyPointsBalance;
+  final int? expiringPointsAmount;
+  final String? nextExpiryDate;
+  final List<ChallengeEntity>? activeChallenges;
   const ProfileEntity({
     required this.userId,
     required this.firstName,
@@ -28,6 +60,10 @@ class ProfileEntity extends Equatable {
     this.totalTrips,
     this.totalDistanceKm,
     this.walletBalance,
+    this.loyaltyPointsBalance,
+    this.expiringPointsAmount,
+    this.nextExpiryDate,
+    this.activeChallenges,
   });
 
   ProfileEntity copyWith({
@@ -40,6 +76,10 @@ class ProfileEntity extends Equatable {
     int? totalTrips,
     double? totalDistanceKm,
     double? walletBalance,
+    int? loyaltyPointsBalance,
+    int? expiringPointsAmount,
+    String? nextExpiryDate,
+    List<ChallengeEntity>? activeChallenges,
   }) {
     return ProfileEntity(
       userId: userId,
@@ -55,12 +95,15 @@ class ProfileEntity extends Equatable {
       totalTrips: totalTrips ?? this.totalTrips,
       totalDistanceKm: totalDistanceKm ?? this.totalDistanceKm,
       walletBalance: walletBalance ?? this.walletBalance,
+      loyaltyPointsBalance: loyaltyPointsBalance ?? this.loyaltyPointsBalance,
+      expiringPointsAmount: expiringPointsAmount ?? this.expiringPointsAmount,
+      nextExpiryDate: nextExpiryDate ?? this.nextExpiryDate,
+      activeChallenges: activeChallenges ?? this.activeChallenges,
     );
   }
 
   String get fullName =>
-      '${firstName.capitalize()} ${lastName.capitalize()} ${familyName.capitalize()}'
-          .trim();
+      '$firstName $familyName $lastName'.replaceAll(RegExp(r'\s+'), ' ').trim();
 
   @override
   List<Object?> get props => [userId, email];

@@ -24,10 +24,10 @@ class CartCubit extends Cubit<CartState> {
     }
   }
 
-  Future<void> checkout() async {
+  Future<void> checkout({int pointsToRedeem = 0}) async {
     emit(CheckoutLoading());
     try {
-      await datasource.checkout();
+      await datasource.checkout(pointsToRedeem: pointsToRedeem);
       emit(CheckoutSuccess());
     } on ServerException catch (e) {
       emit(CheckoutError(e.message));

@@ -7,6 +7,7 @@ import 'package:transportation_app/features/my_tickets/data/datasources/my_ticke
 import 'package:transportation_app/features/my_tickets/data/repositories/my_tickets_repository_impl.dart';
 import 'package:transportation_app/features/my_tickets/domain/repositories/my_tickets_repository.dart';
 import 'package:transportation_app/features/my_tickets/presentation/cubit/my_tickets_cubit.dart';
+import 'package:transportation_app/features/my_tickets/presentation/cubit/marketplace_cubit.dart';
 import 'package:transportation_app/features/home/data/datasource/stations_remote_datasource.dart';
 import 'package:transportation_app/features/home/data/repositories/stations_repository_imp.dart';
 import 'package:transportation_app/features/home/domain/repositories/station_repository.dart';
@@ -142,5 +143,8 @@ Future<void> init() async {
   );
   sl.registerFactory(
     () => MyTicketsCubit(repository: sl<MyTicketsRepository>()),
+  );
+  sl.registerFactory(
+    () => MarketplaceCubit(repository: sl<MyTicketsRepository>()),
   );
 }

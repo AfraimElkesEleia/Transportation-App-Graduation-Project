@@ -169,13 +169,15 @@ class ProfileRemoteDatasourceImpl implements ProfileRemoteDatasource {
   TicketEntity _parseTicket(Map<String, dynamic> json) {
     final passengers = (json['passengers'] as List<dynamic>? ?? [])
         .map((p) => TicketPassengerEntity(
-              name: p['name'] as String? ?? '',
-              idNumber: p['idNumber'] as String? ?? '',
-              seatNumber: p['seatNumber'] as String? ?? '',
+              passengerId: p['passengerId'] as int? ?? p['id'] as int? ?? 0,
+              name: p['name'] as String? ?? p['passengerName'] as String? ?? 'Unknown',
+              idNumber: p['idNumber'] as String? ?? 'N/A',
+              seatNumber: p['seatNumber']?.toString() ?? 'N/A',
             ))
         .toList();
     return TicketEntity(
       bookingId: json['bookingId'] as int,
+      userId: json['userId'] as int? ?? 0,
       status: json['status'] as String? ?? '',
       paymentStatus: json['paymentStatus'] as String? ?? '',
       totalPrice: (json['totalPrice'] as num).toDouble(),
@@ -183,7 +185,10 @@ class ProfileRemoteDatasourceImpl implements ProfileRemoteDatasource {
       bookingDate: DateTime.tryParse(json['bookingDate'] as String? ?? '') ?? DateTime.now(),
       agencyName: json['agencyName'] as String? ?? '',
       className: json['className'] as String? ?? '',
+      isMarketplacePurchase: json['isMarketplacePurchase'] as bool? ?? false,
+      originGovernorate: json['originGovernorate'] as String? ?? 'Cairo',
       originStation: json['originStation'] as String? ?? '',
+      destinationGovernorate: json['destinationGovernorate'] as String? ?? 'Alexandria',
       destinationStation: json['destinationStation'] as String? ?? '',
       boardingTime: DateTime.tryParse(json['boardingTime'] as String? ?? '') ?? DateTime.now(),
       dropoffTime: DateTime.tryParse(json['dropoffTime'] as String? ?? '') ?? DateTime.now(),

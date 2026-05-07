@@ -59,29 +59,33 @@ class _IndirectPassengerFormScreenState
     ) {
       final c = _controllers[i];
       final Map<String, dynamic> p = {
-        'name': c.nameController.text.trim(),
-        'age': 25,
+        'passengerName': c.nameController.text.trim(),
         'idNumber': c.idController.text.trim().isEmpty
             ? 'N/A'
             : c.idController.text.trim(),
-        'phoneNumber': c.phoneController.text.trim(),
+        'idType': 'NationalId',
       };
 
       if (isTrain) {
-        p['idType'] = 1;
         p['seatNumber'] = '${i + 1}';
       } else {
-        p['idType'] = 5;
         p['seatNumber'] = selectedSeats[i];
       }
       return p;
     });
+
+    final contactName = _controllers.first.nameController.text.trim();
+    final contactPhone = _controllers.first.phoneController.text.trim();
+    final contactEmail = _controllers.first.emailController.text.trim();
 
     return {
       'tripOccurrenceId': trip.tripOccurrenceId,
       'coachClassId': coachClassId,
       'originStationId': trip.originStationId,
       'destinationStationId': trip.destinationStationId,
+      'contactName': contactName,
+      'contactPhone': contactPhone,
+      'contactEmail': contactEmail.isEmpty ? 'user@example.com' : contactEmail,
       'passengers': passengers,
     };
   }
@@ -219,12 +223,14 @@ class _PassengerControllers {
   final nameController = TextEditingController();
   final idController = TextEditingController();
   final phoneController = TextEditingController();
+  final emailController = TextEditingController();
   String gender = 'Male';
 
   void dispose() {
     nameController.dispose();
     idController.dispose();
     phoneController.dispose();
+    emailController.dispose();
   }
 }
 
@@ -294,6 +300,16 @@ class _PassengerCard extends StatelessWidget {
             ),
             validator: (v) =>
                 (v == null || v.trim().isEmpty) ? 'Required' : null,
+          ),
+          const SizedBox(height: 12),
+          TextFormField(
+            controller: controllers.emailController,
+            keyboardType: TextInputType.emailAddress,
+            style: const TextStyle(color: Colors.white),
+            decoration: const InputDecoration(
+              labelText: 'Email Address (Optional)',
+              labelStyle: TextStyle(color: ColorsManager.textMuted),
+            ),
           ),
           const SizedBox(height: 12),
           if (!hasTrainAnywhere) ...[

@@ -19,4 +19,5 @@ abstract class AppRoutes {
   static const multidestinationSummaryScreen = '/multidestination_summary_screen';
   static const multidestinationBookingScreen = '/multidestination_booking_screen';
   static const multidestinationPassengerFormScreen = '/multidestination_passenger_form_screen';
+  static const ticketDetailsScreen = '/ticket_details_screen';
 }

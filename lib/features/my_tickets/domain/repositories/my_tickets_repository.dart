@@ -12,4 +12,15 @@ abstract class MyTicketsRepository {
     required String expiryDate,
     required String cvv,
   });
+
+  ResultFuture<Map<String, dynamic>> getActiveListings({
+    int pageNumber = 1,
+    int pageSize = 10,
+    String? originGovernorate,
+    String? destinationGovernorate,
+    String? travelDate,
+  });
+  ResultVoid listTicket({required int bookingId, required double askingPrice});
+  ResultVoid buyTicket({required int listingId});
+  ResultVoid cancelListing({required int listingId});
 }

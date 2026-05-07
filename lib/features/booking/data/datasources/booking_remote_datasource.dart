@@ -8,7 +8,7 @@ abstract class BookingRemoteDatasource {
   Future<CartResponseModel?> getCart();
   Future<SeatMapModel> getSeatMap(int occurrenceId);
   Future<void>         addToCart(Map<String, dynamic> payload);
-  Future<void>         checkout();
+  Future<void>         checkout({int pointsToRedeem = 0});
 }
 
 class BookingRemoteDatasourceImpl implements BookingRemoteDatasource {
@@ -64,11 +64,14 @@ class BookingRemoteDatasourceImpl implements BookingRemoteDatasource {
   }
 
   @override
-  Future<void> checkout() async {
+  Future<void> checkout({int pointsToRedeem = 0}) async {
     try {
       final res  = await dio.post(
         ApiConstants.checkout,
-        data: {'paymentMethod': 'Wallet'},
+        data: {
+          'paymentMethod': 'Wallet',
+          'pointsToRedeem': pointsToRedeem,
+        },
       );
       final body = res.data as Map<String, dynamic>;
       if (body['success'] != true) {

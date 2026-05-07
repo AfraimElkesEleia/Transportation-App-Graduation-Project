@@ -15,10 +15,14 @@ import 'package:transportation_app/features/multidestination/presentation/screen
 import 'package:transportation_app/features/multidestination/presentation/cubit/multi_destination_booking_cubit.dart';
 import 'package:transportation_app/features/multidestination/presentation/screens/multi_destination_booking_screen.dart';
 import 'package:transportation_app/features/multidestination/presentation/screens/multi_destination_passenger_form_screen.dart';
+import 'package:transportation_app/features/my_tickets/presentation/cubit/marketplace_cubit.dart';
+import 'package:transportation_app/features/my_tickets/presentation/cubit/my_tickets_cubit.dart';
 import 'package:transportation_app/features/my_tickets/presentation/views/screen/market_place.dart';
 import 'package:transportation_app/features/my_tickets/presentation/views/screen/resell_tickets.dart';
+import 'package:transportation_app/features/my_tickets/presentation/views/screen/ticket_details_screen.dart';
 import 'package:transportation_app/features/onboarding/presentation/views/onboarding_screen.dart';
 import 'package:transportation_app/features/profile/domain/entities/profile_entity.dart';
+import 'package:transportation_app/features/profile/domain/entities/ticket_entity.dart';
 import 'package:transportation_app/features/profile/presentation/cubit/profile_cubit/profile_cubit.dart';
 import 'package:transportation_app/features/profile/presentation/views/screen/edit_profile_screen.dart';
 import 'package:transportation_app/features/search/data/datasources/recent_search_local_data_source.dart';
@@ -82,9 +86,26 @@ class AppRouter {
           ),
         );
       case AppRoutes.marketPlaceScreen:
-        return MaterialPageRoute(builder: (_) => MarketplaceScreen());
+        return MaterialPageRoute(
+          builder: (_) => MultiBlocProvider(
+            providers: [
+              BlocProvider(create: (_) => sl<MarketplaceCubit>()..fetchActiveListings()),
+              BlocProvider(create: (_) => sl<ProfileCubit>()..loadProfile()),
+            ],
+            child: MarketplaceScreen(),
+          ),
+        );
       case AppRoutes.resellTicketsScreen:
-        return MaterialPageRoute(builder: (_) => ResellTicketsScreen());
+        final myTicketsCubit = settings.arguments as MyTicketsCubit;
+        return MaterialPageRoute(
+          builder: (_) => MultiBlocProvider(
+            providers: [
+              BlocProvider.value(value: myTicketsCubit),
+              BlocProvider(create: (_) => sl<MarketplaceCubit>()),
+            ],
+            child: ResellTicketsScreen(),
+          ),
+        );
       case AppRoutes.loginScreen:
         return MaterialPageRoute(
           builder: (_) => BlocProvider(
@@ -141,9 +162,16 @@ class AppRouter {
         final seats = args['seats'] as List<String>;
         final isTrain = args['isTrain'] as bool;
         return MaterialPageRoute(
-          builder: (_) => BlocProvider(
-            create: (_) =>
-                SeatMapCubit(datasource: sl<BookingRemoteDatasource>()),
+          builder: (_) => MultiBlocProvider(
+            providers: [
+              BlocProvider(
+                create: (_) =>
+                    SeatMapCubit(datasource: sl<BookingRemoteDatasource>()),
+              ),
+              BlocProvider(
+                create: (_) => sl<ProfileCubit>()..loadProfile(),
+              ),
+            ],
             child: PassengerFormScreen(
               trip: trip,
               coachClass: coachClass,
@@ -154,8 +182,16 @@ class AppRouter {
         );
       case AppRoutes.cartScreen:
         return MaterialPageRoute(
-          builder: (_) => BlocProvider(
-            create: (_) => CartCubit(datasource: sl<BookingRemoteDatasource>()),
+          builder: (_) => MultiBlocProvider(
+            providers: [
+              BlocProvider(
+                create: (_) =>
+                    CartCubit(datasource: sl<BookingRemoteDatasource>()),
+              ),
+              BlocProvider(
+                create: (_) => sl<ProfileCubit>()..loadProfile(),
+              ),
+            ],
             child: const CartScreen(),
           ),
         );
@@ -218,6 +254,11 @@ class AppRouter {
             ],
             child: MultidestinationScreen(),
           ),
+        );
+      case AppRoutes.ticketDetailsScreen:
+        final ticket = settings.arguments as TicketEntity;
+        return MaterialPageRoute(
+          builder: (_) => TicketDetailsScreen(ticket: ticket),
         );
       default:
         return null;

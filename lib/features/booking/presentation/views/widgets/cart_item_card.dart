@@ -43,7 +43,7 @@ class CartItemCard extends StatelessWidget {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        '${item.origin} ➔ ${item.destination}',
+                        '${item.origin}${item.originGov.isNotEmpty ? ' (${item.originGov})' : ''} ➔ ${item.destination}${item.destinationGov.isNotEmpty ? ' (${item.destinationGov})' : ''}',
                         style: const TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,

@@ -26,3 +26,9 @@ class CartError   extends SeatMapState {
   const CartError(this.message);
   @override List<Object?> get props => [message];
 }
+
+class CartAddedButCheckoutFailed extends SeatMapState {
+  final String message;
+  const CartAddedButCheckoutFailed(this.message);
+  @override List<Object?> get props => [message];
+}

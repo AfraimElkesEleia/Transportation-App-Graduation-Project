@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:transportation_app/features/my_tickets/domain/repositories/my_tickets_repository.dart';
+import 'package:transportation_app/features/profile/domain/entities/ticket_entity.dart';
 import 'my_tickets_states.dart';
 
 class MyTicketsCubit extends Cubit<MyTicketsState> {
@@ -8,6 +9,11 @@ class MyTicketsCubit extends Cubit<MyTicketsState> {
   // Cached values so the UI can always show something while loading
   double _cachedBalance = 0.0;
   double get cachedBalance => _cachedBalance;
+
+  // Cache the last successfully loaded tickets so intermediate states
+  // (e.g. marketplace listing) don't wipe the ticket list from the UI.
+  List<TicketEntity> _cachedTickets = [];
+  List<TicketEntity> get cachedTickets => _cachedTickets;
 
   MyTicketsCubit({required this.repository}) : super(MyTicketsInitial());
 
@@ -22,7 +28,10 @@ class MyTicketsCubit extends Cubit<MyTicketsState> {
     final result = await repository.getMyTickets();
     result.fold(
       (failure) => emit(TicketsErrorState(failure.message)),
-      (tickets) => emit(TicketsLoadedState(tickets)),
+      (tickets) {
+        _cachedTickets = tickets;
+        emit(TicketsLoadedState(tickets));
+      },
     );
   }
 

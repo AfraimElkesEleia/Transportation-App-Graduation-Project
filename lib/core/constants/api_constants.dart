@@ -25,6 +25,10 @@ class ApiConstants {
   static const String checkout = '/Bookings/checkout';
   static const String myTickets = '/Bookings/my-tickets';
   static const String walletDeposit = '/Wallet/deposit';
+  static const String marketplaceList = '/Marketplace/list';
+  static const String marketplaceBuy = '/Marketplace/buy';
+  static const String marketplaceActive = '/Marketplace/active';
+  static const String marketplaceCancel = '/Marketplace/cancel';
   static String? mediaUrl(String? path) {
     if (path == null || path.isEmpty) return null;
     if (path.startsWith('http')) return path;

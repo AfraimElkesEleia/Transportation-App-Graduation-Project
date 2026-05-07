@@ -231,7 +231,13 @@ class RoundTripBookingCubit extends Cubit<RoundTripBookingState> {
   }
 
   // ── Cart / Bundle Submission ──
-  Future<void> submitRoundTrip(List<Map<String, dynamic>> outboundPassengers, List<Map<String, dynamic>> returnPassengers) async {
+  Future<void> submitRoundTrip({
+    required String contactName,
+    required String contactPhone,
+    required String contactEmail,
+    required List<Map<String, dynamic>> outboundPassengers,
+    required List<Map<String, dynamic>> returnPassengers,
+  }) async {
     if (isClosed) return;
     emit(state.copyWith(isAddingToCart: true, clearCartError: true));
 
@@ -241,6 +247,9 @@ class RoundTripBookingCubit extends Cubit<RoundTripBookingState> {
         'coachClassId': state.selectedOutboundClass!.coachClassId,
         'originStationId': state.selectedOutboundTrip!.originStationId,
         'destinationStationId': state.selectedOutboundTrip!.destinationStationId,
+        'contactName': contactName,
+        'contactPhone': contactPhone,
+        'contactEmail': contactEmail,
         'passengers': outboundPassengers,
       };
 
@@ -249,6 +258,9 @@ class RoundTripBookingCubit extends Cubit<RoundTripBookingState> {
         'coachClassId': state.selectedReturnClass!.coachClassId,
         'originStationId': state.selectedReturnTrip!.originStationId,
         'destinationStationId': state.selectedReturnTrip!.destinationStationId,
+        'contactName': contactName,
+        'contactPhone': contactPhone,
+        'contactEmail': contactEmail,
         'passengers': returnPassengers,
       };
 

@@ -64,9 +64,8 @@ class _MultiDestinationPassengerFormScreenState
       for (int pIndex = 0; pIndex < count; pIndex++) {
         final c = _controllers[legIndex][pIndex];
         legPass.add({
-          'name': c.nameController.text.trim(),
-          'age': 30,
-          'idType': 1,
+          'passengerName': c.nameController.text.trim(),
+          'idType': 'NationalId',
           'idNumber': c.nationalIdController.text.trim(),
           'seatNumber': seats[pIndex].toString(),
         });
@@ -74,7 +73,17 @@ class _MultiDestinationPassengerFormScreenState
       allLegPassengers[legIndex] = legPass;
     }
 
-    cubit.submitCart(allLegPassengers);
+    final firstLegControllers = _controllers.isNotEmpty && _controllers.first.isNotEmpty ? _controllers.first.first : null;
+    final contactName = firstLegControllers?.nameController.text.trim() ?? 'Unknown';
+    final contactPhone = firstLegControllers?.phoneController.text.trim() ?? 'Unknown';
+    final contactEmail = firstLegControllers?.emailController.text.trim() ?? '';
+
+    cubit.submitCart(
+      contactName: contactName,
+      contactPhone: contactPhone,
+      contactEmail: contactEmail.isEmpty ? 'user@example.com' : contactEmail,
+      allPassengers: allLegPassengers,
+    );
   }
 
   @override
@@ -242,10 +251,14 @@ class _LegHeader extends StatelessWidget {
 class _PassengerControllers {
   final nameController     = TextEditingController();
   final nationalIdController = TextEditingController();
+  final phoneController = TextEditingController();
+  final emailController = TextEditingController();
 
   void dispose() {
     nameController.dispose();
     nationalIdController.dispose();
+    phoneController.dispose();
+    emailController.dispose();
   }
 }
 
@@ -313,6 +326,28 @@ class _PassengerCard extends StatelessWidget {
             ),
             validator: (v) =>
                 (v == null || v.trim().isEmpty) ? 'Required' : null,
+          ),
+          const SizedBox(height: 12),
+          TextFormField(
+            controller: controllers.phoneController,
+            keyboardType: TextInputType.phone,
+            style: const TextStyle(color: Colors.white, fontSize: 14),
+            decoration: _inputDecoration(
+              label: 'Phone Number',
+              icon: Icons.phone_outlined,
+            ),
+            validator: (v) =>
+                (v == null || v.trim().isEmpty) ? 'Required' : null,
+          ),
+          const SizedBox(height: 12),
+          TextFormField(
+            controller: controllers.emailController,
+            keyboardType: TextInputType.emailAddress,
+            style: const TextStyle(color: Colors.white, fontSize: 14),
+            decoration: _inputDecoration(
+              label: 'Email Address (Optional)',
+              icon: Icons.email_outlined,
+            ),
           ),
         ],
       ),

@@ -5,8 +5,6 @@ class ProfileCard extends StatelessWidget {
   final String fullName;
   final String email;
   final String? profilePictureUrl;
-  final int? totalTrips;
-  final double? totalDistanceKm;
   final VoidCallback? onEditTap;
 
   const ProfileCard({
@@ -14,8 +12,6 @@ class ProfileCard extends StatelessWidget {
     required this.fullName,
     required this.email,
     this.profilePictureUrl,
-    this.totalTrips,
-    this.totalDistanceKm,
     this.onEditTap,
   });
 
@@ -124,43 +120,8 @@ class ProfileCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 20),
-
-          // ── Stats ────────────────────────────────────────
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              _buildStatItem('Total Trips', totalTrips?.toString() ?? '--'),
-              _buildStatItem(
-                'Distance Traveled',
-                totalDistanceKm != null
-                    ? '${totalDistanceKm!.toStringAsFixed(0)} km'
-                    : '--',
-              ),
-            ],
-          ),
         ],
       ),
-    );
-  }
-
-  Widget _buildStatItem(String label, String value) {
-    return Column(
-      children: [
-        Text(
-          value,
-          style: const TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-            fontSize: 16,
-          ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          label,
-          style: const TextStyle(color: Colors.white70, fontSize: 12),
-          textAlign: TextAlign.center,
-        ),
-      ],
     );
   }
 }

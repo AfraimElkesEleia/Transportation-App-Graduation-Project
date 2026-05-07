@@ -73,4 +73,77 @@ class MyTicketsRepositoryImpl implements MyTicketsRepository {
       return Left(UnauthorizedFailure(message: e.message));
     }
   }
+
+  @override
+  ResultFuture<Map<String, dynamic>> getActiveListings({
+    int pageNumber = 1,
+    int pageSize = 10,
+    String? originGovernorate,
+    String? destinationGovernorate,
+    String? travelDate,
+  }) async {
+    try {
+      return Right(await remoteDatasource.getActiveListings(
+        pageNumber: pageNumber,
+        pageSize: pageSize,
+        originGovernorate: originGovernorate,
+        destinationGovernorate: destinationGovernorate,
+        travelDate: travelDate,
+      ));
+    } on ServerException catch (e) {
+      return Left(ServerFailure(message: e.message));
+    } on NetworkException {
+      return Left(const NetworkFailure());
+    } on UnauthorizedException catch (e) {
+      return Left(UnauthorizedFailure(message: e.message));
+    }
+  }
+
+  @override
+  ResultVoid listTicket({
+    required int bookingId,
+    required double askingPrice,
+  }) async {
+    try {
+      await remoteDatasource.listTicket(
+        bookingId: bookingId,
+        askingPrice: askingPrice,
+      );
+      return const Right(null);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(message: e.message));
+    } on NetworkException {
+      return Left(const NetworkFailure());
+    } on UnauthorizedException catch (e) {
+      return Left(UnauthorizedFailure(message: e.message));
+    }
+  }
+
+  @override
+  ResultVoid buyTicket({required int listingId}) async {
+    try {
+      await remoteDatasource.buyTicket(listingId: listingId);
+      return const Right(null);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(message: e.message));
+    } on NetworkException {
+      return Left(const NetworkFailure());
+    } on UnauthorizedException catch (e) {
+      return Left(UnauthorizedFailure(message: e.message));
+    }
+  }
+
+  @override
+  ResultVoid cancelListing({required int listingId}) async {
+    try {
+      await remoteDatasource.cancelListing(listingId: listingId);
+      return const Right(null);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(message: e.message));
+    } on NetworkException {
+      return Left(const NetworkFailure());
+    } on UnauthorizedException catch (e) {
+      return Left(UnauthorizedFailure(message: e.message));
+    }
+  }
 }

@@ -1,51 +1,40 @@
 import 'package:flutter/material.dart';
 import 'package:transportation_app/core/theming/colors.dart';
 
-/// A card displaying a marketplace ticket listing with route, schedule,
-/// seat info, seller rating, and pricing.
+/// A card displaying a marketplace ticket listing.
+///
+/// Redesigned to handle long Arabic station names and long class strings
+/// without overflow — all text uses Expanded/Flexible and ellipsis clipping.
 class MarketplaceTicketCard extends StatelessWidget {
-  /// Route label (e.g. "Cairo → Alexandria").
   final String fromTo;
-
-  /// Departure date.
   final String date;
-
-  /// Departure time.
   final String time;
-
-  /// Seat number.
-  final String seat;
-
-  /// Travel class name.
   final String className;
-
-  /// Seller rating value.
-  final String sellerRating;
-
-  /// When the listing was posted.
-  final String postedTime;
-
-  /// Original (strikethrough) price.
+  final String sellerName;
   final String oldPrice;
-
-  /// Discounted price.
   final String newPrice;
-
-  /// Discount percentage label.
   final String discount;
+  final VoidCallback onBuy;
+  final String? fromLocation;
+  final String? toLocation;
+  final String? originGov;
+  final String? destinationGov;
 
   const MarketplaceTicketCard({
     super.key,
     required this.fromTo,
     required this.date,
     required this.time,
-    required this.seat,
     required this.className,
-    required this.sellerRating,
-    required this.postedTime,
+    required this.sellerName,
     required this.oldPrice,
     required this.newPrice,
     required this.discount,
+    required this.onBuy,
+    this.fromLocation,
+    this.toLocation,
+    this.originGov,
+    this.destinationGov,
   });
 
   @override
@@ -53,150 +42,254 @@ class MarketplaceTicketCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: ColorsManager.marketplaceCardBg.withOpacity(0.4),
-        borderRadius: BorderRadius.circular(25),
-        border: Border.all(color: ColorsManager.accentCyan.withOpacity(0.2)),
+        color: ColorsManager.marketplaceCardBg.withValues(alpha: 0.4),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: ColorsManager.accentCyan.withValues(alpha: 0.15),
+        ),
       ),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Route header
+          // ── Route header ──────────────────────────────────────────────
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                children: [
-                  const Icon(
-                    Icons.train,
-                    color: ColorsManager.accentCyan,
-                    size: 28,
-                  ),
-                  const SizedBox(width: 10),
-                  Text(
-                    fromTo,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
+              const Icon(
+                Icons.directions_bus_rounded,
+                color: ColorsManager.accentCyan,
+                size: 20,
               ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  fromTo,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                  textDirection: TextDirection.rtl,
+                ),
+              ),
+              const SizedBox(width: 8),
               Container(
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 4,
+                  horizontal: 10,
+                  vertical: 3,
                 ),
                 decoration: BoxDecoration(
-                  color: Colors.green.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(15),
+                  color: ColorsManager.successGreen.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: ColorsManager.successGreen.withValues(alpha: 0.3),
+                  ),
                 ),
                 child: const Text(
-                  "For Sale",
+                  'For Sale',
                   style: TextStyle(
                     color: ColorsManager.successGreen,
-                    fontSize: 12,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 6),
 
-          // Date & time
+          // ── Governorate-to-governorate line ───────────────────────────
+          if (originGov != null || destinationGov != null)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 4),
+              child: Row(
+                children: [
+                  const Icon(
+                    Icons.location_on_outlined,
+                    size: 13,
+                    color: ColorsManager.accentCyan,
+                  ),
+                  const SizedBox(width: 4),
+                  Flexible(
+                    child: Text(
+                      originGov ?? '',
+                      style: const TextStyle(
+                        color: ColorsManager.accentCyan,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                    ),
+                  ),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 6),
+                    child: Icon(
+                      Icons.arrow_forward,
+                      size: 12,
+                      color: Colors.white38,
+                    ),
+                  ),
+                  Flexible(
+                    child: Text(
+                      destinationGov ?? '',
+                      style: const TextStyle(
+                        color: ColorsManager.accentCyan,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+          // ── Station detail line ───────────────────────────────────────
+          if (fromLocation != null || toLocation != null)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 10),
+              child: Text(
+                '${fromLocation ?? ''}${fromLocation != null && toLocation != null ? ' • ' : ''}${toLocation ?? ''}',
+                style: const TextStyle(color: Colors.white54, fontSize: 12),
+                overflow: TextOverflow.ellipsis,
+                maxLines: 2,
+              ),
+            ),
+
+          // ── Date & time ───────────────────────────────────────────────
           Row(
             children: [
-              const Icon(Icons.calendar_today, size: 14, color: Colors.white60),
+              const Icon(
+                Icons.calendar_today_outlined,
+                size: 13,
+                color: Colors.white54,
+              ),
               const SizedBox(width: 4),
               Text(
                 date,
-                style: const TextStyle(color: Colors.white60, fontSize: 13),
+                style: const TextStyle(color: Colors.white54, fontSize: 12),
               ),
-              const SizedBox(width: 15),
-              const Icon(Icons.access_time, size: 14, color: Colors.white60),
+              const SizedBox(width: 14),
+              const Icon(
+                Icons.access_time_rounded,
+                size: 13,
+                color: Colors.white54,
+              ),
               const SizedBox(width: 4),
               Text(
                 time,
-                style: const TextStyle(color: Colors.white60, fontSize: 13),
+                style: const TextStyle(color: Colors.white54, fontSize: 12),
               ),
             ],
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 14),
 
-          // Info columns
+          // ── Divider ───────────────────────────────────────────────────
+          Divider(color: Colors.white.withValues(alpha: 0.07), height: 1),
+          const SizedBox(height: 12),
+
+          // ── Class & Seller row (two items, each Expanded) ─────────────
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              _infoColumn("Seat", seat),
-              _infoColumn("Class", className),
-              _sellerColumn("Seller", sellerRating),
-              _infoColumn("Posted", postedTime),
+              Expanded(
+                child: _LabelValue(
+                  label: 'Class',
+                  value: className,
+                  icon: Icons.airline_seat_recline_normal_outlined,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: _LabelValue(
+                  label: 'Seller',
+                  value: sellerName,
+                  icon: Icons.person_outline_rounded,
+                  accent: true,
+                ),
+              ),
             ],
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 14),
 
-          // Pricing & buy
+          // ── Pricing & buy button ──────────────────────────────────────
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    oldPrice,
-                    style: const TextStyle(
-                      color: Colors.white38,
-                      decoration: TextDecoration.lineThrough,
-                    ),
-                  ),
-                  Row(
-                    children: [
-                      Text(
-                        newPrice,
-                        style: const TextStyle(
-                          color: ColorsManager.successGreen,
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                        ),
+              // Price block
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      oldPrice,
+                      style: const TextStyle(
+                        color: Colors.white38,
+                        decoration: TextDecoration.lineThrough,
+                        fontSize: 13,
                       ),
-                      const SizedBox(width: 8),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 6,
-                          vertical: 2,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.green.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(5),
-                        ),
-                        child: Text(
-                          discount,
+                    ),
+                    const SizedBox(height: 2),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Text(
+                          newPrice,
                           style: const TextStyle(
                             color: ColorsManager.successGreen,
-                            fontSize: 12,
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                ],
+                        const SizedBox(width: 6),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 2,
+                          ),
+                          decoration: BoxDecoration(
+                            color: ColorsManager.successGreen.withValues(
+                              alpha: 0.1,
+                            ),
+                            borderRadius: BorderRadius.circular(5),
+                          ),
+                          child: Text(
+                            discount,
+                            style: const TextStyle(
+                              color: ColorsManager.successGreen,
+                              fontSize: 11,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
+              const SizedBox(width: 12),
+
+              // Buy button
               ElevatedButton.icon(
-                onPressed: () {},
-                icon: const Icon(Icons.shopping_cart, size: 18),
+                onPressed: onBuy,
+                icon: const Icon(Icons.shopping_cart_outlined, size: 16),
                 label: const Text(
-                  "Buy Now",
+                  'Buy Now',
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: ColorsManager.successGreen,
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 12,
+                    horizontal: 18,
+                    vertical: 11,
                   ),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(15),
+                    borderRadius: BorderRadius.circular(14),
                   ),
+                  elevation: 0,
                 ),
               ),
             ],
@@ -205,47 +298,61 @@ class MarketplaceTicketCard extends StatelessWidget {
       ),
     );
   }
+}
 
-  Widget _infoColumn(String label, String value) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: const TextStyle(color: Colors.white60, fontSize: 12),
-        ),
-        Text(
-          value,
-          style: const TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
+class _LabelValue extends StatelessWidget {
+  final String label;
+  final String value;
+  final IconData icon;
+  final bool accent;
+
+  const _LabelValue({
+    required this.label,
+    required this.value,
+    required this.icon,
+    this.accent = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.04),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.07)),
+      ),
+      child: Row(
+        children: [
+          Icon(
+            icon,
+            size: 14,
+            color: accent ? ColorsManager.accentCyan : Colors.white54,
           ),
-        ),
-      ],
-    );
-  }
-
-  Widget _sellerColumn(String label, String rating) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: const TextStyle(color: Colors.white60, fontSize: 12),
-        ),
-        Row(
-          children: [
-            const Icon(Icons.star, color: Colors.amber, size: 14),
-            Text(
-              rating,
-              style: const TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-              ),
+          const SizedBox(width: 6),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: const TextStyle(color: Colors.white38, fontSize: 10),
+                ),
+                Text(
+                  value,
+                  style: TextStyle(
+                    color: accent ? ColorsManager.accentCyan : Colors.white,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                ),
+              ],
             ),
-          ],
-        ),
-      ],
+          ),
+        ],
+      ),
     );
   }
 }

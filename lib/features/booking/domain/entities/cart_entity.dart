@@ -23,7 +23,9 @@ class CartItemEntity extends Equatable {
   final String agencyName;
   final String className;
   final String origin;
+  final String originGov;
   final String destination;
+  final String destinationGov;
   final DateTime? boardingTime;
   final DateTime? dropoffTime;
   final List<CartPassengerEntity> passengers;
@@ -36,7 +38,9 @@ class CartItemEntity extends Equatable {
     required this.agencyName,
     required this.className,
     required this.origin,
+    this.originGov = '',
     required this.destination,
+    this.destinationGov = '',
     this.boardingTime,
     this.dropoffTime,
     required this.passengers,

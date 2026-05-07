@@ -175,7 +175,12 @@ class MultiDestinationBookingCubit extends Cubit<MultiDestinationBookingState> {
     }
   }
 
-  Future<void> submitCart(Map<int, List<Map<String, dynamic>>> allPassengers) async {
+  Future<void> submitCart({
+    required String contactName,
+    required String contactPhone,
+    required String contactEmail,
+    required Map<int, List<Map<String, dynamic>>> allPassengers,
+  }) async {
     if (isClosed) return;
     emit(state.copyWith(isAddingToCart: true, clearCartError: true));
 
@@ -190,6 +195,9 @@ class MultiDestinationBookingCubit extends Cubit<MultiDestinationBookingState> {
           'coachClassId': c.coachClassId,
           'originStationId': trip.originStationId,
           'destinationStationId': trip.destinationStationId,
+          'contactName': contactName,
+          'contactPhone': contactPhone,
+          'contactEmail': contactEmail,
           'passengers': pass,
         };
 

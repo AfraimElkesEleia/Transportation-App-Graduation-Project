@@ -1,5 +1,27 @@
 import 'package:transportation_app/features/profile/domain/entities/profile_entity.dart';
 
+class ChallengeModel extends ChallengeEntity {
+  const ChallengeModel({
+    required super.challengeId,
+    required super.title,
+    required super.type,
+    required super.currentProgress,
+    required super.goalValue,
+    required super.rewardPoints,
+  });
+
+  factory ChallengeModel.fromJson(Map<String, dynamic> json) {
+    return ChallengeModel(
+      challengeId: json['challengeId'] as int? ?? 0,
+      title: json['title'] as String? ?? '',
+      type: json['type'] as int? ?? 0,
+      currentProgress: json['currentProgress'] as int? ?? 0,
+      goalValue: json['goalValue'] as int? ?? 1,
+      rewardPoints: json['rewardPoints'] as int? ?? 0,
+    );
+  }
+}
+
 class ProfileModel extends ProfileEntity {
   const ProfileModel({
     required super.userId,
@@ -15,6 +37,10 @@ class ProfileModel extends ProfileEntity {
     super.totalTrips,
     super.totalDistanceKm,
     super.walletBalance,
+    super.loyaltyPointsBalance,
+    super.expiringPointsAmount,
+    super.nextExpiryDate,
+    super.activeChallenges,
   });
   static String? _buildImageUrl(String? path) {
   if (path == null || path.isEmpty) return null;
@@ -37,6 +63,12 @@ class ProfileModel extends ProfileEntity {
       totalTrips:        json['totalTripsCount']      as int?,
       totalDistanceKm:   (json['totalDistanceTraveled'] as num?)?.toDouble(),
       walletBalance:     (json['walletBalance']       as num?)?.toDouble(),
+      loyaltyPointsBalance: json['loyaltyPointsBalance'] as int?,
+      expiringPointsAmount: json['expiringPointsAmount'] as int?,
+      nextExpiryDate: json['nextExpiryDate'] as String?,
+      activeChallenges: (json['activeChallenges'] as List<dynamic>?)
+          ?.map((e) => ChallengeModel.fromJson(e as Map<String, dynamic>))
+          .toList(),
     );
   }
 }

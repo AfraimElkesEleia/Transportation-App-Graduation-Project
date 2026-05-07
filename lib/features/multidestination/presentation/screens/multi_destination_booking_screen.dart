@@ -115,11 +115,12 @@ class _MultiDestinationBookingScreenState extends State<MultiDestinationBookingS
         onRetry: () => context.read<MultiDestinationBookingCubit>().startFlow(),
       );
     }
-    if (state.searchResults == null || state.searchResults!.isEmpty) {
-      return const Center(child: Text('No trips available for this leg.', style: TextStyle(color: Colors.white)));
-    }
 
+    // NOTE: We do NOT return early for empty results here.
+    // The sticky header (with the filter button) must always be visible so the
+    // user can adjust filters when no results match.
     final leg = state.legSummaries[state.currentSearchLegIndex];
+    final hasResults = state.searchResults != null && state.searchResults!.isNotEmpty;
 
     return NotificationListener<ScrollNotification>(
       onNotification: (scrollInfo) {
@@ -179,28 +180,51 @@ class _MultiDestinationBookingScreenState extends State<MultiDestinationBookingS
               height: 52,
             ),
           ),
-          SliverPadding(
-            padding: const EdgeInsets.all(16),
-            sliver: SliverList(
-              delegate: SliverChildBuilderDelegate((context, index) {
-                if (index == state.searchResults!.length) {
-                  return state.isFetchingMore
-                      ? const Padding(padding: EdgeInsets.symmetric(vertical: 24), child: Center(child: CircularProgressIndicator(color: ColorsManager.accentCyan)))
-                      : const SizedBox.shrink();
-                }
-                final t = state.searchResults![index];
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 16),
-                  child: TripResultCard(
-                    trip: t,
-                    onBookOverride: (trip, coachClass) {
-                      context.read<MultiDestinationBookingCubit>().selectTripForLeg(trip, coachClass);
-                    },
-                  ),
-                );
-              }, childCount: state.searchResults!.length + 1),
+          if (!hasResults)
+            const SliverFillRemaining(
+              hasScrollBody: false,
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.search_off_rounded, color: Colors.white24, size: 64),
+                    SizedBox(height: 16),
+                    Text(
+                      'No trips found for this leg.',
+                      style: TextStyle(color: Colors.white54, fontSize: 16, fontWeight: FontWeight.w600),
+                    ),
+                    SizedBox(height: 8),
+                    Text(
+                      'Try adjusting the filters above.',
+                      style: TextStyle(color: Colors.white30, fontSize: 13),
+                    ),
+                  ],
+                ),
+              ),
+            )
+          else
+            SliverPadding(
+              padding: const EdgeInsets.all(16),
+              sliver: SliverList(
+                delegate: SliverChildBuilderDelegate((context, index) {
+                  if (index == state.searchResults!.length) {
+                    return state.isFetchingMore
+                        ? const Padding(padding: EdgeInsets.symmetric(vertical: 24), child: Center(child: CircularProgressIndicator(color: ColorsManager.accentCyan)))
+                        : const SizedBox.shrink();
+                  }
+                  final t = state.searchResults![index];
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 16),
+                    child: TripResultCard(
+                      trip: t,
+                      onBookOverride: (trip, coachClass) {
+                        context.read<MultiDestinationBookingCubit>().selectTripForLeg(trip, coachClass);
+                      },
+                    ),
+                  );
+                }, childCount: state.searchResults!.length + 1),
+              ),
             ),
-          ),
         ],
       ),
     );

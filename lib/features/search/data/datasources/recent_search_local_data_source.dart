@@ -10,7 +10,7 @@ abstract class RecentSearchLocalDataSource {
 
 class RecentSearchLocalDataSourceImpl implements RecentSearchLocalDataSource {
   static const String boxName = 'recent_searches_box';
-  static const int maxSearches = 10;
+  static const int maxSearches = 3;
 
   @override
   Future<void> saveSearch(RecentSearchModel search) async {
@@ -33,10 +33,10 @@ class RecentSearchLocalDataSourceImpl implements RecentSearchLocalDataSource {
   Future<List<RecentSearchModel>> getRecentSearches() async {
     final box = Hive.box<RecentSearchModel>(boxName);
     final allSearches = box.values.toList();
-    
+
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
-    
+
     final validSearches = allSearches.where((search) {
       DateTime dateToCheck;
       try {
@@ -48,29 +48,33 @@ class RecentSearchLocalDataSourceImpl implements RecentSearchLocalDataSource {
       } catch (e) {
         return false;
       }
-      
+
       // Keep only if date is today or in future
       return !dateToCheck.isBefore(today);
     }).toList();
 
     validSearches.sort((a, b) => b.createdAt.compareTo(a.createdAt));
-    return validSearches;
+    // Return only the 3 most recent valid searches
+    return validSearches.take(maxSearches).toList();
   }
 
   @override
   Future<void> deleteSearch(String id) async {
     final box = Hive.box<RecentSearchModel>(boxName);
     final keyToDelete = box.keys.cast<dynamic>().firstWhere(
-          (key) => box.get(key)?.id == id,
-          orElse: () => null,
-        );
-        
+      (key) => box.get(key)?.id == id,
+      orElse: () => null,
+    );
+
     if (keyToDelete != null) {
       await box.delete(keyToDelete);
     }
   }
 
-  dynamic _findIdenticalSearchKey(Box<RecentSearchModel> box, RecentSearchModel search) {
+  dynamic _findIdenticalSearchKey(
+    Box<RecentSearchModel> box,
+    RecentSearchModel search,
+  ) {
     for (var key in box.keys) {
       final item = box.get(key);
       if (item != null &&

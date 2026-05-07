@@ -25,7 +25,9 @@ class CartItemModel extends CartItemEntity {
     required super.agencyName,
     required super.className,
     required super.origin,
+    super.originGov,
     required super.destination,
+    super.destinationGov,
     super.boardingTime,
     super.dropoffTime,
     required super.passengers,
@@ -42,7 +44,9 @@ class CartItemModel extends CartItemEntity {
       agencyName: json['agencyName'] as String? ?? '',
       className: json['className'] as String? ?? '',
       origin: json['origin'] as String? ?? '',
+      originGov: json['originGov'] as String? ?? '',
       destination: json['destination'] as String? ?? '',
+      destinationGov: json['destinationGov'] as String? ?? '',
       boardingTime: json['boardingTime'] != null
           ? DateTime.tryParse(json['boardingTime'])
           : null,
