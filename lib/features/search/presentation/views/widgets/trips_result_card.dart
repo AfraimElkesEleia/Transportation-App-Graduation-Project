@@ -1,12 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:transportation_app/core/helper/extensions.dart';
 import 'package:transportation_app/core/routing/routes.dart';
 import 'package:transportation_app/core/theming/colors.dart';
 import 'package:transportation_app/features/search/domain/entities/coach_class_entity.dart';
+import 'package:transportation_app/features/search/domain/entities/floor_group.dart';
 import 'package:transportation_app/features/search/domain/entities/trip_result_entity.dart';
+import 'package:transportation_app/features/search/presentation/views/widgets/trip_expandable_part.dart';
 
 class TripResultCard extends StatelessWidget {
   final TripResultEntity trip;
-  const TripResultCard({super.key, required this.trip});
+  final void Function(TripResultEntity, CoachClassEntity)? onBookOverride;
+
+  const TripResultCard({super.key, required this.trip, this.onBookOverride});
 
   Color _agencyColor(String name) {
     final l = name.toLowerCase();
@@ -63,12 +68,39 @@ class TripResultCard extends StatelessWidget {
           _TimesRow(trip: trip, fmt: _fmt, isNextDay: _isNextDay),
 
           // ── Available classes
-          if (trip.availableClasses.isNotEmpty) ...[
+          // if (trip.availableClasses.isNotEmpty) ...[
+          //   const SizedBox(height: 16),
+          //   const Divider(color: ColorsManager.borderSubtle),
+          //   const SizedBox(height: 8),
+          //   ...trip.floorGroups.map(
+          //     (group) => _ClassRow(cls: group, trip: trip),
+          //   ),
+          // ],
+          if (trip.floorGroups.isNotEmpty) ...[
             const SizedBox(height: 16),
             const Divider(color: ColorsManager.borderSubtle),
             const SizedBox(height: 8),
-            ...trip.availableClasses.map(
-              (cls) => _ClassRow(cls: cls, trip: trip),
+            ...trip.floorGroups.map(
+              (group) => _FloorGroupTile(
+                floor: group,
+                onBook: (c) {
+                  if (onBookOverride != null) {
+                    onBookOverride!(trip, c);
+                  } else {
+                    context.pushNamed(
+                      AppRoutes.resultScreen,
+                      arguments: {"coachClass": c, "trip": trip},
+                    );
+                  }
+                },
+              ),
+            ),
+          ],
+          if (trip.hasRouteStops) ...[
+            const SizedBox(height: 8),
+            TripExpandableSection(
+              key: ValueKey('expand_${trip.tripOccurrenceId}'),
+              routeStops: trip.safeRouteStops,
             ),
           ],
         ],
@@ -253,7 +285,7 @@ class _TimesRow extends StatelessWidget {
               fmt(trip.arrivalTime),
               style: TextStyle(
                 color: trip.arrivalTime == null
-                    ? Colors.white.withOpacity(0.2)
+                    ? Colors.white.withValues(alpha: 0.2)
                     : Colors.white,
                 fontWeight: FontWeight.bold,
                 fontSize: 28,
@@ -299,11 +331,11 @@ class _TimesRow extends StatelessWidget {
   }
 }
 
-/// A single coach-class row with label, seat count, price, and book button.
-class _ClassRow extends StatelessWidget {
-  final CoachClassEntity cls;
-  final TripResultEntity trip;
-  const _ClassRow({required this.cls, required this.trip});
+class _FloorGroupTile extends StatelessWidget {
+  final FloorGroup floor;
+  final void Function(CoachClassEntity) onBook;
+
+  const _FloorGroupTile({required this.floor, required this.onBook});
 
   @override
   Widget build(BuildContext context) {
@@ -311,30 +343,67 @@ class _ClassRow extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 10),
       child: Row(
         children: [
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-            decoration: BoxDecoration(
-              color: ColorsManager.surfaceChip,
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Text(
-              cls.className.replaceFirst(' - ', '\n'),
-              style: const TextStyle(color: Colors.white70, fontSize: 13),
+          // ── Class name + floor label ─────────────────
+          ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 120),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+
+              children: [
+                // "Horus - Prestige"
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: ColorsManager.surfaceChip,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        floor.groupName,
+                        style: const TextStyle(
+                          color: Colors.white70,
+                          fontSize: 13,
+                          height: 1.3,
+                        ),
+                      ),
+                      if (floor.floorNumber != null) ...[
+                        const SizedBox(height: 2),
+                        Text(
+                          floor.label,
+                          style: const TextStyle(
+                            color: ColorsManager.accentCyan,
+                            fontSize: 11,
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+              ],
             ),
           ),
           const SizedBox(width: 8),
+
+          // ── Total seats (combined Single + Double) ───
           Text(
-            '${cls.remainingSeats} seats',
+            '${floor.totalSeats} seats',
             style: TextStyle(
-              color: cls.remainingSeats < 5
+              color: floor.totalSeats < 5
                   ? Colors.orangeAccent
                   : Colors.white38,
               fontSize: 12,
             ),
           ),
           const Spacer(),
+
+          // ── Price ────────────────────────────────────
           Text(
-            'EGP ${cls.price.toStringAsFixed(0)}',
+            'EGP ${floor.lowestPrice.toStringAsFixed(0)}',
             style: const TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.bold,
@@ -342,18 +411,21 @@ class _ClassRow extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 12),
+
+          // ── Book button ──────────────────────────────
           SizedBox(
             height: 36,
             child: ElevatedButton(
-              onPressed: cls.hasSeats
-                  ? () => Navigator.pushNamed(
-                      context,
-                      AppRoutes.resultScreen,
-                      arguments: {'trip': trip, 'coachClass': cls},
-                    )
+              onPressed: floor.hasSeats
+                  ? () {
+                      final cls = floor.classes
+                          .where((c) => c.hasSeats)
+                          .reduce((a, b) => a.price <= b.price ? a : b);
+                      onBook(cls);
+                    }
                   : null,
               style: ElevatedButton.styleFrom(
-                backgroundColor: cls.hasSeats
+                backgroundColor: floor.hasSeats
                     ? ColorsManager.buttonBlue
                     : ColorsManager.surfaceMid,
                 disabledBackgroundColor: ColorsManager.surfaceMid,
@@ -364,9 +436,9 @@ class _ClassRow extends StatelessWidget {
                 elevation: 0,
               ),
               child: Text(
-                cls.hasSeats ? 'Book' : 'Full',
+                floor.hasSeats ? 'Book' : 'Full',
                 style: TextStyle(
-                  color: cls.hasSeats ? Colors.white : Colors.white38,
+                  color: floor.hasSeats ? Colors.white : Colors.white38,
                   fontWeight: FontWeight.bold,
                   fontSize: 13,
                 ),

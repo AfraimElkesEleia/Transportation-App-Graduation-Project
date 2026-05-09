@@ -5,18 +5,11 @@ class ProfileCard extends StatelessWidget {
   final String fullName;
   final String email;
   final String? profilePictureUrl;
-  final int? totalTrips;
-  final double? totalDistanceKm;
-  final VoidCallback? onEditTap;
-
   const ProfileCard({
     super.key,
     required this.fullName,
     required this.email,
     this.profilePictureUrl,
-    this.totalTrips,
-    this.totalDistanceKm,
-    this.onEditTap,
   });
 
   String get _initials {
@@ -40,8 +33,6 @@ class ProfileCard extends StatelessWidget {
       ),
       child: Column(
         children: [
-          Stack(
-            children: [
               Row(
                 children: [
                   // ── Avatar ───────────────────────────────
@@ -64,13 +55,15 @@ class ProfileCard extends StatelessWidget {
                   ),
                   const SizedBox(width: 16),
 
-                  // ── Name / email / badge ─────────────────
+                  // ── Name / email / edit ─────────────────
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
                           fullName,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: 18,
@@ -79,88 +72,18 @@ class ProfileCard extends StatelessWidget {
                         ),
                         Text(
                           email,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                           style: const TextStyle(color: Colors.white70),
-                        ),
-                        const SizedBox(height: 6),
-                        const Chip(
-                          label: Text('Premium Member'),
-                          backgroundColor: Colors.cyan,
                         ),
                       ],
                     ),
                   ),
                 ],
               ),
-
-              // ── Edit button — top right ──────────────────
-              Positioned(
-                top: 0,
-                right: 0,
-                child: GestureDetector(
-                  onTap: onEditTap,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 6,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.15),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: const Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.edit, color: Colors.white, size: 14),
-                        SizedBox(width: 4),
-                        Text(
-                          'Edit',
-                          style: TextStyle(color: Colors.white, fontSize: 12),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
           const SizedBox(height: 20),
-
-          // ── Stats ────────────────────────────────────────
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              _buildStatItem('Total Trips', totalTrips?.toString() ?? '--'),
-              _buildStatItem(
-                'Distance Traveled',
-                totalDistanceKm != null
-                    ? '${totalDistanceKm!.toStringAsFixed(0)} km'
-                    : '--',
-              ),
-            ],
-          ),
         ],
       ),
-    );
-  }
-
-  Widget _buildStatItem(String label, String value) {
-    return Column(
-      children: [
-        Text(
-          value,
-          style: const TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-            fontSize: 16,
-          ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          label,
-          style: const TextStyle(color: Colors.white70, fontSize: 12),
-          textAlign: TextAlign.center,
-        ),
-      ],
     );
   }
 }

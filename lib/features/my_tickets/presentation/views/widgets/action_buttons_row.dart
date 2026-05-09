@@ -20,7 +20,7 @@ class ActionButtonsRow extends StatelessWidget {
               child: _buildButton(
                 onTap: resellButton,
                 icon: Icons.sell_outlined,
-                label: "Resell Tickets",
+                label: "Sell All Tickets",
                 color: const Color(0xFF00C853),
                 textColor: Colors.white,
               ),

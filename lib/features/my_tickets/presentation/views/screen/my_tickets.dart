@@ -1,66 +1,374 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:transportation_app/core/di/injection_container.dart';
 import 'package:transportation_app/core/helper/extensions.dart';
 import 'package:transportation_app/core/routing/routes.dart';
+import 'package:transportation_app/core/theming/colors.dart';
+import 'package:transportation_app/core/widgets/app_shimmer.dart';
 import 'package:transportation_app/core/widgets/basic_container.dart';
+import 'package:transportation_app/features/my_tickets/presentation/cubit/marketplace_cubit.dart';
+import 'package:transportation_app/features/my_tickets/presentation/cubit/marketplace_states.dart';
+import 'package:transportation_app/features/my_tickets/presentation/cubit/my_tickets_cubit.dart';
+import 'package:transportation_app/features/my_tickets/presentation/cubit/my_tickets_states.dart';
 import 'package:transportation_app/features/my_tickets/presentation/views/widgets/action_buttons_row.dart';
-import 'package:transportation_app/features/my_tickets/presentation/views/widgets/custom_ticket_tab.dart';
-import 'package:transportation_app/features/my_tickets/presentation/views/widgets/my_tickets_app_bar.dart';
-import 'package:transportation_app/features/my_tickets/presentation/views/widgets/ticket_card.dart';
-import 'package:transportation_app/features/my_tickets/presentation/views/widgets/wallet_ballance_card.dart'; // Using the card we made before
+import 'package:transportation_app/features/my_tickets/presentation/views/widgets/ticket_detail_card.dart';
+import 'package:transportation_app/features/profile/domain/entities/ticket_entity.dart';
 
-class MyTickets extends StatelessWidget {
+class MyTickets extends StatefulWidget {
   const MyTickets({super.key});
 
   @override
+  State<MyTickets> createState() => _MyTicketsState();
+}
+
+class _MyTicketsState extends State<MyTickets>
+    with SingleTickerProviderStateMixin {
+  late TabController _tabCtrl;
+
+  @override
+  void initState() {
+    super.initState();
+    _tabCtrl = TabController(length: 3, vsync: this);
+    context.read<MyTicketsCubit>().loadAll();
+  }
+
+  @override
+  void dispose() {
+    _tabCtrl.dispose();
+    super.dispose();
+  }
+
+  Future<void> _onRefresh() async {
+    await context.read<MyTicketsCubit>().loadAll();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: BasicContainer(
-        child: SafeArea(
-          child: CustomScrollView(
-            physics: const BouncingScrollPhysics(),
-            slivers: [
-              const MyTicketsAppBar(),
-
-              const SliverToBoxAdapter(child: SizedBox(height: 20)),
-              ActionButtonsRow(
-                marketPlaceButton: () {
-                  context.pushNamed(AppRoutes.marketPlaceScreen);
-                },
-                resellButton: () {
-                  context.pushNamed(AppRoutes.resellTicketsScreen);
-                },
-              ),
-
-              const SliverToBoxAdapter(child: SizedBox(height: 24)),
-              const SliverToBoxAdapter(child: WalletBalanceCard()),
-
-              const SliverToBoxAdapter(child: SizedBox(height: 24)),
-              SliverToBoxAdapter(
-                child: CustomTicketTabs(
-                  tabLabels: ["Active", "Upcoming", "Past"],
-                  onTabChanged: (index) {},
-                ),
-              ),
-
-              const SliverToBoxAdapter(child: SizedBox(height: 16)),
-
-              SliverPadding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                sliver: SliverList(
-                  delegate: SliverChildBuilderDelegate((context, index) {
-                    return const Padding(
-                      padding: EdgeInsets.only(bottom: 16.0),
-                      child: TicketCard(),
+    return BlocProvider(
+      create: (_) => sl<MarketplaceCubit>(),
+      child: Scaffold(
+        body: BasicContainer(
+          child: SafeArea(
+            child: BlocListener<MarketplaceCubit, MarketplaceState>(
+                listener: (context, state) {
+                  if (state is MarketplaceListedState) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Action successful.'),
+                        backgroundColor: Colors.green,
+                      ),
                     );
-                  }, childCount: 3),
-                ),
-              ),
+                    context.read<MyTicketsCubit>().fetchTickets();
+                  } else if (state is MarketplaceListErrorState) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(state.message),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                  }
+                },
+                child: NestedScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  headerSliverBuilder: (context, innerBoxIsScrolled) {
+                    return [
+                      // ── App Bar ───────────────────────────────────────
+                      SliverToBoxAdapter(
+                        child: Padding(
+                          padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Text(
+                                      'My Tickets',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 26,
+                                        letterSpacing: -0.5,
+                                      ),
+                                    ),
+                                    Text(
+                                      'Your digital travel wallet',
+                                      style: TextStyle(
+                                        color: Colors.blue[200],
+                                        fontSize: 13,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              IconButton(
+                                onPressed: _onRefresh,
+                                icon: const Icon(
+                                  Icons.refresh_rounded,
+                                  color: ColorsManager.accentCyan,
+                                ),
+                                tooltip: 'Refresh Tickets',
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
 
-              const SliverToBoxAdapter(child: SizedBox(height: 80)),
-            ],
+                      const SliverToBoxAdapter(child: SizedBox(height: 16)),
+
+                      // ── Marketplace / Resell actions ───────────────────
+                      ActionButtonsRow(
+                        marketPlaceButton: () =>
+                            context.pushNamed(AppRoutes.marketPlaceScreen),
+                        resellButton: () => context.pushNamed(
+                          AppRoutes.resellTicketsScreen,
+                          arguments: context.read<MyTicketsCubit>(),
+                        ),
+                      ),
+
+                      const SliverToBoxAdapter(child: SizedBox(height: 20)),
+
+                      // ── Tabs header (Sticky) ──────────────────────────
+                      SliverPersistentHeader(
+                        pinned: true,
+                        delegate: _StickyTabBarDelegate(
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: ColorsManager.surfaceMid,
+                              borderRadius: BorderRadius.circular(14),
+                            ),
+                            child: TabBar(
+                              controller: _tabCtrl,
+                              indicator: BoxDecoration(
+                                gradient: const LinearGradient(
+                                  colors: [
+                                    ColorsManager.profileGradientStart,
+                                    ColorsManager.profileGradientEnd,
+                                  ],
+                                ),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              indicatorSize: TabBarIndicatorSize.tab,
+                              labelColor: Colors.white,
+                              unselectedLabelColor: Colors.white38,
+                              labelStyle: const TextStyle(
+                                fontWeight: FontWeight.w700,
+                                fontSize: 13,
+                              ),
+                              dividerColor: Colors.transparent,
+                              tabs: const [
+                                Tab(text: 'Upcoming'),
+                                Tab(text: 'Active'),
+                                Tab(text: 'Past'),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ];
+                  },
+                  // ── Ticket list ───────────────────────────────────
+                  body: BlocBuilder<MyTicketsCubit, MyTicketsState>(
+                    buildWhen: (_, c) =>
+                        c is TicketsLoadingState ||
+                        c is TicketsLoadedState ||
+                        c is TicketsErrorState,
+                    builder: (context, state) {
+                      List<Widget> tabChildren;
+
+                      if (state is TicketsLoadingState ||
+                          state is MyTicketsInitial) {
+                        final loadingView = ListView.builder(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 12,
+                          ),
+                          itemCount: 4,
+                          itemBuilder: (_, __) => const AppShimmerCard(),
+                        );
+                        tabChildren = [loadingView, loadingView, loadingView];
+                      } else if (state is TicketsErrorState) {
+                        final errorView = _ErrorView(
+                          message: state.message,
+                          onRetry: () =>
+                              context.read<MyTicketsCubit>().fetchTickets(),
+                        );
+                        tabChildren = [errorView, errorView, errorView];
+                      } else if (state is TicketsLoadedState) {
+                        final upcoming = state.tickets
+                            .where((t) => t.isUpcoming)
+                            .toList();
+
+                        final activeNow = state.tickets
+                            .where((t) => t.isActiveNow)
+                            .toList();
+                        final past = state.tickets
+                            .where((t) => t.isPast)
+                            .toList();
+
+                        tabChildren = [
+                          _TicketListView(
+                            tickets: upcoming,
+                            emptyLabel: 'No upcoming trips',
+                          ),
+                          _TicketListView(
+                            tickets: activeNow,
+                            emptyLabel: 'No trips departing soon',
+                            showUrgency: true,
+                          ),
+                          _TicketListView(
+                            tickets: past,
+                            emptyLabel: 'No past trips',
+                          ),
+                        ];
+                      } else {
+                        // Fallback
+                        final fallbackView = const Center(
+                          child: Text(
+                            'Use the refresh button above',
+                            style: TextStyle(color: Colors.white38),
+                          ),
+                        );
+                        tabChildren = [
+                          fallbackView,
+                          fallbackView,
+                          fallbackView,
+                        ];
+                      }
+
+                      return TabBarView(
+                        controller: _tabCtrl,
+                        children: tabChildren,
+                      );
+                    },
+                  ),
+                ),
+            ),
           ),
         ),
       ),
     );
+  }
+}
+
+// ── Error view ───────────────────────────────────────────────────────
+class _ErrorView extends StatelessWidget {
+  final String message;
+  final VoidCallback onRetry;
+  const _ErrorView({required this.message, required this.onRetry});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Icon(Icons.cloud_off_rounded, color: Colors.white24, size: 56),
+          const SizedBox(height: 16),
+          Text(
+            message,
+            style: const TextStyle(color: Colors.white54, fontSize: 13),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 20),
+          ElevatedButton.icon(
+            onPressed: onRetry,
+            icon: const Icon(Icons.refresh),
+            label: const Text('Retry'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: ColorsManager.accentCyan,
+              foregroundColor: Colors.black,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _TicketListView extends StatelessWidget {
+  final List<TicketEntity> tickets;
+  final String emptyLabel;
+  final bool showUrgency;
+
+  const _TicketListView({
+    required this.tickets,
+    required this.emptyLabel,
+    this.showUrgency = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    if (tickets.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(
+              Icons.airplane_ticket_outlined,
+              color: Colors.white12,
+              size: 64,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              emptyLabel,
+              style: const TextStyle(color: Colors.white38, fontSize: 14),
+            ),
+            const SizedBox(height: 8),
+            const Text(
+              'Tap the refresh button above',
+              style: TextStyle(color: Colors.white24, fontSize: 12),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return ListView.builder(
+      physics: const BouncingScrollPhysics(
+        parent: AlwaysScrollableScrollPhysics(),
+      ),
+      padding: const EdgeInsets.fromLTRB(16, 4, 16, 100),
+      itemCount: tickets.length,
+      itemBuilder: (_, index) {
+        return TicketDetailCard(
+          ticket: tickets[index],
+          showUrgency: showUrgency,
+        );
+      },
+    );
+  }
+}
+
+class _StickyTabBarDelegate extends SliverPersistentHeaderDelegate {
+  final Widget child;
+
+  _StickyTabBarDelegate({required this.child});
+
+  @override
+  double get minExtent => 64.0;
+
+  @override
+  double get maxExtent => 64.0;
+
+  @override
+  Widget build(
+    BuildContext context,
+    double shrinkOffset,
+    bool overlapsContent,
+  ) {
+    return Container(
+      color: Colors.transparent, // Match the scaffold background color
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+      child: child,
+    );
+  }
+
+  @override
+  bool shouldRebuild(covariant _StickyTabBarDelegate oldDelegate) {
+    return oldDelegate.child != child;
   }
 }

@@ -17,4 +17,15 @@ class StationsCubit extends Cubit<StationsState> {
       (groups)  => emit(StationsLoaded(groups)),
     );
   }
+
+  /// Force a reload (used by pull-to-refresh). Ignores the cache guard.
+  Future<void> refresh() async {
+    emit(StationsLoading());
+    final result = await getStationsUseCase(NoParams());
+    if (isClosed) return;
+    result.fold(
+      (failure) => emit(StationsError(failure.message)),
+      (groups)  => emit(StationsLoaded(groups)),
+    );
+  }
 }

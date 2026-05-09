@@ -4,36 +4,55 @@ import 'package:transportation_app/core/theming/colors.dart';
 import 'package:transportation_app/features/home/domain/entities/search_params.dart';
 import 'package:transportation_app/features/search/presentation/cubit/search_cubit.dart';
 import 'package:transportation_app/features/search/presentation/cubit/search_states.dart';
-import 'package:transportation_app/features/search/presentation/views/widgets/direct_trips_tab.dart';
 import 'package:transportation_app/features/search/presentation/views/widgets/filter_bottom_sheet.dart';
-import 'package:transportation_app/features/search/presentation/views/widgets/indirect_trips_tab.dart';
 import 'package:transportation_app/features/search/presentation/views/widgets/search_error_view.dart';
 import 'package:transportation_app/features/search/presentation/views/widgets/search_header.dart';
 import 'package:transportation_app/features/search/presentation/views/widgets/search_loading_view.dart';
-import 'package:transportation_app/features/search/presentation/views/widgets/search_tab_bar.dart';
+import 'package:transportation_app/features/search/presentation/views/widgets/unified_trip_list.dart';
 
 class TransportSearchScreen extends StatefulWidget {
   final SearchParams searchParams;
-  const TransportSearchScreen({super.key,required this.searchParams});
+  const TransportSearchScreen({super.key, required this.searchParams});
 
   @override
   State<TransportSearchScreen> createState() => _TransportSearchScreenState();
 }
 
-class _TransportSearchScreenState extends State<TransportSearchScreen>
-    with SingleTickerProviderStateMixin {
-  late final TabController _tabController;
+class _TransportSearchScreenState extends State<TransportSearchScreen> {
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
+    _scrollController.addListener(_onScroll);
   }
 
   @override
   void dispose() {
-    _tabController.dispose();
+    _scrollController.removeListener(_onScroll);
+    _scrollController.dispose();
     super.dispose();
+  }
+
+  void _onScroll() {
+    final position = _scrollController.position;
+    final nearBottom = position.pixels >= position.maxScrollExtent - 300;
+    if (!nearBottom) return;
+
+    final state = context.read<SearchCubit>().state;
+    if (state is! SearchLoaded) return;
+
+    // Load more direct trips if available
+    if (state.hasMoreDirectPages && !state.isFetchingMoreDirect) {
+      context.read<SearchCubit>().loadMoreDirectTrips();
+      return;
+    }
+
+    if (state.indirectSearched &&
+        state.hasMoreIndirectPages &&
+        !state.isFetchingMoreIndirect) {
+      context.read<SearchCubit>().loadMoreIndirectTrips();
+    }
   }
 
   void _openFilter(BuildContext context, SearchLoaded state) {
@@ -41,9 +60,21 @@ class _TransportSearchScreenState extends State<TransportSearchScreen>
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (_) => BlocProvider.value(
-        value: context.read<SearchCubit>(),
-        child: FilterBottomSheet(activeParams: state.activeParams),
+      builder: (_) => FilterBottomSheet(
+        activeParams: state.activeParams,
+        onApply: (newParams) {
+          context.read<SearchCubit>().applyFilters(newParams);
+        },
+        onReset: () {
+          final reset = state.activeParams.copyWith(
+            transport: TransportType.all,
+            sortBy: SortBy.departureTime,
+            clearMaxPrice: true,
+            clearTimeFilters: true,
+            newPage: 1,
+          );
+          context.read<SearchCubit>().applyFilters(reset);
+        },
       ),
     );
   }
@@ -55,19 +86,13 @@ class _TransportSearchScreenState extends State<TransportSearchScreen>
       body: SafeArea(
         child: BlocBuilder<SearchCubit, SearchState>(
           builder: (context, state) {
-            final directCount = state is SearchLoaded
-                ? state.filteredDirect.length
-                : 0;
-            final indirectCount = state is SearchLoaded
-                ? state.filteredIndirect.length
-                : 0;
             final filterCount = state is SearchLoaded
                 ? state.activeParams.activeFilterCount
                 : 0;
 
             return Column(
               children: [
-                // ── Header ─────────────────────────────
+                // ── Header ────────────────────────────
                 SearchHeader(
                   params: widget.searchParams,
                   filterCount: filterCount,
@@ -76,16 +101,8 @@ class _TransportSearchScreenState extends State<TransportSearchScreen>
                       : null,
                 ),
 
-                // ── Tab bar ────────────────────────────
-                SearchTabBar(
-                  controller: _tabController,
-                  directCount: directCount,
-                  indirectCount: indirectCount,
-                ),
-                const SizedBox(height: 8),
-
-                // ── Content ────────────────────────────
-                Expanded(child: _buildContent(context, state, widget.searchParams)),
+                // ── Content ───────────────────────────
+                Expanded(child: _buildContent(context, state)),
               ],
             );
           },
@@ -94,31 +111,25 @@ class _TransportSearchScreenState extends State<TransportSearchScreen>
     );
   }
 
-  Widget _buildContent(
-    BuildContext context,
-    SearchState state,
-    SearchParams? params,
-  ) {
+  Widget _buildContent(BuildContext context, SearchState state) {
     if (state is SearchLoading) {
       return const SearchLoadingView();
     }
 
+    // ── Error ─────────────────────────────────────────────
     if (state is SearchError) {
       return SearchErrorView(
         message: state.message,
-        onRetry: params != null
-            ? () => context.read<SearchCubit>().search(params)
-            : null,
+        onRetry: () => context.read<SearchCubit>().search(widget.searchParams),
       );
     }
 
+    // ── Loaded — single unified list ──────────────────────
     if (state is SearchLoaded) {
-      return TabBarView(
-        controller: _tabController,
-        children: [
-          DirectTripsTab(trips: state.filteredDirect),
-          IndirectTripsTab(trips: state.filteredIndirect),
-        ],
+      return UnifiedTripList(
+        state: state,
+        scrollController: _scrollController,
+        onSearchIndirect: () => context.read<SearchCubit>().searchIndirect(),
       );
     }
 

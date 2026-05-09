@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:transportation_app/core/helper/extensions.dart';
+import 'package:transportation_app/core/routing/routes.dart';
 import 'package:transportation_app/core/theming/styles.dart';
 
 class AppBarInHomeScreen extends StatelessWidget {
@@ -20,25 +22,11 @@ class AppBarInHomeScreen extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             WelcomeSentenceAppBar(),
-            Row(
-              children: [
-                IconButton(
-                  onPressed: () {},
-                  icon: Icon(
-                    FontAwesomeIcons.sun,
-                    color: Color(0xFF40e0d0),
-                    size: 20,
-                  ),
-                ),
-                IconButton(
-                  onPressed: () {},
-                  icon: Icon(
-                    FontAwesomeIcons.bell,
-                    color: Color(0xFF40e0d0),
-                    size: 20,
-                  ),
-                ),
-              ],
+            IconButton(
+              onPressed: () {
+                context.pushNamed(AppRoutes.cartScreen);
+              },
+              icon: Icon(FontAwesomeIcons.cartShopping, color: Colors.white),
             ),
           ],
         ),
@@ -46,6 +34,7 @@ class AppBarInHomeScreen extends StatelessWidget {
     );
   }
 }
+
 class WelcomeSentenceAppBar extends StatelessWidget {
   const WelcomeSentenceAppBar({super.key});
 

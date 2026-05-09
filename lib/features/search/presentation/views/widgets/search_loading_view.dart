@@ -1,23 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:transportation_app/core/theming/colors.dart';
+import 'package:transportation_app/core/widgets/app_shimmer.dart';
 
 class SearchLoadingView extends StatelessWidget {
   const SearchLoadingView({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          CircularProgressIndicator(color: ColorsManager.accentCyan),
-          SizedBox(height: 16),
-          Text(
-            'Searching for trips...',
-            style: TextStyle(color: Colors.white54),
-          ),
-        ],
-      ),
+    return ListView.builder(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      itemCount: 5,
+      itemBuilder: (context, index) {
+        return const AppShimmerCard();
+      },
     );
   }
 }

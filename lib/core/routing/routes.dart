@@ -8,4 +8,17 @@ abstract class AppRoutes {
   static const editProfile = '/edit_profile';
   static const searchScreen = '/search_screen';
   static const resultScreen = '/result_screen';
+  static const passengerFormScreen = '/passenger_form_screen';
+  static const cartScreen = '/cart_screen';
+  static const indirectBookingScreen = '/indirect_booking_screen';
+  static const indirectPassengerFormScreen = '/indirect_passenger_form_screen';
+  static const roundTripBookingScreen = '/round_trip_booking_screen';
+  static const roundTripPassengerFormScreen =
+      '/round_trip_passenger_form_screen';
+  static const multidestinationScreen = '/multidestination_screen';
+  static const multidestinationSummaryScreen = '/multidestination_summary_screen';
+  static const multidestinationBookingScreen = '/multidestination_booking_screen';
+  static const multidestinationPassengerFormScreen = '/multidestination_passenger_form_screen';
+  static const ticketDetailsScreen = '/ticket_details_screen';
+  static const loyaltyHub = '/loyalty_hub';
 }

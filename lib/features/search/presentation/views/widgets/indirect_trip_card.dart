@@ -1,19 +1,92 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:transportation_app/core/routing/routes.dart';
 import 'package:transportation_app/core/theming/colors.dart';
 import 'package:transportation_app/features/search/domain/entities/indirect_trips_enitity.dart';
-import 'package:transportation_app/features/search/domain/entities/trip_result_entity.dart';
+import 'package:transportation_app/features/home/domain/entities/search_params.dart';
 
-class IndirectTripCard extends StatelessWidget {
+class IndirectTripCard extends StatefulWidget {
   final IndirectTripEntity trip;
-  const IndirectTripCard({super.key, required this.trip});
+  final SearchParams activeParams;
+  
+  const IndirectTripCard({
+    super.key, 
+    required this.trip,
+    required this.activeParams,
+  });
 
-  String _fmt(DateTime? dt) {
-    if (dt == null) return '--:--';
-    final hour = dt.hour == 0 ? 12 : (dt.hour > 12 ? dt.hour - 12 : dt.hour);
-    final period = dt.hour >= 12 ? 'PM' : 'AM';
-    final minute = dt.minute.toString().padLeft(2, '0');
-    return '${hour.toString().padLeft(2, '0')}:$minute $period';
+  @override
+  State<IndirectTripCard> createState() => _IndirectTripCardState();
+}
+
+class _IndirectTripCardState extends State<IndirectTripCard> {
+  late DateTime _dateLeg1;
+  late DateTime _dateLeg2;
+
+  @override
+  void initState() {
+    super.initState();
+    // Default to the suggested dates from the API, or today if missing.
+    _dateLeg1 = widget.trip.firstLeg.departureTime;
+    _dateLeg2 = widget.trip.secondLeg.departureTime;
+
+    // Ensure Leg 2 is >= Leg 1
+    if (_dateLeg2.isBefore(_dateLeg1)) {
+      _dateLeg2 = _dateLeg1;
+    }
+  }
+
+  Future<void> _pickDate(int leg) async {
+    final initialDate = leg == 1 ? _dateLeg1 : _dateLeg2;
+    // Leg 2 minimum date is Leg 1's date
+    final firstDate = leg == 1 ? DateTime.now() : _dateLeg1;
+
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: initialDate.isBefore(firstDate) ? firstDate : initialDate,
+      firstDate: firstDate,
+      lastDate: DateTime.now().add(const Duration(days: 90)),
+      builder: (context, child) {
+        return Theme(
+          data: ThemeData.dark().copyWith(
+            colorScheme: const ColorScheme.dark(
+              primary: ColorsManager.accentCyan,
+              onPrimary: Colors.black,
+              surface: ColorsManager.surfaceDark,
+              onSurface: Colors.white,
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+
+    if (picked != null) {
+      setState(() {
+        if (leg == 1) {
+          _dateLeg1 = picked;
+          if (_dateLeg2.isBefore(_dateLeg1)) {
+            _dateLeg2 = _dateLeg1;
+          }
+        } else {
+          _dateLeg2 = picked;
+        }
+      });
+    }
+  }
+
+  void _onBuildJourney() {
+    // Navigate to the new Indirect Builder Wizard
+    Navigator.pushNamed(
+      context,
+      AppRoutes.indirectBookingScreen,
+      arguments: {
+        'indirectTrip': widget.trip,
+        'dateLeg1': _dateLeg1,
+        'dateLeg2': _dateLeg2,
+        'activeParams': widget.activeParams,
+      },
+    );
   }
 
   @override
@@ -23,52 +96,70 @@ class IndirectTripCard extends StatelessWidget {
         color: ColorsManager.cardBg,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: ColorsManager.accentCyan.withOpacity(0.15),
+          color: ColorsManager.accentCyan.withAlpha(38), // 0.15 * 255
           width: 1,
         ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // ── Total summary
-          _TripSummaryHeader(trip: trip),
+          // ── Header (Stations Overview)
+          _TripSummaryHeader(trip: widget.trip),
           const Divider(height: 1, color: ColorsManager.borderSubtle),
 
           // ── Leg 1
-          _LegRow(label: 'LEG 1', leg: trip.firstLeg, fmt: _fmt),
+          _LegConfigRow(
+            label: 'LEG 1',
+            origin: widget.trip.firstLeg.originStationName.isNotEmpty
+                ? widget.trip.firstLeg.originStationName
+                : widget.trip.firstLeg.originGovernorate,
+            destination: widget.trip.firstLeg.destinationStationName.isNotEmpty
+                ? widget.trip.firstLeg.destinationStationName
+                : widget.trip.firstLeg.destinationGovernorate,
+            date: _dateLeg1,
+            onDateTap: () => _pickDate(1),
+          ),
 
-          // ── Layover badge
-          _LayoverBadge(trip: trip),
+          // ── Transfer badge
+          _TransferBadge(trip: widget.trip),
 
           // ── Leg 2
-          _LegRow(label: 'LEG 2', leg: trip.secondLeg, fmt: _fmt),
+          _LegConfigRow(
+            label: 'LEG 2',
+            origin: widget.trip.secondLeg.originStationName.isNotEmpty
+                ? widget.trip.secondLeg.originStationName
+                : widget.trip.secondLeg.originGovernorate,
+            destination: widget.trip.secondLeg.destinationStationName.isNotEmpty
+                ? widget.trip.secondLeg.destinationStationName
+                : widget.trip.secondLeg.destinationGovernorate,
+            date: _dateLeg2,
+            onDateTap: () => _pickDate(2),
+          ),
 
-          // ── Book button
+          // ── Build Journey button
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 4, 16, 16),
             child: SizedBox(
               width: double.infinity,
-              height: 44,
-              child: ElevatedButton(
-                onPressed: () => Navigator.pushNamed(
-                  context,
-                  AppRoutes.resultScreen,
-                  arguments: {'indirectTrip': trip},
-                ),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: ColorsManager.buttonBlue,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(22),
-                  ),
-                  elevation: 0,
-                ),
-                child: const Text(
-                  'Book Route',
+              height: 48,
+              child: ElevatedButton.icon(
+                onPressed: _onBuildJourney,
+                icon: const Icon(Icons.build, size: 18),
+                label: const Text(
+                  'Build Journey',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 15,
                     color: Colors.white,
                   ),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: ColorsManager.accentCyan,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(24),
+                  ),
+                  elevation: 0,
                 ),
               ),
             ),
@@ -79,13 +170,19 @@ class IndirectTripCard extends StatelessWidget {
   }
 }
 
-/// Top summary with route icon, stop count, and price.
+/// Top summary with route icon, showing Origin -> Transfer -> Destination
 class _TripSummaryHeader extends StatelessWidget {
   final IndirectTripEntity trip;
   const _TripSummaryHeader({required this.trip});
 
   @override
   Widget build(BuildContext context) {
+    final t1 = trip.firstLeg;
+    final t2 = trip.secondLeg;
+    final o = t1.originStationName.isNotEmpty ? t1.originStationName : t1.originGovernorate;
+    final trans = t1.destinationStationName.isNotEmpty ? t1.destinationStationName : t1.destinationGovernorate;
+    final d = t2.destinationStationName.isNotEmpty ? t2.destinationStationName : t2.destinationGovernorate;
+
     return Padding(
       padding: const EdgeInsets.all(16),
       child: Row(
@@ -93,34 +190,34 @@ class _TripSummaryHeader extends StatelessWidget {
           const Icon(
             Icons.alt_route,
             color: ColorsManager.accentCyan,
-            size: 18,
+            size: 24,
           ),
-          const SizedBox(width: 8),
-          Text(
-            '1 Stop • ${trip.totalDurationFormatted}',
-            style: const TextStyle(
-              color: ColorsManager.accentCyan,
-              fontWeight: FontWeight.bold,
-              fontSize: 13,
-            ),
-          ),
-          const Spacer(),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              const Text(
-                'from',
-                style: TextStyle(color: Colors.white38, fontSize: 11),
-              ),
-              Text(
-                'EGP ${trip.totalStartingPrice.toStringAsFixed(0)}',
-                style: const TextStyle(
-                  color: ColorsManager.accentCyan,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Suggested Transfer Route',
+                  style: TextStyle(
+                    color: ColorsManager.accentCyan,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 12,
+                  ),
                 ),
-              ),
-            ],
+                const SizedBox(height: 4),
+                Text(
+                  '$o ➔ $trans ➔ $d',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 15,
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
           ),
         ],
       ),
@@ -128,13 +225,17 @@ class _TripSummaryHeader extends StatelessWidget {
   }
 }
 
-/// Layover badge between two legs.
-class _LayoverBadge extends StatelessWidget {
+/// Transfer badge between two legs.
+class _TransferBadge extends StatelessWidget {
   final IndirectTripEntity trip;
-  const _LayoverBadge({required this.trip});
+  const _TransferBadge({required this.trip});
 
   @override
   Widget build(BuildContext context) {
+    final trans = trip.firstLeg.destinationStationName.isNotEmpty 
+        ? trip.firstLeg.destinationStationName 
+        : trip.firstLeg.destinationGovernorate;
+
     return Center(
       child: Container(
         margin: const EdgeInsets.symmetric(vertical: 4),
@@ -147,16 +248,11 @@ class _LayoverBadge extends StatelessWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.access_time, color: Colors.white38, size: 14),
+            const Icon(Icons.transfer_within_a_station, color: ColorsManager.textMuted, size: 16),
             const SizedBox(width: 6),
             Text(
-              trip.layoverFormatted,
-              style: const TextStyle(color: Colors.white54, fontSize: 12),
-            ),
-            const SizedBox(width: 6),
-            Text(
-              'at ${trip.firstLeg.destinationStationName.isNotEmpty ? trip.firstLeg.destinationStationName : trip.firstLeg.destinationGovernorate}',
-              style: const TextStyle(color: Colors.white38, fontSize: 12),
+              'Transfer at $trans',
+              style: const TextStyle(color: ColorsManager.textMuted, fontSize: 13),
             ),
           ],
         ),
@@ -165,93 +261,83 @@ class _LayoverBadge extends StatelessWidget {
   }
 }
 
-/// A single leg row showing departure → arrival.
-class _LegRow extends StatelessWidget {
+/// A single leg config row showing stations and a date picker.
+class _LegConfigRow extends StatelessWidget {
   final String label;
-  final TripResultEntity leg;
-  final String Function(DateTime?) fmt;
+  final String origin;
+  final String destination;
+  final DateTime date;
+  final VoidCallback onDateTap;
 
-  const _LegRow({required this.label, required this.leg, required this.fmt});
+  const _LegConfigRow({
+    required this.label,
+    required this.origin,
+    required this.destination,
+    required this.date,
+    required this.onDateTap,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-      child: Row(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Leg label
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-            decoration: BoxDecoration(
-              color: ColorsManager.surfaceChip,
-              borderRadius: BorderRadius.circular(4),
-            ),
-            child: Text(
-              label,
-              style: const TextStyle(
-                color: Colors.white38,
-                fontSize: 10,
-                fontWeight: FontWeight.bold,
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  color: ColorsManager.surfaceChip,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: Text(
+                  label,
+                  style: const TextStyle(
+                    color: ColorsManager.textMuted,
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ),
-            ),
-          ),
-          const SizedBox(width: 10),
-
-          // Departure time
-          Text(
-            fmt(leg.departureTime),
-            style: const TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-              fontSize: 16,
-            ),
-          ),
-          const SizedBox(width: 6),
-
-          // Origin
-          Expanded(
-            child: Text(
-              leg.originStationName.isNotEmpty
-                  ? leg.originStationName
-                  : leg.originGovernorate,
-              style: const TextStyle(
-                color: ColorsManager.textMuted,
-                fontSize: 12,
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  '$origin ➔ $destination',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
-              overflow: TextOverflow.ellipsis,
-            ),
+            ],
           ),
-
-          const Icon(
-            Icons.arrow_forward,
-            color: ColorsManager.textMuted,
-            size: 14,
-          ),
-          const SizedBox(width: 6),
-
-          // Arrival time
-          Text(
-            fmt(leg.arrivalTime),
-            style: const TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-              fontSize: 16,
-            ),
-          ),
-          const SizedBox(width: 6),
-
-          // Destination
-          Expanded(
-            child: Text(
-              leg.destinationStationName.isNotEmpty
-                  ? leg.destinationStationName
-                  : leg.destinationGovernorate,
-              style: const TextStyle(
-                color: ColorsManager.textMuted,
-                fontSize: 12,
+          const SizedBox(height: 10),
+          InkWell(
+            onTap: onDateTap,
+            borderRadius: BorderRadius.circular(8),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              decoration: BoxDecoration(
+                color: ColorsManager.seatContainerBg,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: ColorsManager.borderSubtle),
               ),
-              overflow: TextOverflow.ellipsis,
-              textAlign: TextAlign.right,
+              child: Row(
+                children: [
+                  const Icon(Icons.calendar_today, color: ColorsManager.accentCyan, size: 16),
+                  const SizedBox(width: 8),
+                  Text(
+                    DateFormat('EEE, MMM dd, yyyy').format(date),
+                    style: const TextStyle(color: Colors.white, fontSize: 14),
+                  ),
+                  const Spacer(),
+                  const Icon(Icons.edit, color: ColorsManager.textMuted, size: 16),
+                ],
+              ),
             ),
           ),
         ],

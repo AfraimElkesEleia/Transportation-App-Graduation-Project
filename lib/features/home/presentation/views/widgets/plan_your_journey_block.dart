@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
+import 'package:transportation_app/core/helper/extensions.dart';
 import 'package:transportation_app/core/helper/spacing.dart';
 import 'package:transportation_app/core/routing/routes.dart';
 import 'package:transportation_app/core/widgets/block_container.dart';
@@ -34,6 +36,18 @@ class _PlanYourJourneyBlockState extends State<PlanYourJourneyBlock>
 
   late final AnimationController animationController;
   late final Animation<double> swapAnimation;
+  int _selectedToggleIndex = 0; // 0=All, 1=Train, 2=Bus
+
+  TransportType get _apiTransportValue {
+    switch (_selectedToggleIndex) {
+      case 1:
+        return TransportType.train; // Train
+      case 2:
+        return TransportType.bus; // Bus
+      default:
+        return TransportType.all; // All
+    }
+  }
 
   StationGroupEntity? _selectedFromGroup;
   StationEntity? _selectedFromStation;
@@ -163,9 +177,21 @@ class _PlanYourJourneyBlockState extends State<PlanYourJourneyBlock>
     if (_isRoundTrip) {
       if (returnDateController.text.trim().isEmpty) {
         returnDateErr = 'Please select a return date';
-      } else if (returnDateController.text.compareTo(dateController.text) <=
-          0) {
-        returnDateErr = 'Return date must be after departure';
+      } else {
+        final depDate = DateFormat(
+          'dd/MM/yyyy',
+        ).parseStrict(dateController.text);
+        final retDate = DateFormat(
+          'dd/MM/yyyy',
+        ).parseStrict(returnDateController.text);
+
+        // Stripping time is usually safe if you just want to compare calendar days
+        final depDay = DateTime(depDate.year, depDate.month, depDate.day);
+        final retDay = DateTime(retDate.year, retDate.month, retDate.day);
+
+        if (retDay.isBefore(depDay)) {
+          returnDateErr = 'Return date cannot be before departure';
+        }
       }
     }
 
@@ -183,19 +209,28 @@ class _PlanYourJourneyBlockState extends State<PlanYourJourneyBlock>
   }
 
   SearchParams _buildSearchParams() {
+    final fromDisplay =
+        _selectedFromStation?.englishName ?? _selectedFromGroup!.governorate;
+    final toDisplay =
+        _selectedToStation?.englishName ?? _selectedToGroup!.governorate;
+
     return SearchParams(
+      isRoundTrip: _isRoundTrip,
       travelDate: _formatDateForApi(dateController.text),
+      returnDate: _isRoundTrip
+          ? _formatDateForApi(returnDateController.text)
+          : null,
       passengers: 1,
-      // Station ID if specific station picked — else governorate name
+      transport: _apiTransportValue,
+      fromDisplayName: fromDisplay,
+      toDisplayName: toDisplay,
       fromStationId: _selectedFromStation?.id,
       fromGovernorate: _selectedFromStation == null
-          ? _selectedFromGroup!
-                .governorate // exact API string
+          ? _selectedFromGroup!.governorate
           : null,
       toStationId: _selectedToStation?.id,
       toGovernorate: _selectedToStation == null
-          ? _selectedToGroup!
-                .governorate // exact API string
+          ? _selectedToGroup!.governorate
           : null,
     );
   }
@@ -210,11 +245,19 @@ class _PlanYourJourneyBlockState extends State<PlanYourJourneyBlock>
 
   void _onSearch() {
     if (!_validate()) return;
-    Navigator.pushNamed(
-      context,
-      AppRoutes.searchScreen,
-      arguments: _buildSearchParams(),
-    );
+    if (_isRoundTrip) {
+      Navigator.pushNamed(
+        context,
+        AppRoutes.roundTripBookingScreen,
+        arguments: _buildSearchParams(),
+      );
+    } else {
+      Navigator.pushNamed(
+        context,
+        AppRoutes.searchScreen,
+        arguments: _buildSearchParams(),
+      );
+    }
   }
 
   @override
@@ -279,7 +322,14 @@ class _PlanYourJourneyBlockState extends State<PlanYourJourneyBlock>
             children: [
               const PlanYourJourneyHeader(),
               verticalSpace(space: 24),
-              const ToggleAppBar(),
+              ToggleAppBar(
+                selectedType: _selectedToggleIndex,
+                onTypeChanged: (index) {
+                  setState(() {
+                    _selectedToggleIndex = index;
+                  });
+                },
+              ),
               verticalSpace(space: 16),
               TripTypeToggle(
                 isRoundTrip: _isRoundTrip,
@@ -325,6 +375,13 @@ class _PlanYourJourneyBlockState extends State<PlanYourJourneyBlock>
               // verticalSpace(space: 12),
               SearchTripButton(onPressed: _onSearch),
               verticalSpace(space: 12),
+              SearchTripButton(
+                onPressed: () {
+                  context.pushNamed(AppRoutes.multidestinationScreen);
+                },
+                label: "Multi-Destination",
+                backgroundColor: Colors.blueAccent,
+              ),
             ],
           ),
         );

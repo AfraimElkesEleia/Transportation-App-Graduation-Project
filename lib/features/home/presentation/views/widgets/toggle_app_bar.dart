@@ -2,22 +2,24 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:transportation_app/core/helper/spacing.dart';
 
-class ToggleAppBar extends StatefulWidget {
-  const ToggleAppBar({super.key});
+class ToggleAppBar extends StatelessWidget {
+  final int selectedType;
+  final ValueChanged<int> onTypeChanged;
 
-  @override
-  State<ToggleAppBar> createState() => _ToggleAppBarState();
-}
+  const ToggleAppBar({
+    super.key,
+    required this.selectedType,
+    required this.onTypeChanged,
+  });
 
-class _ToggleAppBarState extends State<ToggleAppBar> {
-  List<Widget> trainsType = [
-    trainTypeWidget("All"),
-    trainTypeWidget("Train"),
-    trainTypeWidget("Bus"),
-  ];
-  int selectedType = 0;
   @override
   Widget build(BuildContext context) {
+    List<Widget> trainsType = [
+      trainTypeWidget("All"),
+      trainTypeWidget("Train"),
+      trainTypeWidget("Bus"),
+    ];
+
     return ToggleButtons(
       constraints: BoxConstraints.expand(
         width: MediaQuery.of(context).size.width / 3.6,
@@ -31,11 +33,7 @@ class _ToggleAppBarState extends State<ToggleAppBar> {
         trainsType.length,
         (index) => index == selectedType,
       ),
-      onPressed: (index) {
-        setState(() {
-          selectedType = index;
-        });
-      },
+      onPressed: onTypeChanged, 
       children: trainsType,
     );
   }
