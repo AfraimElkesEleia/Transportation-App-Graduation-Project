@@ -6,8 +6,9 @@ import 'package:transportation_app/core/routing/routes.dart';
 
 class TicketDetailCard extends StatelessWidget {
   final TicketEntity ticket;
+  final bool showUrgency;
 
-  const TicketDetailCard({super.key, required this.ticket});
+  const TicketDetailCard({super.key, required this.ticket, this.showUrgency = false});
 
   Color get _agencyColor {
     final n = ticket.agencyName.toLowerCase();
@@ -74,7 +75,8 @@ class TicketDetailCard extends StatelessWidget {
         ),
         child: Column(
           children: [
-            // ── Header ──────────────────────────────────────────────
+            // ── Urgency Banner (Active tab only) ──────────────────────
+            if (showUrgency) _UrgencyBanner(boardingTime: ticket.boardingTime),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               decoration: BoxDecoration(
@@ -337,6 +339,79 @@ class _InfoChip extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+// ── Urgency Banner ──────────────────────────────────────────────────────────
+class _UrgencyBanner extends StatefulWidget {
+  final DateTime boardingTime;
+  const _UrgencyBanner({required this.boardingTime});
+
+  @override
+  State<_UrgencyBanner> createState() => _UrgencyBannerState();
+}
+
+class _UrgencyBannerState extends State<_UrgencyBanner> {
+  late Duration _remaining;
+  late final Stream<Duration> _stream;
+
+  @override
+  void initState() {
+    super.initState();
+    _remaining = widget.boardingTime.difference(DateTime.now());
+    _stream = Stream.periodic(
+      const Duration(seconds: 30),
+      (_) => widget.boardingTime.difference(DateTime.now()),
+    );
+  }
+
+  String _fmt(Duration d) {
+    if (d.isNegative) return 'Boarding now';
+    if (d.inHours > 0) {
+      final h = d.inHours;
+      final m = d.inMinutes.remainder(60);
+      return 'Departing in ${h}h ${m}m';
+    }
+    return 'Departing in ${d.inMinutes}m';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<Duration>(
+      stream: _stream,
+      initialData: _remaining,
+      builder: (context, snap) {
+        final diff = snap.data ?? _remaining;
+        final isUrgent = diff.inMinutes <= 60;
+        final color = isUrgent ? Colors.orange : Colors.amber;
+        return Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+          decoration: BoxDecoration(
+            color: color.withOpacity(0.12),
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+          ),
+          child: Row(
+            children: [
+              Icon(
+                isUrgent ? Icons.directions_run_rounded : Icons.schedule_rounded,
+                color: color,
+                size: 16,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                _fmt(diff),
+                style: TextStyle(
+                  color: color,
+                  fontSize: 13,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }

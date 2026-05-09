@@ -44,6 +44,9 @@ import 'package:transportation_app/features/booking/presentation/views/round_tri
 import 'package:transportation_app/features/booking/presentation/views/round_trip_passenger_form_screen.dart';
 import 'package:transportation_app/features/signup/presentation/cubit/signup_cubit.dart';
 import 'package:transportation_app/features/signup/presentation/screen/sign_up_screen.dart';
+import 'package:transportation_app/features/profile/presentation/cubit/loyalty_hub_cubit/loyalty_hub_cubit.dart';
+import 'package:transportation_app/features/profile/presentation/views/screen/loyalty_hub_screen.dart';
+
 class AppRouter {
   Route<dynamic>? generateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -259,6 +262,18 @@ class AppRouter {
         final ticket = settings.arguments as TicketEntity;
         return MaterialPageRoute(
           builder: (_) => TicketDetailsScreen(ticket: ticket),
+        );
+      case AppRoutes.loyaltyHub:
+        final args = settings.arguments as Map<String, dynamic>? ?? {};
+        return MaterialPageRoute(
+          builder: (_) => BlocProvider(
+            create: (_) => sl<LoyaltyHubCubit>()..init(),
+            child: LoyaltyHubScreen(
+              pointsBalance: args['pointsBalance'] ?? 0,
+              expiringAmount: args['expiringAmount'] ?? 0,
+              nextExpiryDate: args['nextExpiryDate'],
+            ),
+          ),
         );
       default:
         return null;

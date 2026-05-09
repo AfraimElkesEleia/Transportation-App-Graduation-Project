@@ -9,6 +9,7 @@ abstract class BookingRemoteDatasource {
   Future<SeatMapModel> getSeatMap(int occurrenceId);
   Future<void>         addToCart(Map<String, dynamic> payload);
   Future<void>         checkout({int pointsToRedeem = 0});
+  Future<void>         cancelCartItem(int bookingId);
 }
 
 class BookingRemoteDatasourceImpl implements BookingRemoteDatasource {
@@ -77,6 +78,19 @@ class BookingRemoteDatasourceImpl implements BookingRemoteDatasource {
       if (body['success'] != true) {
         throw ServerException(
             message: body['message'] ?? 'Checkout failed');
+      }
+    } on DioException catch (e) {
+      _handleDio(e);
+    }
+  }
+
+  @override
+  Future<void> cancelCartItem(int bookingId) async {
+    try {
+      final res = await dio.delete('/Bookings/bookings/$bookingId');
+      final body = res.data as Map<String, dynamic>;
+      if (body['success'] != true) {
+        throw ServerException(message: body['message'] ?? 'Failed to cancel trip');
       }
     } on DioException catch (e) {
       _handleDio(e);

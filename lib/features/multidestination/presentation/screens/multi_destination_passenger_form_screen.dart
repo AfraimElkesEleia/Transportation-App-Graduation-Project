@@ -4,6 +4,7 @@ import 'package:transportation_app/core/routing/routes.dart';
 import 'package:transportation_app/core/theming/colors.dart';
 import 'package:transportation_app/features/multidestination/presentation/cubit/multi_destination_booking_cubit.dart';
 import 'package:transportation_app/features/multidestination/presentation/cubit/multi_destination_booking_state.dart';
+import 'package:transportation_app/features/search/domain/entities/trip_result_entity.dart';
 
 class MultiDestinationPassengerFormScreen extends StatefulWidget {
   const MultiDestinationPassengerFormScreen({super.key});
@@ -21,6 +22,7 @@ class _MultiDestinationPassengerFormScreenState
   late final List<List<_PassengerControllers>> _controllers;
   late final List<int> _seatCounts;
   late final int _legCount;
+  late final List<bool> _isTrainPerLeg;
 
   @override
   void initState() {
@@ -34,10 +36,24 @@ class _MultiDestinationPassengerFormScreenState
       (i) => cubit.state.selectedSeats[i]?.length ?? 0,
     );
 
+    _isTrainPerLeg = List.generate(_legCount, (i) {
+      final trip = cubit.state.selectedTrips[i];
+      return _isTrain(trip);
+    });
+
     _controllers = List.generate(
       _legCount,
       (i) => List.generate(_seatCounts[i], (_) => _PassengerControllers()),
     );
+  }
+
+  bool _isTrain(TripResultEntity? trip) {
+    if (trip == null) return false;
+    final name = trip.agencyName.toLowerCase();
+    return name.contains('rail') ||
+        name.contains('enr') ||
+        name.contains('train') ||
+        name.contains('talgo');
   }
 
   @override
@@ -63,12 +79,17 @@ class _MultiDestinationPassengerFormScreenState
 
       for (int pIndex = 0; pIndex < count; pIndex++) {
         final c = _controllers[legIndex][pIndex];
-        legPass.add({
+        final pass = <String, dynamic>{
           'passengerName': c.nameController.text.trim(),
-          'idType': 'NationalId',
-          'idNumber': c.nationalIdController.text.trim(),
           'seatNumber': seats[pIndex].toString(),
-        });
+        };
+        
+        if (_isTrainPerLeg[legIndex]) {
+          pass['idType'] = 'NationalId';
+          pass['idNumber'] = c.nationalIdController.text.trim();
+        }
+        
+        legPass.add(pass);
       }
       allLegPassengers[legIndex] = legPass;
     }
@@ -149,6 +170,7 @@ class _MultiDestinationPassengerFormScreenState
                               seatNumber:
                                   state.selectedSeats[legIndex]![pIndex].toString(),
                               controllers: _controllers[legIndex][pIndex],
+                              isTrain: _isTrainPerLeg[legIndex],
                             ),
 
                           const SizedBox(height: 8),
@@ -267,11 +289,13 @@ class _PassengerCard extends StatelessWidget {
   final int index;
   final String seatNumber;
   final _PassengerControllers controllers;
+  final bool isTrain;
 
   const _PassengerCard({
     required this.index,
     required this.seatNumber,
     required this.controllers,
+    required this.isTrain,
   });
 
   @override
@@ -316,18 +340,20 @@ class _PassengerCard extends StatelessWidget {
                 (v == null || v.trim().isEmpty) ? 'Required' : null,
           ),
           const SizedBox(height: 12),
-          TextFormField(
-            controller: controllers.nationalIdController,
-            keyboardType: TextInputType.number,
-            style: const TextStyle(color: Colors.white, fontSize: 14),
-            decoration: _inputDecoration(
-              label: 'National ID',
-              icon: Icons.badge_outlined,
+          if (isTrain) ...[
+            TextFormField(
+              controller: controllers.nationalIdController,
+              keyboardType: TextInputType.number,
+              style: const TextStyle(color: Colors.white, fontSize: 14),
+              decoration: _inputDecoration(
+                label: 'National ID',
+                icon: Icons.badge_outlined,
+              ),
+              validator: (v) =>
+                  (v == null || v.trim().isEmpty) ? 'Required' : null,
             ),
-            validator: (v) =>
-                (v == null || v.trim().isEmpty) ? 'Required' : null,
-          ),
-          const SizedBox(height: 12),
+            const SizedBox(height: 12),
+          ],
           TextFormField(
             controller: controllers.phoneController,
             keyboardType: TextInputType.phone,

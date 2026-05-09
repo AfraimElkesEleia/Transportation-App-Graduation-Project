@@ -44,3 +44,21 @@ class CheckoutError extends CartState {
   @override
   List<Object?> get props => [message];
 }
+
+class CartItemCancelling extends CartState {
+  final int bookingId;
+
+  const CartItemCancelling(this.bookingId);
+
+  @override
+  List<Object?> get props => [bookingId];
+}
+
+class CartItemCancelError extends CartState {
+  final String message;
+
+  const CartItemCancelError(this.message);
+
+  @override
+  List<Object?> get props => [message];
+}

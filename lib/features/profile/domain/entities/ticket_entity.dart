@@ -19,7 +19,7 @@ class TicketPassengerEntity extends Equatable {
 
 class TicketEntity extends Equatable {
   final int bookingId;
-  final int userId;  // booking-level user id; used as passengerId for marketplace
+  final int userId;
   final String status;
   final String paymentStatus;
   final double totalPrice;
@@ -60,9 +60,17 @@ class TicketEntity extends Equatable {
     required this.passengers,
   });
 
-  bool get isUpcoming => boardingTime.isAfter(DateTime.now());
-  bool get isPast => dropoffTime.isBefore(DateTime.now());
+  bool get isUpcoming =>
+      boardingTime.isAfter(DateTime.now()) && status == 'Confirmed';
+  bool get isPast =>
+      dropoffTime.isBefore(DateTime.now()) && status != 'Cancelled';
   bool get isActive => !isPast && status == 'Confirmed';
+
+  bool get isActiveNow {
+    final now = DateTime.now();
+    final diff = boardingTime.difference(now);
+    return diff.inSeconds >= 0 && diff.inHours < 5 && status == 'Confirmed';
+  }
 
   @override
   List<Object?> get props => [bookingId];

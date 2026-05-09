@@ -4,6 +4,10 @@ import 'package:transportation_app/core/routing/routes.dart';
 import 'package:transportation_app/core/theming/colors.dart';
 import 'package:transportation_app/features/booking/presentation/cubit/round_trip_booking_cubit.dart';
 import 'package:transportation_app/features/booking/presentation/cubit/round_trip_booking_state.dart';
+import 'package:transportation_app/features/booking/presentation/views/widgets/points_redemption_widget.dart';
+import 'package:transportation_app/features/profile/presentation/cubit/profile_cubit/profile_cubit.dart';
+import 'package:transportation_app/features/profile/presentation/cubit/profile_cubit/profile_states.dart';
+import 'package:transportation_app/features/search/domain/entities/trip_result_entity.dart';
 
 class RoundTripPassengerFormScreen extends StatefulWidget {
   const RoundTripPassengerFormScreen({super.key});
@@ -21,6 +25,8 @@ class _RoundTripPassengerFormScreenState extends State<RoundTripPassengerFormScr
 
   late final int _outboundCount;
   late final int _returnCount;
+
+  int _selectedPoints = 0;
 
   @override
   void initState() {
@@ -40,7 +46,16 @@ class _RoundTripPassengerFormScreenState extends State<RoundTripPassengerFormScr
     super.dispose();
   }
 
-  void _submit() {
+  bool _isTrain(TripResultEntity? trip) {
+    if (trip == null) return false;
+    final name = trip.agencyName.toLowerCase();
+    return name.contains('rail') ||
+        name.contains('enr') ||
+        name.contains('train') ||
+        name.contains('talgo');
+  }
+
+  void _submit({required bool bookNow}) {
     if (!_formKey.currentState!.validate()) return;
 
     final cubit = context.read<RoundTripBookingCubit>();
@@ -72,17 +87,34 @@ class _RoundTripPassengerFormScreenState extends State<RoundTripPassengerFormScr
     final contactPhone = _outboundControllers.isNotEmpty ? _outboundControllers.first.phoneController.text.trim() : 'Unknown';
     final contactEmail = _outboundControllers.isNotEmpty ? _outboundControllers.first.emailController.text.trim() : '';
 
-    cubit.submitRoundTrip(
-      contactName: contactName,
-      contactPhone: contactPhone,
-      contactEmail: contactEmail.isEmpty ? 'user@example.com' : contactEmail,
-      outboundPassengers: outboundPassengers,
-      returnPassengers: returnPassengers,
-    );
+    if (bookNow) {
+      cubit.bookNowRoundTrip(
+        contactName: contactName,
+        contactPhone: contactPhone,
+        contactEmail: contactEmail.isEmpty ? 'user@example.com' : contactEmail,
+        outboundPassengers: outboundPassengers,
+        returnPassengers: returnPassengers,
+        pointsToRedeem: _selectedPoints,
+      );
+    } else {
+      cubit.submitRoundTrip(
+        contactName: contactName,
+        contactPhone: contactPhone,
+        contactEmail: contactEmail.isEmpty ? 'user@example.com' : contactEmail,
+        outboundPassengers: outboundPassengers,
+        returnPassengers: returnPassengers,
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    int loyaltyBalance = 0;
+    final profileState = context.watch<ProfileCubit>().state;
+    if (profileState is ProfileLoaded) {
+      loyaltyBalance = profileState.profile.loyaltyPointsBalance ?? 0;
+    }
+
     return Scaffold(
       backgroundColor: ColorsManager.seatBg,
       body: SafeArea(
@@ -103,6 +135,18 @@ class _RoundTripPassengerFormScreenState extends State<RoundTripPassengerFormScr
                 AppRoutes.cartScreen,
                 (route) => route.isFirst,
               );
+            } else if (state.checkoutSuccess) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Booking successful!'),
+                  backgroundColor: Colors.green,
+                ),
+              );
+              Navigator.pushNamedAndRemoveUntil(
+                context,
+                AppRoutes.cartScreen,
+                (route) => route.isFirst,
+              );
             } else if (state.cartError != null) {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
@@ -113,6 +157,12 @@ class _RoundTripPassengerFormScreenState extends State<RoundTripPassengerFormScr
             }
           },
           builder: (context, state) {
+            final isTrain = _isTrain(state.selectedOutboundTrip) ||
+                            _isTrain(state.selectedReturnTrip);
+            final outPrice = state.selectedOutboundClass?.price ?? 0;
+            final retPrice = state.selectedReturnClass?.price ?? 0;
+            final cartTotal = (outPrice * _outboundCount) + (retPrice * _returnCount);
+
             return Column(
               children: [
                 _FormAppBar(),
@@ -135,6 +185,7 @@ class _RoundTripPassengerFormScreenState extends State<RoundTripPassengerFormScr
                             index: i + 1,
                             seatLabel: 'Seat: ${state.selectedOutboundSeats[i]}',
                             controllers: _outboundControllers[i],
+                            isTrain: isTrain,
                           ),
 
                         const SizedBox(height: 16),
@@ -152,14 +203,25 @@ class _RoundTripPassengerFormScreenState extends State<RoundTripPassengerFormScr
                             index: i + 1,
                             seatLabel: 'Seat: ${state.selectedReturnSeats[i]}',
                             controllers: _returnControllers[i],
+                            isTrain: isTrain,
                           ),
+                        const SizedBox(height: 16),
+                        // ── Loyalty points section (for Book Now) ──────────
+                        PointsRedemptionWidget(
+                          cartTotal: cartTotal.toDouble(),
+                          walletPoints: loyaltyBalance,
+                          onPointsChanged: (pts) => setState(() => _selectedPoints = pts),
+                        ),
+                        const SizedBox(height: 8),
                       ],
                     ),
                   ),
                 ),
                 _FormBottomButtons(
                   isAdding: state.isAddingToCart,
-                  onAddToCart: _submit,
+                  isBookingNow: state.isBookingNow,
+                  onAddToCart: () => _submit(bookNow: false),
+                  onBookNow: () => _submit(bookNow: true),
                 ),
               ],
             );
@@ -261,11 +323,13 @@ class _PassengerCard extends StatelessWidget {
   final int index;
   final String seatLabel;
   final _PassengerControllers controllers;
+  final bool isTrain;
 
   const _PassengerCard({
     required this.index,
     required this.seatLabel,
     required this.controllers,
+    required this.isTrain,
   });
 
   @override
@@ -306,14 +370,16 @@ class _PassengerCard extends StatelessWidget {
             validator: (v) => (v == null || v.trim().isEmpty) ? 'Required' : null,
           ),
           const SizedBox(height: 12),
-          _buildTextField(
-            controller: controllers.idController,
-            label: 'National ID',
-            icon: Icons.badge_outlined,
-            keyboardType: TextInputType.number,
-            validator: (v) => (v == null || v.trim().isEmpty) ? 'Required' : null,
-          ),
-          const SizedBox(height: 12),
+          if (isTrain) ...[
+            _buildTextField(
+              controller: controllers.idController,
+              label: 'National ID',
+              icon: Icons.badge_outlined,
+              keyboardType: TextInputType.number,
+              validator: (v) => (v == null || v.trim().isEmpty) ? 'Required' : null,
+            ),
+            const SizedBox(height: 12),
+          ],
           _buildTextField(
             controller: controllers.phoneController,
             label: 'Phone Number',
@@ -370,42 +436,122 @@ class _PassengerCard extends StatelessWidget {
 }
 
 // ── Bottom submit bar ─────────────────────────────────────────────────────────
-class _FormBottomButtons extends StatelessWidget {
+class _FormBottomButtons extends StatefulWidget {
   final bool isAdding;
+  final bool isBookingNow;
   final VoidCallback onAddToCart;
+  final VoidCallback onBookNow;
 
-  const _FormBottomButtons({required this.isAdding, required this.onAddToCart});
+  const _FormBottomButtons({
+    required this.isAdding,
+    required this.isBookingNow,
+    required this.onAddToCart,
+    required this.onBookNow,
+  });
+
+  @override
+  State<_FormBottomButtons> createState() => _FormBottomButtonsState();
+}
+
+class _FormBottomButtonsState extends State<_FormBottomButtons> {
+  int _lastClicked = 0;
 
   @override
   Widget build(BuildContext context) {
+    final isLoading = widget.isAdding || widget.isBookingNow;
+
     return Container(
-      padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
+      padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
       decoration: const BoxDecoration(
         color: ColorsManager.surfaceDark,
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
-      child: SizedBox(
-        width: double.infinity,
-        height: 52,
-        child: ElevatedButton(
-          onPressed: isAdding ? null : onAddToCart,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: ColorsManager.accentCyan,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(26),
-            ),
-          ),
-          child: isAdding
-              ? const CircularProgressIndicator(color: Colors.white)
-              : const Text(
-                  'Add Journey to Cart',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            children: [
+              // Add to Cart
+              Expanded(
+                child: SizedBox(
+                  height: 50,
+                  child: OutlinedButton(
+                    onPressed: isLoading
+                        ? null
+                        : () {
+                            setState(() => _lastClicked = 1);
+                            widget.onAddToCart();
+                          },
+                    style: OutlinedButton.styleFrom(
+                      side: const BorderSide(
+                        color: ColorsManager.accentCyan,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(25),
+                      ),
+                    ),
+                    child: isLoading && _lastClicked == 1
+                        ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: ColorsManager.accentCyan,
+                            ),
+                          )
+                        : const Text(
+                            'Add to Cart',
+                            style: TextStyle(
+                              color: ColorsManager.accentCyan,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 15,
+                            ),
+                          ),
                   ),
                 ),
-        ),
+              ),
+              const SizedBox(width: 12),
+              // Book Now
+              Expanded(
+                child: SizedBox(
+                  height: 50,
+                  child: ElevatedButton(
+                    onPressed: isLoading
+                        ? null
+                        : () {
+                            setState(() => _lastClicked = 2);
+                            widget.onBookNow();
+                          },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: ColorsManager.accentCyan,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(25),
+                      ),
+                      elevation: 0,
+                    ),
+                    child: isLoading && _lastClicked == 2
+                        ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.white,
+                            ),
+                          )
+                        : const Text(
+                            'Book Now',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 15,
+                            ),
+                          ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }

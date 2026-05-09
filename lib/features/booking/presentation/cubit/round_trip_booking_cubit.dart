@@ -290,6 +290,67 @@ class RoundTripBookingCubit extends Cubit<RoundTripBookingState> {
     }
   }
 
+  Future<void> bookNowRoundTrip({
+    required String contactName,
+    required String contactPhone,
+    required String contactEmail,
+    required List<Map<String, dynamic>> outboundPassengers,
+    required List<Map<String, dynamic>> returnPassengers,
+    required int pointsToRedeem,
+  }) async {
+    if (isClosed) return;
+    emit(state.copyWith(isBookingNow: true, clearCartError: true));
+
+    try {
+      final outboundPayload = {
+        'tripOccurrenceId': state.selectedOutboundTrip!.tripOccurrenceId,
+        'coachClassId': state.selectedOutboundClass!.coachClassId,
+        'originStationId': state.selectedOutboundTrip!.originStationId,
+        'destinationStationId': state.selectedOutboundTrip!.destinationStationId,
+        'contactName': contactName,
+        'contactPhone': contactPhone,
+        'contactEmail': contactEmail,
+        'passengers': outboundPassengers,
+      };
+
+      final returnPayload = {
+        'tripOccurrenceId': state.selectedReturnTrip!.tripOccurrenceId,
+        'coachClassId': state.selectedReturnClass!.coachClassId,
+        'originStationId': state.selectedReturnTrip!.originStationId,
+        'destinationStationId': state.selectedReturnTrip!.destinationStationId,
+        'contactName': contactName,
+        'contactPhone': contactPhone,
+        'contactEmail': contactEmail,
+        'passengers': returnPassengers,
+      };
+
+      // 1. Add Outbound to Cart
+      await bookingRemoteDatasource.addToCart(outboundPayload);
+
+      try {
+        // 2. Add Return to Cart
+        await bookingRemoteDatasource.addToCart(returnPayload);
+        
+        // 3. Checkout
+        await bookingRemoteDatasource.checkout(pointsToRedeem: pointsToRedeem);
+        emit(state.copyWith(isBookingNow: false, checkoutSuccess: true));
+      } catch (e) {
+        // Leg 2 or Checkout failed
+        emit(state.copyWith(
+          isBookingNow: false,
+          cartError: 'Failed to complete booking: ${e.toString()}',
+        ));
+      }
+
+    } catch (e) {
+      // Outbound failed
+      emit(state.copyWith(
+        isBookingNow: false,
+        cartError: e.toString(),
+      ));
+    }
+  }
+
   // ── Navigation ──
   void goBackToOutbound() {
     emit(state.copyWith(

@@ -437,6 +437,7 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
                             ),
                             sellerName:
                                 item['sellerName'] as String? ?? 'Seller',
+                            agencyName: item['agencyName'] as String? ?? item['agency'] as String?,
                             oldPrice: '$oldPrice EGP',
                             newPrice: '$newPrice EGP',
                             discount: '-$discountVal%',
@@ -530,7 +531,7 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Agency: ${item['agency'] ?? 'Unknown'}',
+                'Agency: ${item['agencyName'] ?? 'Unknown'}',
                 style: const TextStyle(color: Colors.white70),
               ),
               const SizedBox(height: 8),

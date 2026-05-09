@@ -757,7 +757,9 @@ No request body.
       {
         "challengeId": 1,
         "title": "Frequent Traveler",
+        "description": "Take 4 trips this month to earn bonus points.",
         "type": 1,
+        "frequency": 2,
         "currentProgress": 2,
         "goalValue": 4,
         "rewardPoints": 400
@@ -1039,6 +1041,36 @@ Query string parameters:
 - Indirect routes are returned only when direct routes do not exist for the same request criteria.
 - Routes are evaluated with layover window constraints (minimum 1 hour, maximum 6 hours).
 
+## 7.3 Popular Routes
+
+### Endpoint Overview
+- **Method:** `GET`
+- **URL:** `/api/trips/popular-routes`
+- **Business Use Case:** Returns the top 3 most frequently searched governorate-to-governorate routes from the last 7 days.
+
+### Authentication / Authorization
+- **JWT Required:** No
+- **Role Required:** None
+
+### Caching
+- Results are cached in memory under the `PopularRoutes` cache key.
+- Cache expiration is absolute after 1 hour.
+
+### Response Example (200 OK)
+```json
+{
+  "success": true,
+  "message": "Popular routes retrieved successfully.",
+  "data": [
+    { "originGov": "Cairo", "destinationGov": "Alexandria" },
+    { "originGov": "Giza", "destinationGov": "Cairo" },
+    { "originGov": "Beheira", "destinationGov": "Alexandria" }
+  ],
+  "errors": null,
+  "timestamp": "2026-05-07T10:30:00Z"
+}
+```
+
 ### Response Example (200 OK)
 ```json
 {
@@ -1270,16 +1302,18 @@ Base route: `/api/Bookings`
   "data": {
     "items": [
       {
-        "bookingId": 1024,
-        "totalPrice": 360.0,
-        "seatsBooked": 2,
-        "holdExpiresAt": "2026-03-20T07:10:00Z",
-        "agencyName": "GoBus",
-        "className": "Business",
-        "origin": "رمسيس",
-        "destination": "سيدي جابر",
-        "boardingTime": "2026-03-20T07:20:00",
-        "dropoffTime": "2026-03-20T10:00:00",
+      "bookingId": 1024,
+      "totalPrice": 360.0,
+      "seatsBooked": 2,
+      "holdExpiresAt": "2026-03-20T07:10:00Z",
+      "agencyName": "GoBus",
+      "className": "Business",
+      "origin": "رمسيس",
+      "originGov": "Cairo",
+      "destination": "سيدي جابر",
+      "destinationGov": "Alexandria",
+      "boardingTime": "2026-03-20T07:20:00",
+      "dropoffTime": "2026-03-20T10:00:00",
         "passengers": [
           {
             "name": "Ali Hassan",
@@ -1372,7 +1406,9 @@ No request body.
         "agencyName": "GoBus",
         "className": "Business",
         "origin": "رمسيس",
+        "originGov": "Cairo",
         "destination": "سيدي جابر",
+        "destinationGov": "Alexandria",
         "boardingTime": "2026-04-02T07:20:00",
         "dropoffTime": "2026-04-02T10:00:00",
         "passengers": [
@@ -1407,7 +1443,47 @@ No request body.
 }
 ```
 
-## 9.4 Get My Tickets
+## 9.4 Cancel Cart Hold
+### Endpoint Overview
+- **Method:** `DELETE`
+- **URL:** `/api/Bookings/bookings/{bookingId}`
+- **Business Use Case:** Cancels the full pending booking hold regardless of passenger count.
+
+### Authentication / Authorization
+- **JWT Required:** Yes
+- **Role Required:** Any logged-in User
+
+### Request Payload
+No request body.
+
+### Path Parameters
+| Field     | Type | Required | Notes                                                         |
+| --------- | ---- | -------- | ------------------------------------------------------------- |
+| bookingId | int  | Yes      | Pending booking identifier that belongs to authenticated user |
+
+### Cancellation Rules
+- Booking must exist for authenticated user and be in `Pending` status.
+- The full booking hold is deleted (all passengers under that hold are removed via booking delete).
+- Inventory is restored by the number of passengers in the cancelled booking.
+
+### Response Example (200 OK)
+```json
+{
+  "success": true,
+  "message": "Cart hold cancelled successfully.",
+  "data": null,
+  "errors": null,
+  "timestamp": "2026-05-07T10:30:00Z"
+}
+```
+
+### Response Statuses
+- **200 OK**: Cart hold cancelled successfully.
+- **400 Bad Request**: Booking validation failed.
+- **401 Unauthorized**: Missing or invalid JWT.
+- **500 Internal Server Error**: Unexpected server-side error.
+
+## 9.5 Get My Tickets
 ### Endpoint Overview
 - **Method:** `GET`
 - **URL:** `/api/Bookings/my-tickets`
@@ -1556,7 +1632,120 @@ No request body.
 
 ---
 
-# 11. Jobs API
+# 11. Loyalty API
+
+Base route: `/api/Loyalty`
+
+## 11.1 Get Point History
+### Endpoint Overview
+- **Method:** `GET`
+- **URL:** `/api/Loyalty/history`
+- **Business Use Case:** Returns the authenticated user's loyalty point ledger, newest first, with earned, redeemed, and expired transactions.
+
+### Authentication / Authorization
+- **JWT Required:** Yes
+- **Role Required:** Authenticated user
+
+### Query Parameters
+| Parameter  | Type | Required | Description                                 |
+| ---------- | ---- | -------- | ------------------------------------------- |
+| pageNumber | int  | No       | Page number to retrieve, default is `1`     |
+| pageSize   | int  | No       | Number of records per page, default is `10` |
+
+### Response Example (200 OK)
+```json
+{
+  "success": true,
+  "message": "Point history retrieved.",
+  "data": {
+    "items": [
+      {
+        "transactionId": 81,
+        "amount": 300,
+        "description": "Welcome quest reward",
+        "source": "ChallengeReward",
+        "status": "Available",
+        "createdAt": "2026-05-07T09:15:00Z"
+      },
+      {
+        "transactionId": 80,
+        "amount": -120,
+        "description": "Ticket Discount",
+        "source": "Redemption",
+        "status": "Spent",
+        "createdAt": "2026-05-06T18:20:00Z"
+      }
+    ],
+    "totalCount": 24,
+    "pageSize": 10,
+    "totalPages": 3,
+    "currentPage": 1
+  },
+  "errors": null,
+  "timestamp": "2026-05-07T09:16:00Z"
+}
+```
+
+## 11.2 Get User Challenges History
+### Endpoint Overview
+- **Method:** `GET`
+- **URL:** `/api/Loyalty/challenges`
+- **Business Use Case:** Returns the authenticated user's active and completed gamification quests with paging support.
+
+### Authentication / Authorization
+- **JWT Required:** Yes
+- **Role Required:** Authenticated user
+
+### Query Parameters
+| Parameter   | Type | Required | Description                                 |
+| ----------- | ---- | -------- | ------------------------------------------- |
+| isCompleted | bool | No       | Optional filter for completed state         |
+| pageNumber  | int  | No       | Page number to retrieve, default is `1`     |
+| pageSize    | int  | No       | Number of records per page, default is `10` |
+
+### Response Example (200 OK)
+```json
+{
+  "success": true,
+  "message": "Challenge history retrieved.",
+  "data": {
+    "items": [
+      {
+        "challengeId": 5,
+        "title": "Frequent Traveler",
+        "description": "Take 4 trips this month to earn bonus points.",
+        "type": "TotalTrips",
+        "frequency": "Monthly",
+        "currentProgress": 2,
+        "goalValue": 4,
+        "rewardPoints": 800,
+        "isCompleted": false
+      },
+      {
+        "challengeId": 1,
+        "title": "Welcome Quest",
+        "description": "Complete your first booking to earn welcome points.",
+        "type": "TotalTrips",
+        "frequency": "OneTime",
+        "currentProgress": 1,
+        "goalValue": 1,
+        "rewardPoints": 250,
+        "isCompleted": true
+      }
+    ],
+    "totalCount": 12,
+    "pageSize": 10,
+    "totalPages": 2,
+    "currentPage": 1
+  },
+  "errors": null,
+  "timestamp": "2026-05-07T09:20:00Z"
+}
+```
+
+---
+
+# 12. Jobs API
 
 Base route: `/api/Jobs`
 
@@ -1566,7 +1755,7 @@ Authentication model:
 - JWT is not required.
 - A `secret` query parameter is required and must match server-side `JobSecretKey`.
 
-## 11.1 Generate Occurrences (Scheduler)
+## 12.1 Generate Occurrences (Scheduler)
 ### Endpoint Overview
 - **Method:** `POST`
 - **URL:** `/api/Jobs/generate-occurrences?secret=<JobSecretKey>`
@@ -1583,7 +1772,7 @@ Authentication model:
 }
 ```
 
-## 11.2 Process Completed Trips
+## 12.2 Process Completed Trips
 ### Endpoint Overview
 - **Method:** `POST`
 - **URL:** `/api/Jobs/process-completed-trips?secret=<JobSecretKey>`
@@ -1600,7 +1789,7 @@ Authentication model:
 }
 ```
 
-## 11.3 Release Expired Holds
+## 12.3 Release Expired Holds
 ### Endpoint Overview
 - **Method:** `POST`
 - **URL:** `/api/Jobs/release-expired-holds?secret=<JobSecretKey>`
@@ -1617,7 +1806,7 @@ Authentication model:
 }
 ```
 
-## 11.4 Expire Old Loyalty Points
+## 12.4 Expire Old Loyalty Points
 ### Endpoint Overview
 - **Method:** `POST`
 - **URL:** `/api/Jobs/expire-points?secret=<JobSecretKey>`
@@ -1634,7 +1823,7 @@ Authentication model:
 }
 ```
 
-## 11.5 Reset Monthly Challenges
+## 12.5 Reset Monthly Challenges
 ### Endpoint Overview
 - **Method:** `POST`
 - **URL:** `/api/Jobs/reset-monthly-challenges?secret=<JobSecretKey>`
@@ -1651,7 +1840,7 @@ Authentication model:
 }
 ```
 
-## 11.6 Seed Challenges (One-Time)
+## 12.6 Seed Challenges (One-Time)
 ### Endpoint Overview
 - **Method:** `POST`
 - **URL:** `/api/Jobs/seed-challenges?secret=<JobSecretKey>`
@@ -1670,11 +1859,11 @@ Authentication model:
 
 ---
 
-# 12. Marketplace API
+# 13. Marketplace API
 
 Base route: `/api/Marketplace`
 
-## 12.1 List Ticket
+## 13.1 List Ticket
 ### Endpoint Overview
 - **Method:** `POST`
 - **URL:** `/api/Marketplace/list`
@@ -1711,7 +1900,7 @@ Base route: `/api/Marketplace`
 { "success": true, "message": "Ticket listed on marketplace successfully.", "data": null, "errors": null, "timestamp": "2026-03-06T12:00:00Z" }
 ```
 
-## 12.2 Buy Ticket
+## 13.2 Buy Ticket
 ### Endpoint Overview
 - **Method:** `POST`
 - **URL:** `/api/Marketplace/buy/{listingId}`
@@ -1738,11 +1927,11 @@ Base route: `/api/Marketplace`
 { "success": true, "message": "Ticket purchased successfully.", "data": null, "errors": null, "timestamp": "2026-03-06T12:00:00Z" }
 ```
 
-## 12.3 Get Active Listings
+## 13.3 Get Active Listings
 ### Endpoint Overview
 - **Method:** `GET`
 - **URL:** `/api/Marketplace/active`
-- **Business Use Case:** Returns paged active listings with trip details.
+- **Business Use Case:** Returns paged active marketplace listings with trip details.
 
 ### Authentication / Authorization
 - **JWT Required:** No
@@ -1802,7 +1991,7 @@ Query string parameters:
 - Filters are optional and combined with AND logic.
 - `travelDate` matches the schedule-local date portion of the trip departure.
 
-## 12.4 Cancel Listing
+## 13.4 Cancel Listing
 ### Endpoint Overview
 - **Method:** `POST`
 - **URL:** `/api/Marketplace/cancel/{listingId}`
@@ -1863,9 +2052,11 @@ Query string parameters:
 | `PATCH`  | `/api/admin/users/{id}/toggle-status` |        Yes (Admin) | Toggle user active status                                    |
 | `POST`   | `/api/admin/users/{id}/roles`         |        Yes (Admin) | Assign role                                                  |
 | `DELETE` | `/api/admin/users/{id}`               |        Yes (Admin) | Delete user                                                  |
-| `GET`    | `/api/Users/me`                       |                Yes | Get profile                                                  |
+| `GET`    | `/api/Users/me`                       |                Yes | Get profile with loyalty stats and active challenges         |
 | `PUT`    | `/api/Users/me`                       |                Yes | Update profile                                               |
 | `POST`   | `/api/Users/me/profile-picture`       |                Yes | Upload profile picture                                       |
+| `GET`    | `/api/Loyalty/history`                |                Yes | Retrieve loyalty point ledger history (latest first)         |
+| `GET`    | `/api/Loyalty/challenges`             |                Yes | Retrieve paged active and completed challenge history        |
 | `GET`    | `/api/Stations`                       |                 No | Get grouped stations                                         |
 | `GET`    | `/api/trips/search`                   |                 No | Preferred paginated direct-trip search route                 |
 | `GET`    | `/api/Search`                         |                 No | Backward-compatible alias for direct-trip search             |
@@ -1876,10 +2067,10 @@ Query string parameters:
 | `POST`   | `/api/Bookings/cart/add`              |                Yes | Backward-compatible add-to-cart alias                        |
 | `GET`    | `/api/Bookings/cart`                  |                Yes | Retrieve current active cart                                 |
 | `POST`   | `/api/Bookings/checkout`              |                Yes | Checkout all valid pending cart items with one wallet charge |
-| `GET`    | `/api/Bookings/my-tickets`            |                Yes | Retrieve user's ticket history                               |
+| `GET`    | `/api/Bookings/my-tickets`            |                Yes | Retrieve user's ticket history (non-pending bookings)        |
 | `POST`   | `/api/Marketplace/list`               |                Yes | List ticket for resale                                       |
 | `POST`   | `/api/Marketplace/buy/{listingId}`    |                Yes | Purchase listed ticket                                       |
-| `GET`    | `/api/Marketplace/active`             |                 No | Retrieve active marketplace listings                         |
+| `GET`    | `/api/Marketplace/active`             |                 No | Retrieve paged active marketplace listings                   |
 | `POST`   | `/api/Marketplace/cancel/{listingId}` |                Yes | Cancel an active marketplace listing                         |
 | `POST`   | `/api/Wallet/deposit`                 |                Yes | Deposit wallet funds and write ledger entry                  |
 | `GET`    | `/api/Wallet/history`                 |                Yes | Retrieve wallet transaction history (newest first)           |

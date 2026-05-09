@@ -35,4 +35,18 @@ class CartCubit extends Cubit<CartState> {
       emit(const CheckoutError('An unexpected error occurred during checkout.'));
     }
   }
+
+  Future<void> cancelItem(int bookingId) async {
+    emit(CartItemCancelling(bookingId));
+    try {
+      await datasource.cancelCartItem(bookingId);
+      await fetchCart();
+    } on ServerException catch (e) {
+      emit(CartItemCancelError(e.message));
+      await fetchCart();
+    } catch (_) {
+      emit(const CartItemCancelError('An unexpected error occurred while cancelling.'));
+      await fetchCart();
+    }
+  }
 }

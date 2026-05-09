@@ -8,6 +8,7 @@ import 'package:transportation_app/features/profile/presentation/cubit/profile_c
 import 'package:transportation_app/features/profile/presentation/cubit/profile_cubit/profile_states.dart';
 import 'package:transportation_app/features/search/domain/entities/coach_class_entity.dart';
 import 'package:transportation_app/features/search/domain/entities/trip_result_entity.dart';
+import 'package:transportation_app/features/booking/presentation/views/widgets/points_redemption_widget.dart';
 
 class PassengerFormScreen extends StatefulWidget {
   final TripResultEntity trip;
@@ -34,8 +35,10 @@ class _PassengerFormScreenState extends State<PassengerFormScreen> {
   late final List<_PassengerControllers> _controllers;
 
   // Loyalty points for "Book Now"
-  bool _usePoints = false;
-  final _pointsCtrl = TextEditingController();
+  int _selectedPoints = 0;
+
+  // Autocomplete state — tracks whether the banner is in "re-fill" mode
+  bool _autofilled = false;
 
   @override
   void initState() {
@@ -44,15 +47,75 @@ class _PassengerFormScreenState extends State<PassengerFormScreen> {
       widget.selectedSeats.length,
       (_) => _PassengerControllers(),
     );
+    // Listen on first passenger fields to reset _autofilled badge when user edits
+    _controllers.first.nameController.addListener(_onFirstChanged);
+    _controllers.first.phoneController.addListener(_onFirstChanged);
+  }
+
+  void _onFirstChanged() {
+    if (_autofilled) setState(() => _autofilled = false);
   }
 
   @override
   void dispose() {
+    _controllers.first.nameController.removeListener(_onFirstChanged);
+    _controllers.first.phoneController.removeListener(_onFirstChanged);
     for (final c in _controllers) {
       c.dispose();
     }
-    _pointsCtrl.dispose();
     super.dispose();
+  }
+
+  /// Copies name + phone from seat 0 to all other seats.
+  /// Validates that seat 0 has both fields before proceeding.
+  void _autofill() {
+    final srcName = _controllers.first.nameController.text.trim();
+    final srcPhone = _controllers.first.phoneController.text.trim();
+
+    if (srcName.isEmpty || srcPhone.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Row(
+            children: const [
+              Icon(Icons.warning_amber_rounded, color: Colors.white, size: 18),
+              SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  'Please fill in Name and Phone for the first passenger first.',
+                ),
+              ),
+            ],
+          ),
+          backgroundColor: Colors.orange.shade700,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      return;
+    }
+
+    for (int i = 1; i < _controllers.length; i++) {
+      _controllers[i].nameController.text = srcName;
+      _controllers[i].phoneController.text = srcPhone;
+    }
+    setState(() => _autofilled = true);
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            const Icon(Icons.check_circle, color: Colors.white, size: 18),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                'Filled ${_controllers.length - 1} seat(s) with "$srcName"',
+              ),
+            ),
+          ],
+        ),
+        backgroundColor: Colors.green.shade700,
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
   }
 
   List<Map<String, dynamic>> _buildPassengersPayload() {
@@ -87,7 +150,6 @@ class _PassengerFormScreenState extends State<PassengerFormScreen> {
     final contactEmail = _controllers.first.emailController.text.trim();
 
     if (bookNow) {
-      final pts = _usePoints ? (int.tryParse(_pointsCtrl.text.trim()) ?? 0) : 0;
       cubit.bookNow(
         tripOccurrenceId: widget.trip.tripOccurrenceId,
         coachClassId: widget.coachClass.coachClassId,
@@ -97,7 +159,7 @@ class _PassengerFormScreenState extends State<PassengerFormScreen> {
         contactPhone: contactPhone,
         contactEmail: contactEmail.isEmpty ? 'user@example.com' : contactEmail,
         passengers: passengers,
-        pointsToRedeem: pts,
+        pointsToRedeem: _selectedPoints,
       );
     } else {
       cubit.addToCart(
@@ -122,7 +184,7 @@ class _PassengerFormScreenState extends State<PassengerFormScreen> {
     if (profileState is ProfileLoaded) {
       loyaltyBalance = profileState.profile.loyaltyPointsBalance ?? 0;
     }
- 
+
     return Scaffold(
       backgroundColor: ColorsManager.seatBg,
       body: SafeArea(
@@ -181,25 +243,49 @@ class _PassengerFormScreenState extends State<PassengerFormScreen> {
                       vertical: 16,
                     ),
                     children: [
-                      // Passenger cards
-                      ...List.generate(widget.selectedSeats.length, (index) {
-                        final seatLabel = widget.isTrain
-                            ? 'Passenger ${index + 1}'
-                            : 'Seat ${widget.selectedSeats[index]}';
-                        return _PassengerCard(
-                          label: seatLabel,
-                          controllers: _controllers[index],
-                          isTrain: widget.isTrain,
-                        );
-                      }),
+                      // Passenger cards — with autofill banner after first card
+                      ...() {
+                        final widgets = <Widget>[];
+                        for (
+                          int index = 0;
+                          index < widget.selectedSeats.length;
+                          index++
+                        ) {
+                          final seatLabel = widget.isTrain
+                              ? 'Passenger ${index + 1}'
+                              : 'Seat ${widget.selectedSeats[index]}';
+                          widgets.add(
+                            _PassengerCard(
+                              label: seatLabel,
+                              controllers: _controllers[index],
+                              isTrain: widget.isTrain,
+                            ),
+                          );
+
+                          // Show the autofill banner after the FIRST card
+                          // only for bus with 2+ seats
+                          if (index == 0 &&
+                              !widget.isTrain &&
+                              widget.selectedSeats.length > 1) {
+                            widgets.add(
+                              _AutofillBanner(
+                                autofilled: _autofilled,
+                                onAutofill: _autofill,
+                              ),
+                            );
+                          }
+                        }
+                        return widgets;
+                      }(),
 
                       // ── Loyalty points section (for Book Now) ──────────
-                      _LoyaltyPointsSection(
-                        loyaltyBalance: loyaltyBalance,
-                        usePoints: _usePoints,
-                        pointsCtrl: _pointsCtrl,
-                        onToggle: (val) =>
-                            setState(() => _usePoints = val),
+                      PointsRedemptionWidget(
+                        cartTotal:
+                            widget.coachClass.price *
+                            widget.selectedSeats.length,
+                        walletPoints: loyaltyBalance,
+                        onPointsChanged: (pts) =>
+                            setState(() => _selectedPoints = pts),
                       ),
                       const SizedBox(height: 8),
                     ],
@@ -467,126 +553,9 @@ class _PassengerCardState extends State<_PassengerCard> {
 }
 
 // ─────────────────────────────────────────────────────────────────
-// _LoyaltyPointsSection — shown in form, applies to "Book Now" only
-// ─────────────────────────────────────────────────────────────────
-class _LoyaltyPointsSection extends StatelessWidget {
-  final int loyaltyBalance;
-  final bool usePoints;
-  final TextEditingController pointsCtrl;
-  final ValueChanged<bool> onToggle;
-
-  const _LoyaltyPointsSection({
-    required this.loyaltyBalance,
-    required this.usePoints,
-    required this.pointsCtrl,
-    required this.onToggle,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: ColorsManager.surfaceDark,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: usePoints
-              ? const Color(0xFFFFD700).withValues(alpha: 0.4)
-              : ColorsManager.borderDim,
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              const Icon(
-                Icons.stars_rounded,
-                color: Color(0xFFFFD700),
-                size: 20,
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Use Loyalty Points',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    Text(
-                      'Balance: $loyaltyBalance pts',
-                      style: TextStyle(
-                        color: loyaltyBalance > 0
-                            ? const Color(0xFFFFD700)
-                            : Colors.white38,
-                        fontSize: 11,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Switch(
-                value: usePoints,
-                onChanged: loyaltyBalance > 0 ? onToggle : null,
-                activeThumbColor: const Color(0xFFFFD700),
-              ),
-            ],
-          ),
-          if (usePoints) ...[
-            const SizedBox(height: 12),
-            TextField(
-              controller: pointsCtrl,
-              keyboardType: TextInputType.number,
-              style: const TextStyle(color: Colors.white),
-              decoration: InputDecoration(
-                hintText: 'Points to redeem (max 50% of total, max $loyaltyBalance)',
-                hintStyle: const TextStyle(color: Colors.white38, fontSize: 12),
-                filled: true,
-                fillColor: Colors.white.withValues(alpha: 0.05),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  borderSide: const BorderSide(color: Colors.white24),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  borderSide: const BorderSide(color: Colors.white24),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  borderSide: const BorderSide(color: Color(0xFFFFD700)),
-                ),
-              ),
-            ),
-            const SizedBox(height: 6),
-            const Text(
-              'Only applies to "Book Now". Points are capped at 50% of the cart total.',
-              style: TextStyle(color: Colors.white38, fontSize: 11),
-            ),
-          ],
-          if (loyaltyBalance == 0)
-            const Padding(
-              padding: EdgeInsets.only(top: 8),
-              child: Text(
-                'You have no loyalty points to redeem.',
-                style: TextStyle(color: Colors.white38, fontSize: 11),
-              ),
-            ),
-        ],
-      ),
-    );
-  }
-}
-
-// ─────────────────────────────────────────────────────────────────
 // _FormBottomButtons — Add to Cart + Book Now
 // ─────────────────────────────────────────────────────────────────
-class _FormBottomButtons extends StatelessWidget {
+class _FormBottomButtons extends StatefulWidget {
   final VoidCallback onAddToCart;
   final VoidCallback onBookNow;
 
@@ -596,8 +565,25 @@ class _FormBottomButtons extends StatelessWidget {
   });
 
   @override
+  State<_FormBottomButtons> createState() => _FormBottomButtonsState();
+}
+
+class _FormBottomButtonsState extends State<_FormBottomButtons> {
+  // 0 = none, 1 = add to cart, 2 = book now
+  int _lastClicked = 0;
+
+  @override
   Widget build(BuildContext context) {
-    return BlocBuilder<SeatMapCubit, SeatMapState>(
+    return BlocConsumer<SeatMapCubit, SeatMapState>(
+      listener: (context, state) {
+        if (state is CartSuccess ||
+            state is CartError ||
+            state is CartAddedButCheckoutFailed) {
+          setState(() {
+            _lastClicked = 0;
+          });
+        }
+      },
       builder: (context, state) {
         final isLoading = state is CartAdding || state is SeatMapLoading;
         return Column(
@@ -613,7 +599,12 @@ class _FormBottomButtons extends StatelessWidget {
                     child: SizedBox(
                       height: 50,
                       child: OutlinedButton(
-                        onPressed: isLoading ? null : onAddToCart,
+                        onPressed: isLoading
+                            ? null
+                            : () {
+                                setState(() => _lastClicked = 1);
+                                widget.onAddToCart();
+                              },
                         style: OutlinedButton.styleFrom(
                           side: const BorderSide(
                             color: ColorsManager.accentCyan,
@@ -622,14 +613,23 @@ class _FormBottomButtons extends StatelessWidget {
                             borderRadius: BorderRadius.circular(25),
                           ),
                         ),
-                        child: const Text(
-                          'Add to Cart',
-                          style: TextStyle(
-                            color: ColorsManager.accentCyan,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 15,
-                          ),
-                        ),
+                        child: isLoading && _lastClicked == 1
+                            ? const SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: ColorsManager.accentCyan,
+                                ),
+                              )
+                            : const Text(
+                                'Add to Cart',
+                                style: TextStyle(
+                                  color: ColorsManager.accentCyan,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 15,
+                                ),
+                              ),
                       ),
                     ),
                   ),
@@ -639,7 +639,12 @@ class _FormBottomButtons extends StatelessWidget {
                     child: SizedBox(
                       height: 50,
                       child: ElevatedButton(
-                        onPressed: isLoading ? null : onBookNow,
+                        onPressed: isLoading
+                            ? null
+                            : () {
+                                setState(() => _lastClicked = 2);
+                                widget.onBookNow();
+                              },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: ColorsManager.accentCyan,
                           shape: RoundedRectangleBorder(
@@ -647,7 +652,7 @@ class _FormBottomButtons extends StatelessWidget {
                           ),
                           elevation: 0,
                         ),
-                        child: isLoading
+                        child: isLoading && _lastClicked == 2
                             ? const SizedBox(
                                 width: 20,
                                 height: 20,
@@ -673,6 +678,98 @@ class _FormBottomButtons extends StatelessWidget {
           ],
         );
       },
+    );
+  }
+}
+
+// -----------------------------------------------------------------
+// _AutofillBanner - shown between seat 0 and seat 1 for bus legs
+// -----------------------------------------------------------------
+class _AutofillBanner extends StatelessWidget {
+  final bool autofilled;
+  final VoidCallback onAutofill;
+
+  const _AutofillBanner({required this.autofilled, required this.onAutofill});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      decoration: BoxDecoration(
+        color: ColorsManager.surfaceDark,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: ColorsManager.accentCyan.withAlpha(80),
+          width: 1.2,
+        ),
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: ColorsManager.accentCyan.withAlpha(25),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: const Icon(
+              Icons.family_restroom_rounded,
+              color: ColorsManager.accentCyan,
+              size: 22,
+            ),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  autofilled ? 'Auto-filled \u2714' : 'Travelling with family?',
+                  style: TextStyle(
+                    color: autofilled
+                        ? ColorsManager.successGreen
+                        : Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 13,
+                  ),
+                ),
+                const SizedBox(height: 3),
+                const Text(
+                  'Fill seat 1, then copy name & phone to all other seats.',
+                  style: TextStyle(color: Colors.white54, fontSize: 11),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 8),
+          OutlinedButton(
+            onPressed: onAutofill,
+            style: OutlinedButton.styleFrom(
+              side: BorderSide(
+                color: autofilled
+                    ? ColorsManager.successGreen
+                    : ColorsManager.accentCyan,
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              minimumSize: Size.zero,
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            ),
+            child: Text(
+              autofilled ? 'Re-fill' : 'Auto-fill',
+              style: TextStyle(
+                color: autofilled
+                    ? ColorsManager.successGreen
+                    : ColorsManager.accentCyan,
+                fontWeight: FontWeight.bold,
+                fontSize: 12,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

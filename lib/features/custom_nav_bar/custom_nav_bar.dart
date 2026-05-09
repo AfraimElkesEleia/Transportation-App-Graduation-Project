@@ -37,15 +37,12 @@ class CustomNavBarState extends State<CustomNavBar> {
     NavItem(icon: FontAwesomeIcons.house, label: "Home"),
     NavItem(icon: FontAwesomeIcons.ticket, label: "Tickets"),
     NavItem(icon: FontAwesomeIcons.user, label: "Profile"),
-    NavItem(icon: FontAwesomeIcons.car, label: "Carpool"),
+    NavItem(icon: FontAwesomeIcons.bell, label: "Notifications"),
   ];
 
   late final List<Widget> _screens = [
     const HomeScreen(),
-    BlocProvider(
-      create: (_) => sl<MyTicketsCubit>(),
-      child: const MyTickets(),
-    ),
+    BlocProvider(create: (_) => sl<MyTicketsCubit>(), child: const MyTickets()),
     MultiBlocProvider(
       providers: [
         BlocProvider(

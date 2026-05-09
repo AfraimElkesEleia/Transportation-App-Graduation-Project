@@ -278,18 +278,20 @@ class _PassengerCard extends StatelessWidget {
                 (v == null || v.trim().isEmpty) ? 'Required' : null,
           ),
           const SizedBox(height: 12),
-          TextFormField(
-            controller: controllers.idController,
-            keyboardType: TextInputType.number,
-            style: const TextStyle(color: Colors.white),
-            decoration: const InputDecoration(
-              labelText: 'National ID',
-              labelStyle: TextStyle(color: ColorsManager.textMuted),
+          if (hasTrainAnywhere) ...[
+            TextFormField(
+              controller: controllers.idController,
+              keyboardType: TextInputType.number,
+              style: const TextStyle(color: Colors.white),
+              decoration: const InputDecoration(
+                labelText: 'National ID',
+                labelStyle: TextStyle(color: ColorsManager.textMuted),
+              ),
+              validator: (v) =>
+                  (v == null || v.trim().isEmpty) ? 'Required' : null,
             ),
-            validator: (v) =>
-                (v == null || v.trim().isEmpty) ? 'Required' : null,
-          ),
-          const SizedBox(height: 12),
+            const SizedBox(height: 12),
+          ],
           TextFormField(
             controller: controllers.phoneController,
             keyboardType: TextInputType.phone,

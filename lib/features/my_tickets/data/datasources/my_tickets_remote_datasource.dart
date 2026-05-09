@@ -232,10 +232,9 @@ class MyTicketsRemoteDatasourceImpl implements MyTicketsRemoteDatasource {
           DateTime.now(),
       agencyName: json['agencyName'] as String? ?? '',
       className: json['className'] as String? ?? '',
-      originGovernorate: json['originGovernorate'] as String? ?? 'Cairo',
+      originGovernorate: json['originGov'] as String? ?? 'Cairo',
       originStation: json['originStation'] as String? ?? '',
-      destinationGovernorate:
-          json['destinationGovernorate'] as String? ?? 'Alexandria',
+      destinationGovernorate: json['destinationGov'] as String? ?? 'Alexandria',
       destinationStation: json['destinationStation'] as String? ?? '',
       boardingTime:
           DateTime.tryParse(json['boardingTime'] as String? ?? '') ??

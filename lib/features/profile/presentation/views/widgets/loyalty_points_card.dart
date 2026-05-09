@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:fl_chart/fl_chart.dart';
+import 'package:transportation_app/core/routing/routes.dart';
 import 'package:transportation_app/core/theming/colors.dart';
 import 'package:transportation_app/features/profile/domain/entities/profile_entity.dart';
 
@@ -13,38 +13,61 @@ class LoyaltyPointsCard extends StatefulWidget {
 }
 
 class _LoyaltyPointsCardState extends State<LoyaltyPointsCard> {
-  bool _showChallenges = false;
-
   @override
   Widget build(BuildContext context) {
     final points = widget.profile?.loyaltyPointsBalance;
     final expiring = widget.profile?.expiringPointsAmount;
     final expiryDate = widget.profile?.nextExpiryDate;
-    final expiringText = expiring != null && expiring > 0
-        ? '$expiring pts expiring${expiryDate != null ? ' by $expiryDate' : ''}'
-        : 'No expiring points right now';
+    String expiringText = 'No expiring points right now';
+    if (expiring != null && expiring > 0 && expiryDate != null) {
+      final expiry = DateTime.parse(expiryDate).toLocal();
+      final diff = expiry.difference(DateTime.now());
+      if (diff.inDays <= 0) {
+        expiringText = '$expiring pts have expired';
+      } else if (diff.inDays == 1) {
+        expiringText = '$expiring pts expire tomorrow';
+      } else if (diff.inDays < 30) {
+        expiringText = '$expiring pts expire in ${diff.inDays} days';
+      } else {
+        final months = diff.inDays ~/ 30;
+        final days = diff.inDays % 30;
+        String mStr = months == 1 ? '1 month' : '$months months';
+        String dStr = days == 1 ? '1 day' : '$days days';
+        expiringText = days > 0
+            ? '$expiring pts expire in $mStr and $dStr'
+            : '$expiring pts expire in $mStr';
+      }
+    }
     
     final challenges = widget.profile?.activeChallenges ?? [];
 
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [Color(0xFF0D2B5E), Color(0xFF1A4A8A)],
-        ),
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Colors.white.withOpacity(0.12)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.3),
-            blurRadius: 20,
-            offset: const Offset(0, 8),
+    return GestureDetector(
+      onTap: () {
+        Navigator.pushNamed(context, AppRoutes.loyaltyHub, arguments: {
+          'pointsBalance': points ?? 0,
+          'expiringAmount': expiring ?? 0,
+          'nextExpiryDate': expiryDate,
+        });
+      },
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [Color(0xFF0D2B5E), Color(0xFF1A4A8A)],
           ),
-        ],
-      ),
-      child: Column(
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(color: Colors.white.withOpacity(0.12)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.3),
+              blurRadius: 20,
+              offset: const Offset(0, 8),
+            ),
+          ],
+        ),
+        child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
@@ -105,140 +128,8 @@ class _LoyaltyPointsCardState extends State<LoyaltyPointsCard> {
             'Points are pending until departure and expire 4 months after departure.',
             style: TextStyle(color: Colors.white54, fontSize: 12),
           ),
-          
-          if (challenges.isNotEmpty) ...[
-            const SizedBox(height: 16),
-            const Divider(color: Colors.white24),
-            InkWell(
-              onTap: () {
-                setState(() {
-                  _showChallenges = !_showChallenges;
-                });
-              },
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Row(
-                      children: [
-                        Icon(Icons.flag_rounded, color: Color(0xFFFFD700), size: 20),
-                        SizedBox(width: 8),
-                        Text(
-                          'Active Challenges',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 15,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                    Icon(
-                      _showChallenges ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
-                      color: Colors.white70,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            AnimatedCrossFade(
-              firstChild: const SizedBox.shrink(),
-              secondChild: Column(
-                children: challenges.map((challenge) => _buildChallengeChartCard(challenge)).toList(),
-              ),
-              crossFadeState: _showChallenges ? CrossFadeState.showSecond : CrossFadeState.showFirst,
-              duration: const Duration(milliseconds: 300),
-            ),
-          ],
         ],
       ),
-    );
-  }
-
-  Widget _buildChallengeChartCard(ChallengeEntity challenge) {
-    final progress = challenge.currentProgress / challenge.goalValue;
-    final percent = (progress * 100).clamp(0, 100).toDouble();
-
-    return Container(
-      margin: const EdgeInsets.only(top: 12),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Row(
-        children: [
-          SizedBox(
-            width: 60,
-            height: 60,
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                PieChart(
-                  PieChartData(
-                    sectionsSpace: 0,
-                    centerSpaceRadius: 22,
-                    startDegreeOffset: -90,
-                    sections: [
-                      PieChartSectionData(
-                        color: ColorsManager.accentCyan,
-                        value: percent,
-                        showTitle: false,
-                        radius: 8,
-                      ),
-                      PieChartSectionData(
-                        color: Colors.white.withOpacity(0.1),
-                        value: 100 - percent,
-                        showTitle: false,
-                        radius: 8,
-                      ),
-                    ],
-                  ),
-                ),
-                Text(
-                  '${percent.toInt()}%',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  challenge.title,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 15,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  '${challenge.currentProgress} / ${challenge.goalValue} trips',
-                  style: const TextStyle(color: Colors.white70, fontSize: 13),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  'Reward: ${challenge.rewardPoints} points',
-                  style: const TextStyle(
-                    color: Color(0xFFFFD700),
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
+    ));
   }
 }

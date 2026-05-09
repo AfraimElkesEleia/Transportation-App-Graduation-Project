@@ -97,7 +97,7 @@ class _SearchSectionState extends State<SearchSection> {
       for (int i = initialCount - 1; i >= 0; i--) {
         final currentLeg = _legs[i];
         final newLeg = TripLegState();
-        
+
         newLeg.fromGroup = currentLeg.toGroup;
         newLeg.fromStation = currentLeg.toStation;
         newLeg.fromGovController.text = currentLeg.toGovController.text;
@@ -200,8 +200,10 @@ class _SearchSectionState extends State<SearchSection> {
 
       if (leg.dateController.text.trim().isEmpty) {
         dErr = 'Please select departure date';
-      } else if (i > 0 && leg.parsedDate != null && _legs[i-1].parsedDate != null) {
-        if (leg.parsedDate!.isBefore(_legs[i-1].parsedDate!)) {
+      } else if (i > 0 &&
+          leg.parsedDate != null &&
+          _legs[i - 1].parsedDate != null) {
+        if (leg.parsedDate!.isBefore(_legs[i - 1].parsedDate!)) {
           dErr = 'Date cannot be earlier than previous leg';
         }
       }
@@ -220,29 +222,38 @@ class _SearchSectionState extends State<SearchSection> {
   }
 
   void _onSearch() {
-    if (_validateAll()) {
-      final summaries = _legs.map((leg) {
-        final fromDisplay =
-            leg.fromStation?.englishName ?? leg.fromGroup!.governorate;
-        final toDisplay =
-            leg.toStation?.englishName ?? leg.toGroup!.governorate;
-        
-        final d = leg.parsedDate!;
-        final apiDate = '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
+    if (!_validateAll()) return;
 
-        return MultiDestinationLegSummary(
-          from: fromDisplay,
-          to: toDisplay,
-          date: leg.dateController.text,
-          apiDate: apiDate,
-        );
-      }).toList();
+    final summaries = _legs.map((leg) {
+      final fromDisplay =
+          leg.fromStation?.englishName ?? leg.fromGroup!.governorate;
+      final toDisplay = leg.toStation?.englishName ?? leg.toGroup!.governorate;
 
-      context.pushNamed(
-        AppRoutes.multidestinationSummaryScreen,
-        arguments: summaries,
+      final d = leg.parsedDate!;
+      final apiDate =
+          '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
+
+      return MultiDestinationLegSummary(
+        from: fromDisplay,
+        to: toDisplay,
+        date: leg.dateController.text,
+        apiDate: apiDate,
       );
+    }).toList();
+
+    if (summaries.length == 1) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please use the Standard Search for a single trip.'),
+          backgroundColor: Colors.orange,
+        ),
+      );
+      return;
     }
+    context.pushNamed(
+      AppRoutes.multidestinationSummaryScreen,
+      arguments: summaries,
+    );
   }
 
   @override
@@ -328,7 +339,7 @@ class _SearchSectionState extends State<SearchSection> {
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          if (index > 1)
+                          if (index == _legs.length - 1 && index > 0)
                             IconButton(
                               icon: const Icon(Icons.close, color: Colors.red),
                               onPressed: () => _removeLeg(index),
@@ -382,7 +393,8 @@ class _SearchSectionState extends State<SearchSection> {
                               setState(() {
                                 leg.toGroup = group;
                                 leg.toStation = null;
-                                leg.toGovController.text = group?.governorate ?? '';
+                                leg.toGovController.text =
+                                    group?.governorate ?? '';
                                 leg.toSubController.clear();
                               });
                             },
@@ -402,12 +414,15 @@ class _SearchSectionState extends State<SearchSection> {
                       DateTimeField(
                         controller: leg.dateController,
                         errorText: leg.dateError,
-                        minimumDate: index > 0 ? _legs[index - 1].parsedDate : null,
+                        minimumDate: index > 0
+                            ? _legs[index - 1].parsedDate
+                            : null,
                         onDateSelected: (date) {
                           setState(() {
                             leg.parsedDate = date;
                             for (int j = index + 1; j < _legs.length; j++) {
-                              if (_legs[j].parsedDate != null && _legs[j].parsedDate!.isBefore(date)) {
+                              if (_legs[j].parsedDate != null &&
+                                  _legs[j].parsedDate!.isBefore(date)) {
                                 _legs[j].parsedDate = null;
                                 _legs[j].dateController.clear();
                               }
@@ -445,7 +460,10 @@ class _SearchSectionState extends State<SearchSection> {
                             ),
                             child: const Text(
                               'Step-by-Step Reverse',
-                              style: TextStyle(color: Colors.cyan, fontSize: 12),
+                              style: TextStyle(
+                                color: Colors.cyan,
+                                fontSize: 12,
+                              ),
                               textAlign: TextAlign.center,
                             ),
                           ),
@@ -459,7 +477,10 @@ class _SearchSectionState extends State<SearchSection> {
                             ),
                             child: const Text(
                               'Direct Return',
-                              style: TextStyle(color: Colors.cyan, fontSize: 12),
+                              style: TextStyle(
+                                color: Colors.cyan,
+                                fontSize: 12,
+                              ),
                               textAlign: TextAlign.center,
                             ),
                           ),
@@ -470,12 +491,15 @@ class _SearchSectionState extends State<SearchSection> {
                   TextButton.icon(
                     onPressed: () {
                       final lastLeg = _legs.last;
-                      if (lastLeg.fromGroup != null && lastLeg.toGroup != null) {
+                      if (lastLeg.fromGroup != null &&
+                          lastLeg.toGroup != null) {
                         _addLeg();
                       } else {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
-                            content: Text('Please fill From and To before adding a new trip.'),
+                            content: Text(
+                              'Please fill From and To before adding a new trip.',
+                            ),
                             backgroundColor: Colors.red,
                           ),
                         );

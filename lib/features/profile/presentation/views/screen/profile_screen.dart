@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:transportation_app/core/constants/api_constants.dart';
-import 'package:transportation_app/core/helper/extensions.dart';
 import 'package:transportation_app/core/routing/routes.dart';
 import 'package:transportation_app/core/widgets/app_shimmer.dart';
 import 'package:transportation_app/core/widgets/basic_container.dart';
@@ -9,7 +8,6 @@ import 'package:transportation_app/features/profile/presentation/cubit/logout_cu
 import 'package:transportation_app/features/profile/presentation/cubit/logout_cubit/logout_states.dart';
 import 'package:transportation_app/features/profile/presentation/cubit/profile_cubit/profile_cubit.dart';
 import 'package:transportation_app/features/profile/presentation/cubit/profile_cubit/profile_states.dart';
-import 'package:transportation_app/features/profile/presentation/views/widgets/personal_info_section.dart';
 import 'package:transportation_app/features/profile/presentation/views/widgets/profile_app_bar.dart';
 import 'package:transportation_app/features/profile/presentation/views/widgets/profile_card.dart';
 import 'package:transportation_app/features/profile/presentation/views/widgets/profile_logout_button.dart';
@@ -25,27 +23,6 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileViewState extends State<ProfileScreen> {
-  final fullNameController = TextEditingController();
-  final emailController = TextEditingController();
-  final phoneController = TextEditingController();
-  final locationController = TextEditingController();
-
-  @override
-  void dispose() {
-    fullNameController.dispose();
-    emailController.dispose();
-    phoneController.dispose();
-    locationController.dispose();
-    super.dispose();
-  }
-
-  void _fillControllers(ProfileLoaded state) {
-    fullNameController.text = state.profile.fullName;
-    emailController.text = state.profile.email;
-    phoneController.text = state.profile.phoneNumber;
-    locationController.text = state.profile.countryName;
-  }
-
   Future<void> _onRefresh() async {
     await context.read<ProfileCubit>().loadProfile();
   }
@@ -87,7 +64,6 @@ class _ProfileViewState extends State<ProfileScreen> {
     );
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -105,9 +81,7 @@ class _ProfileViewState extends State<ProfileScreen> {
               },
             ),
             BlocListener<ProfileCubit, ProfileState>(
-              listener: (context, state) {
-                if (state is ProfileLoaded) _fillControllers(state);
-              },
+              listener: (context, state) {},
             ),
           ],
           child: BlocBuilder<ProfileCubit, ProfileState>(
@@ -162,6 +136,7 @@ class _ProfileViewState extends State<ProfileScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      const SizedBox(height: 30),
                       const ProfileAppBar(),
                       const SizedBox(height: 20),
                       ProfileCard(
@@ -170,31 +145,13 @@ class _ProfileViewState extends State<ProfileScreen> {
                         profilePictureUrl: ApiConstants.mediaUrl(
                           profile?.profilePictureUrl,
                         ),
-                        onEditTap: () {
-                          context.pushNamed(
-                            AppRoutes.editProfile,
-                            arguments: {
-                              'profile': profile,
-                              'cubit': context.read<ProfileCubit>(),
-                            },
-                          );
-                        },
                       ),
                       const SizedBox(height: 20),
                       WalletSection(balance: profile?.walletBalance),
                       const SizedBox(height: 20),
-                      LoyaltyPointsCard(
-                        profile: profile,
-                      ),
+                      LoyaltyPointsCard(profile: profile),
                       const SizedBox(height: 20),
-                      PersonalInfoSection(
-                        fullNameController: fullNameController,
-                        emailController: emailController,
-                        phoneController: phoneController,
-                        locationController: locationController,
-                      ),
-                      const SizedBox(height: 20),
-                      const QuickActionsSection(),
+                      QuickActionsSection(profile: profile),
                       const SizedBox(height: 30),
                       BlocBuilder<LogoutCubit, LogoutState>(
                         builder: (context, logoutState) {

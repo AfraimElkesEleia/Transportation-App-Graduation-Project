@@ -40,8 +40,10 @@ class RoundTripBookingState extends Equatable {
 
   // ── Booking Status ──
   final bool isAddingToCart;
+  final bool isBookingNow;
   final String? cartError;
   final bool cartSuccess;
+  final bool checkoutSuccess;
 
   /// Number of passengers = each leg can have its own count.
   /// Exposed per-leg so the form can generate correct cards.
@@ -86,8 +88,10 @@ class RoundTripBookingState extends Equatable {
     this.selectedReturnSeats = const [],
 
     this.isAddingToCart = false,
+    this.isBookingNow = false,
     this.cartError,
     this.cartSuccess = false,
+    this.checkoutSuccess = false,
   });
 
   RoundTripBookingState copyWith({
@@ -119,9 +123,11 @@ class RoundTripBookingState extends Equatable {
     List<String>? selectedReturnSeats,
 
     bool? isAddingToCart,
+    bool? isBookingNow,
     String? cartError,
     bool clearCartError = false,
     bool? cartSuccess,
+    bool? checkoutSuccess,
   }) {
     return RoundTripBookingState(
       currentStep: currentStep ?? this.currentStep,
@@ -150,8 +156,10 @@ class RoundTripBookingState extends Equatable {
       selectedReturnSeats: selectedReturnSeats ?? this.selectedReturnSeats,
 
       isAddingToCart: isAddingToCart ?? this.isAddingToCart,
+      isBookingNow: isBookingNow ?? this.isBookingNow,
       cartError: clearCartError ? null : cartError ?? this.cartError,
       cartSuccess: cartSuccess ?? this.cartSuccess,
+      checkoutSuccess: checkoutSuccess ?? this.checkoutSuccess,
     );
   }
 
@@ -178,7 +186,9 @@ class RoundTripBookingState extends Equatable {
         selectedReturnClass,
         selectedReturnSeats,
         isAddingToCart,
+        isBookingNow,
         cartError,
         cartSuccess,
+        checkoutSuccess,
       ];
 }

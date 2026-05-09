@@ -19,6 +19,7 @@ class MarketplaceTicketCard extends StatelessWidget {
   final String? toLocation;
   final String? originGov;
   final String? destinationGov;
+  final String? agencyName;
 
   const MarketplaceTicketCard({
     super.key,
@@ -35,6 +36,7 @@ class MarketplaceTicketCard extends StatelessWidget {
     this.toLocation,
     this.originGov,
     this.destinationGov,
+    this.agencyName,
   });
 
   @override
@@ -51,6 +53,27 @@ class MarketplaceTicketCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // ── Agency Label ──────────────────────────────────────────────
+          if (agencyName != null && agencyName!.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  agencyName!,
+                  style: const TextStyle(
+                    color: ColorsManager.accentCyan,
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+
           // ── Route header ──────────────────────────────────────────────
           Row(
             children: [
