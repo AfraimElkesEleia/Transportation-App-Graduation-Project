@@ -7,9 +7,9 @@ import 'package:transportation_app/features/booking/data/models/cart_model.dart'
 abstract class BookingRemoteDatasource {
   Future<CartResponseModel?> getCart();
   Future<SeatMapModel> getSeatMap(int occurrenceId);
-  Future<void>         addToCart(Map<String, dynamic> payload);
-  Future<void>         checkout({int pointsToRedeem = 0});
-  Future<void>         cancelCartItem(int bookingId);
+  Future<void> addToCart(Map<String, dynamic> payload);
+  Future<void> checkout({int pointsToRedeem = 0});
+  Future<void> cancelCartItem(int bookingId);
 }
 
 class BookingRemoteDatasourceImpl implements BookingRemoteDatasource {
@@ -22,7 +22,9 @@ class BookingRemoteDatasourceImpl implements BookingRemoteDatasource {
       final res = await dio.get('/Bookings/cart');
       final body = res.data as Map<String, dynamic>;
       if (body['success'] != true) {
-        throw ServerException(message: body['message'] ?? 'Failed to load cart');
+        throw ServerException(
+          message: body['message'] ?? 'Failed to load cart',
+        );
       }
       if (body['data'] == null) return null;
       return CartResponseModel.fromJson(body['data'] as Map<String, dynamic>);
@@ -34,14 +36,14 @@ class BookingRemoteDatasourceImpl implements BookingRemoteDatasource {
   @override
   Future<SeatMapModel> getSeatMap(int occurrenceId) async {
     try {
-      final res  = await dio.get(ApiConstants.seatMap(occurrenceId));
+      final res = await dio.get(ApiConstants.seatMap(occurrenceId));
       final body = res.data as Map<String, dynamic>;
       if (body['success'] != true) {
         throw ServerException(
-            message: body['message'] ?? 'Failed to load seat map');
+          message: body['message'] ?? 'Failed to load seat map',
+        );
       }
-      return SeatMapModel.fromJson(
-          body['data'] as Map<String, dynamic>);
+      return SeatMapModel.fromJson(body['data'] as Map<String, dynamic>);
     } on DioException catch (e) {
       _handleDio(e);
     }
@@ -50,14 +52,18 @@ class BookingRemoteDatasourceImpl implements BookingRemoteDatasource {
   @override
   Future<void> addToCart(Map<String, dynamic> payload) async {
     try {
-      final res  = await dio.post(ApiConstants.cartAdd, data: payload);
+      final res = await dio.post(ApiConstants.cartAdd, data: payload);
       final body = res.data as Map<String, dynamic>;
       if (body['success'] != true) {
-        final errors = (body['errors'] as List<dynamic>?)
-                ?.map((e) => e.toString()).toList() ?? [];
+        final errors =
+            (body['errors'] as List<dynamic>?)
+                ?.map((e) => e.toString())
+                .toList() ??
+            [];
         throw ServerException(
-            message: body['message'] ?? 'Failed to add to cart',
-            errors:  errors);
+          message: body['message'] ?? 'Failed to add to cart',
+          errors: errors,
+        );
       }
     } on DioException catch (e) {
       _handleDio(e);
@@ -67,17 +73,13 @@ class BookingRemoteDatasourceImpl implements BookingRemoteDatasource {
   @override
   Future<void> checkout({int pointsToRedeem = 0}) async {
     try {
-      final res  = await dio.post(
+      final res = await dio.post(
         ApiConstants.checkout,
-        data: {
-          'paymentMethod': 'Wallet',
-          'pointsToRedeem': pointsToRedeem,
-        },
+        data: {'paymentMethod': 'Wallet', 'pointsToRedeem': pointsToRedeem},
       );
       final body = res.data as Map<String, dynamic>;
       if (body['success'] != true) {
-        throw ServerException(
-            message: body['message'] ?? 'Checkout failed');
+        throw ServerException(message: body['message'] ?? 'Checkout failed');
       }
     } on DioException catch (e) {
       _handleDio(e);
@@ -87,10 +89,12 @@ class BookingRemoteDatasourceImpl implements BookingRemoteDatasource {
   @override
   Future<void> cancelCartItem(int bookingId) async {
     try {
-      final res = await dio.delete('/Bookings/bookings/$bookingId');
+      final res = await dio.delete('/Bookings/$bookingId');
       final body = res.data as Map<String, dynamic>;
       if (body['success'] != true) {
-        throw ServerException(message: body['message'] ?? 'Failed to cancel trip');
+        throw ServerException(
+          message: body['message'] ?? 'Failed to cancel trip',
+        );
       }
     } on DioException catch (e) {
       _handleDio(e);
@@ -98,21 +102,23 @@ class BookingRemoteDatasourceImpl implements BookingRemoteDatasource {
   }
 
   Never _handleDio(DioException e) {
-    if (e.type == DioExceptionType.connectionError   ||
-        e.type == DioExceptionType.receiveTimeout    ||
+    if (e.type == DioExceptionType.connectionError ||
+        e.type == DioExceptionType.receiveTimeout ||
         e.type == DioExceptionType.connectionTimeout) {
       throw NetworkException();
     }
     if (e.response?.statusCode == 401) {
-      throw UnauthorizedException(
-          message: 'Please login to continue.');
+      throw UnauthorizedException(message: 'Please login to continue.');
     }
-    final body   = e.response?.data as Map<String, dynamic>?;
-    final errors = (body?['errors'] as List<dynamic>?)
-            ?.map((e) => e.toString()).toList() ?? [];
+    final body = e.response?.data as Map<String, dynamic>?;
+    final errors =
+        (body?['errors'] as List<dynamic>?)
+            ?.map((e) => e.toString())
+            .toList() ??
+        [];
     throw ServerException(
-      message:    body?['message'] ?? 'Server error',
-      errors:     errors,
+      message: body?['message'] ?? 'Server error',
+      errors: errors,
       statusCode: e.response?.statusCode,
     );
   }

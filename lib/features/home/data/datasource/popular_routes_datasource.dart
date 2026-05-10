@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:transportation_app/core/constants/api_constants.dart';
 import 'package:transportation_app/core/error/exceptions.dart';
 import 'package:transportation_app/features/home/data/models/popular_route_model.dart';
 
@@ -14,7 +15,7 @@ class PopularRoutesDatasourceImpl implements PopularRoutesDatasource {
   @override
   Future<List<PopularRouteModel>> getPopularRoutes() async {
     try {
-      final res = await dio.get('/trips/popular-routes');
+      final res = await dio.get(ApiConstants.popularRoutes);
       final body = res.data as Map<String, dynamic>;
       if (body['success'] != true) {
         throw ServerException(message: body['message'] ?? 'Failed to load popular routes');

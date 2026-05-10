@@ -83,8 +83,11 @@ class AppRouter {
       case AppRoutes.multidestinationPassengerFormScreen:
         final cubit = settings.arguments as MultiDestinationBookingCubit;
         return MaterialPageRoute(
-          builder: (_) => BlocProvider.value(
-            value: cubit,
+          builder: (_) => MultiBlocProvider(
+            providers: [
+              BlocProvider.value(value: cubit),
+              BlocProvider(create: (_) => sl<ProfileCubit>()..loadProfile()),
+            ],
             child: const MultiDestinationPassengerFormScreen(),
           ),
         );
@@ -241,8 +244,11 @@ class AppRouter {
       case AppRoutes.roundTripPassengerFormScreen:
         final cubit = settings.arguments as RoundTripBookingCubit;
         return MaterialPageRoute(
-          builder: (_) => BlocProvider.value(
-            value: cubit,
+          builder: (_) => MultiBlocProvider(
+            providers: [
+              BlocProvider.value(value: cubit),
+              BlocProvider(create: (_) => sl<ProfileCubit>()..loadProfile()),
+            ],
             child: const RoundTripPassengerFormScreen(),
           ),
         );

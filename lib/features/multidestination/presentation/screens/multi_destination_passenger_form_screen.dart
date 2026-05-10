@@ -4,6 +4,7 @@ import 'package:transportation_app/core/routing/routes.dart';
 import 'package:transportation_app/core/theming/colors.dart';
 import 'package:transportation_app/features/multidestination/presentation/cubit/multi_destination_booking_cubit.dart';
 import 'package:transportation_app/features/multidestination/presentation/cubit/multi_destination_booking_state.dart';
+import 'package:transportation_app/features/multidestination/presentation/screens/multidestination_summary_screen.dart';
 import 'package:transportation_app/features/search/domain/entities/trip_result_entity.dart';
 
 class MultiDestinationPassengerFormScreen extends StatefulWidget {
@@ -83,20 +84,25 @@ class _MultiDestinationPassengerFormScreenState
           'passengerName': c.nameController.text.trim(),
           'seatNumber': seats[pIndex].toString(),
         };
-        
+
         if (_isTrainPerLeg[legIndex]) {
           pass['idType'] = 'NationalId';
           pass['idNumber'] = c.nationalIdController.text.trim();
         }
-        
+
         legPass.add(pass);
       }
       allLegPassengers[legIndex] = legPass;
     }
 
-    final firstLegControllers = _controllers.isNotEmpty && _controllers.first.isNotEmpty ? _controllers.first.first : null;
-    final contactName = firstLegControllers?.nameController.text.trim() ?? 'Unknown';
-    final contactPhone = firstLegControllers?.phoneController.text.trim() ?? 'Unknown';
+    final firstLegControllers =
+        _controllers.isNotEmpty && _controllers.first.isNotEmpty
+        ? _controllers.first.first
+        : null;
+    final contactName =
+        firstLegControllers?.nameController.text.trim() ?? 'Unknown';
+    final contactPhone =
+        firstLegControllers?.phoneController.text.trim() ?? 'Unknown';
     final contactEmail = firstLegControllers?.emailController.text.trim() ?? '';
 
     cubit.submitCart(
@@ -119,100 +125,114 @@ class _MultiDestinationPassengerFormScreenState
         ),
         iconTheme: const IconThemeData(color: Colors.white),
       ),
-      body: BlocConsumer<MultiDestinationBookingCubit, MultiDestinationBookingState>(
-        listenWhen: (prev, current) =>
-            prev.isAddingToCart != current.isAddingToCart ||
-            current.cartSuccess ||
-            current.cartError != null,
-        listener: (context, state) {
-          if (state.cartSuccess) {
-            Navigator.pushNamedAndRemoveUntil(
-              context,
-              AppRoutes.cartScreen,
-              (route) => route.settings.name == AppRoutes.homeScreen,
-            );
-          } else if (state.cartError != null) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.cartError!),
-                backgroundColor: Colors.red,
-              ),
-            );
-          }
-        },
-        builder: (context, state) {
-          return SafeArea(
-            child: Form(
-              key: _formKey,
-              child: Column(
-                children: [
-                  Expanded(
-                    child: ListView(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 20,
-                        vertical: 16,
-                      ),
-                      children: [
-                        for (int legIndex = 0; legIndex < _legCount; legIndex++) ...[
-                          // ── Leg header ──────────────────────────────
-                          _LegHeader(
-                            legIndex: legIndex,
-                            seatCount: _seatCounts[legIndex],
-                            from: state.legSummaries[legIndex].from,
-                            to: state.legSummaries[legIndex].to,
-                          ),
-                          const SizedBox(height: 10),
-
-                          // ── Passenger cards for this leg ─────────────
-                          for (int pIndex = 0; pIndex < _seatCounts[legIndex]; pIndex++)
-                            _PassengerCard(
-                              index: pIndex + 1,
-                              seatNumber:
-                                  state.selectedSeats[legIndex]![pIndex].toString(),
-                              controllers: _controllers[legIndex][pIndex],
-                              isTrain: _isTrainPerLeg[legIndex],
-                            ),
-
-                          const SizedBox(height: 8),
-                        ],
-                      ],
-                    ),
+      body:
+          BlocConsumer<
+            MultiDestinationBookingCubit,
+            MultiDestinationBookingState
+          >(
+            listenWhen: (prev, current) =>
+                prev.isAddingToCart != current.isAddingToCart ||
+                current.cartSuccess ||
+                current.cartError != null,
+            listener: (context, state) {
+              if (state.cartSuccess) {
+                Navigator.pushNamedAndRemoveUntil(
+                  context,
+                  AppRoutes.cartScreen,
+                  (route) => route.settings.name == AppRoutes.homeScreen,
+                );
+              } else if (state.cartError != null) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(state.cartError!),
+                    backgroundColor: Colors.red,
                   ),
+                );
+              }
+            },
+            builder: (context, state) {
+              return SafeArea(
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    children: [
+                      Expanded(
+                        child: ListView(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 20,
+                            vertical: 16,
+                          ),
+                          children: [
+                            for (
+                              int legIndex = 0;
+                              legIndex < _legCount;
+                              legIndex++
+                            ) ...[
+                              // ── Leg header ──────────────────────────────
+                              _LegHeader(
+                                legIndex: legIndex,
+                                seatCount: _seatCounts[legIndex],
+                                summary: state.legSummaries[legIndex],
+                              ),
+                              const SizedBox(height: 10),
 
-                  // ── Submit button ─────────────────────────────────────
-                  Container(
-                    padding: const EdgeInsets.all(16),
-                    color: ColorsManager.surfaceDark,
-                    child: SizedBox(
-                      width: double.infinity,
-                      height: 52,
-                      child: ElevatedButton(
-                        onPressed: state.isAddingToCart ? null : _submit,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: ColorsManager.buttonBlue,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(26),
+                              // ── Passenger cards for this leg ─────────────
+                              for (
+                                int pIndex = 0;
+                                pIndex < _seatCounts[legIndex];
+                                pIndex++
+                              )
+                                _PassengerCard(
+                                  index: pIndex + 1,
+                                  seatNumber: state
+                                      .selectedSeats[legIndex]![pIndex]
+                                      .toString(),
+                                  controllers: _controllers[legIndex][pIndex],
+                                  isTrain: _isTrainPerLeg[legIndex],
+                                ),
+
+                              const SizedBox(height: 8),
+                            ],
+                          ],
+                        ),
+                      ),
+
+                      // ── Submit button ─────────────────────────────────────
+                      Container(
+                        padding: const EdgeInsets.all(16),
+                        color: ColorsManager.surfaceDark,
+                        child: SizedBox(
+                          width: double.infinity,
+                          height: 52,
+                          child: ElevatedButton(
+                            onPressed: state.isAddingToCart ? null : _submit,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: ColorsManager.buttonBlue,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(26),
+                              ),
+                            ),
+                            child: state.isAddingToCart
+                                ? const CircularProgressIndicator(
+                                    color: Colors.white,
+                                  )
+                                : const Text(
+                                    'Add to Cart',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
                           ),
                         ),
-                        child: state.isAddingToCart
-                            ? const CircularProgressIndicator(color: Colors.white)
-                            : const Text(
-                                'Add to Cart',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
                       ),
-                    ),
+                    ],
                   ),
-                ],
-              ),
-            ),
-          );
-        },
-      ),
+                ),
+              );
+            },
+          ),
     );
   }
 }
@@ -221,15 +241,26 @@ class _MultiDestinationPassengerFormScreenState
 class _LegHeader extends StatelessWidget {
   final int legIndex;
   final int seatCount;
-  final String from;
-  final String to;
+  final MultiDestinationLegSummary summary;
 
   const _LegHeader({
     required this.legIndex,
     required this.seatCount,
-    required this.from,
-    required this.to,
+    required this.summary,
   });
+
+  List<Widget> _buildGovSubList(String gov, String sub) {
+    if (sub.isEmpty || sub == gov) {
+      return [
+        Text(gov, style: const TextStyle(color: Colors.white70, fontSize: 12)),
+      ];
+    }
+    return [
+      Text(gov, style: const TextStyle(color: Colors.white70, fontSize: 12)),
+      const Text(' - ', style: TextStyle(color: Colors.white70, fontSize: 12)),
+      Text(sub, style: const TextStyle(color: Colors.white70, fontSize: 12)),
+    ];
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -256,9 +287,20 @@ class _LegHeader extends StatelessWidget {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                Text(
-                  '$from → $to',
-                  style: const TextStyle(color: Colors.white70, fontSize: 12),
+                Wrap(
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  textDirection: TextDirection.ltr,
+                  children: [
+                    ..._buildGovSubList(
+                      summary.fromGov,
+                      summary.fromSub ?? " ",
+                    ),
+                    const Text(
+                      ' ➔ ',
+                      style: TextStyle(color: Colors.white70, fontSize: 12),
+                    ),
+                    ..._buildGovSubList(summary.toGov, summary.toSub ?? " "),
+                  ],
                 ),
               ],
             ),
@@ -271,7 +313,7 @@ class _LegHeader extends StatelessWidget {
 
 // ── Per-passenger controllers ─────────────────────────────────────────────────
 class _PassengerControllers {
-  final nameController     = TextEditingController();
+  final nameController = TextEditingController();
   final nationalIdController = TextEditingController();
   final phoneController = TextEditingController();
   final emailController = TextEditingController();

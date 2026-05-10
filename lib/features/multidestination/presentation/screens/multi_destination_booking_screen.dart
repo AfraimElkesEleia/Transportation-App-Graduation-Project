@@ -17,10 +17,12 @@ class MultiDestinationBookingScreen extends StatefulWidget {
   const MultiDestinationBookingScreen({super.key});
 
   @override
-  State<MultiDestinationBookingScreen> createState() => _MultiDestinationBookingScreenState();
+  State<MultiDestinationBookingScreen> createState() =>
+      _MultiDestinationBookingScreenState();
 }
 
-class _MultiDestinationBookingScreenState extends State<MultiDestinationBookingScreen> {
+class _MultiDestinationBookingScreenState
+    extends State<MultiDestinationBookingScreen> {
   @override
   void initState() {
     super.initState();
@@ -29,26 +31,36 @@ class _MultiDestinationBookingScreenState extends State<MultiDestinationBookingS
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<MultiDestinationBookingCubit, MultiDestinationBookingState>(
+    return BlocBuilder<
+      MultiDestinationBookingCubit,
+      MultiDestinationBookingState
+    >(
       builder: (context, state) {
         final totalSteps = (state.legSummaries.length * 2) + 1;
         int currentProgress = 0;
-        
+
         if (state.currentStep == MultiDestinationBookingStep.searchLegs) {
           currentProgress = state.currentSearchLegIndex;
-        } else if (state.currentStep == MultiDestinationBookingStep.selectSeats) {
-          currentProgress = state.legSummaries.length + state.currentSeatLegIndex;
+        } else if (state.currentStep ==
+            MultiDestinationBookingStep.selectSeats) {
+          currentProgress =
+              state.legSummaries.length + state.currentSeatLegIndex;
         } else {
           currentProgress = totalSteps - 1;
         }
-        
-        final progressPercent = totalSteps > 0 ? (currentProgress / totalSteps) : 0.0;
+
+        final progressPercent = totalSteps > 0
+            ? (currentProgress / totalSteps)
+            : 0.0;
 
         return Scaffold(
           backgroundColor: ColorsManager.seatBg,
           appBar: AppBar(
             backgroundColor: ColorsManager.surfaceDark,
-            title: const Text('Multi-Destination', style: TextStyle(color: Colors.white, fontSize: 16)),
+            title: const Text(
+              'Multi-Destination',
+              style: TextStyle(color: Colors.white, fontSize: 16),
+            ),
             iconTheme: const IconThemeData(color: Colors.white),
             bottom: PreferredSize(
               preferredSize: const Size.fromHeight(40),
@@ -64,7 +76,11 @@ class _MultiDestinationBookingScreenState extends State<MultiDestinationBookingS
                     padding: const EdgeInsets.symmetric(vertical: 8),
                     child: Text(
                       _getStepText(state),
-                      style: const TextStyle(color: ColorsManager.accentCyan, fontSize: 13, fontWeight: FontWeight.bold),
+                      style: const TextStyle(
+                        color: ColorsManager.accentCyan,
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ],
@@ -95,7 +111,10 @@ class _MultiDestinationBookingScreenState extends State<MultiDestinationBookingS
     return "Review & Checkout";
   }
 
-  Widget _buildStepContent(BuildContext context, MultiDestinationBookingState state) {
+  Widget _buildStepContent(
+    BuildContext context,
+    MultiDestinationBookingState state,
+  ) {
     if (state.currentStep == MultiDestinationBookingStep.searchLegs) {
       return _buildSearchLeg(state);
     } else if (state.currentStep == MultiDestinationBookingStep.selectSeats) {
@@ -107,7 +126,9 @@ class _MultiDestinationBookingScreenState extends State<MultiDestinationBookingS
 
   Widget _buildSearchLeg(MultiDestinationBookingState state) {
     if (state.isSearching) {
-      return const Center(child: CircularProgressIndicator(color: ColorsManager.accentCyan));
+      return const Center(
+        child: CircularProgressIndicator(color: ColorsManager.accentCyan),
+      );
     }
     if (state.searchError != null) {
       return SearchErrorView(
@@ -120,12 +141,15 @@ class _MultiDestinationBookingScreenState extends State<MultiDestinationBookingS
     // The sticky header (with the filter button) must always be visible so the
     // user can adjust filters when no results match.
     final leg = state.legSummaries[state.currentSearchLegIndex];
-    final hasResults = state.searchResults != null && state.searchResults!.isNotEmpty;
+    final hasResults =
+        state.searchResults != null && state.searchResults!.isNotEmpty;
 
     return NotificationListener<ScrollNotification>(
       onNotification: (scrollInfo) {
-        if (!state.isFetchingMore && state.currentPage < state.totalPages &&
-            scrollInfo.metrics.pixels >= scrollInfo.metrics.maxScrollExtent - 200) {
+        if (!state.isFetchingMore &&
+            state.currentPage < state.totalPages &&
+            scrollInfo.metrics.pixels >=
+                scrollInfo.metrics.maxScrollExtent - 200) {
           context.read<MultiDestinationBookingCubit>().loadMore();
         }
         return false;
@@ -137,19 +161,119 @@ class _MultiDestinationBookingScreenState extends State<MultiDestinationBookingS
             delegate: _StickyHeaderDelegate(
               child: Container(
                 color: ColorsManager.surfaceChip,
-                padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
+                padding: const EdgeInsets.symmetric(
+                  vertical: 4,
+                  horizontal: 16,
+                ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Expanded(
-                      child: Text(
-                        '${leg.from} ➔ ${leg.to}',
-                        style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold),
-                        overflow: TextOverflow.ellipsis,
+                      child: Row(
+                        textDirection: TextDirection.ltr,
+                        children: [
+                          Flexible(
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              textDirection: TextDirection.ltr,
+                              children: [
+                                Flexible(
+                                  child: Text(
+                                    leg.fromGov,
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                                if (leg.fromSub != null &&
+                                    leg.fromSub!.isNotEmpty) ...[
+                                  const Text(
+                                    ' - ',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  Flexible(
+                                    child: Text(
+                                      leg.fromSub!,
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ],
+                              ],
+                            ),
+                          ),
+                          const Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 4.0),
+                            child: Text(
+                              '➔',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                          Flexible(
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              textDirection: TextDirection.ltr,
+                              children: [
+                                Flexible(
+                                  child: Text(
+                                    leg.toGov,
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                                if (leg.toSub != null &&
+                                    leg.toSub!.isNotEmpty) ...[
+                                  const Text(
+                                    ' - ',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  Flexible(
+                                    child: Text(
+                                      leg.toSub!,
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ],
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                     IconButton(
-                      icon: const Icon(Icons.tune, color: Colors.white, size: 20),
+                      icon: const Icon(
+                        Icons.tune,
+                        color: Colors.white,
+                        size: 20,
+                      ),
                       onPressed: () {
                         showModalBottomSheet(
                           context: context,
@@ -158,17 +282,22 @@ class _MultiDestinationBookingScreenState extends State<MultiDestinationBookingS
                           builder: (_) => FilterBottomSheet(
                             activeParams: state.currentActiveParams!,
                             onApply: (newParams) {
-                              context.read<MultiDestinationBookingCubit>().applyFilters(newParams);
+                              context
+                                  .read<MultiDestinationBookingCubit>()
+                                  .applyFilters(newParams);
                             },
                             onReset: () {
-                              final resetParams = state.currentActiveParams!.copyWith(
-                                transport: TransportType.all,
-                                sortBy: SortBy.departureTime,
-                                clearMaxPrice: true,
-                                clearTimeFilters: true,
-                                newPage: 1,
-                              );
-                              context.read<MultiDestinationBookingCubit>().applyFilters(resetParams);
+                              final resetParams = state.currentActiveParams!
+                                  .copyWith(
+                                    transport: TransportType.all,
+                                    sortBy: SortBy.departureTime,
+                                    clearMaxPrice: true,
+                                    clearTimeFilters: true,
+                                    newPage: 1,
+                                  );
+                              context
+                                  .read<MultiDestinationBookingCubit>()
+                                  .applyFilters(resetParams);
                             },
                           ),
                         );
@@ -187,11 +316,19 @@ class _MultiDestinationBookingScreenState extends State<MultiDestinationBookingS
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.search_off_rounded, color: Colors.white24, size: 64),
+                    Icon(
+                      Icons.search_off_rounded,
+                      color: Colors.white24,
+                      size: 64,
+                    ),
                     SizedBox(height: 16),
                     Text(
                       'No trips found for this leg.',
-                      style: TextStyle(color: Colors.white54, fontSize: 16, fontWeight: FontWeight.w600),
+                      style: TextStyle(
+                        color: Colors.white54,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                     SizedBox(height: 8),
                     Text(
@@ -209,7 +346,14 @@ class _MultiDestinationBookingScreenState extends State<MultiDestinationBookingS
                 delegate: SliverChildBuilderDelegate((context, index) {
                   if (index == state.searchResults!.length) {
                     return state.isFetchingMore
-                        ? const Padding(padding: EdgeInsets.symmetric(vertical: 24), child: Center(child: CircularProgressIndicator(color: ColorsManager.accentCyan)))
+                        ? const Padding(
+                            padding: EdgeInsets.symmetric(vertical: 24),
+                            child: Center(
+                              child: CircularProgressIndicator(
+                                color: ColorsManager.accentCyan,
+                              ),
+                            ),
+                          )
                         : const SizedBox.shrink();
                   }
                   final t = state.searchResults![index];
@@ -218,7 +362,9 @@ class _MultiDestinationBookingScreenState extends State<MultiDestinationBookingS
                     child: TripResultCard(
                       trip: t,
                       onBookOverride: (trip, coachClass) {
-                        context.read<MultiDestinationBookingCubit>().selectTripForLeg(trip, coachClass);
+                        context
+                            .read<MultiDestinationBookingCubit>()
+                            .selectTripForLeg(trip, coachClass);
                       },
                     ),
                   );
@@ -242,7 +388,11 @@ class _MultiDestinationBookingScreenState extends State<MultiDestinationBookingS
             padding: const EdgeInsets.all(16),
             child: Text(
               'Select Seats for Leg ${legIndex + 1}',
-              style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
         ),
@@ -251,15 +401,20 @@ class _MultiDestinationBookingScreenState extends State<MultiDestinationBookingS
             height: MediaQuery.of(context).size.height * 0.75,
             child: BlocProvider(
               key: ValueKey('seat_leg_$legIndex'),
-              create: (_) => SeatMapCubit(datasource: sl<BookingRemoteDatasource>())..loadSeatMap(trip.tripOccurrenceId, cClass.coachClassId),
+              create: (_) =>
+                  SeatMapCubit(datasource: sl<BookingRemoteDatasource>())
+                    ..loadSeatMap(trip.tripOccurrenceId, cClass.coachClassId),
               child: EmbeddedSeatSelection(
                 trip: trip,
                 coachClass: cClass,
-                enforcedSeatCount: null,   // ← no restriction per leg
+                enforcedSeatCount: null, // ← no restriction per leg
                 initialSeats: state.selectedSeats[legIndex] ?? [],
-                onCancel: () => context.read<MultiDestinationBookingCubit>().goBack(),
+                onCancel: () =>
+                    context.read<MultiDestinationBookingCubit>().goBack(),
                 onProceed: (seats) {
-                  context.read<MultiDestinationBookingCubit>().saveSeatsForCurrentLeg(seats);
+                  context
+                      .read<MultiDestinationBookingCubit>()
+                      .saveSeatsForCurrentLeg(seats);
                 },
               ),
             ),
@@ -272,7 +427,9 @@ class _MultiDestinationBookingScreenState extends State<MultiDestinationBookingS
   Widget _buildSummary(MultiDestinationBookingState state) {
     double grandTotal = 0;
     for (int i = 0; i < state.legSummaries.length; i++) {
-      grandTotal += (state.selectedSeats[i]?.length ?? 0) * (state.selectedClasses[i]?.price ?? 0);
+      grandTotal +=
+          (state.selectedSeats[i]?.length ?? 0) *
+          (state.selectedClasses[i]?.price ?? 0);
     }
 
     return SingleChildScrollView(
@@ -280,22 +437,146 @@ class _MultiDestinationBookingScreenState extends State<MultiDestinationBookingS
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const Text('Journey Summary', style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
+          const Text(
+            'Journey Summary',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
           const SizedBox(height: 16),
           for (int i = 0; i < state.legSummaries.length; i++) ...[
             Container(
               padding: const EdgeInsets.all(16),
               margin: const EdgeInsets.only(bottom: 16),
-              decoration: BoxDecoration(color: ColorsManager.surfaceChip, borderRadius: BorderRadius.circular(12)),
+              decoration: BoxDecoration(
+                color: ColorsManager.surfaceChip,
+                borderRadius: BorderRadius.circular(12),
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Leg ${i + 1}', style: const TextStyle(color: ColorsManager.accentCyan, fontWeight: FontWeight.bold)),
+                  Text(
+                    'Leg ${i + 1}',
+                    style: const TextStyle(
+                      color: ColorsManager.accentCyan,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                   const SizedBox(height: 8),
-                  Text('${state.selectedTrips[i]!.originStationName} ➔ ${state.selectedTrips[i]!.destinationStationName}', style: const TextStyle(color: Colors.white, fontSize: 16)),
-                  Text('${state.selectedTrips[i]!.agencyName} - ${state.selectedClasses[i]!.className}', style: const TextStyle(color: ColorsManager.textMuted, fontSize: 13)),
+                  Row(
+                    textDirection: TextDirection.ltr,
+                    children: [
+                      Flexible(
+                        child: Wrap(
+                          crossAxisAlignment: WrapCrossAlignment.center,
+                          textDirection: TextDirection.ltr,
+                          children: [
+                            Text(
+                              state.selectedTrips[i]!.originGovernorate,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                              ),
+                            ),
+                            if (state.selectedTrips[i]!.originStationName !=
+                                state.selectedTrips[i]!.originGovernorate) ...[
+                              const Text(
+                                ' - ',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 16,
+                                ),
+                              ),
+                              Text(
+                                state.selectedTrips[i]!.originStationName,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 16,
+                                ),
+                              ),
+                            ],
+                          ],
+                        ),
+                      ),
+                      const Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 4.0),
+                        child: Text(
+                          '➔',
+                          style: TextStyle(color: Colors.white, fontSize: 16),
+                        ),
+                      ),
+                      Flexible(
+                        child: Wrap(
+                          crossAxisAlignment: WrapCrossAlignment.center,
+                          textDirection: TextDirection.ltr,
+                          children: [
+                            Text(
+                              state.selectedTrips[i]!.destinationGovernorate,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                              ),
+                            ),
+                            if (state
+                                    .selectedTrips[i]!
+                                    .destinationStationName !=
+                                state
+                                    .selectedTrips[i]!
+                                    .destinationGovernorate) ...[
+                              const Text(
+                                ' - ',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 16,
+                                ),
+                              ),
+                              Text(
+                                state.selectedTrips[i]!.destinationStationName,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 16,
+                                ),
+                              ),
+                            ],
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  Wrap(
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    textDirection: TextDirection.ltr,
+                    children: [
+                      Text(
+                        state.selectedTrips[i]!.agencyName,
+                        style: const TextStyle(
+                          color: ColorsManager.textMuted,
+                          fontSize: 13,
+                        ),
+                      ),
+                      const Text(
+                        ' - ',
+                        style: TextStyle(
+                          color: ColorsManager.textMuted,
+                          fontSize: 13,
+                        ),
+                      ),
+                      Text(
+                        state.selectedClasses[i]!.className,
+                        style: const TextStyle(
+                          color: ColorsManager.textMuted,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ],
+                  ),
                   const SizedBox(height: 8),
-                  Text('${state.selectedSeats[i]?.length ?? 0} Seats: ${state.selectedSeats[i]?.join(", ")}', style: const TextStyle(color: Colors.white70)),
+                  Text(
+                    '${state.selectedSeats[i]?.length ?? 0} Seats: ${state.selectedSeats[i]?.join(", ")}',
+                    style: const TextStyle(color: Colors.white70),
+                  ),
                 ],
               ),
             ),
@@ -304,8 +585,18 @@ class _MultiDestinationBookingScreenState extends State<MultiDestinationBookingS
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text('Grand Total', style: TextStyle(color: ColorsManager.textMuted, fontSize: 16)),
-              Text('EGP $grandTotal', style: const TextStyle(color: ColorsManager.accentCyan, fontSize: 24, fontWeight: FontWeight.bold)),
+              const Text(
+                'Grand Total',
+                style: TextStyle(color: ColorsManager.textMuted, fontSize: 16),
+              ),
+              Text(
+                'EGP $grandTotal',
+                style: const TextStyle(
+                  color: ColorsManager.accentCyan,
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ],
           ),
           const SizedBox(height: 24),
@@ -319,8 +610,17 @@ class _MultiDestinationBookingScreenState extends State<MultiDestinationBookingS
                   arguments: context.read<MultiDestinationBookingCubit>(),
                 );
               },
-              style: ElevatedButton.styleFrom(backgroundColor: ColorsManager.buttonBlue),
-              child: const Text('Proceed to Passenger Details', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: ColorsManager.buttonBlue,
+              ),
+              child: const Text(
+                'Proceed to Passenger Details',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ),
           ),
         ],
@@ -338,7 +638,11 @@ class _StickyHeaderDelegate extends SliverPersistentHeaderDelegate {
   @override
   double get maxExtent => height;
   @override
-  Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) => child;
+  Widget build(
+    BuildContext context,
+    double shrinkOffset,
+    bool overlapsContent,
+  ) => child;
   @override
   bool shouldRebuild(_StickyHeaderDelegate oldDelegate) => true;
 }

@@ -8,8 +8,9 @@ class PopularRouteModel extends PopularRoute {
 
   factory PopularRouteModel.fromJson(Map<String, dynamic> json) {
     return PopularRouteModel(
-      originGov: json['originGov'] ?? '',
-      destinationGov: json['destinationGov'] ?? '',
+      originGov: json['originGov'] as String? ?? '',
+      destinationGov: json['destinationGov'] as String? ?? '',
     );
   }
 }
+

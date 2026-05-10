@@ -80,18 +80,6 @@ class MarketplaceCubit extends Cubit<MarketplaceState> {
               ? item['sellerId'] as int
               : int.tryParse('${item['sellerId']}');
           if (sellerId != null && sellerId == user.userId) return false;
-
-          final sellerName = (item['sellerName'] as String? ?? '')
-              .trim()
-              .toLowerCase();
-          final userFullName = user.fullName.trim().toLowerCase();
-          final userFirstName = user.firstName.trim().toLowerCase();
-
-          if (sellerName == userFullName) return false;
-          if (sellerName == userFirstName) return false;
-          if (userFullName.startsWith(sellerName)) return false;
-          if (sellerName.startsWith(userFirstName)) return false;
-
           return true;
         }).toList();
       }

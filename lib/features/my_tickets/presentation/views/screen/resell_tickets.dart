@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'dart:ui' as ui;
 import 'package:transportation_app/core/theming/colors.dart';
 import 'package:transportation_app/features/my_tickets/presentation/cubit/marketplace_cubit.dart';
 import 'package:transportation_app/features/my_tickets/presentation/cubit/marketplace_states.dart';
@@ -237,12 +238,43 @@ class _ResellTicketsScreenState extends State<ResellTicketsScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      '${ticket.originStation} → ${ticket.destinationStation}',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
+                    Wrap(
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      textDirection: ui.TextDirection.ltr,
+                      children: [
+                        Text(
+                          ticket.originGovernorate,
+                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                        ),
+                        if (ticket.originStation.isNotEmpty && ticket.originStation != ticket.originGovernorate) ...[
+                          const Text(
+                            ' - ',
+                            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                          ),
+                          Text(
+                            ticket.originStation,
+                            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                          ),
+                        ],
+                        const Text(
+                          ' → ',
+                          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                        ),
+                        Text(
+                          ticket.destinationGovernorate,
+                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                        ),
+                        if (ticket.destinationStation.isNotEmpty && ticket.destinationStation != ticket.destinationGovernorate) ...[
+                          const Text(
+                            ' - ',
+                            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                          ),
+                          Text(
+                            ticket.destinationStation,
+                            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                          ),
+                        ],
+                      ],
                     ),
                     const SizedBox(height: 4),
                     Text(
@@ -581,19 +613,48 @@ class _ResellTicketCard extends StatelessWidget {
               children: [
                 // Route
                 Row(
+                  textDirection: ui.TextDirection.ltr,
                   children: [
                     Expanded(
-                      child: Text(
-                        ticket.originStation.isNotEmpty
-                            ? ticket.originStation
-                            : ticket.originGovernorate,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 15,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        textDirection: ui.TextDirection.ltr,
+                        children: [
+                          Flexible(
+                            child: Text(
+                              ticket.originGovernorate,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 15,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          if (ticket.originStation.isNotEmpty && ticket.originStation != ticket.originGovernorate) ...[
+                            const Text(
+                              ' - ',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 15,
+                              ),
+                            ),
+                            Flexible(
+                              child: Text(
+                                ticket.originStation,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 15,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        ],
                       ),
                     ),
                     const Padding(
@@ -605,18 +666,45 @@ class _ResellTicketCard extends StatelessWidget {
                       ),
                     ),
                     Expanded(
-                      child: Text(
-                        ticket.destinationStation.isNotEmpty
-                            ? ticket.destinationStation
-                            : ticket.destinationGovernorate,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 15,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        textAlign: TextAlign.end,
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        textDirection: ui.TextDirection.ltr,
+                        children: [
+                          Flexible(
+                            child: Text(
+                              ticket.destinationGovernorate,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 15,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          if (ticket.destinationStation.isNotEmpty && ticket.destinationStation != ticket.destinationGovernorate) ...[
+                            const Text(
+                              ' - ',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 15,
+                              ),
+                            ),
+                            Flexible(
+                              child: Text(
+                                ticket.destinationStation,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 15,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        ],
                       ),
                     ),
                   ],

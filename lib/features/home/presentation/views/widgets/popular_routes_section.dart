@@ -35,12 +35,19 @@ class PopularRoutesSection extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 12),
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: state.routes
-                    .map((r) => _RouteChip(route: r))
-                    .toList(),
+              SizedBox(
+                height: 100, // Fixed height for horizontal list
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: state.routes.length,
+                  itemBuilder: (context, index) {
+                    final route = state.routes[index];
+                    return Padding(
+                      padding: const EdgeInsets.only(right: 12.0),
+                      child: _RouteCard(route: route),
+                    );
+                  },
+                ),
               ),
             ],
           ),
@@ -50,10 +57,10 @@ class PopularRoutesSection extends StatelessWidget {
   }
 }
 
-class _RouteChip extends StatelessWidget {
+class _RouteCard extends StatelessWidget {
   final PopularRoute route;
 
-  const _RouteChip({required this.route});
+  const _RouteCard({required this.route});
 
   @override
   Widget build(BuildContext context) {
@@ -74,19 +81,58 @@ class _RouteChip extends StatelessWidget {
         );
       },
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        decoration: BoxDecoration(
-          color: ColorsManager.surfaceMid,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: ColorsManager.cyanBlue),
-        ),
-        child: Text(
-          route.label,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 13,
-            fontWeight: FontWeight.w500,
+        width: 280,
+        padding: const EdgeInsets.all(16),
+        decoration: ShapeDecoration(
+          color: const Color(0XFF11255E),
+          shape: RoundedRectangleBorder(
+            side: const BorderSide(width: 1, color: ColorsManager.cyanBlue),
+            borderRadius: BorderRadius.circular(20),
           ),
+        ),
+        child: Row(
+          children: [
+            const Icon(Icons.route, color: ColorsManager.cyanBlue, size: 24),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    route.originGov,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 2),
+                    child: Text(
+                      '➔',
+                      style: TextStyle(
+                        color: ColorsManager.cyanBlue,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ),
+                  Text(
+                    route.destinationGov,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );

@@ -43,8 +43,8 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
   @override
   Widget build(BuildContext context) {
     final profileState = context.watch<ProfileCubit>().state;
-    final currentUserName = profileState is ProfileLoaded
-        ? profileState.profile.fullName
+    final currentUserId = profileState is ProfileLoaded
+        ? profileState.profile.userId
         : '';
 
     return Scaffold(
@@ -246,19 +246,12 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
                     builder: (ctx) {
                       final count = (state is MarketplaceLoadedState)
                           ? state.listings.where((l) {
-                              return (l['sellerName'] as String?) !=
-                                  currentUserName;
+                              return (l['sellerId'] as int?) != currentUserId;
                             }).length
                           : 0;
                       return Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          MarketplaceStatBox(
-                            icon: Icons.trending_up,
-                            value: '$count',
-                            label: 'Available',
-                            color: Colors.greenAccent,
-                          ),
                           MarketplaceStatBox(
                             icon: Icons.bolt,
                             value:
@@ -437,7 +430,9 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
                             ),
                             sellerName:
                                 item['sellerName'] as String? ?? 'Seller',
-                            agencyName: item['agencyName'] as String? ?? item['agency'] as String?,
+                            agencyName:
+                                item['agencyName'] as String? ??
+                                item['agency'] as String?,
                             oldPrice: '$oldPrice EGP',
                             newPrice: '$newPrice EGP',
                             discount: '-$discountVal%',

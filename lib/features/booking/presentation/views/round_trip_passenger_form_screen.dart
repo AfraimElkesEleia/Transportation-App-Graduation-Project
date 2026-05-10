@@ -178,6 +178,7 @@ class _RoundTripPassengerFormScreenState extends State<RoundTripPassengerFormScr
                           seatCount: _outboundCount,
                           icon: Icons.flight_takeoff,
                           color: ColorsManager.accentCyan,
+                          trip: state.selectedOutboundTrip,
                         ),
                         const SizedBox(height: 8),
                         for (int i = 0; i < _outboundCount; i++)
@@ -196,6 +197,7 @@ class _RoundTripPassengerFormScreenState extends State<RoundTripPassengerFormScr
                           seatCount: _returnCount,
                           icon: Icons.flight_land,
                           color: ColorsManager.turquoise,
+                          trip: state.selectedReturnTrip,
                         ),
                         const SizedBox(height: 8),
                         for (int i = 0; i < _returnCount; i++)
@@ -238,13 +240,26 @@ class _LegHeader extends StatelessWidget {
   final int seatCount;
   final IconData icon;
   final Color color;
+  final TripResultEntity? trip;
 
   const _LegHeader({
     required this.label,
     required this.seatCount,
     required this.icon,
     required this.color,
+    required this.trip,
   });
+
+  List<Widget> _buildGovSubList(String gov, String sub) {
+    if (sub.isEmpty || sub == gov) {
+      return [Text(gov, style: const TextStyle(color: Colors.white70, fontSize: 12))];
+    }
+    return [
+      Text(gov, style: const TextStyle(color: Colors.white70, fontSize: 12)),
+      const Text(' - ', style: TextStyle(color: Colors.white70, fontSize: 12)),
+      Text(sub, style: const TextStyle(color: Colors.white70, fontSize: 12)),
+    ];
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -259,9 +274,28 @@ class _LegHeader extends StatelessWidget {
         children: [
           Icon(icon, color: color, size: 20),
           const SizedBox(width: 10),
-          Text(
-            '$label — $seatCount Passenger${seatCount != 1 ? 's' : ''}',
-            style: TextStyle(color: color, fontSize: 14, fontWeight: FontWeight.bold),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '$label — $seatCount Passenger${seatCount != 1 ? 's' : ''}',
+                  style: TextStyle(color: color, fontSize: 14, fontWeight: FontWeight.bold),
+                ),
+                if (trip != null) ...[
+                  const SizedBox(height: 2),
+                  Wrap(
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    textDirection: TextDirection.ltr,
+                    children: [
+                      ..._buildGovSubList(trip!.originGovernorate, trip!.originStationName),
+                      const Text(' ➔ ', style: TextStyle(color: Colors.white70, fontSize: 12)),
+                      ..._buildGovSubList(trip!.destinationGovernorate, trip!.destinationStationName),
+                    ],
+                  ),
+                ],
+              ],
+            ),
           ),
         ],
       ),
