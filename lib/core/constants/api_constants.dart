@@ -20,6 +20,7 @@ class ApiConstants {
   static const String stations = '/Stations';
   static const String search = '/trips/search';
   static const String searchIndirect = '/trips/search/indirect';
+  static const String popularRoutes = '/Search/popular-routes';
   static String seatMap(int occurrenceId) => '/occurrences/$occurrenceId/seats';
   static const String cartAdd = '/Bookings/cart';
   static const String checkout = '/Bookings/checkout';

@@ -27,31 +27,34 @@ class MarketplaceStatBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 105,
-      padding: const EdgeInsets.symmetric(vertical: 16),
-      decoration: BoxDecoration(
-        color: ColorsManager.marketplaceCardBg.withOpacity(0.5),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white10),
-      ),
-      child: Column(
-        children: [
-          Icon(icon, color: color, size: 28),
-          const SizedBox(height: 8),
-          Text(
-            value,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
+    return Expanded(
+      child: Container(
+        margin: EdgeInsets.only(left: 8, right: 8),
+        width: 105,
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        decoration: BoxDecoration(
+          color: ColorsManager.marketplaceCardBg.withOpacity(0.5),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: Colors.white10),
+        ),
+        child: Column(
+          children: [
+            Icon(icon, color: color, size: 28),
+            const SizedBox(height: 8),
+            Text(
+              value,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-          ),
-          Text(
-            label,
-            style: const TextStyle(color: Colors.white60, fontSize: 10),
-          ),
-        ],
+            Text(
+              label,
+              style: const TextStyle(color: Colors.white60, fontSize: 10),
+            ),
+          ],
+        ),
       ),
     );
   }

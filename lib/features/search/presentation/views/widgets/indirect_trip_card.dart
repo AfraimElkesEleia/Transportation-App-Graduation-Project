@@ -8,9 +8,9 @@ import 'package:transportation_app/features/home/domain/entities/search_params.d
 class IndirectTripCard extends StatefulWidget {
   final IndirectTripEntity trip;
   final SearchParams activeParams;
-  
+
   const IndirectTripCard({
-    super.key, 
+    super.key,
     required this.trip,
     required this.activeParams,
   });
@@ -110,12 +110,10 @@ class _IndirectTripCardState extends State<IndirectTripCard> {
           // ── Leg 1
           _LegConfigRow(
             label: 'LEG 1',
-            origin: widget.trip.firstLeg.originStationName.isNotEmpty
-                ? widget.trip.firstLeg.originStationName
-                : widget.trip.firstLeg.originGovernorate,
-            destination: widget.trip.firstLeg.destinationStationName.isNotEmpty
-                ? widget.trip.firstLeg.destinationStationName
-                : widget.trip.firstLeg.destinationGovernorate,
+            originGov: widget.trip.firstLeg.originGovernorate,
+            originSub: widget.trip.firstLeg.originStationName,
+            destGov: widget.trip.firstLeg.destinationGovernorate,
+            destSub: widget.trip.firstLeg.destinationStationName,
             date: _dateLeg1,
             onDateTap: () => _pickDate(1),
           ),
@@ -126,12 +124,10 @@ class _IndirectTripCardState extends State<IndirectTripCard> {
           // ── Leg 2
           _LegConfigRow(
             label: 'LEG 2',
-            origin: widget.trip.secondLeg.originStationName.isNotEmpty
-                ? widget.trip.secondLeg.originStationName
-                : widget.trip.secondLeg.originGovernorate,
-            destination: widget.trip.secondLeg.destinationStationName.isNotEmpty
-                ? widget.trip.secondLeg.destinationStationName
-                : widget.trip.secondLeg.destinationGovernorate,
+            originGov: widget.trip.secondLeg.originGovernorate,
+            originSub: widget.trip.secondLeg.originStationName,
+            destGov: widget.trip.secondLeg.destinationGovernorate,
+            destSub: widget.trip.secondLeg.destinationStationName,
             date: _dateLeg2,
             onDateTap: () => _pickDate(2),
           ),
@@ -175,13 +171,51 @@ class _TripSummaryHeader extends StatelessWidget {
   final IndirectTripEntity trip;
   const _TripSummaryHeader({required this.trip});
 
+  List<Widget> _buildGovSubList(String gov, String sub) {
+    if (sub.isEmpty || sub == gov) {
+      return [
+        Text(
+          gov,
+          style: const TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 15,
+          ),
+        ),
+      ];
+    }
+    return [
+      Text(
+        gov,
+        style: const TextStyle(
+          color: Colors.white,
+          fontWeight: FontWeight.bold,
+          fontSize: 15,
+        ),
+      ),
+      const Text(
+        ' - ',
+        style: TextStyle(
+          color: Colors.white,
+          fontWeight: FontWeight.bold,
+          fontSize: 15,
+        ),
+      ),
+      Text(
+        sub,
+        style: const TextStyle(
+          color: Colors.white,
+          fontWeight: FontWeight.bold,
+          fontSize: 15,
+        ),
+      ),
+    ];
+  }
+
   @override
   Widget build(BuildContext context) {
     final t1 = trip.firstLeg;
     final t2 = trip.secondLeg;
-    final o = t1.originStationName.isNotEmpty ? t1.originStationName : t1.originGovernorate;
-    final trans = t1.destinationStationName.isNotEmpty ? t1.destinationStationName : t1.destinationGovernorate;
-    final d = t2.destinationStationName.isNotEmpty ? t2.destinationStationName : t2.destinationGovernorate;
 
     return Padding(
       padding: const EdgeInsets.all(16),
@@ -206,15 +240,38 @@ class _TripSummaryHeader extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 4),
-                Text(
-                  '$o ➔ $trans ➔ $d',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 15,
-                  ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
+                Wrap(
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: [
+                    ..._buildGovSubList(
+                      t1.originGovernorate,
+                      t1.originStationName,
+                    ),
+                    const Text(
+                      ' ➔ ',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15,
+                      ),
+                    ),
+                    ..._buildGovSubList(
+                      t1.destinationGovernorate,
+                      t1.destinationStationName,
+                    ),
+                    const Text(
+                      ' ➔ ',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15,
+                      ),
+                    ),
+                    ..._buildGovSubList(
+                      t2.destinationGovernorate,
+                      t2.destinationStationName,
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -232,9 +289,8 @@ class _TransferBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final trans = trip.firstLeg.destinationStationName.isNotEmpty 
-        ? trip.firstLeg.destinationStationName 
-        : trip.firstLeg.destinationGovernorate;
+    final transGov = trip.firstLeg.destinationGovernorate;
+    final transSub = trip.firstLeg.destinationStationName;
 
     return Center(
       child: Container(
@@ -245,15 +301,39 @@ class _TransferBadge extends StatelessWidget {
           borderRadius: BorderRadius.circular(20),
           border: Border.all(color: ColorsManager.borderSubtle),
         ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
+        child: Wrap(
+          crossAxisAlignment: WrapCrossAlignment.center,
           children: [
-            const Icon(Icons.transfer_within_a_station, color: ColorsManager.textMuted, size: 16),
-            const SizedBox(width: 6),
-            Text(
-              'Transfer at $trans',
-              style: const TextStyle(color: ColorsManager.textMuted, fontSize: 13),
+            const Icon(
+              Icons.transfer_within_a_station,
+              color: ColorsManager.textMuted,
+              size: 16,
             ),
+            const SizedBox(width: 6),
+            const Text(
+              'Transfer at ',
+              style: TextStyle(color: ColorsManager.textMuted, fontSize: 13),
+            ),
+            Text(
+              transGov,
+              style: const TextStyle(
+                color: ColorsManager.textMuted,
+                fontSize: 13,
+              ),
+            ),
+            if (transSub.isNotEmpty && transSub != transGov) ...[
+              const Text(
+                ' - ',
+                style: TextStyle(color: ColorsManager.textMuted, fontSize: 13),
+              ),
+              Text(
+                transSub,
+                style: const TextStyle(
+                  color: ColorsManager.textMuted,
+                  fontSize: 13,
+                ),
+              ),
+            ],
           ],
         ),
       ),
@@ -264,18 +344,63 @@ class _TransferBadge extends StatelessWidget {
 /// A single leg config row showing stations and a date picker.
 class _LegConfigRow extends StatelessWidget {
   final String label;
-  final String origin;
-  final String destination;
+  final String originGov;
+  final String originSub;
+  final String destGov;
+  final String destSub;
   final DateTime date;
   final VoidCallback onDateTap;
 
   const _LegConfigRow({
     required this.label,
-    required this.origin,
-    required this.destination,
+    required this.originGov,
+    required this.originSub,
+    required this.destGov,
+    required this.destSub,
     required this.date,
     required this.onDateTap,
   });
+
+  List<Widget> _buildGovSubList(String gov, String sub) {
+    if (sub.isEmpty || sub == gov) {
+      return [
+        Text(
+          gov,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 14,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ];
+    }
+    return [
+      Text(
+        gov,
+        style: const TextStyle(
+          color: Colors.white,
+          fontSize: 14,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+      const Text(
+        ' - ',
+        style: TextStyle(
+          color: Colors.white,
+          fontSize: 14,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+      Text(
+        sub,
+        style: const TextStyle(
+          color: Colors.white,
+          fontSize: 14,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    ];
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -303,14 +428,20 @@ class _LegConfigRow extends StatelessWidget {
               ),
               const SizedBox(width: 10),
               Expanded(
-                child: Text(
-                  '$origin ➔ $destination',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  overflow: TextOverflow.ellipsis,
+                child: Wrap(
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: [
+                    ..._buildGovSubList(originGov, originSub),
+                    const Text(
+                      ' ➔ ',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    ..._buildGovSubList(destGov, destSub),
+                  ],
                 ),
               ),
             ],
@@ -328,14 +459,22 @@ class _LegConfigRow extends StatelessWidget {
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.calendar_today, color: ColorsManager.accentCyan, size: 16),
+                  const Icon(
+                    Icons.calendar_today,
+                    color: ColorsManager.accentCyan,
+                    size: 16,
+                  ),
                   const SizedBox(width: 8),
                   Text(
                     DateFormat('EEE, MMM dd, yyyy').format(date),
                     style: const TextStyle(color: Colors.white, fontSize: 14),
                   ),
                   const Spacer(),
-                  const Icon(Icons.edit, color: ColorsManager.textMuted, size: 16),
+                  const Icon(
+                    Icons.edit,
+                    color: ColorsManager.textMuted,
+                    size: 16,
+                  ),
                 ],
               ),
             ),

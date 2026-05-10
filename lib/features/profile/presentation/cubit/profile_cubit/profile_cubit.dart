@@ -8,11 +8,11 @@ import 'package:transportation_app/features/profile/domain/usecases/deposit_wall
 import 'profile_states.dart';
 
 class ProfileCubit extends Cubit<ProfileState> {
-  final GetProfileUseCase            getProfileUseCase;
-  final UpdateProfileUseCase         updateProfileUseCase;
-  final UploadProfilePictureUseCase  uploadPictureUseCase;
-  final DepositWalletUseCase         depositWalletUseCase;
-  final ProfileRepository            profileRepository;
+  final GetProfileUseCase getProfileUseCase;
+  final UpdateProfileUseCase updateProfileUseCase;
+  final UploadProfilePictureUseCase uploadPictureUseCase;
+  final DepositWalletUseCase depositWalletUseCase;
+  final ProfileRepository profileRepository;
 
   ProfileCubit({
     required this.getProfileUseCase,
@@ -23,8 +23,10 @@ class ProfileCubit extends Cubit<ProfileState> {
   }) : super(ProfileInitial());
 
   Future<void> loadProfile() async {
+    if (isClosed) return;
     emit(ProfileLoading());
     final result = await getProfileUseCase(NoParams());
+    if (isClosed) return;
     result.fold(
       (failure) => emit(ProfileError(failure.message)),
       (profile) => emit(ProfileLoaded(profile)),
@@ -38,29 +40,34 @@ class ProfileCubit extends Cubit<ProfileState> {
     required String email,
     required String phoneNumber,
   }) async {
+    if (isClosed) return;
     emit(ProfileUpdating());
-    final result = await updateProfileUseCase(UpdateProfileParams(
-      firstName:   firstName,
-      lastName:    lastName,
-      familyName:  familyName,
-      email:       email,
-      phoneNumber: phoneNumber,
-    ));
+    final result = await updateProfileUseCase(
+      UpdateProfileParams(
+        firstName: firstName,
+        lastName: lastName,
+        familyName: familyName,
+        email: email,
+        phoneNumber: phoneNumber,
+      ),
+    );
+    if (isClosed) return;
     result.fold(
-      (failure) => emit(ProfileUpdateFailure(
-        message: failure.message,
-        errors:  failure.errors,
-      )),
+      (failure) => emit(
+        ProfileUpdateFailure(message: failure.message, errors: failure.errors),
+      ),
       (profile) => emit(ProfileUpdateSuccess(profile)),
     );
   }
 
   Future<void> uploadProfilePicture(String filePath) async {
+    if (isClosed) return;
     emit(ProfilePictureUploading());
     final result = await uploadPictureUseCase(UploadPictureParams(filePath));
+    if (isClosed) return;
     result.fold(
       (failure) => emit(ProfilePictureUploadFailure(failure.message)),
-      (url)     => emit(ProfilePictureUploadSuccess(url)),
+      (url) => emit(ProfilePictureUploadSuccess(url)),
     );
   }
 
@@ -70,6 +77,7 @@ class ProfileCubit extends Cubit<ProfileState> {
     required String expiryDate,
     required String cvv,
   }) async {
+    if (isClosed) return;
     emit(WalletDepositLoading());
     final result = await depositWalletUseCase(
       DepositWalletParams(
@@ -79,18 +87,18 @@ class ProfileCubit extends Cubit<ProfileState> {
         cvv: cvv,
       ),
     );
-    result.fold(
-      (failure) => emit(WalletDepositFailure(failure.message)),
-      (_) {
-        emit(WalletDepositSuccess());
-        loadProfile();
-      },
-    );
+    if (isClosed) return;
+    result.fold((failure) => emit(WalletDepositFailure(failure.message)), (_) {
+      emit(WalletDepositSuccess());
+      loadProfile();
+    });
   }
 
   Future<void> loadMyTickets() async {
+    if (isClosed) return;
     emit(TicketsLoading());
     final result = await profileRepository.getMyTickets();
+    if (isClosed) return;
     result.fold(
       (failure) => emit(TicketsError(failure.message)),
       (tickets) => emit(TicketsLoaded(tickets)),
@@ -98,11 +106,13 @@ class ProfileCubit extends Cubit<ProfileState> {
   }
 
   Future<void> loadWalletHistory() async {
+    if (isClosed) return;
     emit(WalletHistoryLoading());
     final result = await profileRepository.getWalletHistory();
+    if (isClosed) return;
     result.fold(
       (failure) => emit(WalletHistoryError(failure.message)),
-      (txns)    => emit(WalletHistoryLoaded(txns)),
+      (txns) => emit(WalletHistoryLoaded(txns)),
     );
   }
 }

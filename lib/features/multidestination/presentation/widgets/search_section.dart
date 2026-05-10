@@ -225,15 +225,23 @@ class _SearchSectionState extends State<SearchSection> {
     if (!_validateAll()) return;
 
     final summaries = _legs.map((leg) {
-      final fromDisplay =
-          leg.fromStation?.englishName ?? leg.fromGroup!.governorate;
-      final toDisplay = leg.toStation?.englishName ?? leg.toGroup!.governorate;
+      final fromGov = leg.fromGroup!.governorate;
+      final fromSub = leg.fromStation?.englishName;
+      final fromDisplay = fromSub ?? fromGov;
+
+      final toGov = leg.toGroup!.governorate;
+      final toSub = leg.toStation?.englishName;
+      final toDisplay = toSub ?? toGov;
 
       final d = leg.parsedDate!;
       final apiDate =
           '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
 
       return MultiDestinationLegSummary(
+        fromGov: fromGov,
+        fromSub: fromSub,
+        toGov: toGov,
+        toSub: toSub,
         from: fromDisplay,
         to: toDisplay,
         date: leg.dateController.text,
