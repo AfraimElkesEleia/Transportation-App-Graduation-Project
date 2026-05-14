@@ -8,6 +8,8 @@ import 'package:transportation_app/features/my_tickets/data/repositories/my_tick
 import 'package:transportation_app/features/my_tickets/domain/repositories/my_tickets_repository.dart';
 import 'package:transportation_app/features/my_tickets/presentation/cubit/my_tickets_cubit.dart';
 import 'package:transportation_app/features/my_tickets/presentation/cubit/marketplace_cubit.dart';
+import 'package:transportation_app/features/notfication/data/datasources/notfication_remote_datasource.dart';
+import 'package:transportation_app/features/notfication/presentation/cubit/notfication_cubit.dart';
 import 'package:transportation_app/features/home/data/datasource/stations_remote_datasource.dart';
 import 'package:transportation_app/features/home/data/repositories/stations_repository_imp.dart';
 import 'package:transportation_app/features/home/domain/repositories/station_repository.dart';
@@ -180,4 +182,10 @@ Future<void> init() async {
   sl.registerLazySingleton(() => GetPointHistoryUsecase(sl()));
   sl.registerLazySingleton(() => GetChallengeHistoryUsecase(sl()));
   sl.registerFactory(() => LoyaltyHubCubit(sl(), sl()));
+  sl.registerLazySingleton<NotficationRemoteDatasource>(
+    () => NotficationRemoteDatasourceImpl(dio: DioClient.getInstance()),
+  );
+  sl.registerFactory(
+    () => NotificationCubit(sl<NotficationRemoteDatasource>()),
+  );
 }

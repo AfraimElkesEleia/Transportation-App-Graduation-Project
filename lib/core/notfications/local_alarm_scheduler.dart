@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:timezone/data/latest.dart' as tz;
@@ -12,19 +13,29 @@ class LocalAlarmScheduler {
   static Future<void> _initTimezone() async {
     if (_tzReady) return;
     tz.initializeTimeZones();
-    final timezoneName = await FlutterTimezone.getLocalTimezone();
-    tz.setLocalLocation(
-      tz.getLocation(timezoneName.localizedName?.locale ?? 'UTC'),
-    );
-    _tzReady = true;
+    try {
+      final timezoneName = await FlutterTimezone.getLocalTimezone();
+      tz.setLocalLocation(tz.getLocation(timezoneName.identifier));
+      _tzReady = true;
+    } catch (_) {
+      tz.setLocalLocation(tz.getLocation('UTC'));
+      _tzReady = true;
+    }
   }
+
   static Future<void> scheduleCartExpiry({
     required DateTime holdExpiresAt,
   }) async {
     await _initTimezone();
     await NotficationPermissionManager.requestExactAlarmIfNeeded();
-    final triggerAt = holdExpiresAt.subtract(const Duration(minutes: 3));
-    if (triggerAt.isBefore(DateTime.now())) return;
+    final localExpiresAt = holdExpiresAt.isUtc
+        ? holdExpiresAt.toLocal()
+        : holdExpiresAt;
+    DateTime triggerAt = localExpiresAt.subtract(const Duration(minutes: 3));
+    if (triggerAt.isBefore(DateTime.now())) {
+      if (localExpiresAt.isBefore(DateTime.now())) return;
+      triggerAt = DateTime.now().add(const Duration(seconds: 5));
+    }
     await _plugin.zonedSchedule(
       id: 1001,
       title: '⏰ Seats About to Be Released!',
@@ -45,9 +56,11 @@ class LocalAlarmScheduler {
       payload: 'cart',
     );
   }
+
   static Future<void> cancelCartExpiry() async {
     await _plugin.cancel(id: 1001);
   }
+
   static Future<void> scheduleBoardingReminder({
     required String bookingId,
     required DateTime boardingTime,
@@ -55,8 +68,16 @@ class LocalAlarmScheduler {
   }) async {
     await _initTimezone();
     await NotficationPermissionManager.requestExactAlarmIfNeeded();
-    final triggerAt = boardingTime.subtract(const Duration(minutes: 30));
-    if (triggerAt.isBefore(DateTime.now())) return;
+    final localBoardingTime = boardingTime.isUtc
+        ? boardingTime.toLocal()
+        : boardingTime;
+    DateTime triggerAt = localBoardingTime.subtract(
+      const Duration(minutes: 30),
+    );
+    if (triggerAt.isBefore(DateTime.now())) {
+      if (localBoardingTime.isBefore(DateTime.now())) return;
+      triggerAt = DateTime.now().add(const Duration(seconds: 5));
+    }
     final notificationId = bookingId.hashCode;
     await _plugin.zonedSchedule(
       id: notificationId,
@@ -74,9 +95,10 @@ class LocalAlarmScheduler {
         iOS: DarwinNotificationDetails(),
       ),
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-      payload: 'booking_',
+      payload: 'booking_$bookingId',
     );
   }
+
   static Future<void> cancelBoardingReminder(String bookingId) async {
     await _plugin.cancel(id: bookingId.hashCode);
   }

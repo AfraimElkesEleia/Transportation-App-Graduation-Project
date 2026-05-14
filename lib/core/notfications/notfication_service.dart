@@ -1,6 +1,8 @@
 import 'dart:developer';
 
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:transportation_app/core/routing/routes.dart';
+import 'package:transportation_app/main.dart';
 
 class NotficationService {
   static final _plugin = FlutterLocalNotificationsPlugin();
@@ -54,9 +56,12 @@ class NotficationService {
   static void _onTap(NotificationResponse response) {
     final payload = response.payload ?? '';
     log('Notification tapped with payload: $payload');
-    // if (payload == 'cart') → navigate to /cart
-    // if (payload.startsWith('booking_')) → navigate to /my-tickets
-    // if (payload == 'marketplace')
+
+    if (payload == 'cart') {
+      navigatorKey.currentState?.pushNamed(AppRoutes.cartScreen);
+    } else {
+      navigatorKey.currentState?.pushNamed(AppRoutes.homeScreen);
+    }
   }
 
   static Future<void> showNotification({
