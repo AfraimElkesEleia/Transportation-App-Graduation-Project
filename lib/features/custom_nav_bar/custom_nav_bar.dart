@@ -1,9 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:transportation_app/core/di/injection_container.dart';
 import 'package:transportation_app/core/widgets/basic_container.dart';
 import 'package:transportation_app/features/custom_nav_bar/custom_bottom_nav_bar.dart';
 import 'package:transportation_app/features/home/presentation/views/screen/home_screen.dart';
+import 'package:transportation_app/features/my_tickets/presentation/cubit/my_tickets_cubit.dart';
 import 'package:transportation_app/features/my_tickets/presentation/views/screen/my_tickets.dart';
+import 'package:transportation_app/features/profile/domain/usecases/deposit_wallet_usecase.dart';
+import 'package:transportation_app/features/profile/domain/usecases/get_profile_usecase.dart';
+import 'package:transportation_app/features/profile/domain/usecases/logout_usecase.dart';
+import 'package:transportation_app/features/profile/domain/usecases/update_profile_picture_usecase.dart';
+import 'package:transportation_app/features/profile/domain/usecases/update_profile_usecase.dart';
+import 'package:transportation_app/features/profile/presentation/cubit/logout_cubit/logout_cubit.dart';
+import 'package:transportation_app/features/profile/presentation/cubit/profile_cubit/profile_cubit.dart';
 import 'package:transportation_app/features/profile/presentation/views/screen/profile_screen.dart';
 
 class NavItem {
@@ -27,14 +37,28 @@ class CustomNavBarState extends State<CustomNavBar> {
     NavItem(icon: FontAwesomeIcons.house, label: "Home"),
     NavItem(icon: FontAwesomeIcons.ticket, label: "Tickets"),
     NavItem(icon: FontAwesomeIcons.user, label: "Profile"),
-    NavItem(icon: FontAwesomeIcons.bell, label: "More"),
   ];
 
   late final List<Widget> _screens = [
     const HomeScreen(),
-    const MyTickets(),
-    const ProfileScreen(),
-    const Center(child: Text("More")),
+    BlocProvider(create: (_) => sl<MyTicketsCubit>(), child: const MyTickets()),
+    MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (context) => LogoutCubit(logoutUseCase: sl<LogoutUseCase>()),
+        ),
+        BlocProvider(
+          create: (context) => ProfileCubit(
+            getProfileUseCase: sl<GetProfileUseCase>(),
+            updateProfileUseCase: sl<UpdateProfileUseCase>(),
+            uploadPictureUseCase: sl<UploadProfilePictureUseCase>(),
+            depositWalletUseCase: sl<DepositWalletUseCase>(),
+            profileRepository: sl(),
+          )..loadProfile(),
+        ),
+      ],
+      child: const ProfileScreen(),
+    ),
   ];
 
   void _onItemTapped(int index) {

@@ -1,10 +1,50 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:transportation_app/core/routing/routes.dart';
 import 'package:transportation_app/core/theming/colors.dart';
 import 'package:transportation_app/core/theming/styles.dart';
+import 'package:transportation_app/features/home/domain/entities/search_params.dart';
+import 'package:transportation_app/features/search/data/models/recent_search_model.dart';
+import 'package:transportation_app/features/search/data/datasources/recent_search_local_data_source.dart';
+import 'package:transportation_app/core/di/injection_container.dart';
+
+class RecentSearchesList extends StatelessWidget {
+  const RecentSearchesList({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<List<RecentSearchModel>>(
+      future: sl<RecentSearchLocalDataSource>().getRecentSearches(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        if (snapshot.hasError || !snapshot.hasData || snapshot.data!.isEmpty) {
+          return Padding(
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            child: Text(
+              "No recent searches",
+              style: AppStyles.regular15White(
+                context,
+              ).copyWith(color: Colors.white70),
+            ),
+          );
+        }
+
+        final searches = snapshot.data!;
+        return Column(
+          children: searches
+              .map((search) => RecentSearchItem(search: search))
+              .toList(),
+        );
+      },
+    );
+  }
+}
 
 class RecentSearchItem extends StatelessWidget {
-  const RecentSearchItem({super.key});
+  final RecentSearchModel search;
+  const RecentSearchItem({super.key, required this.search});
 
   @override
   Widget build(BuildContext context) {
@@ -17,26 +57,78 @@ class RecentSearchItem extends StatelessWidget {
           side: BorderSide(width: 0.5, color: Colors.grey),
         ),
       ),
-      child: recentSearchesItem(context),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(16),
+          onTap: () {
+            // Reconstruct SearchParams
+            final params = SearchParams(
+              isRoundTrip: search.isRoundTrip,
+              travelDate: search.travelDate,
+              returnDate: search.returnDate,
+              passengers: search.passengers,
+              fromDisplayName: search.fromDisplayName,
+              toDisplayName: search.toDisplayName,
+              fromGovernorate: search.fromGovernorate,
+              fromStationId: search.fromStationId,
+              toGovernorate: search.toGovernorate,
+              toStationId: search.toStationId,
+            );
+
+            // Navigate to SearchScreen directly
+            if (params.isRoundTrip) {
+              Navigator.pushNamed(
+                context,
+                AppRoutes.roundTripBookingScreen,
+                arguments: params,
+              );
+            } else {
+              Navigator.pushNamed(
+                context,
+                AppRoutes.searchScreen,
+                arguments: params,
+              );
+            }
+          },
+          child: recentSearchesItem(context),
+        ),
+      ),
     );
   }
 
   ListTile recentSearchesItem(BuildContext context) {
+    final routeText = search.isRoundTrip
+        ? "${search.fromDisplayName} <-> ${search.toDisplayName}"
+        : "${search.fromDisplayName} -> ${search.toDisplayName}";
+
+    final dateText = search.isRoundTrip && search.returnDate != null
+        ? "${search.travelDate} to ${search.returnDate}"
+        : search.travelDate;
+
     return ListTile(
-      leading: Icon(FontAwesomeIcons.clock, color: ColorsManager.cyanBlue),
-      title: Text(
-        "Alex -> Sohag",
-        style: AppStyles.bold18DarkBlue(
-          context,
-        ).copyWith(color: Colors.white),
+      leading: Icon(
+        FontAwesomeIcons.clockRotateLeft,
+        color: ColorsManager.cyanBlue,
       ),
-      subtitle: Text("15-01-2024", style: AppStyles.regular18white(context)),
-      trailing: Transform.rotate(
-        angle: -1.57079633,
-        child: Icon(
-          FontAwesomeIcons.arrowDown,
-          color: ColorsManager.cyanBlue,
-        ),
+      title: Text(
+        routeText,
+        style: AppStyles.bold18DarkBlue(context).copyWith(color: Colors.white),
+      ),
+      subtitle: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(height: 4),
+          Text(
+            dateText,
+            style: AppStyles.regular15White(context).copyWith(fontSize: 14),
+          ),
+        ],
+      ),
+      trailing: Icon(
+        FontAwesomeIcons.chevronRight,
+        color: ColorsManager.cyanBlue,
+        size: 16,
       ),
     );
   }

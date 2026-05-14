@@ -1,23 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:transportation_app/core/theming/colors.dart';
 
-/// Profile hero card displaying avatar, name, email, premium badge, and trip stats.
 class ProfileCard extends StatelessWidget {
-  /// The user's full name displayed on the card.
   final String fullName;
-
-  /// The user's email displayed below the name.
   final String email;
-
-  /// Callback when the edit button is tapped.
-  final VoidCallback? onEditTap;
-
+  final String? profilePictureUrl;
   const ProfileCard({
     super.key,
     required this.fullName,
     required this.email,
-    this.onEditTap,
+    this.profilePictureUrl,
   });
+
+  String get _initials {
+    final parts = fullName.trim().split(' ');
+    if (parts.length >= 2) return '${parts[0][0]}${parts[1][0]}'.toUpperCase();
+    return fullName.isNotEmpty ? fullName[0].toUpperCase() : '?';
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,22 +33,37 @@ class ProfileCard extends StatelessWidget {
       ),
       child: Column(
         children: [
-          Stack(
-            children: [
               Row(
                 children: [
-                  const CircleAvatar(
+                  // ── Avatar ───────────────────────────────
+                  CircleAvatar(
                     radius: 36,
                     backgroundColor: Colors.white24,
-                    child: Icon(Icons.person, size: 40),
+                    backgroundImage: profilePictureUrl != null
+                        ? NetworkImage(profilePictureUrl!)
+                        : null,
+                    child: profilePictureUrl == null
+                        ? Text(
+                            _initials,
+                            style: const TextStyle(
+                              fontSize: 24,
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          )
+                        : null,
                   ),
                   const SizedBox(width: 16),
+
+                  // ── Name / email / edit ─────────────────
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
                           fullName,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: 18,
@@ -58,59 +72,18 @@ class ProfileCard extends StatelessWidget {
                         ),
                         Text(
                           email,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                           style: const TextStyle(color: Colors.white70),
-                        ),
-                        const SizedBox(height: 6),
-                        const Chip(
-                          label: Text('Premium Member'),
-                          backgroundColor: Colors.cyan,
                         ),
                       ],
                     ),
                   ),
                 ],
               ),
-              Positioned(
-                top: 0,
-                right: 0,
-                child: IconButton(
-                  icon: const Icon(Icons.edit, color: Colors.white),
-                  onPressed: onEditTap,
-                ),
-              ),
-            ],
-          ),
           const SizedBox(height: 20),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              _buildStatItem('Total Trips', '12'),
-              _buildStatItem('Distance Traveled', '2,450 km'),
-            ],
-          ),
         ],
       ),
-    );
-  }
-
-  Widget _buildStatItem(String label, String value) {
-    return Column(
-      children: [
-        Text(
-          value,
-          style: const TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-            fontSize: 16,
-          ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          label,
-          style: const TextStyle(color: Colors.white70, fontSize: 12),
-          textAlign: TextAlign.center,
-        ),
-      ],
     );
   }
 }

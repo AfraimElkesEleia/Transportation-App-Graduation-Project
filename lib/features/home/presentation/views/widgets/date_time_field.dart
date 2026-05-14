@@ -3,17 +3,35 @@ import 'package:transportation_app/core/theming/colors.dart';
 import 'package:transportation_app/core/theming/styles.dart';
 
 class DateTimeField extends StatefulWidget {
-  const DateTimeField({super.key});
+  final TextEditingController? controller;
+  final String? errorText;
+  final DateTime? minimumDate;
+  final ValueChanged<DateTime>? onDateSelected;
+
+  const DateTimeField({
+    super.key, 
+    this.controller, 
+    this.errorText,
+    this.minimumDate,
+    this.onDateSelected,
+  });
 
   @override
-  State<DateTimeField> createState() => _DateTimeFieldState();
+  State<DateTimeField> createState() => DateTimeFieldState();
 }
 
-class _DateTimeFieldState extends State<DateTimeField> {
-  final TextEditingController _controller = TextEditingController();
+class DateTimeFieldState extends State<DateTimeField> {
+  late final TextEditingController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = widget.controller ?? TextEditingController();
+  }
+
   @override
   void dispose() {
-    _controller.dispose();
+    if (widget.controller == null) _controller.dispose();
     super.dispose();
   }
 
@@ -25,10 +43,12 @@ class _DateTimeFieldState extends State<DateTimeField> {
       style: AppStyles.regular18white(context),
       decoration: InputDecoration(
         hint: Text(
-          "${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year}",
+          '${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year}',
           style: AppStyles.regular18white(context),
         ),
         prefixIcon: Icon(Icons.calendar_month, color: ColorsManager.iconsColor),
+        errorText: widget.errorText,
+        errorStyle: const TextStyle(color: Colors.redAccent),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(20),
           borderSide: BorderSide(color: ColorsManager.iconsColor, width: 5),
@@ -47,23 +67,25 @@ class _DateTimeFieldState extends State<DateTimeField> {
             width: 2.5,
           ),
         ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(20),
+          borderSide: const BorderSide(color: Colors.redAccent, width: 2),
+        ),
       ),
-      onTap: () => selectDate(context),
+      onTap: () => selectDate(),
     );
   }
 
-  Future<void> selectDate(BuildContext context) async {
-    DateTime? pickedDate = await showDatePicker(
+  Future<void> selectDate() async {
+    final pickedDate = await showDatePicker(
       context: context,
-      firstDate: DateTime.now(),
-      lastDate: DateTime(21000),
+      firstDate: widget.minimumDate ?? DateTime.now(),
+      lastDate: DateTime(2100),
     );
     if (pickedDate != null) {
-      String formatted =
-          "${pickedDate.day}/${pickedDate.month}/${pickedDate.year}";
-      setState(() {
-        _controller.text = formatted;
-      });
+      _controller.text =
+          '${pickedDate.day}/${pickedDate.month}/${pickedDate.year}';
+      widget.onDateSelected?.call(pickedDate);
     }
   }
 }
