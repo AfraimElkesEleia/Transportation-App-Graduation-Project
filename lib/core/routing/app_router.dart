@@ -20,6 +20,8 @@ import 'package:transportation_app/features/my_tickets/presentation/cubit/my_tic
 import 'package:transportation_app/features/my_tickets/presentation/views/screen/market_place.dart';
 import 'package:transportation_app/features/my_tickets/presentation/views/screen/resell_tickets.dart';
 import 'package:transportation_app/features/my_tickets/presentation/views/screen/ticket_details_screen.dart';
+import 'package:transportation_app/features/notfication/presentation/screens/notfication_inbox_screen.dart';
+import 'package:transportation_app/features/notfication/presentation/cubit/notfication_cubit.dart';
 import 'package:transportation_app/features/onboarding/presentation/views/onboarding_screen.dart';
 import 'package:transportation_app/features/profile/domain/entities/profile_entity.dart';
 import 'package:transportation_app/features/profile/domain/entities/ticket_entity.dart';
@@ -279,6 +281,13 @@ class AppRouter {
               expiringAmount: args['expiringAmount'] ?? 0,
               nextExpiryDate: args['nextExpiryDate'],
             ),
+          ),
+        );
+      case AppRoutes.notificationsScreen:
+        return MaterialPageRoute(
+          builder: (_) => BlocProvider.value(
+            value: sl<NotificationCubit>()..loadNotifications(),
+            child: const NotificationInboxScreen(),
           ),
         );
       default:

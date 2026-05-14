@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:transportation_app/core/error/exceptions.dart';
+import 'package:transportation_app/core/notfications/local_alarm_scheduler.dart';
 import 'package:transportation_app/features/booking/data/datasources/booking_remote_datasource.dart';
 import 'package:transportation_app/features/booking/presentation/cubit/seat_map_state.dart';
 
@@ -97,7 +98,24 @@ class SeatMapCubit extends Cubit<SeatMapState> {
         'passengers':          passengers,
       });
       try {
+        final cart = await datasource.getCart();
         await datasource.checkout(pointsToRedeem: pointsToRedeem);
+        
+        if (cart != null) {
+          for (final item in cart.items) {
+            if (item.boardingTime != null) {
+              try {
+                await LocalAlarmScheduler.scheduleBoardingReminder(
+                  bookingId: item.bookingId.toString(),
+                  boardingTime: item.boardingTime!,
+                  routeLabel: '${item.originGov} → ${item.destinationGov}',
+                );
+              } catch (_) {}
+            }
+          }
+        }
+        await LocalAlarmScheduler.cancelCartExpiry();
+        
         if (!isClosed) emit(CartSuccess());
       } on ServerException catch (e) {
         if (!isClosed) emit(CartAddedButCheckoutFailed(e.message));

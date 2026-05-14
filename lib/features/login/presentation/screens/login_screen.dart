@@ -11,6 +11,9 @@ import 'package:transportation_app/features/login/presentation/cubit/login_cubit
 import 'package:transportation_app/features/login/presentation/widgets/auth_headline.dart';
 import 'package:transportation_app/features/login/presentation/widgets/remember_me_row.dart';
 import 'package:transportation_app/features/login/presentation/widgets/sign_up_redirect.dart';
+import 'package:transportation_app/core/di/injection_container.dart';
+import 'package:transportation_app/core/notfications/signalr_service.dart';
+import 'package:transportation_app/core/utils/token_manager.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -20,10 +23,10 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final _formKey           = GlobalKey<FormState>();
-  final _emailController   = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
+  final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  bool _rememberMe         = false;
+  bool _rememberMe = false;
 
   @override
   void dispose() {
@@ -37,10 +40,10 @@ class _LoginScreenState extends State<LoginScreen> {
     if (!(_formKey.currentState?.validate() ?? false)) return;
 
     context.read<LoginCubit>().login(
-      email:      _emailController.text.trim(),
-      password:   _passwordController.text,
+      email: _emailController.text.trim(),
+      password: _passwordController.text,
       deviceInfo: 'Flutter App',
-      rememberMe:_rememberMe
+      rememberMe: _rememberMe,
     );
   }
 
@@ -50,6 +53,10 @@ class _LoginScreenState extends State<LoginScreen> {
       child: BlocConsumer<LoginCubit, LoginState>(
         listener: (context, state) {
           if (state is LoginSuccess) {
+            SignalrService.connect(
+              tokenFactory: () async =>
+                  await sl<TokenManager>().getAccessToken() ?? '',
+            );
             context.pushNamedAndRemoveuntil(
               AppRoutes.homeScreen,
               predicate: (_) => false,
@@ -57,7 +64,7 @@ class _LoginScreenState extends State<LoginScreen> {
           } else if (state is LoginFailure) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(state.message),           // Text() wraps the string
+                content: Text(state.message), // Text() wraps the string
                 backgroundColor: Colors.red,
                 behavior: SnackBarBehavior.floating,
                 shape: RoundedRectangleBorder(
@@ -84,21 +91,21 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: Column(
                   children: [
                     AppTextFormField(
-                      label:           'Email Address',
-                      hint:            'Enter your email',
-                      prefixIcon:      Icons.email,
-                      keyboardType:    TextInputType.emailAddress,
-                      controller:      _emailController,
+                      label: 'Email Address',
+                      hint: 'Enter your email',
+                      prefixIcon: Icons.email,
+                      keyboardType: TextInputType.emailAddress,
+                      controller: _emailController,
                       textInputAction: TextInputAction.next,
-                      validator:       AppValidators.email,
+                      validator: AppValidators.email,
                     ),
                     const SizedBox(height: 20),
                     AppTextFormField(
-                      label:           'Password',
-                      hint:            'Enter your password',
-                      prefixIcon:      Icons.lock,
-                      obscureText:     true,
-                      controller:      _passwordController,
+                      label: 'Password',
+                      hint: 'Enter your password',
+                      prefixIcon: Icons.lock,
+                      obscureText: true,
+                      controller: _passwordController,
                       textInputAction: TextInputAction.done,
                       onFieldSubmitted: (_) => _handleLogin(),
                       validator: (value) {
@@ -112,12 +119,12 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
               RememberMeRow(
-                value:     _rememberMe,
+                value: _rememberMe,
                 onChanged: (v) => setState(() => _rememberMe = v ?? false),
               ),
               const SizedBox(height: 20),
               AppGradientButton(
-                label:     'Sign In',
+                label: 'Sign In',
                 onPressed: _handleLogin,
                 isLoading: state is LoginLoading,
               ),

@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:transportation_app/core/di/injection_container.dart';
 import 'package:transportation_app/core/helper/spacing.dart';
+import 'package:transportation_app/core/notfications/notfication_permission_manager.dart';
 import 'package:transportation_app/core/theming/colors.dart';
 import 'package:transportation_app/core/theming/styles.dart';
 import 'package:transportation_app/core/widgets/app_shimmer.dart';
@@ -11,6 +12,7 @@ import 'package:transportation_app/features/home/domain/usecases/get_stations_us
 import 'package:transportation_app/features/home/presentation/cubit/stations_cubit.dart';
 import 'package:transportation_app/features/home/presentation/cubit/stations_state.dart';
 import 'package:transportation_app/features/home/presentation/cubit/popular_routes_cubit.dart';
+import 'package:transportation_app/features/notfication/presentation/cubit/notfication_cubit.dart';
 import 'package:transportation_app/features/home/presentation/views/widgets/app_bar_in_home_screen.dart';
 import 'package:transportation_app/features/home/presentation/views/widgets/latest_news_block.dart';
 import 'package:transportation_app/features/home/presentation/views/widgets/plan_your_journey_block.dart';
@@ -19,18 +21,19 @@ import 'package:transportation_app/features/home/presentation/views/widgets/popu
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
-
   @override
   Widget build(BuildContext context) {
+    NotficationPermissionManager.requestIfNeeded(context);
     return MultiBlocProvider(
       providers: [
         BlocProvider(
-          create: (_) => StationsCubit(
-            getStationsUseCase: sl<GetStationsUseCase>(),
-          )..loadStations(),
+          create: (_) =>
+              StationsCubit(getStationsUseCase: sl<GetStationsUseCase>())
+                ..loadStations(),
         ),
+        BlocProvider(create: (_) => sl<PopularRoutesCubit>()..load()),
         BlocProvider(
-          create: (_) => sl<PopularRoutesCubit>()..load(),
+          create: (_) => sl<NotificationCubit>()..loadNotifications(),
         ),
       ],
       child: const _HomeContent(),
@@ -128,7 +131,9 @@ class _HomeErrorView extends StatelessWidget {
               style: ElevatedButton.styleFrom(
                 backgroundColor: ColorsManager.accentCyan,
                 foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
               ),
             ),
           ],

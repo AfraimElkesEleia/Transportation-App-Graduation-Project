@@ -63,7 +63,7 @@ class TicketEntity extends Equatable {
   bool get isUpcoming =>
       boardingTime.isAfter(DateTime.now()) && status == 'Confirmed';
   bool get isPast =>
-      dropoffTime.isBefore(DateTime.now()) && status != 'Cancelled';
+      dropoffTime.isBefore(DateTime.now()) && status == 'Completed';
   bool get isActive => !isPast && status == 'Confirmed';
 
   bool get isActiveNow {

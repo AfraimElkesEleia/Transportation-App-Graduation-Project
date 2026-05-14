@@ -8,6 +8,8 @@ import 'package:transportation_app/core/utils/app_startup.dart';
 import 'package:transportation_app/core/utils/token_manager.dart';
 import 'package:transportation_app/features/search/data/models/recent_search_model.dart';
 
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
@@ -45,6 +47,7 @@ class TransportationApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      navigatorKey: navigatorKey,
       debugShowCheckedModeBanner: false,
       locale: DevicePreview.locale(context),
       builder: DevicePreview.appBuilder,

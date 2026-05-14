@@ -21,4 +21,5 @@ abstract class AppRoutes {
   static const multidestinationPassengerFormScreen = '/multidestination_passenger_form_screen';
   static const ticketDetailsScreen = '/ticket_details_screen';
   static const loyaltyHub = '/loyalty_hub';
+  static const notificationsScreen = '/notifications_screen';
 }
