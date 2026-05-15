@@ -10,6 +10,7 @@ import 'package:transportation_app/features/my_tickets/presentation/cubit/my_tic
 import 'package:transportation_app/features/my_tickets/presentation/cubit/marketplace_cubit.dart';
 import 'package:transportation_app/features/notfication/data/datasources/notfication_remote_datasource.dart';
 import 'package:transportation_app/features/notfication/presentation/cubit/notfication_cubit.dart';
+import 'package:transportation_app/core/notfications/fcm_token_datasource.dart';
 import 'package:transportation_app/features/home/data/datasource/stations_remote_datasource.dart';
 import 'package:transportation_app/features/home/data/repositories/stations_repository_imp.dart';
 import 'package:transportation_app/features/home/domain/repositories/station_repository.dart';
@@ -187,5 +188,8 @@ Future<void> init() async {
   );
   sl.registerFactory(
     () => NotificationCubit(sl<NotficationRemoteDatasource>()),
+  );
+  sl.registerLazySingleton<FcmTokenDatasource>(
+    () => FcmTokenDatasource(DioClient.getInstance()),
   );
 }

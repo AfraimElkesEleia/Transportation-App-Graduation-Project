@@ -8,7 +8,7 @@ class NotficationService {
   static final _plugin = FlutterLocalNotificationsPlugin();
   static Future<void> init() async {
     const androidSettings = AndroidInitializationSettings(
-      '@drawable/notification',
+      '@mipmap/ic_launcher',
     );
     const iosSettings = DarwinInitializationSettings(
       requestAlertPermission: false, // We request separately — see Step 2

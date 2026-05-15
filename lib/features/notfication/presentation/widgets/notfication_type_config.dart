@@ -12,46 +12,34 @@ abstract class NotificationTypeConfig {
 
   static IconData getIcon(NotificationType type) {
     switch (type) {
-      case NotificationType.offerReceived:
+      case NotificationType.marketplace:
         return Icons.local_offer_rounded;
-      case NotificationType.offerAccepted:
-        return Icons.check_circle_rounded;
-      case NotificationType.offerRejected:
-        return Icons.cancel_rounded;
-      case NotificationType.counterOfferReceived:
-        return Icons.compare_arrows_rounded;
-      case NotificationType.ticketSold:
-        return Icons.confirmation_num_rounded;
+      case NotificationType.gamification:
+        return Icons.emoji_events_rounded;
+      case NotificationType.boarding:
+        return Icons.directions_bus_rounded;
     }
   }
 
   static Color getColor(NotificationType type) {
     switch (type) {
-      case NotificationType.offerReceived:
+      case NotificationType.marketplace:
         return ColorsManager.accentCyan;
-      case NotificationType.offerAccepted:
+      case NotificationType.gamification:
         return ColorsManager.successGreen;
-      case NotificationType.offerRejected:
-        return const Color(0xFFFF5252);
-      case NotificationType.counterOfferReceived:
-        return ColorsManager.turquoise;
-      case NotificationType.ticketSold:
+      case NotificationType.boarding:
         return ColorsManager.brightBlue;
     }
   }
 
   static String getLabel(NotificationType type) {
     switch (type) {
-      case NotificationType.offerReceived:
-        return 'Offer Received';
-      case NotificationType.offerAccepted:
-        return 'Offer Accepted';
-      case NotificationType.offerRejected:
-        return 'Offer Rejected';
-      case NotificationType.counterOfferReceived:
-        return 'Counter Offer';
-      case NotificationType.ticketSold:
-        return 'Ticket Sold';
+      case NotificationType.marketplace:
+        return 'Marketplace';
+      case NotificationType.gamification:
+        return 'Gamification';
+      case NotificationType.boarding:
+        return 'Boarding';
     }
   }
 }

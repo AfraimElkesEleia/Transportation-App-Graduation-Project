@@ -12,10 +12,22 @@ import 'package:transportation_app/features/notfication/presentation/widgets/not
 import 'package:transportation_app/features/notfication/presentation/widgets/notfication_filter_bar.dart';
 import 'package:transportation_app/features/notfication/presentation/widgets/notfication_section_header.dart';
 import 'package:transportation_app/features/notfication/presentation/widgets/notfication_type_config.dart';
+import 'package:transportation_app/core/routing/routes.dart';
 
 /// Notification Inbox Screen.
-class NotificationInboxScreen extends StatelessWidget {
+class NotificationInboxScreen extends StatefulWidget {
   const NotificationInboxScreen({super.key});
+
+  @override
+  State<NotificationInboxScreen> createState() => _NotificationInboxScreenState();
+}
+
+class _NotificationInboxScreenState extends State<NotificationInboxScreen> {
+  @override
+  void initState() {
+    super.initState();
+    context.read<NotificationCubit>().loadNotifications();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -111,12 +123,6 @@ class _NotificationList extends StatelessWidget {
                             onTap: () => _onTap(context, notif),
                             onDismiss: () =>
                                 context.read<NotificationCubit>().dismiss(notif.id),
-                            onAccept: NotificationTypeConfig.hasActions(notif.type)
-                                ? () => _onAccept(context, notif)
-                                : null,
-                            onDecline: NotificationTypeConfig.hasActions(notif.type)
-                                ? () => _onDecline(context, notif)
-                                : null,
                           );
                         },
                         childCount: entry.value.length,
@@ -139,50 +145,18 @@ class _NotificationList extends StatelessWidget {
 
   void _onTap(BuildContext context, AppNotification notif) {
     context.read<NotificationCubit>().markRead(notif.id);
-    // Navigate based on type when deep-link targets are ready.
     switch (notif.type) {
-      case NotificationType.offerReceived:
-      case NotificationType.counterOfferReceived:
+      case NotificationType.marketplace:
+        context.read<NotificationCubit>().loadNotifications();
+        // Navigator.of(context).pushNamed(AppRoutes.m);
         break;
-      case NotificationType.offerAccepted:
+      case NotificationType.boarding:
+        // Navigator.of(context).pushNamed(AppRoutes.myTickets);
         break;
-      case NotificationType.offerRejected:
-        break;
-      case NotificationType.ticketSold:
+      case NotificationType.gamification:
+        // Navigator.of(context).pushNamed(AppRoutes.pr);
         break;
     }
-  }
-
-  void _onAccept(BuildContext context, AppNotification notif) {
-    context.read<NotificationCubit>().markRead(notif.id);
-    context.read<NotificationCubit>().acceptOffer(notif.offerId ?? '');
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        backgroundColor: ColorsManager.successGreen.withOpacity(0.9),
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        content: Text(
-          'Offer accepted for ${notif.offeredPrice ?? ""} EGP',
-          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
-        ),
-      ),
-    );
-  }
-
-  void _onDecline(BuildContext context, AppNotification notif) {
-    context.read<NotificationCubit>().markRead(notif.id);
-    context.read<NotificationCubit>().rejectOffer(notif.offerId ?? '');
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        backgroundColor: ColorsManager.cardUnread,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        content: const Text(
-          'Offer declined',
-          style: TextStyle(color: Colors.white70, fontWeight: FontWeight.w500),
-        ),
-      ),
-    );
   }
 }
 
