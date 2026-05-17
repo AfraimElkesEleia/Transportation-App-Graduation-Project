@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:transportation_app/core/l10n/app_localizations.dart';
 
 class ActionButtonsRow extends StatelessWidget {
   final void Function() resellButton;
@@ -11,6 +12,7 @@ class ActionButtonsRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return SliverPadding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       sliver: SliverToBoxAdapter(
@@ -20,7 +22,7 @@ class ActionButtonsRow extends StatelessWidget {
               child: _buildButton(
                 onTap: resellButton,
                 icon: Icons.sell_outlined,
-                label: "Sell All Tickets",
+                label: l10n.sellAllTickets,
                 color: const Color(0xFF00C853),
                 textColor: Colors.white,
               ),
@@ -30,8 +32,8 @@ class ActionButtonsRow extends StatelessWidget {
               child: _buildButton(
                 onTap: marketPlaceButton,
                 icon: Icons.star_border,
-                label: "Marketplace",
-                color: const Color(0xFF5C6BC0).withOpacity(0.3), // Glassy Blue
+                label: l10n.marketplace,
+                color: const Color(0xFF5C6BC0).withOpacity(0.3),
                 textColor: Colors.blue[100]!,
                 isOutlined: true,
               ),

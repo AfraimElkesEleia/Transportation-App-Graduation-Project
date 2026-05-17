@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:transportation_app/core/helper/spacing.dart';
+import 'package:transportation_app/core/l10n/app_localizations.dart';
 import 'package:transportation_app/core/widgets/block_container.dart';
 import 'package:transportation_app/features/home/domain/entities/station_entity.dart';
 import 'package:transportation_app/features/home/domain/entities/station_group_entity.dart';
@@ -84,8 +85,8 @@ class _SearchSectionState extends State<SearchSection> {
     final lastLeg = _legs.last;
     if (lastLeg.fromGroup == null || lastLeg.toGroup == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please fill From and To before reversing.'),
+        SnackBar(
+          content: Text(AppLocalizations.of(context)!.fillFromToBeforeReverse),
           backgroundColor: Colors.red,
         ),
       );
@@ -121,8 +122,8 @@ class _SearchSectionState extends State<SearchSection> {
     final lastLeg = _legs.last;
     if (lastLeg.fromGroup == null || lastLeg.toGroup == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please fill From and To before returning.'),
+        SnackBar(
+          content: Text(AppLocalizations.of(context)!.fillFromToBeforeReturn),
           backgroundColor: Colors.red,
         ),
       );
@@ -183,8 +184,10 @@ class _SearchSectionState extends State<SearchSection> {
       String? tErr;
       String? dErr;
 
-      if (leg.fromGroup == null) fErr = 'Please select departure governorate';
-      if (leg.toGroup == null) tErr = 'Please select destination governorate';
+      if (leg.fromGroup == null)
+        fErr = AppLocalizations.of(context)!.selectDepartureGov;
+      if (leg.toGroup == null)
+        tErr = AppLocalizations.of(context)!.selectDestinationGov;
 
       if (leg.fromGroup != null &&
           leg.toGroup != null &&
@@ -192,19 +195,19 @@ class _SearchSectionState extends State<SearchSection> {
         if (leg.fromStation != null &&
             leg.toStation != null &&
             leg.fromStation!.id == leg.toStation!.id) {
-          tErr = 'Destination must differ from departure';
+          tErr = AppLocalizations.of(context)!.destMustDiffer;
         } else if (leg.fromStation == null && leg.toStation == null) {
-          tErr = 'Destination governorate must differ from departure';
+          tErr = AppLocalizations.of(context)!.destGovMustDiffer;
         }
       }
 
       if (leg.dateController.text.trim().isEmpty) {
-        dErr = 'Please select departure date';
+        dErr = AppLocalizations.of(context)!.selectDepartureDate;
       } else if (i > 0 &&
           leg.parsedDate != null &&
           _legs[i - 1].parsedDate != null) {
         if (leg.parsedDate!.isBefore(_legs[i - 1].parsedDate!)) {
-          dErr = 'Date cannot be earlier than previous leg';
+          dErr = AppLocalizations.of(context)!.dateCannotBeEarlier;
         }
       }
 
@@ -251,8 +254,10 @@ class _SearchSectionState extends State<SearchSection> {
 
     if (summaries.length == 1) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please use the Standard Search for a single trip.'),
+        SnackBar(
+          content: Text(
+            AppLocalizations.of(context)!.useStandardSearchSingleTrip,
+          ),
           backgroundColor: Colors.orange,
         ),
       );
@@ -269,7 +274,7 @@ class _SearchSectionState extends State<SearchSection> {
     return BlocBuilder<StationsCubit, StationsState>(
       builder: (context, state) {
         if (state is StationsInitial || state is StationsLoading) {
-          return const BlockContainer(
+          return BlockContainer(
             isVip: true,
             child: Center(
               child: Padding(
@@ -279,8 +284,8 @@ class _SearchSectionState extends State<SearchSection> {
                     CircularProgressIndicator(color: Colors.cyan),
                     SizedBox(height: 12),
                     Text(
-                      'Loading stations...',
-                      style: TextStyle(color: Colors.white54),
+                      AppLocalizations.of(context)!.loadingStations,
+                      style: const TextStyle(color: Colors.white54),
                     ),
                   ],
                 ),
@@ -309,7 +314,7 @@ class _SearchSectionState extends State<SearchSection> {
                       onPressed: () =>
                           context.read<StationsCubit>().loadStations(),
                       icon: const Icon(Icons.refresh),
-                      label: const Text('Retry'),
+                      label: Text(AppLocalizations.of(context)!.retry),
                     ),
                   ],
                 ),
@@ -340,7 +345,7 @@ class _SearchSectionState extends State<SearchSection> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            'Trip ${index + 1}',
+                            '${AppLocalizations.of(context)!.trip} ${index + 1}',
                             style: const TextStyle(
                               color: Colors.white,
                               fontSize: 18,
@@ -360,7 +365,7 @@ class _SearchSectionState extends State<SearchSection> {
                         child: Opacity(
                           opacity: leg.isFromLocked ? 0.6 : 1.0,
                           child: GovernorateSelector(
-                            title: "From Governorate",
+                            title: AppLocalizations.of(context)!.fromGov,
                             controller: leg.fromGovController,
                             subCityController: leg.fromSubController,
                             selectedGroup: leg.fromGroup,
@@ -392,7 +397,7 @@ class _SearchSectionState extends State<SearchSection> {
                         child: Opacity(
                           opacity: leg.isToLocked ? 0.6 : 1.0,
                           child: GovernorateSelector(
-                            title: "To Governorate",
+                            title: AppLocalizations.of(context)!.toGov,
                             controller: leg.toGovController,
                             subCityController: leg.toSubController,
                             selectedGroup: leg.toGroup,
@@ -447,11 +452,14 @@ class _SearchSectionState extends State<SearchSection> {
             if (_showAutoButtons)
               Column(
                 children: [
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16.0),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
                     child: Text(
-                      'Note: Choose one of these options only after completing your full trip plan.',
-                      style: TextStyle(color: Colors.white54, fontSize: 12),
+                      AppLocalizations.of(context)!.multiDestNote,
+                      style: const TextStyle(
+                        color: Colors.white54,
+                        fontSize: 12,
+                      ),
                       textAlign: TextAlign.center,
                     ),
                   ),
@@ -466,9 +474,9 @@ class _SearchSectionState extends State<SearchSection> {
                             style: OutlinedButton.styleFrom(
                               side: const BorderSide(color: Colors.cyan),
                             ),
-                            child: const Text(
-                              'Step-by-Step Reverse',
-                              style: TextStyle(
+                            child: Text(
+                              AppLocalizations.of(context)!.stepByStepReverse,
+                              style: const TextStyle(
                                 color: Colors.cyan,
                                 fontSize: 12,
                               ),
@@ -483,9 +491,9 @@ class _SearchSectionState extends State<SearchSection> {
                             style: OutlinedButton.styleFrom(
                               side: const BorderSide(color: Colors.cyan),
                             ),
-                            child: const Text(
-                              'Direct Return',
-                              style: TextStyle(
+                            child: Text(
+                              AppLocalizations.of(context)!.directReturn,
+                              style: const TextStyle(
                                 color: Colors.cyan,
                                 fontSize: 12,
                               ),
@@ -504,9 +512,11 @@ class _SearchSectionState extends State<SearchSection> {
                         _addLeg();
                       } else {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
+                          SnackBar(
                             content: Text(
-                              'Please fill From and To before adding a new trip.',
+                              AppLocalizations.of(
+                                context,
+                              )!.fillFromToBeforeAdding,
                             ),
                             backgroundColor: Colors.red,
                           ),
@@ -514,9 +524,9 @@ class _SearchSectionState extends State<SearchSection> {
                       }
                     },
                     icon: const Icon(Icons.add, color: Colors.blueAccent),
-                    label: const Text(
-                      'Add another destination',
-                      style: TextStyle(color: Colors.blueAccent),
+                    label: Text(
+                      AppLocalizations.of(context)!.addAnotherDestination,
+                      style: const TextStyle(color: Colors.blueAccent),
                     ),
                   ),
                 ],
@@ -525,9 +535,9 @@ class _SearchSectionState extends State<SearchSection> {
               TextButton.icon(
                 onPressed: _undoAutoAction,
                 icon: const Icon(Icons.undo, color: Colors.redAccent),
-                label: const Text(
-                  'Undo Auto-Generated Trips',
-                  style: TextStyle(color: Colors.redAccent),
+                label: Text(
+                  AppLocalizations.of(context)!.undoAutoGeneratedTrips,
+                  style: const TextStyle(color: Colors.redAccent),
                 ),
               ),
 
@@ -536,7 +546,7 @@ class _SearchSectionState extends State<SearchSection> {
               isVip: true,
               child: SearchTripButton(
                 onPressed: _onSearch,
-                label: "Search Multi-Destination",
+                label: AppLocalizations.of(context)!.searchMultiDestination,
               ),
             ),
             verticalSpace(space: 32),

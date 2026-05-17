@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:transportation_app/core/l10n/app_localizations.dart';
 
 class SignUpRedirect extends StatelessWidget {
   const SignUpRedirect({super.key, required this.onTap});
@@ -7,6 +8,7 @@ class SignUpRedirect extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Center(
       child: GestureDetector(
         onTap: onTap,
@@ -14,7 +16,7 @@ class SignUpRedirect extends StatelessWidget {
           text: TextSpan(
             children: [
               TextSpan(
-                text: "Don't have an account? ",
+                text: l10n.dontHaveAccount,
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 16,
@@ -23,7 +25,7 @@ class SignUpRedirect extends StatelessWidget {
                 ),
               ),
               TextSpan(
-                text: 'Sign Up',
+                text: l10n.signUp,
                 style: TextStyle(
                   color: const Color(0xff1AC8E8),
                   fontSize: 16,

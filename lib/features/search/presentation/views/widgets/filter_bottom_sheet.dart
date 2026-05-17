@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:transportation_app/core/l10n/app_localizations.dart';
 import 'package:transportation_app/core/theming/colors.dart';
 import 'package:transportation_app/features/home/domain/entities/search_params.dart';
-import 'package:transportation_app/features/search/presentation/cubit/search_cubit.dart';
 
 class FilterBottomSheet extends StatefulWidget {
   final SearchParams activeParams;
@@ -85,12 +84,13 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
   }
 
   String _fmtTime(TimeOfDay? t) {
-    if (t == null) return 'Any';
+    if (t == null) return AppLocalizations.of(context)!.any;
     return '${t.hour.toString().padLeft(2, '0')}:${t.minute.toString().padLeft(2, '0')}';
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       decoration: const BoxDecoration(
         color: ColorsManager.surfaceDarker,
@@ -124,9 +124,9 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
-                  'Filter & Sort',
-                  style: TextStyle(
+                Text(
+                  l10n.filters,
+                  style: const TextStyle(
                     color: Colors.white,
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
@@ -134,9 +134,9 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
                 ),
                 TextButton(
                   onPressed: _reset,
-                  child: const Text(
-                    'Reset All',
-                    style: TextStyle(
+                  child: Text(
+                    l10n.reset,
+                    style: const TextStyle(
                       color: ColorsManager.accentCyan,
                       fontSize: 14,
                     ),
@@ -147,15 +147,27 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
             const SizedBox(height: 24),
 
             // ── Sort By
-            const _SectionLabel(label: 'Sort By'),
+            _SectionLabel(label: l10n.sortBy),
             const SizedBox(height: 12),
             Wrap(
               spacing: 8,
               runSpacing: 8,
               children: SortBy.values.map((s) {
                 final selected = _sortBy == s;
+                String label;
+                switch (s) {
+                  case SortBy.departureTime:
+                    label = l10n.departureTime;
+                    break;
+                  case SortBy.lowestPrice:
+                    label = l10n.lowestPrice;
+                    break;
+                  case SortBy.shortestDuration:
+                    label = l10n.shortestDuration;
+                    break;
+                }
                 return _FilterChip(
-                  label: s.label,
+                  label: label,
                   selected: selected,
                   onTap: () => setState(() => _sortBy = s),
                 );
@@ -164,16 +176,28 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
             const SizedBox(height: 28),
 
             // ── Transport
-            const _SectionLabel(label: 'Transport Type'),
+            _SectionLabel(label: l10n.transportType),
             const SizedBox(height: 12),
             Row(
               children: TransportType.values.map((t) {
                 final selected = _transport == t;
+                String label;
+                switch (t) {
+                  case TransportType.all:
+                    label = l10n.all;
+                    break;
+                  case TransportType.bus:
+                    label = l10n.bus;
+                    break;
+                  case TransportType.train:
+                    label = l10n.train;
+                    break;
+                }
                 return Expanded(
                   child: Padding(
                     padding: const EdgeInsets.only(right: 8),
                     child: _TransportTile(
-                      label: t.label,
+                      label: label,
                       icon: _transportIcon(t),
                       selected: selected,
                       onTap: () => setState(() => _transport = t),
@@ -188,7 +212,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const _SectionLabel(label: 'Max Price'),
+                _SectionLabel(label: l10n.maxPriceText),
                 Text(
                   _maxPrice == null
                       ? 'Any'
@@ -241,7 +265,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
             const SizedBox(height: 28),
 
             // ── Departure Time
-            const _SectionLabel(label: 'Departure Time'),
+            _SectionLabel(label: l10n.departureTime),
             const SizedBox(height: 12),
             Row(
               children: [
@@ -320,9 +344,9 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
                   ),
                   elevation: 0,
                 ),
-                child: const Text(
-                  'Apply Filters',
-                  style: TextStyle(
+                child: Text(
+                  l10n.apply,
+                  style: const TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
                     fontSize: 16,

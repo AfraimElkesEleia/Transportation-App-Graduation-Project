@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:transportation_app/core/di/injection_container.dart';
+import 'package:transportation_app/core/l10n/app_localizations.dart';
 import 'package:transportation_app/core/widgets/basic_container.dart';
 import 'package:transportation_app/features/custom_nav_bar/custom_bottom_nav_bar.dart';
 import 'package:transportation_app/features/home/presentation/views/screen/home_screen.dart';
@@ -33,11 +34,14 @@ class CustomNavBar extends StatefulWidget {
 class CustomNavBarState extends State<CustomNavBar> {
   int currentIndex = 0;
 
-  final List<NavItem> _navItems = [
-    NavItem(icon: FontAwesomeIcons.house, label: "Home"),
-    NavItem(icon: FontAwesomeIcons.ticket, label: "Tickets"),
-    NavItem(icon: FontAwesomeIcons.user, label: "Profile"),
-  ];
+  List<NavItem> _getNavItems(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return [
+      NavItem(icon: FontAwesomeIcons.house, label: l10n.navHome),
+      NavItem(icon: FontAwesomeIcons.ticket, label: l10n.navTickets),
+      NavItem(icon: FontAwesomeIcons.user, label: l10n.navProfile),
+    ];
+  }
 
   late final List<Widget> _screens = [
     const HomeScreen(),
@@ -92,8 +96,8 @@ class CustomNavBarState extends State<CustomNavBar> {
               padding: const EdgeInsets.symmetric(vertical: 8.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: List.generate(_navItems.length, (idx) {
-                  final item = _navItems[idx];
+                children: List.generate(_getNavItems(context).length, (idx) {
+                  final item = _getNavItems(context)[idx];
                   return CustomBottomNavBarItem(
                     isActive: currentIndex == idx,
                     icon: item.icon,

@@ -1,4 +1,5 @@
 import 'package:get_it/get_it.dart';
+import 'package:transportation_app/core/l10n/locale_cubit.dart';
 import 'package:transportation_app/core/networking/dio_client.dart';
 import 'package:transportation_app/core/utils/token_manager.dart';
 import 'package:transportation_app/features/booking/data/datasources/booking_remote_datasource.dart';
@@ -55,6 +56,7 @@ import 'package:transportation_app/features/signup/presentation/cubit/signup_cub
 final sl = GetIt.instance;
 
 Future<void> init() async {
+  sl.registerLazySingleton(() => LocaleCubit());
   sl.registerLazySingleton(() => TokenManager());
   sl.registerLazySingleton<AuthRemoteDataSource>(
     () => AuthRemoteDataSourceImpl(dio: DioClient.getInstance()),

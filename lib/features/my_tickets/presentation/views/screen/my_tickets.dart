@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:transportation_app/core/di/injection_container.dart';
 import 'package:transportation_app/core/helper/extensions.dart';
+import 'package:transportation_app/core/l10n/app_localizations.dart';
 import 'package:transportation_app/core/routing/routes.dart';
 import 'package:transportation_app/core/theming/colors.dart';
 import 'package:transportation_app/core/widgets/app_shimmer.dart';
@@ -44,6 +45,7 @@ class _MyTicketsState extends State<MyTickets>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return BlocProvider(
       create: (_) => sl<MarketplaceCubit>(),
       child: Scaffold(
@@ -53,8 +55,8 @@ class _MyTicketsState extends State<MyTickets>
                 listener: (context, state) {
                   if (state is MarketplaceListedState) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Action successful.'),
+                      SnackBar(
+                        content: Text(l10n.actionSuccessful),
                         backgroundColor: Colors.green,
                       ),
                     );
@@ -82,9 +84,9 @@ class _MyTicketsState extends State<MyTickets>
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    const Text(
-                                      'My Tickets',
-                                      style: TextStyle(
+                                    Text(
+                                      l10n.myTickets,
+                                      style: const TextStyle(
                                         color: Colors.white,
                                         fontWeight: FontWeight.bold,
                                         fontSize: 26,
@@ -92,7 +94,7 @@ class _MyTicketsState extends State<MyTickets>
                                       ),
                                     ),
                                     Text(
-                                      'Your digital travel wallet',
+                                      l10n.digitalWallet,
                                       style: TextStyle(
                                         color: Colors.blue[200],
                                         fontSize: 13,
@@ -156,10 +158,10 @@ class _MyTicketsState extends State<MyTickets>
                                 fontSize: 13,
                               ),
                               dividerColor: Colors.transparent,
-                              tabs: const [
-                                Tab(text: 'Upcoming'),
-                                Tab(text: 'Active'),
-                                Tab(text: 'Past'),
+                              tabs: [
+                                Tab(text: l10n.upcoming),
+                                Tab(text: l10n.active),
+                                Tab(text: l10n.past),
                               ],
                             ),
                           ),
@@ -209,16 +211,16 @@ class _MyTicketsState extends State<MyTickets>
                         tabChildren = [
                           _TicketListView(
                             tickets: upcoming,
-                            emptyLabel: 'No upcoming trips',
+                            emptyLabel: l10n.noUpcomingTrips,
                           ),
                           _TicketListView(
                             tickets: activeNow,
-                            emptyLabel: 'No trips departing soon',
+                            emptyLabel: l10n.noActiveTrips,
                             showUrgency: true,
                           ),
                           _TicketListView(
                             tickets: past,
-                            emptyLabel: 'No past trips',
+                            emptyLabel: l10n.noPastTrips,
                           ),
                         ];
                       } else {
@@ -259,6 +261,7 @@ class _ErrorView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -274,7 +277,7 @@ class _ErrorView extends StatelessWidget {
           ElevatedButton.icon(
             onPressed: onRetry,
             icon: const Icon(Icons.refresh),
-            label: const Text('Retry'),
+            label: Text(l10n.retry),
             style: ElevatedButton.styleFrom(
               backgroundColor: ColorsManager.accentCyan,
               foregroundColor: Colors.black,
@@ -302,6 +305,7 @@ class _TicketListView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     if (tickets.isEmpty) {
       return Center(
         child: Column(
@@ -318,9 +322,9 @@ class _TicketListView extends StatelessWidget {
               style: const TextStyle(color: Colors.white38, fontSize: 14),
             ),
             const SizedBox(height: 8),
-            const Text(
-              'Tap the refresh button above',
-              style: TextStyle(color: Colors.white24, fontSize: 12),
+            Text(
+              l10n.refreshTickets,
+              style: const TextStyle(color: Colors.white24, fontSize: 12),
             ),
           ],
         ),

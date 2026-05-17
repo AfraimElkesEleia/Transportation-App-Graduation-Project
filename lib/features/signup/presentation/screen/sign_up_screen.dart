@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:transportation_app/core/helper/extensions.dart';
+import 'package:transportation_app/core/l10n/app_localizations.dart';
 import 'package:transportation_app/core/routing/routes.dart';
 import 'package:transportation_app/core/validators/app_validators.dart';
 import 'package:transportation_app/core/widgets/app_gradient_button.dart';
@@ -69,12 +70,13 @@ class _SignupScreenState extends State<SignupScreen> {
   // ── Validation helpers for non-Form widgets ───────────
 
   bool _validateCustomFields() {
+    final l10n = AppLocalizations.of(context)!;
     bool ok = true;
 
-    final genderErr = _gender == null ? 'Please select your gender.' : null;
+    final genderErr = _gender == null ? l10n.genderError : null;
     final dobErr = AppValidators.dateOfBirth(_dateOfBirth);
     final countryErr = _countryCode == null
-        ? 'Please select your country.'
+        ? l10n.countryError
         : null;
     setState(() {
       _genderError = genderErr;
@@ -122,6 +124,7 @@ class _SignupScreenState extends State<SignupScreen> {
   // ── Build ──────────────────────────────────────────────
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return AuthBackground(
       child: BlocConsumer<SignupCubit, SignupState>(
         listener: (context, state) {
@@ -157,7 +160,7 @@ class _SignupScreenState extends State<SignupScreen> {
                   ),
                 ),
                 const SizedBox(height: 20),
-                SectionLabel(label: 'Personal Information'),
+                SectionLabel(label: l10n.sectionPersonal),
                 const SizedBox(height: 16),
                 SignupPersonalSection(
                   firstNameController: _firstNameController,
@@ -181,7 +184,7 @@ class _SignupScreenState extends State<SignupScreen> {
                 // SECTION 2 — Contact
                 // ══════════════════════════════
                 const SizedBox(height: 32),
-                SectionLabel(label: 'Contact Details'),
+                SectionLabel(label: l10n.sectionContact),
                 const SizedBox(height: 16),
 
                 SignupContactSection(
@@ -205,7 +208,7 @@ class _SignupScreenState extends State<SignupScreen> {
                 // SECTION 3 — Security
                 // ══════════════════════════════
                 const SizedBox(height: 32),
-                SectionLabel(label: 'Security'),
+                SectionLabel(label: l10n.sectionSecurity),
                 const SizedBox(height: 16),
                 SignupSecuritySection(
                   passwordController: _passwordController,
@@ -220,7 +223,7 @@ class _SignupScreenState extends State<SignupScreen> {
 
                 // ── Create Account button ────────────
                 AppGradientButton(
-                  label: 'Create Account',
+                  label: l10n.createAccount,
                   onPressed: _handleSignup,
                   isLoading: state is SignupLoading,
                 ),
@@ -234,7 +237,7 @@ class _SignupScreenState extends State<SignupScreen> {
                       text: TextSpan(
                         children: [
                           TextSpan(
-                            text: 'Already have an account? ',
+                            text: l10n.alreadyHaveAccount,
                             style: TextStyle(
                               color: Colors.white,
                               fontSize: 16,
@@ -243,7 +246,7 @@ class _SignupScreenState extends State<SignupScreen> {
                             ),
                           ),
                           TextSpan(
-                            text: 'Sign In',
+                            text: l10n.signIn,
                             style: TextStyle(
                               color: const Color(0xff1AC8E8),
                               fontSize: 16,
