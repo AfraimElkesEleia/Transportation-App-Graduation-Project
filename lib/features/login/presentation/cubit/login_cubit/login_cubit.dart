@@ -1,6 +1,9 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:transportation_app/features/login/domain/usecase/login_usecase.dart';
 import 'package:transportation_app/features/login/presentation/cubit/login_cubit/login_states.dart';
+import 'package:transportation_app/core/di/injection_container.dart';
+import 'package:transportation_app/core/notfications/fcm_service.dart';
+import 'package:transportation_app/core/notfications/fcm_token_datasource.dart';
 
 class LoginCubit extends Cubit<LoginState> {
   final LoginUsecase loginUseCase;
@@ -21,7 +24,16 @@ class LoginCubit extends Cubit<LoginState> {
 
     result.fold(
       (failure) => emit(LoginFailure(message: failure.message, errors: failure.errors)),
-      (authResponse) => emit(LoginSuccess(authResponse)),
+      (authResponse) async {
+        emit(LoginSuccess(authResponse));
+        final fcmToken = await FcmService.getToken();
+        if (fcmToken != null) {
+          await sl<FcmTokenDatasource>().registerToken(
+            token: fcmToken,
+            deviceType: FcmService.deviceType,
+          );
+        }
+      },
     );
   }
 }

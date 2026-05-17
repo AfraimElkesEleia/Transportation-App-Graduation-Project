@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:transportation_app/core/constants/api_constants.dart';
 import 'package:transportation_app/features/notfication/data/models/notfication_model.dart';
 import 'package:transportation_app/features/notfication/domain/entities/app_notfication.dart';
 
@@ -25,7 +26,7 @@ class NotficationRemoteDatasourceImpl implements NotficationRemoteDatasource {
   @override
   Future<List<AppNotification>> getNotifications() async {
     final res = await dio.get(
-      '/api/Notifications',
+      ApiConstants.notifications,
       queryParameters: {'limit': 50},
     );
     final body = res.data as Map<String, dynamic>;
@@ -37,11 +38,11 @@ class NotficationRemoteDatasourceImpl implements NotficationRemoteDatasource {
 
   @override
   Future<void> markRead(String id) async {
-    await dio.patch('/api/Notifications/$id/read');
+    await dio.patch(ApiConstants.readNotification(id));
   }
 
   @override
   Future<void> markAllRead() async {
-    await dio.patch('/api/Notifications/read-all');
+    await dio.patch(ApiConstants.readAllNotifications);
   }
 }

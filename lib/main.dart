@@ -7,6 +7,9 @@ import 'package:transportation_app/core/routing/routes.dart';
 import 'package:transportation_app/core/utils/app_startup.dart';
 import 'package:transportation_app/core/utils/token_manager.dart';
 import 'package:transportation_app/features/search/data/models/recent_search_model.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:transportation_app/core/notfications/fcm_service.dart';
+import 'package:transportation_app/core/notfications/notfication_service.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
@@ -16,6 +19,10 @@ void main() async {
   await Hive.initFlutter();
   Hive.registerAdapter(RecentSearchModelAdapter());
   await Hive.openBox<RecentSearchModel>('recent_searches_box');
+
+  await Firebase.initializeApp();
+  await FcmService.init();
+  await NotficationService.init();
 
   await init();
   final tokenManager = sl<TokenManager>();

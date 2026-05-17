@@ -33,12 +33,7 @@ class NotificationLoaded extends NotificationState {
         return notifications;
       case NotificationFilter.marketplace:
         return notifications
-            .where((n) =>
-                n.type == NotificationType.offerReceived ||
-                n.type == NotificationType.offerAccepted ||
-                n.type == NotificationType.offerRejected ||
-                n.type == NotificationType.counterOfferReceived ||
-                n.type == NotificationType.ticketSold)
+            .where((n) => n.type == NotificationType.marketplace)
             .toList();
       case NotificationFilter.unread:
         return notifications.where((n) => !n.isRead).toList();

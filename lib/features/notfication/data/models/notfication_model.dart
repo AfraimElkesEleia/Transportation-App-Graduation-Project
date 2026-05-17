@@ -38,9 +38,13 @@ class NotficationModel {
   NotificationType _mapType(String t) {
     switch (t) {
       case 'Marketplace':
-        return NotificationType.offerReceived;
+        return NotificationType.marketplace;
+      case 'Gamification':
+        return NotificationType.gamification;
+      case 'Boarding':
+        return NotificationType.boarding;
       default:
-        return NotificationType.offerReceived;
+        return NotificationType.marketplace;
     }
   }
 }
