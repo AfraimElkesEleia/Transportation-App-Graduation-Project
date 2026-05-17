@@ -11,12 +11,12 @@ import 'package:transportation_app/features/search/data/models/recent_search_mod
 import 'package:firebase_core/firebase_core.dart';
 import 'package:transportation_app/core/notfications/fcm_service.dart';
 import 'package:transportation_app/core/notfications/notfication_service.dart';
-
-final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
-
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:transportation_app/core/l10n/locale_box.dart';
 import 'package:transportation_app/core/l10n/locale_cubit.dart';
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
