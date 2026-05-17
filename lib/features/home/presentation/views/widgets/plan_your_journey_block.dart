@@ -381,7 +381,7 @@ class _PlanYourJourneyBlockState extends State<PlanYourJourneyBlock>
                 onPressed: () {
                   context.pushNamed(AppRoutes.multidestinationScreen);
                 },
-                label: "Multi-Destination",
+                label: l10n.multiDestination,
                 backgroundColor: Colors.blueAccent,
               ),
             ],

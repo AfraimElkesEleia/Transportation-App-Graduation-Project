@@ -1,6 +1,9 @@
 import 'package:dio/dio.dart';
 import 'package:transportation_app/core/constants/api_constants.dart';
 import 'package:transportation_app/core/utils/token_manager.dart';
+import 'package:transportation_app/core/routing/routes.dart';
+import 'package:transportation_app/main.dart';
+import 'package:transportation_app/core/notfications/signalr_service.dart';
 
 class AuthInterceptor extends Interceptor {
   final Dio dio;
@@ -37,6 +40,9 @@ class AuthInterceptor extends Interceptor {
     print(
       '🔵 [AuthInterceptor] onError called — status: ${err.response?.statusCode}',
     );
+    final isPublic = _publicEndpoints.any(
+      (e) => err.requestOptions.path.contains(e),
+    );
     final tokenExpired = err.response?.headers.value('Token-Expired') == 'true';
     if (tokenExpired) {
       print('🔵 [AuthInterceptor] token expired — trying silent refresh');
@@ -46,10 +52,23 @@ class AuthInterceptor extends Interceptor {
         err.requestOptions.headers['Authorization'] = 'Bearer $newToken';
         final retried = await dio.fetch(err.requestOptions);
         return handler.resolve(retried);
+      } else if (!isPublic) {
+        _forceLogout();
       }
+    } else if (err.response?.statusCode == 401 && !isPublic) {
+      _forceLogout();
     }
     print('🔵 [AuthInterceptor] forwarding error to next handler');
     handler.next(err);
+  }
+
+  void _forceLogout() async {
+    await _tokenManager.clearAllTokens();
+    SignalrService.disconnect();
+    navigatorKey.currentState?.pushNamedAndRemoveUntil(
+      AppRoutes.loginScreen,
+      (route) => false,
+    );
   }
 
   Future<bool> _tryRefreshToken() async {

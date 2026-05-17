@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:transportation_app/features/home/domain/entities/station_entity.dart';
 import 'package:transportation_app/features/home/domain/entities/station_group_entity.dart';
 import 'package:transportation_app/features/home/presentation/views/widgets/dropdown_app_menu.dart';
+import 'package:transportation_app/core/l10n/app_localizations.dart';
 
 class GovernorateSelector extends StatelessWidget {
  final List<StationGroupEntity>            items;
@@ -40,7 +41,7 @@ class GovernorateSelector extends StatelessWidget {
         children: [
           DropdownAppMenu<StationGroupEntity>(
             items:           items,           
-            hintText:        '$title (e.g. Cairo, Luxor)',
+            hintText:        AppLocalizations.of(context)!.govHint(title),
             controller:      controller,
             errorText:       errorText,
             selectedItem:    selectedGroup,
@@ -51,7 +52,7 @@ class GovernorateSelector extends StatelessWidget {
             const SizedBox(height: 10),
             DropdownAppMenu<StationEntity>(
               items:              selectedGroup!.stations,
-              hintText:           'Sub-city (optional — any station)',
+              hintText:           AppLocalizations.of(context)!.subCityOptional,
               controller:         subCityController,  // ← separate controller
               selectedItem:       selectedStation,
               onSelected:         onStationSelected,

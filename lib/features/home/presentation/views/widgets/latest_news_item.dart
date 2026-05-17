@@ -4,9 +4,13 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:transportation_app/core/helper/spacing.dart';
 import 'package:transportation_app/core/theming/styles.dart';
 
+import 'package:transportation_app/features/notfication/domain/entities/app_notfication.dart';
+
 class LatestNewsItem extends StatelessWidget {
+  final AppNotification? notification;
   const LatestNewsItem({
     super.key,
+    this.notification,
   });
 
   @override
@@ -32,12 +36,13 @@ class LatestNewsItem extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "New High Speed Service",
+                  notification?.title ?? "New High Speed Service",
                   style: AppStyles.bold18DarkBlue(
                     context,
                   ).copyWith(color: Colors.white),
                 ),
                 Text(
+                  notification?.body ??
                   "Cairo-Alex route now is 40% faster with new trains",
                   maxLines: 4,
                   overflow: TextOverflow.fade,
@@ -46,8 +51,8 @@ class LatestNewsItem extends StatelessWidget {
                   ).copyWith(color: Colors.white),
                 ),
                 Text(
-                  "2 hours",
-                  style: TextStyle(fontSize: 14, color: Colors.grey),
+                  notification != null ? _timeAgo(notification!.receivedAt) : "2 hours ago",
+                  style: const TextStyle(fontSize: 14, color: Colors.grey),
                 ),
               ],
             ),
@@ -55,5 +60,12 @@ class LatestNewsItem extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  String _timeAgo(DateTime dt) {
+    final diff = DateTime.now().difference(dt);
+    if (diff.inMinutes < 60) return '${diff.inMinutes}m ago';
+    if (diff.inHours < 24) return '${diff.inHours}h ago';
+    return '${diff.inDays}d ago';
   }
 }

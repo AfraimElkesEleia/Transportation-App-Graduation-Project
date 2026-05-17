@@ -579,7 +579,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get editProfile => 'تعديل الملف الشخصي';
 
   @override
-  String get loyaltyHub => 'مركز الولاء';
+  String get loyaltyHub => 'مركز التحديات والمكافآت';
 
   @override
   String get signOut => 'تسجيل الخروج';
@@ -622,6 +622,86 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get threeDigitsRequired => 'مطلوب 3 أرقام';
+
+  @override
+  String get loyaltyPoints => 'نقاط المكافآت';
+
+  @override
+  String get pts => 'نقطة';
+
+  @override
+  String get noExpiringPoints => 'لا توجد نقاط تنتهي صلاحيتها حالياً';
+
+  @override
+  String ptsExpired(String n) {
+    return 'انتهت صلاحية $n نقطة';
+  }
+
+  @override
+  String ptsExpireTomorrow(String n) {
+    return 'تنتهي صلاحية $n نقطة غداً';
+  }
+
+  @override
+  String ptsExpireInDays(String n, String d) {
+    return 'تنتهي صلاحية $n نقطة خلال $d يوم';
+  }
+
+  @override
+  String ptsExpireInMonthsDays(String n, String m, String d) {
+    return 'تنتهي صلاحية $n نقطة خلال $m و $d';
+  }
+
+  @override
+  String ptsExpireInMonths(String n, String m) {
+    return 'تنتهي صلاحية $n نقطة خلال $m';
+  }
+
+  @override
+  String get oneMonth => 'شهر واحد';
+
+  @override
+  String monthsPlural(String m) {
+    return '$m أشهر';
+  }
+
+  @override
+  String get oneDay => 'يوم واحد';
+
+  @override
+  String daysPlural(String d) {
+    return '$d أيام';
+  }
+
+  @override
+  String get pointsPending =>
+      'تظل النقاط معلقة حتى المغادرة وتنتهي صلاحيتها بعد 4 أشهر من المغادرة.';
+
+  @override
+  String get profile => 'الملف الشخصي';
+
+  @override
+  String get manageAccount => 'إدارة حسابك';
+
+  @override
+  String get planYourJourney => 'خطط لرحلتك';
+
+  @override
+  String get departureDate => 'تاريخ الانطلاق';
+
+  @override
+  String get subCityOptional => 'مدينة فرعية (اختياري — أي محطة)';
+
+  @override
+  String govHint(String title) {
+    return '$title (مثل القاهرة، الأقصر)';
+  }
+
+  @override
+  String get popularRoutes => 'مسارات شائعة';
+
+  @override
+  String get latestNews => 'أحدث الأخبار';
 
   @override
   String get gov_Cairo => 'القاهرة';

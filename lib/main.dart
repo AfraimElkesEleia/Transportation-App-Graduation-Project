@@ -14,12 +14,12 @@ import 'package:transportation_app/core/notfications/notfication_service.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:transportation_app/core/l10n/locale_box.dart';
 import 'package:transportation_app/core/l10n/locale_cubit.dart';
-final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
   await Hive.initFlutter();
   Hive.registerAdapter(RecentSearchModelAdapter());
   await Hive.openBox<RecentSearchModel>('recent_searches_box');
@@ -62,7 +62,7 @@ class TransportationApp extends StatelessWidget {
       child: BlocBuilder<LocaleCubit, Locale>(
         builder: (context, locale) => MaterialApp(
           navigatorKey: navigatorKey,
-      debugShowCheckedModeBanner: false,
+          debugShowCheckedModeBanner: false,
           locale: locale,
           supportedLocales: AppLocalizations.supportedLocales,
           localizationsDelegates: AppLocalizations.localizationsDelegates,

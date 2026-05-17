@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:transportation_app/core/l10n/app_localizations.dart';
 
 /// App bar for the profile screen showing the title and settings icon.
 class ProfileAppBar extends StatelessWidget {
@@ -6,31 +7,27 @@ class ProfileAppBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Row(
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: const [
-                Text(
-                  'Profile',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                Text(
-                  'Manage your account',
-                  style: TextStyle(color: Colors.white70, fontSize: 13),
-                ),
-              ],
+            Text(
+              l10n.profile,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            Text(
+              l10n.manageAccount,
+              style: const TextStyle(color: Colors.white70, fontSize: 13),
             ),
           ],
         ),
-        const Icon(Icons.settings, color: Colors.white),
       ],
     );
   }

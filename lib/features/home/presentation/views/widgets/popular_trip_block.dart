@@ -5,6 +5,7 @@ import 'package:transportation_app/core/theming/colors.dart';
 import 'package:transportation_app/core/theming/styles.dart';
 import 'package:transportation_app/core/widgets/block_container.dart';
 import 'package:transportation_app/features/home/presentation/views/widgets/popular_trip_item.dart';
+import 'package:transportation_app/core/l10n/app_localizations.dart';
 
 class PopularTripBlock extends StatelessWidget {
   const PopularTripBlock({super.key});
@@ -21,7 +22,7 @@ class PopularTripBlock extends StatelessWidget {
                 color: ColorsManager.cyanBlue,
               ),
               horizontalSpace(space: 10),
-              Text("Popular Routes", style: AppStyles.semiBold18White(context)),
+              Text(AppLocalizations.of(context)!.popularRoutes, style: AppStyles.semiBold18White(context)),
             ],
           ),
           verticalSpace(space: 12),

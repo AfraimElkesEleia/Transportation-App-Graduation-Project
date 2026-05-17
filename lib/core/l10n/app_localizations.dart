@@ -1292,6 +1292,132 @@ abstract class AppLocalizations {
   /// **'3 digits required'**
   String get threeDigitsRequired;
 
+  /// No description provided for @loyaltyPoints.
+  ///
+  /// In en, this message translates to:
+  /// **'Loyalty Points'**
+  String get loyaltyPoints;
+
+  /// No description provided for @pts.
+  ///
+  /// In en, this message translates to:
+  /// **'pts'**
+  String get pts;
+
+  /// No description provided for @noExpiringPoints.
+  ///
+  /// In en, this message translates to:
+  /// **'No expiring points right now'**
+  String get noExpiringPoints;
+
+  /// No description provided for @ptsExpired.
+  ///
+  /// In en, this message translates to:
+  /// **'{n} pts have expired'**
+  String ptsExpired(String n);
+
+  /// No description provided for @ptsExpireTomorrow.
+  ///
+  /// In en, this message translates to:
+  /// **'{n} pts expire tomorrow'**
+  String ptsExpireTomorrow(String n);
+
+  /// No description provided for @ptsExpireInDays.
+  ///
+  /// In en, this message translates to:
+  /// **'{n} pts expire in {d} days'**
+  String ptsExpireInDays(String n, String d);
+
+  /// No description provided for @ptsExpireInMonthsDays.
+  ///
+  /// In en, this message translates to:
+  /// **'{n} pts expire in {m} and {d}'**
+  String ptsExpireInMonthsDays(String n, String m, String d);
+
+  /// No description provided for @ptsExpireInMonths.
+  ///
+  /// In en, this message translates to:
+  /// **'{n} pts expire in {m}'**
+  String ptsExpireInMonths(String n, String m);
+
+  /// No description provided for @oneMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'1 month'**
+  String get oneMonth;
+
+  /// No description provided for @monthsPlural.
+  ///
+  /// In en, this message translates to:
+  /// **'{m} months'**
+  String monthsPlural(String m);
+
+  /// No description provided for @oneDay.
+  ///
+  /// In en, this message translates to:
+  /// **'1 day'**
+  String get oneDay;
+
+  /// No description provided for @daysPlural.
+  ///
+  /// In en, this message translates to:
+  /// **'{d} days'**
+  String daysPlural(String d);
+
+  /// No description provided for @pointsPending.
+  ///
+  /// In en, this message translates to:
+  /// **'Points are pending until departure and expire 4 months after departure.'**
+  String get pointsPending;
+
+  /// No description provided for @profile.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile'**
+  String get profile;
+
+  /// No description provided for @manageAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage your account'**
+  String get manageAccount;
+
+  /// No description provided for @planYourJourney.
+  ///
+  /// In en, this message translates to:
+  /// **'Plan Your Journey'**
+  String get planYourJourney;
+
+  /// No description provided for @departureDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Departure date'**
+  String get departureDate;
+
+  /// No description provided for @subCityOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'Sub-city (optional — any station)'**
+  String get subCityOptional;
+
+  /// No description provided for @govHint.
+  ///
+  /// In en, this message translates to:
+  /// **'{title} (e.g. Cairo, Luxor)'**
+  String govHint(String title);
+
+  /// No description provided for @popularRoutes.
+  ///
+  /// In en, this message translates to:
+  /// **'Popular Routes'**
+  String get popularRoutes;
+
+  /// No description provided for @latestNews.
+  ///
+  /// In en, this message translates to:
+  /// **'Latest News'**
+  String get latestNews;
+
   /// No description provided for @gov_Cairo.
   ///
   /// In en, this message translates to:

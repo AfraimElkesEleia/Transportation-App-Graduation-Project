@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:transportation_app/core/l10n/app_localizations.dart';
 
 /// Full-width logout button styled in red.
 class ProfileLogoutButton extends StatelessWidget {
@@ -21,9 +22,9 @@ class ProfileLogoutButton extends StatelessWidget {
         ),
         onPressed: onPressed,
         icon: const Icon(Icons.logout, color: Colors.white),
-        label: const Text(
-          'Log Out',
-          style: TextStyle(
+        label: Text(
+          AppLocalizations.of(context)!.signOut,
+          style: const TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.bold,
             color: Colors.white,

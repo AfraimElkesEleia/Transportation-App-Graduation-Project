@@ -625,6 +625,86 @@ class AppLocalizationsEn extends AppLocalizations {
   String get threeDigitsRequired => '3 digits required';
 
   @override
+  String get loyaltyPoints => 'Loyalty Points';
+
+  @override
+  String get pts => 'pts';
+
+  @override
+  String get noExpiringPoints => 'No expiring points right now';
+
+  @override
+  String ptsExpired(String n) {
+    return '$n pts have expired';
+  }
+
+  @override
+  String ptsExpireTomorrow(String n) {
+    return '$n pts expire tomorrow';
+  }
+
+  @override
+  String ptsExpireInDays(String n, String d) {
+    return '$n pts expire in $d days';
+  }
+
+  @override
+  String ptsExpireInMonthsDays(String n, String m, String d) {
+    return '$n pts expire in $m and $d';
+  }
+
+  @override
+  String ptsExpireInMonths(String n, String m) {
+    return '$n pts expire in $m';
+  }
+
+  @override
+  String get oneMonth => '1 month';
+
+  @override
+  String monthsPlural(String m) {
+    return '$m months';
+  }
+
+  @override
+  String get oneDay => '1 day';
+
+  @override
+  String daysPlural(String d) {
+    return '$d days';
+  }
+
+  @override
+  String get pointsPending =>
+      'Points are pending until departure and expire 4 months after departure.';
+
+  @override
+  String get profile => 'Profile';
+
+  @override
+  String get manageAccount => 'Manage your account';
+
+  @override
+  String get planYourJourney => 'Plan Your Journey';
+
+  @override
+  String get departureDate => 'Departure date';
+
+  @override
+  String get subCityOptional => 'Sub-city (optional — any station)';
+
+  @override
+  String govHint(String title) {
+    return '$title (e.g. Cairo, Luxor)';
+  }
+
+  @override
+  String get popularRoutes => 'Popular Routes';
+
+  @override
+  String get latestNews => 'Latest News';
+
+  @override
   String get gov_Cairo => 'Cairo';
 
   @override
