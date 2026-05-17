@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:transportation_app/core/l10n/app_localizations.dart';
 import 'package:transportation_app/core/theming/colors.dart';
 
 class SearchErrorView extends StatelessWidget {
@@ -9,6 +10,7 @@ class SearchErrorView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(24),
@@ -26,7 +28,7 @@ class SearchErrorView extends StatelessWidget {
             ElevatedButton.icon(
               onPressed: onRetry,
               icon: const Icon(Icons.refresh, color: Colors.white),
-              label: const Text('Retry', style: TextStyle(color: Colors.white)),
+              label: Text(l10n.retry, style: const TextStyle(color: Colors.white)),
               style: ElevatedButton.styleFrom(
                 backgroundColor: ColorsManager.surfaceMid,
               ),

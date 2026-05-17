@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:transportation_app/core/constants/api_constants.dart';
+import 'package:transportation_app/core/l10n/app_localizations.dart';
 import 'package:transportation_app/core/routing/routes.dart';
 import 'package:transportation_app/core/widgets/app_shimmer.dart';
 import 'package:transportation_app/core/widgets/basic_container.dart';
@@ -28,25 +29,26 @@ class _ProfileViewState extends State<ProfileScreen> {
   }
 
   void _showLogoutDialog() {
+    final l10n = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: const Color(0xFF1A2A3A),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text(
-          'Sign Out?',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        title: Text(
+          l10n.signOutConfirm,
+          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
-        content: const Text(
-          'You will need to sign in again to access your account.',
-          style: TextStyle(color: Colors.white60),
+        content: Text(
+          l10n.signOutBody,
+          style: const TextStyle(color: Colors.white60),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text(
-              'Cancel',
-              style: TextStyle(color: Colors.white54),
+            child: Text(
+              l10n.cancel,
+              style: const TextStyle(color: Colors.white54),
             ),
           ),
           TextButton(
@@ -54,9 +56,9 @@ class _ProfileViewState extends State<ProfileScreen> {
               Navigator.pop(context);
               context.read<LogoutCubit>().logout();
             },
-            child: const Text(
-              'Sign Out',
-              style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+            child: Text(
+              l10n.signOut,
+              style: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
             ),
           ),
         ],
@@ -132,7 +134,7 @@ class _ProfileViewState extends State<ProfileScreen> {
                 onRefresh: _onRefresh,
                 child: SingleChildScrollView(
                   physics: const AlwaysScrollableScrollPhysics(),
-                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 32),
+                  padding: const EdgeInsetsDirectional.fromSTEB(16, 0, 16, 32),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [

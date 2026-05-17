@@ -18,6 +18,7 @@ import 'package:transportation_app/features/home/presentation/views/widgets/late
 import 'package:transportation_app/features/home/presentation/views/widgets/plan_your_journey_block.dart';
 import 'package:transportation_app/features/home/presentation/views/widgets/recent_searches_block.dart';
 import 'package:transportation_app/features/home/presentation/views/widgets/popular_routes_section.dart';
+import 'package:transportation_app/core/l10n/app_localizations.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -46,6 +47,7 @@ class _HomeContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return BlocBuilder<StationsCubit, StationsState>(
       builder: (context, state) {
         // ── Loading state → show shimmer ──────────────────────────────────
@@ -83,7 +85,7 @@ class _HomeContent extends StatelessWidget {
                           ),
                           horizontalSpace(space: 8),
                           Text(
-                            'Recent Searches',
+                            l10n.recentSearches,
                             style: AppStyles.semiBold18White(context),
                           ),
                         ],
@@ -110,6 +112,7 @@ class _HomeErrorView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
@@ -127,7 +130,7 @@ class _HomeErrorView extends StatelessWidget {
             ElevatedButton.icon(
               onPressed: () => context.read<StationsCubit>().loadStations(),
               icon: const Icon(Icons.refresh),
-              label: const Text('Retry'),
+              label: Text(l10n.retry),
               style: ElevatedButton.styleFrom(
                 backgroundColor: ColorsManager.accentCyan,
                 foregroundColor: Colors.white,

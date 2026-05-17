@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:transportation_app/core/helper/extensions.dart';
+import 'package:transportation_app/core/l10n/app_localizations.dart';
 import 'package:transportation_app/core/routing/routes.dart';
 import 'package:transportation_app/core/validators/app_validators.dart';
 import 'package:transportation_app/core/widgets/app_gradient_button.dart';
@@ -49,6 +50,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return AuthBackground(
       child: BlocConsumer<LoginCubit, LoginState>(
         listener: (context, state) {
@@ -81,9 +84,9 @@ class _LoginScreenState extends State<LoginScreen> {
               const SizedBox(height: 50),
               const AuthAccentBar(),
               const SizedBox(height: 10),
-              const AuthHeadline(
-                title: 'Welcome \nBack.',
-                subtitle: 'Enter the future of travel',
+              AuthHeadline(
+                title: l10n.loginTitle,
+                subtitle: l10n.loginSubtitle,
               ),
               const SizedBox(height: 50),
               Form(
@@ -91,26 +94,26 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: Column(
                   children: [
                     AppTextFormField(
-                      label: 'Email Address',
-                      hint: 'Enter your email',
-                      prefixIcon: Icons.email,
-                      keyboardType: TextInputType.emailAddress,
-                      controller: _emailController,
+                      label:           l10n.emailLabel,
+                      hint:            l10n.emailHint,
+                      prefixIcon:      Icons.email,
+                      keyboardType:    TextInputType.emailAddress,
+                      controller:      _emailController,
                       textInputAction: TextInputAction.next,
                       validator: AppValidators.email,
                     ),
                     const SizedBox(height: 20),
                     AppTextFormField(
-                      label: 'Password',
-                      hint: 'Enter your password',
-                      prefixIcon: Icons.lock,
-                      obscureText: true,
-                      controller: _passwordController,
+                      label:           l10n.passwordLabel,
+                      hint:            l10n.passwordHint,
+                      prefixIcon:      Icons.lock,
+                      obscureText:     true,
+                      controller:      _passwordController,
                       textInputAction: TextInputAction.done,
                       onFieldSubmitted: (_) => _handleLogin(),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Password is required';
+                          return l10n.passwordRequired;
                         }
                         return null;
                       },
@@ -124,7 +127,7 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               const SizedBox(height: 20),
               AppGradientButton(
-                label: 'Sign In',
+                label:     l10n.signIn,
                 onPressed: _handleLogin,
                 isLoading: state is LoginLoading,
               ),

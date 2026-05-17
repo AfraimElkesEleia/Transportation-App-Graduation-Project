@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:transportation_app/core/l10n/app_localizations.dart';
 
 class RememberMeRow extends StatelessWidget {
   const RememberMeRow({super.key, required this.value, required this.onChanged});
@@ -8,6 +9,7 @@ class RememberMeRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Row(
       children: [
         Checkbox(
@@ -17,7 +19,7 @@ class RememberMeRow extends StatelessWidget {
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
         ),
         Text(
-          'Remember me',
+          l10n.rememberMe,
           style: TextStyle(
             color: Colors.white,
             fontSize: 14,
@@ -29,7 +31,7 @@ class RememberMeRow extends StatelessWidget {
         GestureDetector(
           onTap: () {}, 
           child: Text(
-            'Forgot Password?',
+            l10n.forgotPassword,
             style: TextStyle(
               color: const Color(0xff1AC8E8),
               fontSize: 14,

@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:transportation_app/core/helper/extensions.dart';
 import 'package:transportation_app/core/helper/spacing.dart';
+import 'package:transportation_app/core/l10n/app_localizations.dart';
 import 'package:transportation_app/core/routing/routes.dart';
 import 'package:transportation_app/core/widgets/block_container.dart';
 import 'package:transportation_app/features/home/domain/entities/search_params.dart';
@@ -146,16 +147,17 @@ class _PlanYourJourneyBlockState extends State<PlanYourJourneyBlock>
 
   // ── validation ─────────────────────────────────────────────────────────────
   bool _validate() {
+    final l10n = AppLocalizations.of(context)!;
     String? fromErr;
     String? toErr;
     String? dateErr;
     String? returnDateErr;
 
     if (_selectedFromGroup == null) {
-      fromErr = 'Please select a departure governorate';
+      fromErr = l10n.selectDepartureGov;
     }
     if (_selectedToGroup == null) {
-      toErr = 'Please select a destination governorate';
+      toErr = l10n.selectDestinationGov;
     }
 
     // Same governorate selected
@@ -165,18 +167,18 @@ class _PlanYourJourneyBlockState extends State<PlanYourJourneyBlock>
       if (_selectedFromStation != null &&
           _selectedToStation != null &&
           _selectedFromStation!.id == _selectedToStation!.id) {
-        toErr = 'Destination must differ from departure';
+        toErr = l10n.destMustDiffer;
       } else if (_selectedFromStation == null && _selectedToStation == null) {
-        toErr = 'Destination governorate must differ from departure';
+        toErr = l10n.destGovMustDiffer;
       }
     }
 
     if (dateController.text.trim().isEmpty) {
-      dateErr = 'Please select a departure date';
+      dateErr = l10n.selectDepartureDate;
     }
     if (_isRoundTrip) {
       if (returnDateController.text.trim().isEmpty) {
-        returnDateErr = 'Please select a return date';
+        returnDateErr = l10n.selectReturnDate;
       } else {
         final depDate = DateFormat(
           'dd/MM/yyyy',
@@ -185,12 +187,11 @@ class _PlanYourJourneyBlockState extends State<PlanYourJourneyBlock>
           'dd/MM/yyyy',
         ).parseStrict(returnDateController.text);
 
-        // Stripping time is usually safe if you just want to compare calendar days
         final depDay = DateTime(depDate.year, depDate.month, depDate.day);
         final retDay = DateTime(retDate.year, retDate.month, retDate.day);
 
         if (retDay.isBefore(depDay)) {
-          returnDateErr = 'Return date cannot be before departure';
+          returnDateErr = l10n.returnDateBeforeDep;
         }
       }
     }
@@ -262,21 +263,22 @@ class _PlanYourJourneyBlockState extends State<PlanYourJourneyBlock>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return BlocBuilder<StationsCubit, StationsState>(
       builder: (context, state) {
         if (state is StationsInitial || state is StationsLoading) {
           return BlockContainer(
             isVip: true,
-            child: const Center(
+            child: Center(
               child: Padding(
-                padding: EdgeInsets.all(40),
+                padding: const EdgeInsets.all(40),
                 child: Column(
                   children: [
-                    CircularProgressIndicator(color: Colors.cyan),
-                    SizedBox(height: 12),
+                    const CircularProgressIndicator(color: Colors.cyan),
+                    const SizedBox(height: 12),
                     Text(
-                      'Loading stations...',
-                      style: TextStyle(color: Colors.white54),
+                      l10n.loadingStations,
+                      style: const TextStyle(color: Colors.white54),
                     ),
                   ],
                 ),
@@ -305,7 +307,7 @@ class _PlanYourJourneyBlockState extends State<PlanYourJourneyBlock>
                     onPressed: () =>
                         context.read<StationsCubit>().loadStations(),
                     icon: const Icon(Icons.refresh),
-                    label: const Text('Retry'),
+                    label: Text(l10n.retry),
                   ),
                 ],
               ),
@@ -338,7 +340,7 @@ class _PlanYourJourneyBlockState extends State<PlanYourJourneyBlock>
               verticalSpace(space: 20),
               GovernorateSelector(
                 items: governorates.groups,
-                title: "From Governorate",
+                title: l10n.fromGov,
                 controller: fromGovernorateController,
                 subCityController: fromSubCityController,
                 selectedGroup: _selectedFromGroup,
@@ -353,7 +355,7 @@ class _PlanYourJourneyBlockState extends State<PlanYourJourneyBlock>
               verticalSpace(space: 12),
               GovernorateSelector(
                 items: governorates.groups,
-                title: "To Governorate",
+                title: l10n.toGov,
                 controller: toGovernorateController,
                 subCityController: toSubCityController,
                 selectedGroup: _selectedToGroup,

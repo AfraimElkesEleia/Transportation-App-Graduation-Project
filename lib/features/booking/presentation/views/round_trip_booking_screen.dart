@@ -14,6 +14,7 @@ import 'package:transportation_app/features/home/domain/entities/search_params.d
 import 'package:transportation_app/features/search/presentation/views/widgets/search_error_view.dart';
 import 'package:transportation_app/features/search/presentation/views/widgets/trips_result_card.dart';
 import 'package:transportation_app/features/search/presentation/views/widgets/filter_bottom_sheet.dart';
+import 'package:transportation_app/core/l10n/app_localizations.dart';
 
 class RoundTripBookingScreen extends StatefulWidget {
   final SearchParams activeParams;
@@ -39,9 +40,9 @@ class _RoundTripBookingScreenState extends State<RoundTripBookingScreen> {
           backgroundColor: ColorsManager.seatBg,
           appBar: AppBar(
             backgroundColor: ColorsManager.surfaceDark,
-            title: const Text(
-              'Round Trip',
-              style: TextStyle(color: Colors.white, fontSize: 16),
+            title: Text(
+              AppLocalizations.of(context)!.roundTrip,
+              style: const TextStyle(color: Colors.white, fontSize: 16),
             ),
             iconTheme: const IconThemeData(color: Colors.white),
             bottom: PreferredSize(
@@ -136,10 +137,10 @@ class _RoundTripBookingScreenState extends State<RoundTripBookingScreen> {
       );
     }
     if (state.outboundResults == null || state.outboundResults!.isEmpty) {
-      return const Center(
+      return Center(
         child: Text(
-          'No outbound trips available.',
-          style: TextStyle(color: Colors.white),
+          AppLocalizations.of(context)!.noOutbound,
+          style: const TextStyle(color: Colors.white),
         ),
       );
     }
@@ -169,9 +170,9 @@ class _RoundTripBookingScreenState extends State<RoundTripBookingScreen> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
-                      'Select Outbound Trip',
-                      style: TextStyle(
+                    Text(
+                      AppLocalizations.of(context)!.selectOutbound,
+                      style: const TextStyle(
                         color: Colors.white,
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
@@ -249,9 +250,9 @@ class _RoundTripBookingScreenState extends State<RoundTripBookingScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  const Text(
-                    'Outbound Summary',
-                    style: TextStyle(
+                  Text(
+                    AppLocalizations.of(context)!.outboundSummary,
+                    style: const TextStyle(
                       color: ColorsManager.accentCyan,
                       fontWeight: FontWeight.bold,
                     ),
@@ -259,7 +260,6 @@ class _RoundTripBookingScreenState extends State<RoundTripBookingScreen> {
                   const SizedBox(height: 16),
                   Wrap(
                     crossAxisAlignment: WrapCrossAlignment.center,
-                    textDirection: TextDirection.ltr,
                     children: [
                       Text(
                         state.selectedOutboundTrip!.originStationName,
@@ -289,7 +289,7 @@ class _RoundTripBookingScreenState extends State<RoundTripBookingScreen> {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    'Arrives at: ${_formatTime(state.selectedOutboundTrip!.arrivalTime)}',
+                    AppLocalizations.of(context)!.arrivesAt(_formatTime(state.selectedOutboundTrip!.arrivalTime)),
                     style: const TextStyle(color: ColorsManager.textMuted),
                   ),
                 ],
@@ -298,9 +298,9 @@ class _RoundTripBookingScreenState extends State<RoundTripBookingScreen> {
             title: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
-                  'Select Return Trip',
-                  style: TextStyle(color: Colors.white, fontSize: 16),
+                Text(
+                  AppLocalizations.of(context)!.selectReturn,
+                  style: const TextStyle(color: Colors.white, fontSize: 16),
                 ),
                 IconButton(
                   icon: const Icon(Icons.tune, color: Colors.white, size: 20),
@@ -329,11 +329,11 @@ class _RoundTripBookingScreenState extends State<RoundTripBookingScreen> {
             ),
           )
         else if (state.returnResults == null || state.returnResults!.isEmpty)
-          const SliverFillRemaining(
+          SliverFillRemaining(
             child: Center(
               child: Text(
-                'No return trips found for your date.',
-                style: TextStyle(color: Colors.white),
+                AppLocalizations.of(context)!.noReturn,
+                style: const TextStyle(color: Colors.white),
               ),
             ),
           )
@@ -436,9 +436,9 @@ class _RoundTripBookingScreenState extends State<RoundTripBookingScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const Text(
-                'Round Trip Summary',
-                style: TextStyle(
+              Text(
+                AppLocalizations.of(context)!.roundTripSummary,
+                style: const TextStyle(
                   color: Colors.white,
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
@@ -446,7 +446,7 @@ class _RoundTripBookingScreenState extends State<RoundTripBookingScreen> {
               ),
               const SizedBox(height: 16),
               _SummaryLegInfo(
-                title: 'Outbound',
+                title: AppLocalizations.of(context)!.outbound,
                 trip: t1,
                 c: c1,
                 seats: s1,
@@ -454,7 +454,7 @@ class _RoundTripBookingScreenState extends State<RoundTripBookingScreen> {
               ),
               const SizedBox(height: 16),
               _SummaryLegInfo(
-                title: 'Return',
+                title: AppLocalizations.of(context)!.returnTrip,
                 trip: t2,
                 c: c2,
                 seats: s2,
@@ -464,9 +464,9 @@ class _RoundTripBookingScreenState extends State<RoundTripBookingScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
-                    'Grand Total',
-                    style: TextStyle(
+                  Text(
+                    AppLocalizations.of(context)!.grandTotal,
+                    style: const TextStyle(
                       color: ColorsManager.textMuted,
                       fontSize: 16,
                     ),
@@ -499,9 +499,9 @@ class _RoundTripBookingScreenState extends State<RoundTripBookingScreen> {
                   ),
                   child: state.isAddingToCart
                       ? const CircularProgressIndicator(color: Colors.white)
-                      : const Text(
-                          'Proceed to Passenger Details',
-                          style: TextStyle(
+                      : Text(
+                          AppLocalizations.of(context)!.proceedToPassenger,
+                          style: const TextStyle(
                             color: Colors.white,
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
@@ -597,9 +597,9 @@ class _UnifiedSeatSelectionLayerState
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
-                  'Step 1: Select Outbound Seats',
-                  style: TextStyle(
+                Text(
+                  AppLocalizations.of(context)!.step1Seats,
+                  style: const TextStyle(
                     color: Colors.white,
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -613,9 +613,9 @@ class _UnifiedSeatSelectionLayerState
                     size: 14,
                     color: ColorsManager.accentCyan,
                   ),
-                  label: const Text(
-                    'Previous',
-                    style: TextStyle(color: ColorsManager.accentCyan),
+                  label: Text(
+                    AppLocalizations.of(context)!.previous,
+                    style: const TextStyle(color: ColorsManager.accentCyan),
                   ),
                 ),
               ],
@@ -662,12 +662,12 @@ class _UnifiedSeatSelectionLayerState
               ),
             ),
           ),
-          const SliverToBoxAdapter(
+          SliverToBoxAdapter(
             child: Padding(
-              padding: EdgeInsets.all(16),
+              padding: const EdgeInsets.all(16),
               child: Text(
-                'Step 2: Select Return Seats',
-                style: TextStyle(
+                AppLocalizations.of(context)!.step2Seats,
+                style: const TextStyle(
                   color: Colors.white,
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -749,7 +749,6 @@ class _SummaryLegInfo extends StatelessWidget {
           const SizedBox(height: 8),
           Wrap(
             crossAxisAlignment: WrapCrossAlignment.center,
-            textDirection: TextDirection.ltr,
             children: [
               Text(
                 trip.originStationName,
@@ -778,7 +777,7 @@ class _SummaryLegInfo extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                '${seats.length} Seats',
+                AppLocalizations.of(context)!.nSeats(seats.length.toString()),
                 style: const TextStyle(color: Colors.white70),
               ),
               Text(

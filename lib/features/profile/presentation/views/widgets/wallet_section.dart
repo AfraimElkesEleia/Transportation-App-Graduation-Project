@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:transportation_app/core/l10n/app_localizations.dart';
 import 'package:transportation_app/features/profile/presentation/cubit/profile_cubit/profile_cubit.dart';
 import 'package:transportation_app/features/profile/presentation/cubit/profile_cubit/profile_states.dart';
 
@@ -22,6 +23,7 @@ class WalletSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -58,9 +60,9 @@ class WalletSection extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 12),
-              const Text(
-                'My Wallet',
-                style: TextStyle(
+              Text(
+                l10n.myWallet,
+                style: const TextStyle(
                   color: Colors.white70,
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
@@ -79,13 +81,13 @@ class WalletSection extends StatelessWidget {
                     color: const Color(0xFF00E5FF).withOpacity(0.4),
                   ),
                 ),
-                child: const Row(
+                child: Row(
                   children: [
-                    Icon(Icons.circle, color: Color(0xFF00C853), size: 8),
-                    SizedBox(width: 4),
+                    const Icon(Icons.circle, color: Color(0xFF00C853), size: 8),
+                    const SizedBox(width: 4),
                     Text(
-                      'Active',
-                      style: TextStyle(color: Color(0xFF00E5FF), fontSize: 11),
+                      l10n.walletActive,
+                      style: const TextStyle(color: Color(0xFF00E5FF), fontSize: 11),
                     ),
                   ],
                 ),
@@ -102,9 +104,9 @@ class WalletSection extends StatelessWidget {
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'Available Balance',
-                    style: TextStyle(color: Colors.white54, fontSize: 12),
+                  Text(
+                    l10n.availableBalance,
+                    style: const TextStyle(color: Colors.white54, fontSize: 12),
                   ),
                   const SizedBox(height: 6),
                   Row(
@@ -119,11 +121,11 @@ class WalletSection extends StatelessWidget {
                           letterSpacing: -1,
                         ),
                       ),
-                      const Padding(
-                        padding: EdgeInsets.only(bottom: 6, left: 6),
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 6, left: 6),
                         child: Text(
-                          'EGP',
-                          style: TextStyle(color: Colors.white60, fontSize: 14),
+                          l10n.egp,
+                          style: const TextStyle(color: Colors.white60, fontSize: 14),
                         ),
                       ),
                     ],
@@ -138,7 +140,7 @@ class WalletSection extends StatelessWidget {
               Expanded(
                 child: _ActionBtn(
                   icon: Icons.add_circle_outline,
-                  label: 'Charge',
+                  label: l10n.charge,
                   color: const Color(0xFF00E5FF),
                   onTap: () => _showChargeSheet(context),
                 ),
@@ -147,7 +149,7 @@ class WalletSection extends StatelessWidget {
               Expanded(
                 child: _ActionBtn(
                   icon: Icons.history_rounded,
-                  label: 'History',
+                  label: l10n.history,
                   color: const Color(0xFF40E0D0),
                   onTap: () => _showHistorySheet(context),
                 ),
@@ -253,13 +255,14 @@ class _ChargeWalletSheetState extends State<_ChargeWalletSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return BlocListener<ProfileCubit, ProfileState>(
       listener: (context, state) {
         if (state is WalletDepositSuccess) {
           Navigator.pop(context);
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Wallet charged successfully!'),
+            SnackBar(
+              content: Text(l10n.walletChargedSuccessfully),
               backgroundColor: Colors.green,
             ),
           );
@@ -290,9 +293,9 @@ class _ChargeWalletSheetState extends State<_ChargeWalletSheet> {
                 ),
               ),
               const SizedBox(height: 20),
-              const Text(
-                'Charge Wallet',
-                style: TextStyle(
+              Text(
+                l10n.chargeWallet,
+                style: const TextStyle(
                   color: Colors.white,
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -336,9 +339,9 @@ class _ChargeWalletSheetState extends State<_ChargeWalletSheet> {
                                   color: Colors.black,
                                 ),
                               )
-                            : const Text(
-                                'Confirm Payment',
-                                style: TextStyle(
+                            : Text(
+                                l10n.confirmPayment,
+                                style: const TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 15,
                                 ),
@@ -368,32 +371,33 @@ class _CardTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return ListView(
       padding: const EdgeInsets.all(20),
       children: [
         _SheetField(
           controller: amountCtrl,
-          label: 'Amount (EGP)',
+          label: l10n.amountEgp,
           hint: '100 – 10,000',
           icon: Icons.payments_outlined,
           keyboardType: TextInputType.number,
           validator: (v) {
             final n = double.tryParse(v ?? '');
-            if (n == null) return 'Enter a valid amount';
-            if (n < 10 || n > 10000) return 'Amount must be 10–10,000 EGP';
+            if (n == null) return l10n.enterValidAmount;
+            if (n < 10 || n > 10000) return l10n.amountMustBeRange;
             return null;
           },
         ),
         const SizedBox(height: 14),
         _SheetField(
           controller: cardCtrl,
-          label: 'Card Number',
+          label: l10n.cardNumber,
           hint: '4242 4242 4242 4242',
           icon: Icons.credit_card,
           keyboardType: TextInputType.number,
           validator: (v) {
             final clean = (v ?? '').replaceAll(' ', '');
-            if (clean.length != 16) return 'Must be 16 digits';
+            if (clean.length != 16) return l10n.mustBe16Digits;
             return null;
           },
         ),
@@ -403,7 +407,7 @@ class _CardTab extends StatelessWidget {
             Expanded(
               child: _SheetField(
                 controller: expiryCtrl,
-                label: 'Expiry',
+                label: l10n.expiry,
                 hint: 'MM/YY',
                 icon: Icons.date_range,
                 keyboardType: TextInputType.number,
@@ -413,7 +417,7 @@ class _CardTab extends StatelessWidget {
                 ],
                 validator: (v) {
                   if (v == null || !RegExp(r'^\d{2}/\d{2}$').hasMatch(v)) {
-                    return 'Format: MM/YY';
+                    return l10n.formatMmYy;
                   }
                   return null;
                 },
@@ -432,7 +436,7 @@ class _CardTab extends StatelessWidget {
                   FilteringTextInputFormatter.digitsOnly,
                   LengthLimitingTextInputFormatter(3),
                 ],
-                validator: (v) => (v?.length == 3) ? null : '3 digits required',
+                validator: (v) => (v?.length == 3) ? null : l10n.threeDigitsRequired,
               ),
             ),
           ],
@@ -444,13 +448,13 @@ class _CardTab extends StatelessWidget {
             color: Colors.white.withOpacity(0.05),
             borderRadius: BorderRadius.circular(12),
           ),
-          child: const Row(
+          child: Row(
             children: [
-              Icon(Icons.security, color: Colors.white38, size: 16),
-              SizedBox(width: 8),
+              const Icon(Icons.security, color: Colors.white38, size: 16),
+              const SizedBox(width: 8),
               Text(
-                'Simulated payment • No real charge',
-                style: TextStyle(color: Colors.white38, fontSize: 11),
+                l10n.simulatedPayment,
+                style: const TextStyle(color: Colors.white38, fontSize: 11),
               ),
             ],
           ),
@@ -524,6 +528,7 @@ class _WalletHistorySheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return DraggableScrollableSheet(
       initialChildSize: 0.65,
       maxChildSize: 0.92,
@@ -545,9 +550,9 @@ class _WalletHistorySheet extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 20),
-            const Text(
-              'Transaction History',
-              style: TextStyle(
+            Text(
+              l10n.transactionHistory,
+              style: const TextStyle(
                 color: Colors.white,
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
@@ -574,10 +579,10 @@ class _WalletHistorySheet extends StatelessWidget {
                   }
                   if (state is WalletHistoryLoaded) {
                     if (state.transactions.isEmpty) {
-                      return const Center(
+                      return Center(
                         child: Text(
-                          'No transactions yet',
-                          style: TextStyle(color: Colors.white54),
+                          l10n.noTransactionsYet,
+                          style: const TextStyle(color: Colors.white54),
                         ),
                       );
                     }

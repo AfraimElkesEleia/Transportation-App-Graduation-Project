@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:transportation_app/core/helper/extensions.dart';
+import 'package:transportation_app/core/l10n/app_localizations.dart';
 import 'package:transportation_app/core/routing/routes.dart';
 import 'package:transportation_app/core/theming/styles.dart';
 
@@ -76,17 +77,18 @@ class WelcomeSentenceAppBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          "Welcome!",
+          l10n.welcome,
           style: AppStyles.bold18DarkBlue(
             context,
           ).copyWith(color: Colors.white, fontSize: 24),
         ),
         Text(
-          "Where would you like to go today?",
+          l10n.whereToGoToday,
           style: AppStyles.regular16CyanBlue(
             context,
           ).copyWith(color: Color(0xFF7abbe8)),

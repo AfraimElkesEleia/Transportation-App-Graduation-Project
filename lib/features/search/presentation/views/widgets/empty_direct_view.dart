@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:transportation_app/core/l10n/app_localizations.dart';
 
 class EmptyDirectView extends StatelessWidget {
   final VoidCallback onSearchIndirect;
@@ -6,6 +7,7 @@ class EmptyDirectView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
@@ -14,25 +16,25 @@ class EmptyDirectView extends StatelessWidget {
           children: [
             const Icon(Icons.search_off, color: Colors.white24, size: 64),
             const SizedBox(height: 20),
-            const Text(
-              'No direct trips found',
-              style: TextStyle(
+            Text(
+              l10n.noDirectTripsFound,
+              style: const TextStyle(
                 color: Colors.white,
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
             ),
             const SizedBox(height: 8),
-            const Text(
-              'Try searching for connecting routes with 1 stop',
-              style: TextStyle(color: Colors.white54, fontSize: 14),
+            Text(
+              l10n.trySearchingIndirect,
+              style: const TextStyle(color: Colors.white54, fontSize: 14),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 28),
             ElevatedButton.icon(
               onPressed: onSearchIndirect,
               icon: const Icon(Icons.alt_route),
-              label: const Text('Search Indirect Routes'),
+              label: Text(l10n.searchIndirectTrips),
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF1A2E4A),
                 foregroundColor: const Color(0xFF00E5FF),

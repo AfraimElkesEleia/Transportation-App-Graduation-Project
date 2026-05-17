@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:transportation_app/core/l10n/app_localizations.dart';
 import 'package:transportation_app/features/search/domain/entities/indirect_trips_enitity.dart';
 import 'package:transportation_app/features/search/domain/entities/trip_result_entity.dart';
 import 'package:transportation_app/features/search/presentation/cubit/search_states.dart';
 import 'package:transportation_app/features/search/presentation/views/widgets/empty_direct_view.dart';
-
 import 'package:transportation_app/features/search/presentation/views/widgets/indirect_trip_card.dart';
 import 'package:transportation_app/features/search/presentation/views/widgets/trips_result_card.dart';
 
@@ -111,16 +111,16 @@ class UnifiedTripList extends StatelessWidget {
     }
 
     if (item is _IndirectLoadingItem) {
-      return const Padding(
+      return  Padding(
         padding: EdgeInsets.symmetric(vertical: 32),
         child: Center(
           child: Column(
             children: [
               CircularProgressIndicator(color: Color(0xFF00E5FF)),
-              SizedBox(height: 12),
+               SizedBox(height: 12),
               Text(
-                'Searching for connecting routes...',
-                style: TextStyle(color: Colors.white54, fontSize: 13),
+                AppLocalizations.of(context)!.searchingConnectingRoutes,
+                style: const TextStyle(color: Colors.white54, fontSize: 13),
               ),
             ],
           ),
@@ -139,26 +139,26 @@ class UnifiedTripList extends StatelessWidget {
       );
     }
     if (item is _IndirectEmptyItem) {
-      return const Padding(
-        padding: EdgeInsets.symmetric(vertical: 24),
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 24),
         child: Center(
           child: Text(
-            'No connecting routes found.',
-            style: TextStyle(color: Colors.white54),
+            AppLocalizations.of(context)!.noConnectingRoutes,
+            style: const TextStyle(color: Colors.white54),
           ),
         ),
       );
     }
     if (item is _IndirectHeaderItem) {
-      return const Padding(
-        padding: EdgeInsets.only(bottom: 12, top: 8),
+      return Padding(
+        padding: const EdgeInsets.only(bottom: 12, top: 8),
         child: Row(
           children: [
-            Icon(Icons.alt_route, color: Color(0xFF00E5FF), size: 18),
-            SizedBox(width: 8),
+            const Icon(Icons.alt_route, color: Color(0xFF00E5FF), size: 18),
+            const SizedBox(width: 8),
             Text(
-              'Connecting Routes',
-              style: TextStyle(
+              AppLocalizations.of(context)!.connectingRoutes,
+              style: const TextStyle(
                 color: Color(0xFF00E5FF),
                 fontWeight: FontWeight.bold,
                 fontSize: 15,

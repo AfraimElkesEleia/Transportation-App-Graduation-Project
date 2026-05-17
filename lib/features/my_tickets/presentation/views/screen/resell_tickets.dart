@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:transportation_app/core/l10n/app_localizations.dart';
 import 'dart:ui' as ui;
 import 'package:transportation_app/core/theming/colors.dart';
 import 'package:transportation_app/features/my_tickets/presentation/cubit/marketplace_cubit.dart';
@@ -37,20 +38,20 @@ class _ResellTicketsScreenState extends State<ResellTicketsScreen> {
           icon: const Icon(Icons.arrow_back, color: ColorsManager.accentCyan),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Column(
+        title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Resell Tickets',
-              style: TextStyle(
+              AppLocalizations.of(context)!.resellTickets,
+              style: const TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
                 color: Colors.white,
               ),
             ),
             Text(
-              'Turn your unused tickets into cash',
-              style: TextStyle(fontSize: 12, color: Colors.white70),
+              AppLocalizations.of(context)!.turnTicketsIntoCash,
+              style: const TextStyle(fontSize: 12, color: Colors.white70),
             ),
           ],
         ),
@@ -63,8 +64,8 @@ class _ResellTicketsScreenState extends State<ResellTicketsScreen> {
           setState(() => _pendingTicketKey = null);
           if (state is MarketplaceListedState) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Listing updated successfully!'),
+              SnackBar(
+                content: Text(AppLocalizations.of(context)!.listingUpdated),
                 backgroundColor: Colors.green,
               ),
             );
@@ -135,17 +136,17 @@ class _ResellTicketsScreenState extends State<ResellTicketsScreen> {
                     const SizedBox(height: 20),
 
                     // ── Section header ─────────────────────────────────────
-                    const Row(
+                    Row(
                       children: [
-                        Icon(
+                        const Icon(
                           Icons.sell_outlined,
                           color: ColorsManager.accentCyan,
                           size: 20,
                         ),
-                        SizedBox(width: 8),
+                        const SizedBox(width: 8),
                         Text(
-                          'Your Upcoming Tickets',
-                          style: TextStyle(
+                          AppLocalizations.of(context)!.yourUpcomingTickets,
+                          style: const TextStyle(
                             color: Colors.white,
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
@@ -209,17 +210,17 @@ class _ResellTicketsScreenState extends State<ResellTicketsScreen> {
       builder: (ctx) => AlertDialog(
         backgroundColor: ColorsManager.cardBg,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Row(
+        title: Row(
           children: [
-            Icon(
+            const Icon(
               Icons.sell_outlined,
               color: ColorsManager.accentCyan,
               size: 22,
             ),
-            SizedBox(width: 8),
+            const SizedBox(width: 8),
             Text(
-              'List Ticket for Sale',
-              style: TextStyle(color: Colors.white, fontSize: 17),
+              AppLocalizations.of(context)!.listTicketForSale,
+              style: const TextStyle(color: Colors.white, fontSize: 17),
             ),
           ],
         ),
@@ -240,7 +241,6 @@ class _ResellTicketsScreenState extends State<ResellTicketsScreen> {
                   children: [
                     Wrap(
                       crossAxisAlignment: WrapCrossAlignment.center,
-                      textDirection: ui.TextDirection.ltr,
                       children: [
                         Text(
                           ticket.originGovernorate,
@@ -296,7 +296,7 @@ class _ResellTicketsScreenState extends State<ResellTicketsScreen> {
               ),
               const SizedBox(height: 16),
               Text(
-                'Asking price (max ${maxAskingPrice.round()} EGP)',
+                '${AppLocalizations.of(context)!.askingPrice} (${maxAskingPrice.round()} EGP)',
                 style: const TextStyle(color: Colors.white70, fontSize: 13),
               ),
               const SizedBox(height: 8),
@@ -333,9 +333,9 @@ class _ResellTicketsScreenState extends State<ResellTicketsScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text(
-              'Cancel',
-              style: TextStyle(color: Colors.white38),
+            child: Text(
+              AppLocalizations.of(context)!.cancel,
+              style: const TextStyle(color: Colors.white38),
             ),
           ),
           ElevatedButton(
@@ -367,9 +367,9 @@ class _ResellTicketsScreenState extends State<ResellTicketsScreen> {
                 borderRadius: BorderRadius.circular(10),
               ),
             ),
-            child: const Text(
-              'List Ticket',
-              style: TextStyle(
+            child: Text(
+              AppLocalizations.of(context)!.sell,
+              style: const TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.bold,
               ),
@@ -391,22 +391,21 @@ class _ResellTicketsScreenState extends State<ResellTicketsScreen> {
       builder: (ctx) => AlertDialog(
         backgroundColor: ColorsManager.cardBg,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Row(
+        title: Row(
           children: [
-            Icon(Icons.warning_amber_rounded, color: Colors.orange, size: 24),
-            SizedBox(width: 8),
-            Text('Cancel Listing', style: TextStyle(color: Colors.white)),
+            const Icon(Icons.warning_amber_rounded, color: Colors.orange, size: 24),
+            const SizedBox(width: 8),
+            Text(AppLocalizations.of(context)!.cancelListing, style: const TextStyle(color: Colors.white)),
           ],
         ),
-        content: const Text(
-          'This booking is currently listed on the marketplace. '
-          'Do you want to remove it from sale?',
-          style: TextStyle(color: Colors.white70),
+        content: Text(
+          AppLocalizations.of(context)!.cancelListingPrompt,
+          style: const TextStyle(color: Colors.white70),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('No', style: TextStyle(color: Colors.white54)),
+            child: Text(AppLocalizations.of(context)!.no, style: const TextStyle(color: Colors.white54)),
           ),
           ElevatedButton(
             onPressed: () {
@@ -417,9 +416,9 @@ class _ResellTicketsScreenState extends State<ResellTicketsScreen> {
               );
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent),
-            child: const Text(
-              'Cancel Listing',
-              style: TextStyle(color: Colors.white),
+            child: Text(
+              AppLocalizations.of(context)!.cancelListing,
+              style: const TextStyle(color: Colors.white),
             ),
           ),
         ],
@@ -443,7 +442,7 @@ class _StatsRow extends StatelessWidget {
         Expanded(
           child: _StatCard(
             icon: Icons.confirmation_number_outlined,
-            label: 'Available',
+            label: AppLocalizations.of(context)!.available,
             value: '${tickets.length}',
             color: ColorsManager.accentCyan,
           ),
@@ -452,7 +451,7 @@ class _StatsRow extends StatelessWidget {
         Expanded(
           child: _StatCard(
             icon: Icons.storefront_outlined,
-            label: 'Listed',
+            label: AppLocalizations.of(context)!.listed,
             value: '$listed',
             color: Colors.orange,
           ),
@@ -461,7 +460,7 @@ class _StatsRow extends StatelessWidget {
         Expanded(
           child: _StatCard(
             icon: Icons.trending_up,
-            label: 'Est. Value',
+            label: AppLocalizations.of(context)!.estValue,
             value: '${totalValue.round()} EGP',
             color: ColorsManager.successGreen,
           ),
@@ -571,7 +570,7 @@ class _ResellTicketCard extends StatelessWidget {
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    isListed ? 'Listed on Marketplace' : 'Available for Sale',
+                    isListed ? AppLocalizations.of(context)!.listedOnMarketplace : AppLocalizations.of(context)!.availableForSale,
                     style: TextStyle(
                       color: isListed
                           ? Colors.orange
@@ -613,12 +612,10 @@ class _ResellTicketCard extends StatelessWidget {
               children: [
                 // Route
                 Row(
-                  textDirection: ui.TextDirection.ltr,
                   children: [
                     Expanded(
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
-                        textDirection: ui.TextDirection.ltr,
                         children: [
                           Flexible(
                             child: Text(
@@ -668,7 +665,6 @@ class _ResellTicketCard extends StatelessWidget {
                     Expanded(
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
-                        textDirection: ui.TextDirection.ltr,
                         children: [
                           Flexible(
                             child: Text(
@@ -734,9 +730,9 @@ class _ResellTicketCard extends StatelessWidget {
                 // Price
                 Row(
                   children: [
-                    const Text(
-                      'Total price: ',
-                      style: TextStyle(color: Colors.white54, fontSize: 13),
+                    Text(
+                      AppLocalizations.of(context)!.totalPrice,
+                      style: const TextStyle(color: Colors.white54, fontSize: 13),
                     ),
                     Text(
                       '${ticket.totalPrice.round()} EGP',
@@ -763,7 +759,7 @@ class _ResellTicketCard extends StatelessWidget {
                               isListed ? Icons.cancel_outlined : Icons.sell,
                               size: 16,
                             ),
-                            label: Text(isListed ? 'Cancel' : 'Sell'),
+                            label: Text(isListed ? AppLocalizations.of(context)!.cancel : AppLocalizations.of(context)!.sell),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: isListed
                                   ? Colors.redAccent
