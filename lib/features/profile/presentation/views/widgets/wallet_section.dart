@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:transportation_app/features/profile/presentation/cubit/profile_cubit/profile_cubit.dart';
 import 'package:transportation_app/features/profile/presentation/cubit/profile_cubit/profile_states.dart';
@@ -405,6 +406,11 @@ class _CardTab extends StatelessWidget {
                 label: 'Expiry',
                 hint: 'MM/YY',
                 icon: Icons.date_range,
+                keyboardType: TextInputType.number,
+                inputFormatters: [
+                  LengthLimitingTextInputFormatter(5),
+                  _ExpiryDateFormatter(),
+                ],
                 validator: (v) {
                   if (v == null || !RegExp(r'^\d{2}/\d{2}$').hasMatch(v)) {
                     return 'Format: MM/YY';
@@ -421,6 +427,11 @@ class _CardTab extends StatelessWidget {
                 hint: '•••',
                 icon: Icons.lock_outline,
                 obscureText: true,
+                keyboardType: TextInputType.number,
+                inputFormatters: [
+                  FilteringTextInputFormatter.digitsOnly,
+                  LengthLimitingTextInputFormatter(3),
+                ],
                 validator: (v) => (v?.length == 3) ? null : '3 digits required',
               ),
             ),
@@ -456,6 +467,7 @@ class _SheetField extends StatelessWidget {
   final TextInputType? keyboardType;
   final bool obscureText;
   final String? Function(String?)? validator;
+  final List<TextInputFormatter>? inputFormatters;
 
   const _SheetField({
     required this.controller,
@@ -465,6 +477,7 @@ class _SheetField extends StatelessWidget {
     this.keyboardType,
     this.obscureText = false,
     this.validator,
+    this.inputFormatters,
   });
 
   @override
@@ -475,6 +488,7 @@ class _SheetField extends StatelessWidget {
       obscureText: obscureText,
       style: const TextStyle(color: Colors.white),
       validator: validator,
+      inputFormatters: inputFormatters,
       decoration: InputDecoration(
         labelText: label,
         hintText: hint,
@@ -634,6 +648,37 @@ class _WalletHistorySheet extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+class _ExpiryDateFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+      TextEditingValue oldValue, TextEditingValue newValue) {
+    final newText = newValue.text;
+
+    if (oldValue.text.length >= newText.length) {
+      return newValue;
+    }
+
+    var digitsOnly = newText.replaceAll(RegExp(r'[^\d]'), '');
+    if (digitsOnly.length > 4) {
+      digitsOnly = digitsOnly.substring(0, 4);
+    }
+
+    final buffer = StringBuffer();
+    for (int i = 0; i < digitsOnly.length; i++) {
+      buffer.write(digitsOnly[i]);
+      if (i == 1 && digitsOnly.length >= 2) {
+        buffer.write('/');
+      }
+    }
+
+    final string = buffer.toString();
+    return TextEditingValue(
+      text: string,
+      selection: TextSelection.collapsed(offset: string.length),
     );
   }
 }

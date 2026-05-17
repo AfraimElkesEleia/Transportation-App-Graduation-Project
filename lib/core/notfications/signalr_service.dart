@@ -34,11 +34,9 @@ class SignalrService {
           body: message,
           type: type,
         );
-        if (type == 'Marketplace') {
-          // Refresh the inbox — new item has been saved server-side
-          // The cubit re-fetches from GET /api/Notifications
-          sl<NotificationCubit>().loadNotifications();
-        }
+        // Refresh the inbox — new item has been saved server-side
+        // The cubit re-fetches from GET /api/Notifications
+        sl<NotificationCubit>().loadNotifications();
       });
       _hub!.onclose(({error}) async {
         // withAutomaticReconnect handles most cases,

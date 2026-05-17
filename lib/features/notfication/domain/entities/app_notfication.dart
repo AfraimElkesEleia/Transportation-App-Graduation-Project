@@ -1,9 +1,7 @@
 enum NotificationType {
-  offerReceived,
-  offerAccepted,
-  offerRejected,
-  counterOfferReceived,
-  ticketSold,
+  marketplace,
+  gamification,
+  boarding,
 }
 
 class AppNotification {
@@ -44,9 +42,4 @@ class AppNotification {
       payload: payload ?? this.payload,
     );
   }
-
-  String? get offerId => payload['offerId'] as String?;
-  String? get listingId => payload['listingId'] as String?;
-  String? get offeredPrice => payload['offeredPrice'] as String?;
-  String? get route => payload['route'] as String?;
 }
