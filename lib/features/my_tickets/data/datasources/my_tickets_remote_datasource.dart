@@ -25,7 +25,7 @@ abstract class MyTicketsRemoteDatasource {
     required int bookingId,
     required double askingPrice,
   });
-  Future<void> buyTicket({required int listingId});
+  Future<void> buyTicket({required int listingId, required List<Map<String, dynamic>> passengers});
   Future<void> cancelListing({required int listingId});
 }
 
@@ -180,9 +180,9 @@ class MyTicketsRemoteDatasourceImpl implements MyTicketsRemoteDatasource {
   }
 
   @override
-  Future<void> buyTicket({required int listingId}) async {
+  Future<void> buyTicket({required int listingId, required List<Map<String, dynamic>> passengers}) async {
     try {
-      final res = await dio.post('${ApiConstants.marketplaceBuy}/$listingId');
+      final res = await dio.post('${ApiConstants.marketplaceBuy}/$listingId', data: {'passengers': passengers});
       final body = res.data as Map<String, dynamic>;
       if (body['success'] != true) {
         throw ServerException(message: body['message'] ?? 'Purchase failed');

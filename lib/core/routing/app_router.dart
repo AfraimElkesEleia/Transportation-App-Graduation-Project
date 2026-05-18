@@ -18,6 +18,7 @@ import 'package:transportation_app/features/multidestination/presentation/screen
 import 'package:transportation_app/features/my_tickets/presentation/cubit/marketplace_cubit.dart';
 import 'package:transportation_app/features/my_tickets/presentation/cubit/my_tickets_cubit.dart';
 import 'package:transportation_app/features/my_tickets/presentation/views/screen/market_place.dart';
+import 'package:transportation_app/features/my_tickets/presentation/views/screen/marketplace_passenger_form_screen.dart';
 import 'package:transportation_app/features/my_tickets/presentation/views/screen/resell_tickets.dart';
 import 'package:transportation_app/features/my_tickets/presentation/views/screen/ticket_details_screen.dart';
 import 'package:transportation_app/features/notfication/presentation/screens/notfication_inbox_screen.dart';
@@ -101,6 +102,19 @@ class AppRouter {
               BlocProvider(create: (_) => sl<ProfileCubit>()..loadProfile()),
             ],
             child: MarketplaceScreen(),
+          ),
+        );
+      case AppRoutes.marketplacePassengerFormScreen:
+        final args = settings.arguments as Map<String, dynamic>;
+        final item = args['item'] as Map<String, dynamic>;
+        final cubit = args['cubit'] as MarketplaceCubit;
+        return MaterialPageRoute(
+          builder: (_) => MultiBlocProvider(
+            providers: [
+              BlocProvider.value(value: cubit),
+              BlocProvider(create: (_) => sl<ProfileCubit>()..loadProfile()),
+            ],
+            child: MarketplacePassengerFormScreen(item: item),
           ),
         );
       case AppRoutes.resellTicketsScreen:

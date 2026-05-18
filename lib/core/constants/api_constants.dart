@@ -36,7 +36,8 @@ class ApiConstants {
   static const String fcmToken = '/Users/fcm-token';
   static String? mediaUrl(String? path) {
     if (path == null || path.isEmpty) return null;
-    if (path.startsWith('http')) return path;
-    return '$mediaBase/$path';
+    if (path.toLowerCase().startsWith('http')) return path;
+    final cleanPath = path.startsWith('/') ? path.substring(1) : path;
+    return '$mediaBase/$cleanPath';
   }
 }

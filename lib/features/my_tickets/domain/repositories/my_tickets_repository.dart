@@ -21,6 +21,6 @@ abstract class MyTicketsRepository {
     String? travelDate,
   });
   ResultVoid listTicket({required int bookingId, required double askingPrice});
-  ResultVoid buyTicket({required int listingId});
+  ResultVoid buyTicket({required int listingId, required List<Map<String, dynamic>> passengers});
   ResultVoid cancelListing({required int listingId});
 }

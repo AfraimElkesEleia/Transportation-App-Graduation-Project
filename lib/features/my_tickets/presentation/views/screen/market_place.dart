@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:transportation_app/core/theming/colors.dart';
 import 'package:transportation_app/features/my_tickets/presentation/cubit/marketplace_cubit.dart';
 import 'package:transportation_app/features/my_tickets/presentation/cubit/marketplace_states.dart';
+import 'package:transportation_app/core/routing/routes.dart';
 import 'package:transportation_app/features/my_tickets/presentation/views/widgets/marketplace_filter_sheet.dart';
 import 'package:transportation_app/features/profile/presentation/cubit/profile_cubit/profile_cubit.dart';
 import 'package:transportation_app/features/profile/presentation/cubit/profile_cubit/profile_states.dart';
@@ -582,7 +583,11 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
           ElevatedButton(
             onPressed: () {
               Navigator.pop(ctx);
-              cubit.buyTicket(id);
+              Navigator.pushNamed(
+                context,
+                AppRoutes.marketplacePassengerFormScreen,
+                arguments: {'item': item, 'cubit': cubit},
+              );
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: ColorsManager.successGreen,

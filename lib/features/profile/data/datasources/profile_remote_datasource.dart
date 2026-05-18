@@ -105,10 +105,7 @@ class ProfileRemoteDatasourceImpl implements ProfileRemoteDatasource {
 
       final data = body['data'] as Map<String, dynamic>;
       final rawUrl = data['profilePictureUrl'] as String;
-      final fullUrl = rawUrl.startsWith('http')
-          ? rawUrl
-          : 'http://rehlabussines-001-site1.anytempurl.com/$rawUrl';
-      return fullUrl;
+      return ApiConstants.mediaUrl(rawUrl)!;
     } on DioException catch (e) {
       _handleDio(e);
     }
@@ -157,7 +154,9 @@ class ProfileRemoteDatasourceImpl implements ProfileRemoteDatasource {
       final res = await dio.get(ApiConstants.myTickets);
       final body = res.data as Map<String, dynamic>;
       if (body['success'] != true) {
-        throw ServerException(message: body['message'] ?? 'Failed to load tickets');
+        throw ServerException(
+          message: body['message'] ?? 'Failed to load tickets',
+        );
       }
       final list = (body['data'] as List<dynamic>? ?? []);
       return list.map((e) => _parseTicket(e as Map<String, dynamic>)).toList();
@@ -168,12 +167,17 @@ class ProfileRemoteDatasourceImpl implements ProfileRemoteDatasource {
 
   TicketEntity _parseTicket(Map<String, dynamic> json) {
     final passengers = (json['passengers'] as List<dynamic>? ?? [])
-        .map((p) => TicketPassengerEntity(
-              passengerId: p['passengerId'] as int? ?? p['id'] as int? ?? 0,
-              name: p['name'] as String? ?? p['passengerName'] as String? ?? 'Unknown',
-              idNumber: p['idNumber'] as String? ?? 'N/A',
-              seatNumber: p['seatNumber']?.toString() ?? 'N/A',
-            ))
+        .map(
+          (p) => TicketPassengerEntity(
+            passengerId: p['passengerId'] as int? ?? p['id'] as int? ?? 0,
+            name:
+                p['name'] as String? ??
+                p['passengerName'] as String? ??
+                'Unknown',
+            idNumber: p['idNumber'] as String? ?? 'N/A',
+            seatNumber: p['seatNumber']?.toString() ?? 'N/A',
+          ),
+        )
         .toList();
     return TicketEntity(
       bookingId: json['bookingId'] as int,
@@ -182,16 +186,23 @@ class ProfileRemoteDatasourceImpl implements ProfileRemoteDatasource {
       paymentStatus: json['paymentStatus'] as String? ?? '',
       totalPrice: (json['totalPrice'] as num).toDouble(),
       seatsBooked: json['seatsBooked'] as int? ?? 1,
-      bookingDate: DateTime.tryParse(json['bookingDate'] as String? ?? '') ?? DateTime.now(),
+      bookingDate:
+          DateTime.tryParse(json['bookingDate'] as String? ?? '') ??
+          DateTime.now(),
       agencyName: json['agencyName'] as String? ?? '',
       className: json['className'] as String? ?? '',
       isMarketplacePurchase: json['isMarketplacePurchase'] as bool? ?? false,
       originGovernorate: json['originGovernorate'] as String? ?? 'Cairo',
       originStation: json['originStation'] as String? ?? '',
-      destinationGovernorate: json['destinationGovernorate'] as String? ?? 'Alexandria',
+      destinationGovernorate:
+          json['destinationGovernorate'] as String? ?? 'Alexandria',
       destinationStation: json['destinationStation'] as String? ?? '',
-      boardingTime: DateTime.tryParse(json['boardingTime'] as String? ?? '') ?? DateTime.now(),
-      dropoffTime: DateTime.tryParse(json['dropoffTime'] as String? ?? '') ?? DateTime.now(),
+      boardingTime:
+          DateTime.tryParse(json['boardingTime'] as String? ?? '') ??
+          DateTime.now(),
+      dropoffTime:
+          DateTime.tryParse(json['dropoffTime'] as String? ?? '') ??
+          DateTime.now(),
       passengers: passengers,
     );
   }
@@ -202,7 +213,9 @@ class ProfileRemoteDatasourceImpl implements ProfileRemoteDatasource {
       final res = await dio.get('/Wallet/history');
       final body = res.data as Map<String, dynamic>;
       if (body['success'] != true) {
-        throw ServerException(message: body['message'] ?? 'Failed to load history');
+        throw ServerException(
+          message: body['message'] ?? 'Failed to load history',
+        );
       }
       final list = (body['data'] as List<dynamic>? ?? []);
       return list.map((e) {
@@ -213,7 +226,9 @@ class ProfileRemoteDatasourceImpl implements ProfileRemoteDatasource {
           type: json['type'] as String? ?? '',
           description: json['description'] as String? ?? '',
           bookingId: json['bookingId'] as int?,
-          createdAt: DateTime.tryParse(json['createdAt'] as String? ?? '') ?? DateTime.now(),
+          createdAt:
+              DateTime.tryParse(json['createdAt'] as String? ?? '') ??
+              DateTime.now(),
         );
       }).toList();
     } on DioException catch (e) {

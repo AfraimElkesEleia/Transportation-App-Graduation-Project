@@ -765,8 +765,139 @@ class AppLocalizationsEn extends AppLocalizations {
   String get gov_Suez => 'Suez';
 
   @override
-  String get gov_PortSaid => 'Port Said';
+  String get gov_Damietta => 'Damietta';
 
   @override
-  String get gov_Damietta => 'Damietta';
+  String get challenges => 'Challenges';
+
+  @override
+  String get pointsHistory => 'Points History';
+
+  @override
+  String get noChallengesFound => 'No challenges found.';
+
+  @override
+  String get noPointHistory => 'No point history.';
+
+  @override
+  String get activeChallenges => 'Active';
+
+  @override
+  String get completedChallenges => 'Completed';
+
+  @override
+  String get uploadingPhoto => 'Uploading photo...';
+
+  @override
+  String get photoUploaded => 'Photo uploaded';
+
+  @override
+  String photoUploadFailed(String msg) {
+    return 'Photo upload failed: $msg';
+  }
+
+  @override
+  String get skipAndSave => 'Skip & Save';
+
+  @override
+  String get profileUpdatedSuccessfully => 'Profile updated successfully';
+
+  @override
+  String get firstName => 'First Name';
+
+  @override
+  String get firstNameHint => 'Enter your first name';
+
+  @override
+  String get firstNameRequired => 'First name is required';
+
+  @override
+  String get lastName => 'Last Name';
+
+  @override
+  String get lastNameHint => 'Enter your last name';
+
+  @override
+  String get lastNameRequired => 'Last name is required';
+
+  @override
+  String get familyName => 'Family Name';
+
+  @override
+  String get familyNameHint => 'Enter your family / tribal name';
+
+  @override
+  String get emailAddressValid => 'Enter a valid email';
+
+  @override
+  String get phoneNumberRequired => 'Phone is required';
+
+  @override
+  String get phoneNumberLabel => 'Phone Number';
+
+  @override
+  String get fixedDetails => 'Fixed Details';
+
+  @override
+  String get countryLabel => 'Country';
+
+  @override
+  String get countryCannotBeChanged => 'Country cannot be changed.';
+
+  @override
+  String get saveChanges => 'Save Changes';
+
+  @override
+  String get saving => 'Saving...';
+
+  @override
+  String pointsBalanceIs(String n) {
+    return 'Points Balance: $n';
+  }
+
+  @override
+  String expiringSoonCard(String n, String date) {
+    return 'Expiring Soon: $n pts ($date)';
+  }
+
+  @override
+  String get earnedPointsPending =>
+      'Earned points are pending until departure and expire 4 months after departure.';
+
+  @override
+  String get myCart => 'My Cart';
+
+  @override
+  String get yourCartIsEmpty => 'Your cart is empty';
+
+  @override
+  String get addTripsToCart => 'Add trips to your cart to checkout later.';
+
+  @override
+  String get checkoutWallet => 'Checkout (Wallet)';
+
+  @override
+  String get checkoutSuccess =>
+      'Checkout successful!\nYour wallet has been deducted.';
+
+  @override
+  String get backToHome => 'Back to Home';
+
+  @override
+  String get nationalIdOptional => 'National ID Number  (optional)';
+
+  @override
+  String get nationalIdHint => 'e.g. 29901011234567';
+
+  @override
+  String get dateOfBirthLabel => 'Date of Birth';
+
+  @override
+  String get createPasswordHint => 'Create a strong password';
+
+  @override
+  String get confirmPasswordLabel => 'Confirm Password';
+
+  @override
+  String get confirmPasswordHint => 'Re-enter your password';
 }

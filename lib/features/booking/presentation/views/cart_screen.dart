@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:transportation_app/core/l10n/app_localizations.dart';
 import 'package:transportation_app/core/theming/colors.dart';
 import 'package:transportation_app/core/widgets/app_shimmer.dart';
 import 'package:transportation_app/core/widgets/basic_container.dart';
@@ -28,8 +29,8 @@ class _CartScreenState extends State<CartScreen> {
     context.read<CartCubit>().checkout(pointsToRedeem: pointsToRedeem);
   }
 
-  @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: BasicContainer(
@@ -63,10 +64,10 @@ class _CartScreenState extends State<CartScreen> {
                       ),
                     ),
                     const SizedBox(width: 14),
-                    const Expanded(
+                    Expanded(
                       child: Text(
-                        'My Cart',
-                        style: TextStyle(
+                        l10n.myCart,
+                        style: const TextStyle(
                           color: Colors.white,
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
@@ -87,7 +88,7 @@ class _CartScreenState extends State<CartScreen> {
                 child: BlocConsumer<CartCubit, CartState>(
                   listener: (context, state) {
                     if (state is CheckoutSuccess) {
-                      _showCheckoutSuccessDialog(context);
+                      _showCheckoutSuccessDialog(context, l10n);
                     } else if (state is CheckoutError) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
@@ -110,10 +111,10 @@ class _CartScreenState extends State<CartScreen> {
                       );
                     }
                     if (state is CartEmpty) {
-                      return _buildEmptyCart();
+                      return _buildEmptyCart(l10n);
                     }
                     if (state is CartError) {
-                      return _buildError(state.message);
+                      return _buildError(state.message, l10n);
                     }
                     if (state is CartLoaded) {
                       return _buildCartList(state);
@@ -129,36 +130,36 @@ class _CartScreenState extends State<CartScreen> {
     );
   }
 
-  Widget _buildEmptyCart() {
-    return const Center(
+  Widget _buildEmptyCart(AppLocalizations l10n) {
+    return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
+          const Icon(
             Icons.shopping_cart_outlined,
             size: 80,
             color: ColorsManager.textMuted,
           ),
-          SizedBox(height: 16),
+          const SizedBox(height: 16),
           Text(
-            'Your cart is empty',
-            style: TextStyle(
+            l10n.yourCartIsEmpty,
+            style: const TextStyle(
               color: Colors.white,
               fontSize: 18,
               fontWeight: FontWeight.bold,
             ),
           ),
-          SizedBox(height: 8),
+          const SizedBox(height: 8),
           Text(
-            'Add trips to your cart to checkout later.',
-            style: TextStyle(color: ColorsManager.textMuted, fontSize: 14),
+            l10n.addTripsToCart,
+            style: const TextStyle(color: ColorsManager.textMuted, fontSize: 14),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildError(String message) {
+  Widget _buildError(String message, AppLocalizations l10n) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -174,7 +175,7 @@ class _CartScreenState extends State<CartScreen> {
           ElevatedButton.icon(
             onPressed: () => context.read<CartCubit>().fetchCart(),
             icon: const Icon(Icons.refresh),
-            label: const Text('Retry'),
+            label: Text(l10n.retry),
             style: ElevatedButton.styleFrom(
               backgroundColor: ColorsManager.surfaceMid,
             ),
@@ -204,7 +205,7 @@ class _CartScreenState extends State<CartScreen> {
     );
   }
 
-  void _showCheckoutSuccessDialog(BuildContext context) {
+  void _showCheckoutSuccessDialog(BuildContext context, AppLocalizations l10n) {
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -212,9 +213,9 @@ class _CartScreenState extends State<CartScreen> {
         backgroundColor: ColorsManager.surfaceDark,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: const Icon(Icons.check_circle, color: Colors.green, size: 60),
-        content: const Text(
-          'Checkout successful!\nYour wallet has been deducted.',
-          style: TextStyle(color: Colors.white, fontSize: 16),
+        content: Text(
+          l10n.checkoutSuccess,
+          style: const TextStyle(color: Colors.white, fontSize: 16),
           textAlign: TextAlign.center,
         ),
         actions: [
@@ -231,9 +232,9 @@ class _CartScreenState extends State<CartScreen> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: ColorsManager.accentCyan,
               ),
-              child: const Text(
-                'Back to Home',
-                style: TextStyle(color: Colors.white),
+              child: Text(
+                l10n.backToHome,
+                style: const TextStyle(color: Colors.white),
               ),
             ),
           ),
@@ -275,6 +276,7 @@ class _CartBottomBarState extends State<_CartBottomBar> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final loyaltyBalance = _getLoyaltyBalance(context);
 
     return Container(
@@ -319,9 +321,9 @@ class _CartBottomBarState extends State<_CartBottomBar> {
                             color: Colors.white,
                           ),
                         )
-                      : const Text(
-                          'Checkout (Wallet)',
-                          style: TextStyle(
+                      : Text(
+                          l10n.checkoutWallet,
+                          style: const TextStyle(
                             color: Colors.black,
                             fontSize: 16,
                             fontWeight: FontWeight.bold,

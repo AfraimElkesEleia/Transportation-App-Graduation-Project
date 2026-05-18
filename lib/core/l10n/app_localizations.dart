@@ -1538,17 +1538,263 @@ abstract class AppLocalizations {
   /// **'Suez'**
   String get gov_Suez;
 
-  /// No description provided for @gov_PortSaid.
-  ///
-  /// In en, this message translates to:
-  /// **'Port Said'**
-  String get gov_PortSaid;
-
   /// No description provided for @gov_Damietta.
   ///
   /// In en, this message translates to:
   /// **'Damietta'**
   String get gov_Damietta;
+
+  /// No description provided for @challenges.
+  ///
+  /// In en, this message translates to:
+  /// **'Challenges'**
+  String get challenges;
+
+  /// No description provided for @pointsHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'Points History'**
+  String get pointsHistory;
+
+  /// No description provided for @noChallengesFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No challenges found.'**
+  String get noChallengesFound;
+
+  /// No description provided for @noPointHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'No point history.'**
+  String get noPointHistory;
+
+  /// No description provided for @activeChallenges.
+  ///
+  /// In en, this message translates to:
+  /// **'Active'**
+  String get activeChallenges;
+
+  /// No description provided for @completedChallenges.
+  ///
+  /// In en, this message translates to:
+  /// **'Completed'**
+  String get completedChallenges;
+
+  /// No description provided for @uploadingPhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Uploading photo...'**
+  String get uploadingPhoto;
+
+  /// No description provided for @photoUploaded.
+  ///
+  /// In en, this message translates to:
+  /// **'Photo uploaded'**
+  String get photoUploaded;
+
+  /// No description provided for @photoUploadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Photo upload failed: {msg}'**
+  String photoUploadFailed(String msg);
+
+  /// No description provided for @skipAndSave.
+  ///
+  /// In en, this message translates to:
+  /// **'Skip & Save'**
+  String get skipAndSave;
+
+  /// No description provided for @profileUpdatedSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile updated successfully'**
+  String get profileUpdatedSuccessfully;
+
+  /// No description provided for @firstName.
+  ///
+  /// In en, this message translates to:
+  /// **'First Name'**
+  String get firstName;
+
+  /// No description provided for @firstNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your first name'**
+  String get firstNameHint;
+
+  /// No description provided for @firstNameRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'First name is required'**
+  String get firstNameRequired;
+
+  /// No description provided for @lastName.
+  ///
+  /// In en, this message translates to:
+  /// **'Last Name'**
+  String get lastName;
+
+  /// No description provided for @lastNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your last name'**
+  String get lastNameHint;
+
+  /// No description provided for @lastNameRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Last name is required'**
+  String get lastNameRequired;
+
+  /// No description provided for @familyName.
+  ///
+  /// In en, this message translates to:
+  /// **'Family Name'**
+  String get familyName;
+
+  /// No description provided for @familyNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your family / tribal name'**
+  String get familyNameHint;
+
+  /// No description provided for @emailAddressValid.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid email'**
+  String get emailAddressValid;
+
+  /// No description provided for @phoneNumberRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone is required'**
+  String get phoneNumberRequired;
+
+  /// No description provided for @phoneNumberLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone Number'**
+  String get phoneNumberLabel;
+
+  /// No description provided for @fixedDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Fixed Details'**
+  String get fixedDetails;
+
+  /// No description provided for @countryLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Country'**
+  String get countryLabel;
+
+  /// No description provided for @countryCannotBeChanged.
+  ///
+  /// In en, this message translates to:
+  /// **'Country cannot be changed.'**
+  String get countryCannotBeChanged;
+
+  /// No description provided for @saveChanges.
+  ///
+  /// In en, this message translates to:
+  /// **'Save Changes'**
+  String get saveChanges;
+
+  /// No description provided for @saving.
+  ///
+  /// In en, this message translates to:
+  /// **'Saving...'**
+  String get saving;
+
+  /// No description provided for @pointsBalanceIs.
+  ///
+  /// In en, this message translates to:
+  /// **'Points Balance: {n}'**
+  String pointsBalanceIs(String n);
+
+  /// No description provided for @expiringSoonCard.
+  ///
+  /// In en, this message translates to:
+  /// **'Expiring Soon: {n} pts ({date})'**
+  String expiringSoonCard(String n, String date);
+
+  /// No description provided for @earnedPointsPending.
+  ///
+  /// In en, this message translates to:
+  /// **'Earned points are pending until departure and expire 4 months after departure.'**
+  String get earnedPointsPending;
+
+  /// No description provided for @myCart.
+  ///
+  /// In en, this message translates to:
+  /// **'My Cart'**
+  String get myCart;
+
+  /// No description provided for @yourCartIsEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Your cart is empty'**
+  String get yourCartIsEmpty;
+
+  /// No description provided for @addTripsToCart.
+  ///
+  /// In en, this message translates to:
+  /// **'Add trips to your cart to checkout later.'**
+  String get addTripsToCart;
+
+  /// No description provided for @checkoutWallet.
+  ///
+  /// In en, this message translates to:
+  /// **'Checkout (Wallet)'**
+  String get checkoutWallet;
+
+  /// No description provided for @checkoutSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Checkout successful!\nYour wallet has been deducted.'**
+  String get checkoutSuccess;
+
+  /// No description provided for @backToHome.
+  ///
+  /// In en, this message translates to:
+  /// **'Back to Home'**
+  String get backToHome;
+
+  /// No description provided for @nationalIdOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'National ID Number  (optional)'**
+  String get nationalIdOptional;
+
+  /// No description provided for @nationalIdHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. 29901011234567'**
+  String get nationalIdHint;
+
+  /// No description provided for @dateOfBirthLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Date of Birth'**
+  String get dateOfBirthLabel;
+
+  /// No description provided for @createPasswordHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Create a strong password'**
+  String get createPasswordHint;
+
+  /// No description provided for @confirmPasswordLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm Password'**
+  String get confirmPasswordLabel;
+
+  /// No description provided for @confirmPasswordHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Re-enter your password'**
+  String get confirmPasswordHint;
 }
 
 class _AppLocalizationsDelegate

@@ -116,7 +116,7 @@ class _ProfileViewState extends State<ProfileScreen> {
                       ElevatedButton(
                         onPressed: () =>
                             context.read<ProfileCubit>().loadProfile(),
-                        child: const Text('Retry'),
+                        child: Text(AppLocalizations.of(context)!.retry),
                       ),
                     ],
                   ),

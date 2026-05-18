@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:transportation_app/core/l10n/app_localizations.dart';
 import 'package:transportation_app/core/validators/app_validators.dart';
 import 'package:transportation_app/core/widgets/app_text_form_field.dart';
 import 'package:transportation_app/features/signup/presentation/widgets/app_date_picker_field.dart';
@@ -32,12 +33,13 @@ class SignupPersonalSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Column(
       children: [
         // First Name
         AppTextFormField(
-          label: 'First Name',
-          hint: 'Enter your first name',
+          label: l10n.firstName,
+          hint: l10n.firstNameHint,
           prefixIcon: Icons.person_outline,
           controller: firstNameController,
           validator: AppValidators.firstName,
@@ -47,8 +49,8 @@ class SignupPersonalSection extends StatelessWidget {
     
         // Last Name
         AppTextFormField(
-          label: 'Last Name',
-          hint: 'Enter your last name',
+          label: l10n.lastName,
+          hint: l10n.lastNameHint,
           prefixIcon: Icons.person_2_outlined,
           controller: lastNameController,
           validator: AppValidators.lastName,
@@ -58,8 +60,8 @@ class SignupPersonalSection extends StatelessWidget {
     
         // Family Name
         AppTextFormField(
-          label: 'Family Name',
-          hint: 'Enter your family / tribal name',
+          label: l10n.familyName,
+          hint: l10n.familyNameHint,
           prefixIcon: Icons.people_alt_outlined,
           controller: familyNameController,
           validator: AppValidators.familyName,
@@ -76,7 +78,7 @@ class SignupPersonalSection extends StatelessWidget {
     
         // Date of Birth
         AppDatePickerField(
-          label: 'Date of Birth',
+          label: l10n.dateOfBirthLabel,
           selectedDate: dob,
           onDateSelected: onDobChanged,
           errorText: dobError,
@@ -87,8 +89,8 @@ class SignupPersonalSection extends StatelessWidget {
     
         // National ID (optional)
         AppTextFormField(
-          label: 'National ID Number  (optional)',
-          hint: 'e.g. 29901011234567',
+          label: l10n.nationalIdOptional,
+          hint: l10n.nationalIdHint,
           prefixIcon: Icons.badge_outlined,
           keyboardType: TextInputType.number,
           controller: nationalIdController,

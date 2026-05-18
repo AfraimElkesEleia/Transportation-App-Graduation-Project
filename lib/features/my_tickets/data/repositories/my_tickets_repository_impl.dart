@@ -120,9 +120,9 @@ class MyTicketsRepositoryImpl implements MyTicketsRepository {
   }
 
   @override
-  ResultVoid buyTicket({required int listingId}) async {
+  ResultVoid buyTicket({required int listingId, required List<Map<String, dynamic>> passengers}) async {
     try {
-      await remoteDatasource.buyTicket(listingId: listingId);
+      await remoteDatasource.buyTicket(listingId: listingId, passengers: passengers);
       return const Right(null);
     } on ServerException catch (e) {
       return Left(ServerFailure(message: e.message));

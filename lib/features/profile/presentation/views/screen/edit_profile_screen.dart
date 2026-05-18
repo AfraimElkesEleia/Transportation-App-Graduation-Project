@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:transportation_app/core/constants/api_constants.dart';
+import 'package:transportation_app/core/l10n/app_localizations.dart';
 import 'package:transportation_app/core/theming/app_decorations.dart';
 import 'package:transportation_app/core/theming/colors.dart';
 import 'package:transportation_app/core/widgets/basic_container.dart';
@@ -88,6 +89,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       body: BasicContainer(
         child: BlocConsumer<ProfileCubit, ProfileState>(
@@ -102,10 +104,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             if (state is ProfilePictureUploadFailure) {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: Text('Photo upload failed: ${state.message}'),
+                  content: Text(l10n.photoUploadFailed(state.message)),
                   backgroundColor: Colors.orange,
                   action: SnackBarAction(
-                    label: 'Skip & Save',
+                    label: l10n.skipAndSave,
                     textColor: Colors.white,
                     onPressed: _updateProfile, // save without photo
                   ),
@@ -117,8 +119,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             if (state is ProfileUpdateSuccess) {
               Navigator.pop(context);
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Profile updated successfully'),
+                SnackBar(
+                  content: Text(l10n.profileUpdatedSuccessfully),
                   backgroundColor: Colors.green,
                 ),
               );
@@ -158,9 +160,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                             color: Colors.white,
                           ),
                         ),
-                        const Expanded(
+                        Expanded(
                           child: Text(
-                            'Edit Profile',
+                            l10n.editProfile,
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               color: Colors.white,
@@ -196,7 +198,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
                             if (isUploadingPicture) ...[
                               const SizedBox(height: 12),
-                              const Row(
+                               Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   SizedBox(
@@ -209,8 +211,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                   ),
                                   SizedBox(width: 8),
                                   Text(
-                                    'Uploading photo...',
-                                    style: TextStyle(
+                                    l10n.uploadingPhoto,
+                                    style: const TextStyle(
                                       color: Colors.cyan,
                                       fontSize: 13,
                                     ),
@@ -221,7 +223,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
                             if (_uploadedImageUrl != null) ...[
                               const SizedBox(height: 8),
-                              const Row(
+                               Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Icon(
@@ -231,8 +233,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                   ),
                                   SizedBox(width: 6),
                                   Text(
-                                    'Photo uploaded',
-                                    style: TextStyle(
+                                    l10n.photoUploaded,
+                                    style: const TextStyle(
                                       color: Colors.green,
                                       fontSize: 13,
                                     ),
@@ -245,45 +247,45 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
                             // ── Editable fields ──────────────
                             ProfileSectionContainer(
-                              title: 'Personal Information',
+                              title: l10n.sectionPersonal,
                               icon: Icons.person_outline,
                               children: [
                                 _buildField(
-                                  label: 'First Name',
+                                  label: l10n.firstName,
                                   controller: _firstNameController,
                                   validator: (v) =>
                                       v == null || v.trim().isEmpty
-                                      ? 'First name is required'
+                                      ? l10n.firstNameRequired
                                       : null,
                                 ),
                                 _buildField(
-                                  label: 'Last Name',
+                                  label: l10n.lastName,
                                   controller: _lastNameController,
                                   validator: (v) =>
                                       v == null || v.trim().isEmpty
-                                      ? 'Last name is required'
+                                      ? l10n.lastNameRequired
                                       : null,
                                 ),
                                 _buildField(
-                                  label: 'Family Name',
+                                  label: l10n.familyName,
                                   controller: _familyNameController,
                                 ),
                                 _buildField(
-                                  label: 'Email',
+                                  label: l10n.emailLabel,
                                   controller: _emailController,
                                   keyboardType: TextInputType.emailAddress,
                                   validator: (v) =>
                                       v == null || !v.contains('@')
-                                      ? 'Enter a valid email'
+                                      ? l10n.emailAddressValid
                                       : null,
                                 ),
                                 _buildField(
-                                  label: 'Phone Number',
+                                  label: l10n.phoneNumberLabel,
                                   controller: _phoneController,
                                   keyboardType: TextInputType.phone,
                                   validator: (v) =>
                                       v == null || v.trim().isEmpty
-                                      ? 'Phone is required'
+                                      ? l10n.phoneNumberRequired
                                       : null,
                                 ),
                               ],
@@ -292,7 +294,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
                             // ── Points Section ─────────────────
                             ProfileSectionContainer(
-                              title: 'Loyalty Points',
+                              title: l10n.loyaltyPoints,
                               icon: Icons.stars_rounded,
                               children: [
                                 Container(
@@ -301,34 +303,38 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                     color: const Color(0xFF1A2A3A),
                                     borderRadius: BorderRadius.circular(12),
                                   ),
-                                  child: const Column(
+                                  child: Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        'Earned points are pending until departure and expire 4 months after departure.',
-                                        style: TextStyle(
+                                        l10n.earnedPointsPending,
+                                        style: const TextStyle(
                                           color: Colors.white70,
                                           fontSize: 14,
                                         ),
                                       ),
-                                      SizedBox(height: 12),
+                                      const SizedBox(height: 12),
                                       Text(
-                                        'Points Balance: 480',
-                                        style: TextStyle(
+                                        l10n.pointsBalanceIs((widget.profile.loyaltyPointsBalance ?? 0).toString()),
+                                        style: const TextStyle(
                                           color: Colors.white,
                                           fontSize: 16,
                                           fontWeight: FontWeight.bold,
                                         ),
                                       ),
-                                      SizedBox(height: 4),
-                                      Text(
-                                        'Expiring Soon: 120 pts (May 31, 2026)',
-                                        style: TextStyle(
-                                          color: Colors.orangeAccent,
-                                          fontSize: 14,
+                                      const SizedBox(height: 4),
+                                      if (widget.profile.expiringPointsAmount != null && widget.profile.expiringPointsAmount! > 0)
+                                        Text(
+                                          l10n.expiringSoonCard(
+                                            widget.profile.expiringPointsAmount.toString(),
+                                            widget.profile.nextExpiryDate ?? '',
+                                          ),
+                                          style: const TextStyle(
+                                            color: Colors.orangeAccent,
+                                            fontSize: 14,
+                                          ),
                                         ),
-                                      ),
                                     ],
                                   ),
                                 ),
@@ -337,25 +343,25 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
                             const SizedBox(height: 20),
                             ProfileSectionContainer(
-                              title: 'Fixed Details',
+                              title: l10n.fixedDetails,
                               icon: Icons.lock_outline,
                               children: [
                                 _buildReadOnly(
-                                  'Country',
+                                  l10n.countryLabel,
                                   widget.profile.countryName,
                                 ),
                                 const SizedBox(height: 4),
-                                const Row(
+                                Row(
                                   children: [
-                                    Icon(
+                                    const Icon(
                                       Icons.info_outline,
                                       color: Colors.white38,
                                       size: 14,
                                     ),
-                                    SizedBox(width: 6),
+                                    const SizedBox(width: 6),
                                     Text(
-                                      'Country cannot be changed.',
-                                      style: TextStyle(
+                                      l10n.countryCannotBeChanged,
+                                      style: const TextStyle(
                                         color: Colors.white38,
                                         fontSize: 12,
                                       ),
@@ -394,8 +400,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                           const SizedBox(width: 12),
                                           Text(
                                             isUploadingPicture
-                                                ? 'Uploading photo...'
-                                                : 'Saving...',
+                                                ? l10n.uploadingPhoto
+                                                : l10n.saving,
                                             style: const TextStyle(
                                               color: Colors.white,
                                               fontSize: 16,
@@ -403,9 +409,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                           ),
                                         ],
                                       )
-                                    : const Text(
-                                        'Save Changes',
-                                        style: TextStyle(
+                                    : Text(
+                                        l10n.saveChanges,
+                                        style: const TextStyle(
                                           color: Colors.white,
                                           fontSize: 18,
                                           fontWeight: FontWeight.bold,

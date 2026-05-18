@@ -764,8 +764,138 @@ class AppLocalizationsAr extends AppLocalizations {
   String get gov_Suez => 'السويس';
 
   @override
-  String get gov_PortSaid => 'بورسعيد';
+  String get gov_Damietta => 'دمياط';
 
   @override
-  String get gov_Damietta => 'دمياط';
+  String get challenges => 'التحديات';
+
+  @override
+  String get pointsHistory => 'سجل النقاط';
+
+  @override
+  String get noChallengesFound => 'لا توجد تحديات.';
+
+  @override
+  String get noPointHistory => 'لا يوجد سجل للنقاط.';
+
+  @override
+  String get activeChallenges => 'نشطة';
+
+  @override
+  String get completedChallenges => 'مكتملة';
+
+  @override
+  String get uploadingPhoto => 'جاري رفع الصورة...';
+
+  @override
+  String get photoUploaded => 'تم رفع الصورة';
+
+  @override
+  String photoUploadFailed(String msg) {
+    return 'فشل رفع الصورة: $msg';
+  }
+
+  @override
+  String get skipAndSave => 'تخطي وحفظ';
+
+  @override
+  String get profileUpdatedSuccessfully => 'تم تحديث الملف الشخصي بنجاح';
+
+  @override
+  String get firstName => 'الاسم الأول';
+
+  @override
+  String get firstNameHint => 'أدخل الاسم الأول';
+
+  @override
+  String get firstNameRequired => 'الاسم الأول مطلوب';
+
+  @override
+  String get lastName => 'الاسم الأخير';
+
+  @override
+  String get lastNameHint => 'أدخل الاسم الأخير';
+
+  @override
+  String get lastNameRequired => 'الاسم الأخير مطلوب';
+
+  @override
+  String get familyName => 'اسم العائلة';
+
+  @override
+  String get familyNameHint => 'أدخل اسم العائلة / القبيلة';
+
+  @override
+  String get emailAddressValid => 'أدخل بريد إلكتروني صحيح';
+
+  @override
+  String get phoneNumberRequired => 'رقم الهاتف مطلوب';
+
+  @override
+  String get phoneNumberLabel => 'رقم الهاتف';
+
+  @override
+  String get fixedDetails => 'تفاصيل ثابتة';
+
+  @override
+  String get countryLabel => 'الدولة';
+
+  @override
+  String get countryCannotBeChanged => 'لا يمكن تغيير الدولة.';
+
+  @override
+  String get saveChanges => 'حفظ التعديلات';
+
+  @override
+  String get saving => 'جاري الحفظ...';
+
+  @override
+  String pointsBalanceIs(String n) {
+    return 'رصيد النقاط: $n';
+  }
+
+  @override
+  String expiringSoonCard(String n, String date) {
+    return 'تنتهي قريباً: $n نقطة ($date)';
+  }
+
+  @override
+  String get earnedPointsPending =>
+      'النقاط المكتسبة معلقة حتى المغادرة وتنتهي صلاحيتها بعد 4 أشهر من المغادرة.';
+
+  @override
+  String get myCart => 'عربة التسوق';
+
+  @override
+  String get yourCartIsEmpty => 'عربة التسوق فارغة';
+
+  @override
+  String get addTripsToCart => 'أضف رحلات إلى عربة التسوق للدفع لاحقاً.';
+
+  @override
+  String get checkoutWallet => 'إتمام الدفع (بالمحفظة)';
+
+  @override
+  String get checkoutSuccess => 'تم الدفع بنجاح!\nتم الخصم من محفظتك.';
+
+  @override
+  String get backToHome => 'العودة للرئيسية';
+
+  @override
+  String get nationalIdOptional => 'رقم البطاقة القومية (اختياري)';
+
+  @override
+  String get nationalIdHint => 'مثال: 29901011234567';
+
+  @override
+  String get dateOfBirthLabel => 'تاريخ الميلاد';
+
+  @override
+  String get createPasswordHint => 'أنشئ كلمة مرور قوية';
+
+  @override
+  String get confirmPasswordLabel => 'تأكيد كلمة المرور';
+
+  @override
+  String get confirmPasswordHint => 'أعد إدخال كلمة المرور';
 }
