@@ -1409,7 +1409,7 @@ abstract class AppLocalizations {
   /// No description provided for @popularRoutes.
   ///
   /// In en, this message translates to:
-  /// **'Popular Routes'**
+  /// **'🔥 Popular Routes'**
   String get popularRoutes;
 
   /// No description provided for @latestNews.
@@ -1795,6 +1795,588 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Re-enter your password'**
   String get confirmPasswordHint;
+
+  /// No description provided for @directTrip.
+  ///
+  /// In en, this message translates to:
+  /// **'Direct'**
+  String get directTrip;
+
+  /// No description provided for @stopsCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} Stops'**
+  String stopsCount(String count);
+
+  /// No description provided for @hideStops.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide Stops'**
+  String get hideStops;
+
+  /// No description provided for @showStops.
+  ///
+  /// In en, this message translates to:
+  /// **'Show Stops'**
+  String get showStops;
+
+  /// No description provided for @routeStops.
+  ///
+  /// In en, this message translates to:
+  /// **'Route Stops'**
+  String get routeStops;
+
+  /// No description provided for @howManyPassengers.
+  ///
+  /// In en, this message translates to:
+  /// **'How many passengers?'**
+  String get howManyPassengers;
+
+  /// No description provided for @perSeat.
+  ///
+  /// In en, this message translates to:
+  /// **'per seat'**
+  String get perSeat;
+
+  /// No description provided for @seatsAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'{n} seats available'**
+  String seatsAvailable(String n);
+
+  /// No description provided for @continueWithNPassengers.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue with {n} Passenger(s)'**
+  String continueWithNPassengers(String n);
+
+  /// No description provided for @useLoyaltyPoints.
+  ///
+  /// In en, this message translates to:
+  /// **'💎 Use Loyalty Points'**
+  String get useLoyaltyPoints;
+
+  /// No description provided for @noPointsYet.
+  ///
+  /// In en, this message translates to:
+  /// **'You don\'t have any points yet. Complete trips to earn points!'**
+  String get noPointsYet;
+
+  /// No description provided for @pointsCantBeApplied.
+  ///
+  /// In en, this message translates to:
+  /// **'Points can\'t be applied — cart total is too low (10 EGP minimum final price).'**
+  String get pointsCantBeApplied;
+
+  /// No description provided for @needMorePoints.
+  ///
+  /// In en, this message translates to:
+  /// **'You need at least 20 pts to redeem (= 1.00 EGP off). You currently have {points} pts. Keep booking to earn more!'**
+  String needMorePoints(String points);
+
+  /// No description provided for @ptsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'pts'**
+  String get ptsLabel;
+
+  /// No description provided for @pointsInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'ℹ️ 20 pts = 1.00 EGP'**
+  String get pointsInfo;
+
+  /// No description provided for @pointsUsed.
+  ///
+  /// In en, this message translates to:
+  /// **'Points used'**
+  String get pointsUsed;
+
+  /// No description provided for @discount.
+  ///
+  /// In en, this message translates to:
+  /// **'Discount'**
+  String get discount;
+
+  /// No description provided for @remainingAfter.
+  ///
+  /// In en, this message translates to:
+  /// **'Remaining after'**
+  String get remainingAfter;
+
+  /// No description provided for @finalTotal.
+  ///
+  /// In en, this message translates to:
+  /// **'Final total'**
+  String get finalTotal;
+
+  /// No description provided for @ptsValue.
+  ///
+  /// In en, this message translates to:
+  /// **'{n} pts'**
+  String ptsValue(String n);
+
+  /// No description provided for @from.
+  ///
+  /// In en, this message translates to:
+  /// **'From'**
+  String get from;
+
+  /// No description provided for @book.
+  ///
+  /// In en, this message translates to:
+  /// **'Book'**
+  String get book;
+
+  /// No description provided for @fullSeats.
+  ///
+  /// In en, this message translates to:
+  /// **'Full'**
+  String get fullSeats;
+
+  /// No description provided for @skip.
+  ///
+  /// In en, this message translates to:
+  /// **'Skip'**
+  String get skip;
+
+  /// No description provided for @ticketDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Ticket Details'**
+  String get ticketDetails;
+
+  /// No description provided for @ticketClass.
+  ///
+  /// In en, this message translates to:
+  /// **'{className} Class'**
+  String ticketClass(String className);
+
+  /// No description provided for @to.
+  ///
+  /// In en, this message translates to:
+  /// **'To'**
+  String get to;
+
+  /// No description provided for @departure.
+  ///
+  /// In en, this message translates to:
+  /// **'Departure'**
+  String get departure;
+
+  /// No description provided for @arrival.
+  ///
+  /// In en, this message translates to:
+  /// **'Arrival'**
+  String get arrival;
+
+  /// No description provided for @bookingRef.
+  ///
+  /// In en, this message translates to:
+  /// **'Booking Ref'**
+  String get bookingRef;
+
+  /// No description provided for @passengersAndSeats.
+  ///
+  /// In en, this message translates to:
+  /// **'Passengers & Seats'**
+  String get passengersAndSeats;
+
+  /// No description provided for @tapPassengerInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap on a passenger to view their boarding pass'**
+  String get tapPassengerInfo;
+
+  /// No description provided for @idNum.
+  ///
+  /// In en, this message translates to:
+  /// **'ID: {id}'**
+  String idNum(String id);
+
+  /// No description provided for @seatNum.
+  ///
+  /// In en, this message translates to:
+  /// **'Seat {seat}'**
+  String seatNum(String seat);
+
+  /// No description provided for @seat.
+  ///
+  /// In en, this message translates to:
+  /// **'seat(s)'**
+  String get seat;
+
+  /// No description provided for @pax.
+  ///
+  /// In en, this message translates to:
+  /// **'pax'**
+  String get pax;
+
+  /// No description provided for @passengerDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Passenger Details'**
+  String get passengerDetails;
+
+  /// No description provided for @fullName.
+  ///
+  /// In en, this message translates to:
+  /// **'Full Name'**
+  String get fullName;
+
+  /// No description provided for @nationalId.
+  ///
+  /// In en, this message translates to:
+  /// **'National ID'**
+  String get nationalId;
+
+  /// No description provided for @emailOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'Email Address (Optional)'**
+  String get emailOptional;
+
+  /// No description provided for @requiredField.
+  ///
+  /// In en, this message translates to:
+  /// **'Required'**
+  String get requiredField;
+
+  /// No description provided for @addToCart.
+  ///
+  /// In en, this message translates to:
+  /// **'Add to Cart'**
+  String get addToCart;
+
+  /// No description provided for @bookNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Book Now'**
+  String get bookNow;
+
+  /// No description provided for @passengerN.
+  ///
+  /// In en, this message translates to:
+  /// **'Passenger {n}'**
+  String passengerN(String n);
+
+  /// No description provided for @seatLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Seat: {n}'**
+  String seatLabel(String n);
+
+  /// No description provided for @passengersCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{n} Passenger(s)'**
+  String passengersCount(String n);
+
+  /// No description provided for @selectSeats.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Seats'**
+  String get selectSeats;
+
+  /// No description provided for @selectedSeatsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Selected: '**
+  String get selectedSeatsLabel;
+
+  /// No description provided for @seatsCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{n} seats'**
+  String seatsCount(String n);
+
+  /// No description provided for @totalLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Total'**
+  String get totalLabel;
+
+  /// No description provided for @continueBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get continueBtn;
+
+  /// No description provided for @noSeatsSelected.
+  ///
+  /// In en, this message translates to:
+  /// **'No seats selected'**
+  String get noSeatsSelected;
+
+  /// No description provided for @travellingWithFamily.
+  ///
+  /// In en, this message translates to:
+  /// **'Travelling with family?'**
+  String get travellingWithFamily;
+
+  /// No description provided for @autoFill.
+  ///
+  /// In en, this message translates to:
+  /// **'Auto-fill'**
+  String get autoFill;
+
+  /// No description provided for @autoFilled.
+  ///
+  /// In en, this message translates to:
+  /// **'Auto-filled ✔'**
+  String get autoFilled;
+
+  /// No description provided for @reFill.
+  ///
+  /// In en, this message translates to:
+  /// **'Re-fill'**
+  String get reFill;
+
+  /// No description provided for @fillSeat1Info.
+  ///
+  /// In en, this message translates to:
+  /// **'Fill seat 1, then copy name & phone to all other seats.'**
+  String get fillSeat1Info;
+
+  /// No description provided for @addEntireJourneyToCart.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Entire Journey to Cart'**
+  String get addEntireJourneyToCart;
+
+  /// No description provided for @buildJourney.
+  ///
+  /// In en, this message translates to:
+  /// **'Build Journey'**
+  String get buildJourney;
+
+  /// No description provided for @suggestedTransferRoute.
+  ///
+  /// In en, this message translates to:
+  /// **'Suggested Transfer Route'**
+  String get suggestedTransferRoute;
+
+  /// No description provided for @transferAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Transfer at'**
+  String get transferAt;
+
+  /// No description provided for @legN.
+  ///
+  /// In en, this message translates to:
+  /// **'Leg {n}'**
+  String legN(String n);
+
+  /// No description provided for @journeyAddedToCart.
+  ///
+  /// In en, this message translates to:
+  /// **'Journey added to cart successfully!'**
+  String get journeyAddedToCart;
+
+  /// No description provided for @bookingSuccessful.
+  ///
+  /// In en, this message translates to:
+  /// **'Booking successful!'**
+  String get bookingSuccessful;
+
+  /// No description provided for @indirectTripAddedToCart.
+  ///
+  /// In en, this message translates to:
+  /// **'Indirect Trip successfully added to Cart!'**
+  String get indirectTripAddedToCart;
+
+  /// No description provided for @pleaseSelectSeat.
+  ///
+  /// In en, this message translates to:
+  /// **'Please select a seat'**
+  String get pleaseSelectSeat;
+
+  /// No description provided for @selectExactlyNSeats.
+  ///
+  /// In en, this message translates to:
+  /// **'Please pick exactly {n} seats'**
+  String selectExactlyNSeats(String n);
+
+  /// No description provided for @canOnlySelectNSeats.
+  ///
+  /// In en, this message translates to:
+  /// **'You can only select {n} seats for this leg.'**
+  String canOnlySelectNSeats(String n);
+
+  /// No description provided for @pleaseSelectNPassengers.
+  ///
+  /// In en, this message translates to:
+  /// **'Please select exactly {n} passengers'**
+  String pleaseSelectNPassengers(String n);
+
+  /// No description provided for @fillNamePhoneFirst.
+  ///
+  /// In en, this message translates to:
+  /// **'Please fill in Name and Phone for the first passenger first.'**
+  String get fillNamePhoneFirst;
+
+  /// No description provided for @filledNSeats.
+  ///
+  /// In en, this message translates to:
+  /// **'Filled {n} seat(s) with \"{name}\"'**
+  String filledNSeats(String n, String name);
+
+  /// No description provided for @requiredCountSeats.
+  ///
+  /// In en, this message translates to:
+  /// **'Required: {n} seats. Selected: {m}'**
+  String requiredCountSeats(String n, String m);
+
+  /// No description provided for @idTypeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'ID Type'**
+  String get idTypeLabel;
+
+  /// No description provided for @idTypeNationalId.
+  ///
+  /// In en, this message translates to:
+  /// **'National ID'**
+  String get idTypeNationalId;
+
+  /// No description provided for @idTypePassport.
+  ///
+  /// In en, this message translates to:
+  /// **'Passport'**
+  String get idTypePassport;
+
+  /// No description provided for @idNumberLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'ID Number'**
+  String get idNumberLabel;
+
+  /// No description provided for @passportNumberLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Passport Number'**
+  String get passportNumberLabel;
+
+  /// No description provided for @activeChallengesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Active Challenges'**
+  String get activeChallengesTitle;
+
+  /// No description provided for @challengeProgressLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'{current} / {goal} trips'**
+  String challengeProgressLabel(String current, String goal);
+
+  /// No description provided for @challengeRewardLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Reward: {points} points'**
+  String challengeRewardLabel(String points);
+
+  /// No description provided for @challengeMonthly.
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly'**
+  String get challengeMonthly;
+
+  /// No description provided for @challengeOneTime.
+  ///
+  /// In en, this message translates to:
+  /// **'One-Time'**
+  String get challengeOneTime;
+
+  /// No description provided for @challengePts.
+  ///
+  /// In en, this message translates to:
+  /// **'+{pts} pts'**
+  String challengePts(String pts);
+
+  /// No description provided for @challengeProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'{current} / {goal}'**
+  String challengeProgress(String current, String goal);
+
+  /// No description provided for @amLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'AM'**
+  String get amLabel;
+
+  /// No description provided for @pmLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'PM'**
+  String get pmLabel;
+
+  /// No description provided for @floorLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Floor {n}'**
+  String floorLabel(String n);
+
+  /// No description provided for @standardClass.
+  ///
+  /// In en, this message translates to:
+  /// **'Standard'**
+  String get standardClass;
+
+  /// No description provided for @dateCannotBeToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Travel date cannot be today. Please select a future date.'**
+  String get dateCannotBeToday;
+
+  /// No description provided for @selectTravelDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Travel Date'**
+  String get selectTravelDate;
+
+  /// No description provided for @search.
+  ///
+  /// In en, this message translates to:
+  /// **'Search'**
+  String get search;
+
+  /// No description provided for @notifications.
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications'**
+  String get notifications;
+
+  /// No description provided for @markAllRead.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark all read'**
+  String get markAllRead;
+
+  /// No description provided for @filterAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get filterAll;
+
+  /// No description provided for @filterUnread.
+  ///
+  /// In en, this message translates to:
+  /// **'Unread'**
+  String get filterUnread;
+
+  /// No description provided for @filterMarketplace.
+  ///
+  /// In en, this message translates to:
+  /// **'Marketplace'**
+  String get filterMarketplace;
+
+  /// No description provided for @dismiss.
+  ///
+  /// In en, this message translates to:
+  /// **'Dismiss'**
+  String get dismiss;
 }
 
 class _AppLocalizationsDelegate

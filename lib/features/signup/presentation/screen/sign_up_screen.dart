@@ -7,6 +7,7 @@ import 'package:transportation_app/core/routing/routes.dart';
 import 'package:transportation_app/core/validators/app_validators.dart';
 import 'package:transportation_app/core/widgets/app_gradient_button.dart';
 import 'package:transportation_app/core/widgets/auth_background.dart';
+import 'package:transportation_app/core/widgets/language_toggle_button.dart';
 import 'package:transportation_app/core/widgets/profile_picture_picker.dart';
 import 'package:transportation_app/features/signup/presentation/cubit/signup_cubit.dart';
 import 'package:transportation_app/features/signup/presentation/cubit/signup_state.dart';
@@ -150,6 +151,11 @@ class _SignupScreenState extends State<SignupScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(height: 20),
+                Align(
+                  alignment: AlignmentDirectional.centerEnd,
+                  child: const LanguageToggleButton(),
+                ),
+                const SizedBox(height: 8),
                 SignupHeader(),
                 Center(
                   child: ProfilePicturePicker(

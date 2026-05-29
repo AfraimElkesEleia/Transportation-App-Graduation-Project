@@ -3,10 +3,12 @@ import 'station_entity.dart';
 
 class StationGroupEntity extends Equatable {
   final String              governorate;
+  final String?             governorateAr;
   final List<StationEntity> stations;
 
   const StationGroupEntity({
     required this.governorate,
+    this.governorateAr,
     required this.stations,
   });
 

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:transportation_app/core/helper/extensions.dart';
+import 'package:transportation_app/core/l10n/app_localizations.dart';
 import 'package:transportation_app/core/routing/routes.dart';
 import 'package:transportation_app/core/theming/colors.dart';
 import 'package:transportation_app/features/booking/presentation/cubit/round_trip_booking_cubit.dart';
@@ -67,7 +69,7 @@ class _RoundTripPassengerFormScreenState extends State<RoundTripPassengerFormScr
       outboundPassengers.add({
         'passengerName': c.nameController.text.trim(),
         'idNumber': c.idController.text.trim().isEmpty ? 'N/A' : c.idController.text.trim(),
-        'idType': 'NationalId',
+        'idType': c.selectedIdType,
         'seatNumber': state.selectedOutboundSeats[i],
       });
     }
@@ -78,7 +80,7 @@ class _RoundTripPassengerFormScreenState extends State<RoundTripPassengerFormScr
       returnPassengers.add({
         'passengerName': c.nameController.text.trim(),
         'idNumber': c.idController.text.trim().isEmpty ? 'N/A' : c.idController.text.trim(),
-        'idType': 'NationalId',
+        'idType': c.selectedIdType,
         'seatNumber': state.selectedReturnSeats[i],
       });
     }
@@ -125,8 +127,8 @@ class _RoundTripPassengerFormScreenState extends State<RoundTripPassengerFormScr
           listener: (context, state) {
             if (state.cartSuccess) {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Journey added to cart successfully!'),
+                SnackBar(
+                  content: Text(AppLocalizations.of(context)!.journeyAddedToCart),
                   backgroundColor: Colors.green,
                 ),
               );
@@ -137,8 +139,8 @@ class _RoundTripPassengerFormScreenState extends State<RoundTripPassengerFormScr
               );
             } else if (state.checkoutSuccess) {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Booking successful!'),
+                SnackBar(
+                  content: Text(AppLocalizations.of(context)!.bookingSuccessful),
                   backgroundColor: Colors.green,
                 ),
               );
@@ -174,7 +176,7 @@ class _RoundTripPassengerFormScreenState extends State<RoundTripPassengerFormScr
                       children: [
                         // ── Outbound Leg Passengers ──────────────────────
                         _LegHeader(
-                          label: 'Outbound',
+                          label: AppLocalizations.of(context)!.outbound,
                           seatCount: _outboundCount,
                           icon: Icons.flight_takeoff,
                           color: ColorsManager.accentCyan,
@@ -184,7 +186,7 @@ class _RoundTripPassengerFormScreenState extends State<RoundTripPassengerFormScr
                         for (int i = 0; i < _outboundCount; i++)
                           _PassengerCard(
                             index: i + 1,
-                            seatLabel: 'Seat: ${state.selectedOutboundSeats[i]}',
+                            seatLabel: AppLocalizations.of(context)!.seatLabel(state.selectedOutboundSeats[i]),
                             controllers: _outboundControllers[i],
                             isTrain: isTrain,
                           ),
@@ -193,7 +195,7 @@ class _RoundTripPassengerFormScreenState extends State<RoundTripPassengerFormScr
 
                         // ── Return Leg Passengers ────────────────────────
                         _LegHeader(
-                          label: 'Return',
+                          label: AppLocalizations.of(context)!.returnTrip,
                           seatCount: _returnCount,
                           icon: Icons.flight_land,
                           color: ColorsManager.turquoise,
@@ -203,7 +205,7 @@ class _RoundTripPassengerFormScreenState extends State<RoundTripPassengerFormScr
                         for (int i = 0; i < _returnCount; i++)
                           _PassengerCard(
                             index: i + 1,
-                            seatLabel: 'Seat: ${state.selectedReturnSeats[i]}',
+                            seatLabel: AppLocalizations.of(context)!.seatLabel(state.selectedReturnSeats[i]),
                             controllers: _returnControllers[i],
                             isTrain: isTrain,
                           ),
@@ -279,7 +281,7 @@ class _LegHeader extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  '$label — $seatCount Passenger${seatCount != 1 ? 's' : ''}',
+                  '$label — ${AppLocalizations.of(context)!.passengersCount('$seatCount')}',
                   style: TextStyle(color: color, fontSize: 14, fontWeight: FontWeight.bold),
                 ),
                 if (trip != null) ...[
@@ -288,9 +290,15 @@ class _LegHeader extends StatelessWidget {
                     crossAxisAlignment: WrapCrossAlignment.center,
                     textDirection: TextDirection.ltr,
                     children: [
-                      ..._buildGovSubList(trip!.originGovernorate, trip!.originStationName),
+                      ..._buildGovSubList(
+                        trip!.originGovernorate.toLocalizedGov(context),
+                        trip!.originStationName.toLocalizedStation(context),
+                      ),
                       const Text(' ➔ ', style: TextStyle(color: Colors.white70, fontSize: 12)),
-                      ..._buildGovSubList(trip!.destinationGovernorate, trip!.destinationStationName),
+                      ..._buildGovSubList(
+                        trip!.destinationGovernorate.toLocalizedGov(context),
+                        trip!.destinationStationName.toLocalizedStation(context),
+                      ),
                     ],
                   ),
                 ],
@@ -303,12 +311,14 @@ class _LegHeader extends StatelessWidget {
   }
 }
 
-// ── Per-passenger controllers ─────────────────────────────────────────────────
+// ── Per-passenger controllers ────────────────────────────────────────────────
 class _PassengerControllers {
   final nameController  = TextEditingController();
   final idController    = TextEditingController();
   final phoneController = TextEditingController();
   final emailController = TextEditingController();
+  // 'NationalId' | 'Passport'
+  String selectedIdType = 'NationalId';
 
   void dispose() {
     nameController.dispose();
@@ -338,10 +348,10 @@ class _FormAppBar extends StatelessWidget {
               child: const Icon(Icons.arrow_back, color: Colors.white, size: 20),
             ),
           ),
-          const Expanded(
+          Expanded(
             child: Text(
-              'Passenger Details',
-              style: TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.bold),
+              AppLocalizations.of(context)!.passengerDetails,
+              style: const TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.bold),
               textAlign: TextAlign.center,
             ),
           ),
@@ -353,7 +363,7 @@ class _FormAppBar extends StatelessWidget {
 }
 
 // ── Single passenger card ─────────────────────────────────────────────────────
-class _PassengerCard extends StatelessWidget {
+class _PassengerCard extends StatefulWidget {
   final int index;
   final String seatLabel;
   final _PassengerControllers controllers;
@@ -367,7 +377,13 @@ class _PassengerCard extends StatelessWidget {
   });
 
   @override
+  State<_PassengerCard> createState() => _PassengerCardState();
+}
+
+class _PassengerCardState extends State<_PassengerCard> {
+  @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(16),
@@ -383,7 +399,7 @@ class _PassengerCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Passenger $index',
+                loc.passengerN('${widget.index}'),
                 style: const TextStyle(
                   color: ColorsManager.accentCyan,
                   fontSize: 14,
@@ -391,40 +407,79 @@ class _PassengerCard extends StatelessWidget {
                 ),
               ),
               Text(
-                seatLabel,
+                widget.seatLabel,
                 style: const TextStyle(color: Colors.white70, fontSize: 12),
               ),
             ],
           ),
           const SizedBox(height: 12),
           _buildTextField(
-            controller: controllers.nameController,
-            label: 'Full Name',
+            controller: widget.controllers.nameController,
+            label: loc.fullName,
             icon: Icons.person_outline,
-            validator: (v) => (v == null || v.trim().isEmpty) ? 'Required' : null,
+            validator: (v) => (v == null || v.trim().isEmpty) ? loc.requiredField : null,
           ),
           const SizedBox(height: 12),
-          if (isTrain) ...[
+          // ── ID Type Dropdown + ID Number — ONLY for train ──
+          if (widget.isTrain) ...[
+            DropdownButtonFormField<String>(
+              value: widget.controllers.selectedIdType,
+              decoration: InputDecoration(
+                labelText: loc.idTypeLabel,
+                labelStyle: const TextStyle(color: ColorsManager.textMuted, fontSize: 13),
+                prefixIcon: const Icon(Icons.badge_outlined, color: ColorsManager.textMuted, size: 20),
+                filled: true,
+                fillColor: ColorsManager.seatContainerBg,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: const BorderSide(color: ColorsManager.accentCyan),
+                ),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              ),
+              dropdownColor: ColorsManager.surfaceDark,
+              style: const TextStyle(color: Colors.white, fontSize: 14),
+              items: [
+                DropdownMenuItem(value: 'NationalId', child: Text(loc.idTypeNationalId)),
+                DropdownMenuItem(value: 'Passport', child: Text(loc.idTypePassport)),
+              ],
+              onChanged: (val) {
+                if (val != null) {
+                  setState(() {
+                    widget.controllers.selectedIdType = val;
+                    widget.controllers.idController.clear();
+                  });
+                }
+              },
+            ),
+            const SizedBox(height: 12),
             _buildTextField(
-              controller: controllers.idController,
-              label: 'National ID',
-              icon: Icons.badge_outlined,
-              keyboardType: TextInputType.number,
-              validator: (v) => (v == null || v.trim().isEmpty) ? 'Required' : null,
+              controller: widget.controllers.idController,
+              label: widget.controllers.selectedIdType == 'NationalId'
+                  ? loc.idNumberLabel
+                  : loc.passportNumberLabel,
+              icon: Icons.credit_card_outlined,
+              keyboardType: widget.controllers.selectedIdType == 'NationalId'
+                  ? TextInputType.number
+                  : TextInputType.text,
+              validator: (v) => (v == null || v.trim().isEmpty) ? loc.requiredField : null,
             ),
             const SizedBox(height: 12),
           ],
           _buildTextField(
-            controller: controllers.phoneController,
-            label: 'Phone Number',
+            controller: widget.controllers.phoneController,
+            label: loc.phoneNumberLabel,
             icon: Icons.phone_outlined,
             keyboardType: TextInputType.phone,
-            validator: (v) => (v == null || v.trim().isEmpty) ? 'Required' : null,
+            validator: (v) => (v == null || v.trim().isEmpty) ? loc.requiredField : null,
           ),
           const SizedBox(height: 12),
           _buildTextField(
-            controller: controllers.emailController,
-            label: 'Email Address (Optional)',
+            controller: widget.controllers.emailController,
+            label: loc.emailOptional,
             icon: Icons.email_outlined,
             keyboardType: TextInputType.emailAddress,
           ),
@@ -533,9 +588,9 @@ class _FormBottomButtonsState extends State<_FormBottomButtons> {
                               color: ColorsManager.accentCyan,
                             ),
                           )
-                        : const Text(
-                            'Add to Cart',
-                            style: TextStyle(
+                        : Text(
+                            AppLocalizations.of(context)!.addToCart,
+                            style: const TextStyle(
                               color: ColorsManager.accentCyan,
                               fontWeight: FontWeight.bold,
                               fontSize: 15,
@@ -572,9 +627,9 @@ class _FormBottomButtonsState extends State<_FormBottomButtons> {
                               color: Colors.white,
                             ),
                           )
-                        : const Text(
-                            'Book Now',
-                            style: TextStyle(
+                        : Text(
+                            AppLocalizations.of(context)!.bookNow,
+                            style: const TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.bold,
                               fontSize: 15,

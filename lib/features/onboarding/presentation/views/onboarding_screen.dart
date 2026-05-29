@@ -5,7 +5,9 @@ import 'package:transportation_app/core/helper/extensions.dart';
 import 'package:transportation_app/core/helper/spacing.dart';
 import 'package:transportation_app/core/routing/routes.dart';
 import 'package:transportation_app/core/theming/styles.dart';
+import 'package:transportation_app/core/l10n/app_localizations.dart';
 import 'package:transportation_app/core/widgets/basic_container.dart';
+import 'package:transportation_app/core/widgets/language_toggle_button.dart';
 import 'package:transportation_app/features/onboarding/presentation/widgets/next_button.dart';
 import 'package:transportation_app/features/onboarding/presentation/widgets/on_boarding_screen_page_view.dart';
 import 'package:transportation_app/features/onboarding/presentation/widgets/page_view_indicator.dart';
@@ -87,8 +89,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   Row skipButton(BuildContext context) {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.end,
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
+        Padding(
+          padding: const EdgeInsets.only(left: 8),
+          child: const LanguageToggleButton(),
+        ),
         TextButton(
           onPressed: () {
             context.pushNamedAndRemoveuntil(
@@ -100,7 +106,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             backgroundColor: Colors.transparent,
             elevation: 0,
           ),
-          child: Text("Skip", style: AppStyles.semiBold18White(context)),
+          child: Text(
+            AppLocalizations.of(context)?.skip ?? 'Skip',
+            style: AppStyles.semiBold18White(context),
+          ),
         ),
       ],
     );

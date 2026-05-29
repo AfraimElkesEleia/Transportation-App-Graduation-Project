@@ -3,6 +3,9 @@ import 'package:equatable/equatable.dart';
 class ChallengeEntity extends Equatable {
   final int challengeId;
   final String title;
+  final String? titleAr;
+  final String? description;
+  final String? descriptionAr;
   final int type;
   final int currentProgress;
   final int goalValue;
@@ -11,6 +14,9 @@ class ChallengeEntity extends Equatable {
   const ChallengeEntity({
     required this.challengeId,
     required this.title,
+    this.titleAr,
+    this.description,
+    this.descriptionAr,
     required this.type,
     required this.currentProgress,
     required this.goalValue,
@@ -21,6 +27,9 @@ class ChallengeEntity extends Equatable {
   List<Object?> get props => [
     challengeId,
     title,
+    titleAr,
+    description,
+    descriptionAr,
     type,
     currentProgress,
     goalValue,
@@ -103,7 +112,7 @@ class ProfileEntity extends Equatable {
   }
 
   String get fullName =>
-      '$firstName $familyName $lastName'.replaceAll(RegExp(r'\s+'), ' ').trim();
+      '$firstName $lastName $familyName'.replaceAll(RegExp(r'\s+'), ' ').trim();
 
   @override
   List<Object?> get props => [userId, email];

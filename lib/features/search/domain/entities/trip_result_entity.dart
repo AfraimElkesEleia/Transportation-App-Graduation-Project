@@ -8,15 +8,20 @@ class TripResultEntity extends Equatable {
   final int tripOccurrenceId;
   final int tripId;
   final String agencyName;
+  final String? agencyNameAr;
   final DateTime departureTime;
   final DateTime? arrivalTime;
   final int? totalDurationMinutes;
   final int originStationId;
   final String originStationName;
+  final String? originStationNameAr;
   final String originGovernorate;
+  final String? originGovernorateAr;
   final int destinationStationId;
   final String destinationStationName;
+  final String? destinationStationNameAr;
   final String destinationGovernorate;
+  final String? destinationGovernorateAr;
   final List<CoachClassEntity> availableClasses;
   final List<RouteStopsModel>? routeStops;
 
@@ -24,15 +29,20 @@ class TripResultEntity extends Equatable {
     required this.tripOccurrenceId,
     required this.tripId,
     required this.agencyName,
+    this.agencyNameAr,
     required this.departureTime,
     required this.arrivalTime,
     required this.totalDurationMinutes,
     required this.originStationId,
     required this.originStationName,
+    this.originStationNameAr,
     required this.originGovernorate,
+    this.originGovernorateAr,
     required this.destinationStationId,
     required this.destinationStationName,
+    this.destinationStationNameAr,
     required this.destinationGovernorate,
+    this.destinationGovernorateAr,
     required this.availableClasses,
     this.routeStops,
   });

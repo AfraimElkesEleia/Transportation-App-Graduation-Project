@@ -237,21 +237,75 @@
   "pts": "pts",
   "noExpiringPoints": "No expiring points right now",
   "ptsExpired": "{n} pts have expired",
-  "@ptsExpired": { "placeholders": { "n": { "type": "String" } } },
+  "@ptsExpired": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
   "ptsExpireTomorrow": "{n} pts expire tomorrow",
-  "@ptsExpireTomorrow": { "placeholders": { "n": { "type": "String" } } },
+  "@ptsExpireTomorrow": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
   "ptsExpireInDays": "{n} pts expire in {d} days",
-  "@ptsExpireInDays": { "placeholders": { "n": { "type": "String" }, "d": { "type": "String" } } },
+  "@ptsExpireInDays": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      },
+      "d": {
+        "type": "String"
+      }
+    }
+  },
   "ptsExpireInMonthsDays": "{n} pts expire in {m} and {d}",
-  "@ptsExpireInMonthsDays": { "placeholders": { "n": { "type": "String" }, "m": { "type": "String" }, "d": { "type": "String" } } },
+  "@ptsExpireInMonthsDays": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      },
+      "m": {
+        "type": "String"
+      },
+      "d": {
+        "type": "String"
+      }
+    }
+  },
   "ptsExpireInMonths": "{n} pts expire in {m}",
-  "@ptsExpireInMonths": { "placeholders": { "n": { "type": "String" }, "m": { "type": "String" } } },
+  "@ptsExpireInMonths": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      },
+      "m": {
+        "type": "String"
+      }
+    }
+  },
   "oneMonth": "1 month",
   "monthsPlural": "{m} months",
-  "@monthsPlural": { "placeholders": { "m": { "type": "String" } } },
+  "@monthsPlural": {
+    "placeholders": {
+      "m": {
+        "type": "String"
+      }
+    }
+  },
   "oneDay": "1 day",
   "daysPlural": "{d} days",
-  "@daysPlural": { "placeholders": { "d": { "type": "String" } } },
+  "@daysPlural": {
+    "placeholders": {
+      "d": {
+        "type": "String"
+      }
+    }
+  },
   "pointsPending": "Points are pending until departure and expire 4 months after departure.",
   "profile": "Profile",
   "manageAccount": "Manage your account",
@@ -259,7 +313,13 @@
   "departureDate": "Departure date",
   "subCityOptional": "Sub-city (optional — any station)",
   "govHint": "{title} (e.g. Cairo, Luxor)",
-  "@govHint": { "placeholders": { "title": { "type": "String" } } },
+  "@govHint": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
   "popularRoutes": "Popular Routes",
   "latestNews": "Latest News",
   "gov_Cairo": "Cairo",
@@ -292,7 +352,13 @@
   "uploadingPhoto": "Uploading photo...",
   "photoUploaded": "Photo uploaded",
   "photoUploadFailed": "Photo upload failed: {msg}",
-  "@photoUploadFailed": { "placeholders": { "msg": { "type": "String" } } },
+  "@photoUploadFailed": {
+    "placeholders": {
+      "msg": {
+        "type": "String"
+      }
+    }
+  },
   "skipAndSave": "Skip & Save",
   "profileUpdatedSuccessfully": "Profile updated successfully",
   "firstName": "First Name",
@@ -312,9 +378,24 @@
   "saveChanges": "Save Changes",
   "saving": "Saving...",
   "pointsBalanceIs": "Points Balance: {n}",
-  "@pointsBalanceIs": { "placeholders": { "n": { "type": "String" } } },
+  "@pointsBalanceIs": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
   "expiringSoonCard": "Expiring Soon: {n} pts ({date})",
-  "@expiringSoonCard": { "placeholders": { "n": { "type": "String" }, "date": { "type": "String" } } },
+  "@expiringSoonCard": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
   "earnedPointsPending": "Earned points are pending until departure and expire 4 months after departure.",
   "myCart": "My Cart",
   "yourCartIsEmpty": "Your cart is empty",
@@ -327,5 +408,258 @@
   "dateOfBirthLabel": "Date of Birth",
   "createPasswordHint": "Create a strong password",
   "confirmPasswordLabel": "Confirm Password",
-  "confirmPasswordHint": "Re-enter your password"
+  "confirmPasswordHint": "Re-enter your password",
+  "directTrip": "Direct",
+  "stopsCount": "{count} Stops",
+  "@stopsCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "hideStops": "Hide Stops",
+  "showStops": "Show Stops",
+  "routeStops": "Route Stops",
+  "howManyPassengers": "How many passengers?",
+  "perSeat": "per seat",
+  "seatsAvailable": "{n} seats available",
+  "@seatsAvailable": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "continueWithNPassengers": "Continue with {n} Passenger(s)",
+  "@continueWithNPassengers": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "useLoyaltyPoints": "💎 Use Loyalty Points",
+  "noPointsYet": "You don't have any points yet. Complete trips to earn points!",
+  "pointsCantBeApplied": "Points can't be applied — cart total is too low (10 EGP minimum final price).",
+  "needMorePoints": "You need at least 20 pts to redeem (= 1.00 EGP off). You currently have {points} pts. Keep booking to earn more!",
+  "@needMorePoints": {
+    "placeholders": {
+      "points": {
+        "type": "String"
+      }
+    }
+  },
+  "ptsLabel": "pts",
+  "pointsInfo": "ℹ️ 20 pts = 1.00 EGP",
+  "pointsUsed": "Points used",
+  "discount": "Discount",
+  "remainingAfter": "Remaining after",
+  "finalTotal": "Final total",
+  "ptsValue": "{n} pts",
+  "@ptsValue": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "from": "From",
+  "book": "Book",
+  "fullSeats": "Full",
+  "skip": "Skip",
+  "ticketDetails": "Ticket Details",
+  "ticketClass": "{className} Class",
+  "@ticketClass": {"placeholders": {"className": {"type": "String"}}},
+  "to": "To",
+  "departure": "Departure",
+  "arrival": "Arrival",
+  "bookingRef": "Booking Ref",
+  "passengersAndSeats": "Passengers & Seats",
+  "tapPassengerInfo": "Tap on a passenger to view their boarding pass",
+  "idNum": "ID: {id}",
+  "@idNum": {"placeholders": {"id": {"type": "String"}}},
+  "seatNum": "Seat {seat}",
+  "@seatNum": {"placeholders": {"seat": {"type": "String"}}},
+  "seat": "seat(s)",
+  "pax": "pax",
+  "passengerDetails": "Passenger Details",
+  "fullName": "Full Name",
+  "nationalId": "National ID",
+  "emailOptional": "Email Address (Optional)",
+  "requiredField": "Required",
+  "addToCart": "Add to Cart",
+  "bookNow": "Book Now",
+  "passengerN": "Passenger {n}",
+  "@passengerN": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "seatLabel": "Seat: {n}",
+  "@seatLabel": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "passengersCount": "{n} Passenger(s)",
+  "@passengersCount": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "selectSeats": "Select Seats",
+  "selectedSeatsLabel": "Selected: ",
+  "seatsCount": "{n} seats",
+  "@seatsCount": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "totalLabel": "Total",
+  "continueBtn": "Continue",
+  "noSeatsSelected": "No seats selected",
+  "travellingWithFamily": "Travelling with family?",
+  "autoFill": "Auto-fill",
+  "autoFilled": "Auto-filled ✔",
+  "reFill": "Re-fill",
+  "fillSeat1Info": "Fill seat 1, then copy name & phone to all other seats.",
+  "addEntireJourneyToCart": "Add Entire Journey to Cart",
+  "buildJourney": "Build Journey",
+  "suggestedTransferRoute": "Suggested Transfer Route",
+  "transferAt": "Transfer at",
+  "legN": "Leg {n}",
+  "@legN": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "journeyAddedToCart": "Journey added to cart successfully!",
+  "bookingSuccessful": "Booking successful!",
+  "indirectTripAddedToCart": "Indirect Trip successfully added to Cart!",
+  "pleaseSelectSeat": "Please select a seat",
+  "selectExactlyNSeats": "Please pick exactly {n} seats",
+  "@selectExactlyNSeats": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "canOnlySelectNSeats": "You can only select {n} seats for this leg.",
+  "@canOnlySelectNSeats": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "pleaseSelectNPassengers": "Please select exactly {n} passengers",
+  "@pleaseSelectNPassengers": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "fillNamePhoneFirst": "Please fill in Name and Phone for the first passenger first.",
+  "filledNSeats": "Filled {n} seat(s) with \"{name}\"",
+  "@filledNSeats": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      },
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "requiredCountSeats": "Required: {n} seats. Selected: {m}",
+  "@requiredCountSeats": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      },
+      "m": {
+        "type": "String"
+      }
+    }
+  },
+  "idTypeLabel": "ID Type",
+  "idTypeNationalId": "National ID",
+  "idTypePassport": "Passport",
+  "idNumberLabel": "ID Number",
+  "passportNumberLabel": "Passport Number",
+  "activeChallengesTitle": "Active Challenges",
+  "challengeProgressLabel": "{current} / {goal} trips",
+  "@challengeProgressLabel": {
+    "placeholders": {
+      "current": {
+        "type": "String"
+      },
+      "goal": {
+        "type": "String"
+      }
+    }
+  },
+  "challengeRewardLabel": "Reward: {points} points",
+  "@challengeRewardLabel": {
+    "placeholders": {
+      "points": {
+        "type": "String"
+      }
+    }
+  },
+  "challengeMonthly": "Monthly",
+  "challengeOneTime": "One-Time",
+  "challengePts": "+{pts} pts",
+  "@challengePts": {
+    "placeholders": {
+      "pts": {
+        "type": "String"
+      }
+    }
+  },
+  "challengeProgress": "{current} / {goal}",
+  "@challengeProgress": {
+    "placeholders": {
+      "current": {
+        "type": "String"
+      },
+      "goal": {
+        "type": "String"
+      }
+    }
+  },
+  "amLabel": "AM",
+  "pmLabel": "PM",
+  "floorLabel": "Floor {n}",
+  "@floorLabel": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "standardClass": "Standard",
+  "popularRoutes": "🔥 Popular Routes",
+  "dateCannotBeToday": "Travel date cannot be today. Please select a future date.",
+  "selectTravelDate": "Select Travel Date",
+  "search": "Search",
+  "notifications": "Notifications",
+  "markAllRead": "Mark all read",
+  "filterAll": "All",
+  "filterUnread": "Unread",
+  "filterMarketplace": "Marketplace",
+  "dismiss": "Dismiss"
 }

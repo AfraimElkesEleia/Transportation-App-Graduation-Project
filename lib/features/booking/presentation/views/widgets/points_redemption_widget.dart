@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:transportation_app/core/theming/colors.dart';
+import 'package:transportation_app/core/l10n/app_localizations.dart';
 
 class PointsRedemptionWidget extends StatefulWidget {
   final double cartTotal;
@@ -57,20 +58,18 @@ class _PointsRedemptionWidgetState extends State<PointsRedemptionWidget> {
   Widget build(BuildContext context) {
     // Case B — 0 points at all
     if (widget.walletPoints == 0) {
-      return const _PointsInfoBanner(
+      return _PointsInfoBanner(
         icon: Icons.info_outline,
         color: ColorsManager.accentCyan,
-        message:
-            "You don't have any points yet. Complete trips to earn points!",
+        message: AppLocalizations.of(context)!.noPointsYet,
       );
     }
     // Case C — cart at/below floor
     if (widget.cartTotal <= kMinFinalPrice) {
-      return const _PointsInfoBanner(
+      return _PointsInfoBanner(
         icon: Icons.warning_amber_rounded,
         color: Colors.orange,
-        message:
-            'Points can\'t be applied — cart total is too low (10 EGP minimum final price).',
+        message: AppLocalizations.of(context)!.pointsCantBeApplied,
       );
     }
     // Case D — balance too small for even 1 EGP discount (< 20 pts usable)
@@ -78,18 +77,16 @@ class _PointsRedemptionWidgetState extends State<PointsRedemptionWidget> {
       return _PointsInfoBanner(
         icon: Icons.info_outline,
         color: ColorsManager.accentCyan,
-        message:
-            'You need at least 20 pts to redeem (= 1.00 EGP off). '
-            'You currently have ${widget.walletPoints} pts. Keep booking to earn more!',
+        message: AppLocalizations.of(context)!.needMorePoints('${widget.walletPoints}'),
       );
     }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          '💎 Use Loyalty Points',
-          style: TextStyle(
+        Text(
+          AppLocalizations.of(context)!.useLoyaltyPoints,
+          style: const TextStyle(
             color: Colors.white,
             fontSize: 16,
             fontWeight: FontWeight.bold,
@@ -103,7 +100,7 @@ class _PointsRedemptionWidgetState extends State<PointsRedemptionWidget> {
           divisions: _sliderMax ~/ kSliderStep > 0
               ? _sliderMax ~/ kSliderStep
               : 1,
-          label: '$_selectedPoints pts',
+          label: AppLocalizations.of(context)!.ptsValue('$_selectedPoints'),
           activeColor: ColorsManager.accentCyan,
           inactiveColor: Colors.white24,
           onChanged: (v) {
@@ -121,9 +118,9 @@ class _PointsRedemptionWidgetState extends State<PointsRedemptionWidget> {
           finalTotal: _finalTotal,
         ),
         const SizedBox(height: 8),
-        const Text(
-          'ℹ️  20 pts = 1.00 EGP',
-          style: TextStyle(color: Colors.white38, fontSize: 11),
+        Text(
+          AppLocalizations.of(context)!.pointsInfo,
+          style: const TextStyle(color: Colors.white38, fontSize: 11),
         ),
       ],
     );
@@ -154,23 +151,23 @@ class _LiveReceiptCard extends StatelessWidget {
       ),
       child: Column(
         children: [
-          _buildRow('Points used', '$selectedPoints pts', Colors.white),
+          _buildRow(AppLocalizations.of(context)!.pointsUsed, AppLocalizations.of(context)!.ptsValue('$selectedPoints'), Colors.white),
           const SizedBox(height: 4),
           _buildRow(
-            'Discount',
-            '− ${discountEgp.toStringAsFixed(2)} EGP',
+            AppLocalizations.of(context)!.discount,
+            '− ${discountEgp.toStringAsFixed(2)} ${AppLocalizations.of(context)!.egp}',
             ColorsManager.successGreen,
           ),
           const SizedBox(height: 4),
           _buildRow(
-            'Remaining after',
-            '$remainingAfter pts',
+            AppLocalizations.of(context)!.remainingAfter,
+            AppLocalizations.of(context)!.ptsValue('$remainingAfter'),
             ColorsManager.accentCyan,
           ),
           const Divider(color: Colors.white24, height: 16),
           _buildRow(
-            'Final total',
-            '${finalTotal.toStringAsFixed(2)} EGP',
+            AppLocalizations.of(context)!.finalTotal,
+            '${finalTotal.toStringAsFixed(2)} ${AppLocalizations.of(context)!.egp}',
             Colors.white,
             isBold: true,
           ),

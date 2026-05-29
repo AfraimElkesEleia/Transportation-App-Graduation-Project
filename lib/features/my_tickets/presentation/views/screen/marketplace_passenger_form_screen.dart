@@ -191,7 +191,6 @@ class _PassengerControllers {
   final idController = TextEditingController();
   final phoneController = TextEditingController();
   final emailController = TextEditingController();
-  String gender = 'Male';
 
   void dispose() {
     nameController.dispose();
@@ -307,7 +306,6 @@ class _PassengerCardState extends State<_PassengerCard> {
                 (v == null || v.trim().isEmpty) ? 'Required' : null,
           ),
           const SizedBox(height: 12),
-          if (!widget.isTrain) _buildGenderDropdown(),
         ],
       ),
     );
@@ -345,49 +343,6 @@ class _PassengerCardState extends State<_PassengerCard> {
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(color: Colors.redAccent),
-        ),
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 16,
-          vertical: 14,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildGenderDropdown() {
-    return DropdownButtonFormField<String>(
-      initialValue: widget.controllers.gender,
-      onChanged: (val) {
-        if (val != null) {
-          setState(() => widget.controllers.gender = val);
-        }
-      },
-      items: const [
-        DropdownMenuItem(value: 'Male', child: Text('Male')),
-        DropdownMenuItem(value: 'Female', child: Text('Female')),
-      ],
-      dropdownColor: ColorsManager.seatContainerBg,
-      style: const TextStyle(color: Colors.white, fontSize: 14),
-      decoration: InputDecoration(
-        labelText: 'Gender',
-        labelStyle: const TextStyle(
-          color: ColorsManager.textMuted,
-          fontSize: 13,
-        ),
-        prefixIcon: const Icon(
-          Icons.wc_outlined,
-          color: ColorsManager.textMuted,
-          size: 20,
-        ),
-        filled: true,
-        fillColor: ColorsManager.seatContainerBg,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide.none,
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: ColorsManager.accentCyan),
         ),
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 16,

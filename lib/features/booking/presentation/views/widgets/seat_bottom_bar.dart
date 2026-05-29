@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:transportation_app/core/l10n/app_localizations.dart';
 import 'package:transportation_app/core/theming/colors.dart';
 
 /// Bottom bar showing selected seats summary, total price, and Continue button.
 class SeatBottomBar extends StatelessWidget {
-  final Set<String>  selectedSeats;
-  final double       pricePerSeat;
-  final double       total;
+  final Set<String> selectedSeats;
+  final double pricePerSeat;
+  final double total;
   final VoidCallback onProceed;
 
   const SeatBottomBar({
@@ -18,6 +19,7 @@ class SeatBottomBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final labels = selectedSeats.join(', ');
     final hasSelection = selectedSeats.isNotEmpty;
 
@@ -34,18 +36,20 @@ class SeatBottomBar extends StatelessWidget {
             children: [
               // Left: seat count + labels
               _SelectedSeatsInfo(
-                count:  selectedSeats.length,
+                l10n: l10n,
+                count: selectedSeats.length,
                 labels: labels,
               ),
               // Right: total price
-              _TotalPriceInfo(total: total),
+              _TotalPriceInfo(l10n: l10n, total: total),
             ],
           ),
         ),
 
         // ── Continue button ──
         _ContinueButton(
-          enabled:   hasSelection,
+          label: l10n.continueBtn,
+          enabled: hasSelection,
           onPressed: onProceed,
         ),
       ],
@@ -57,10 +61,15 @@ class SeatBottomBar extends StatelessWidget {
 // _SelectedSeatsInfo
 // ─────────────────────────────────────────────────────────────────
 class _SelectedSeatsInfo extends StatelessWidget {
-  final int    count;
+  final AppLocalizations l10n;
+  final int count;
   final String labels;
 
-  const _SelectedSeatsInfo({required this.count, required this.labels});
+  const _SelectedSeatsInfo({
+    required this.l10n,
+    required this.count,
+    required this.labels,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -69,13 +78,13 @@ class _SelectedSeatsInfo extends StatelessWidget {
       children: [
         RichText(
           text: TextSpan(
-            text: 'Selected: ',
+            text: l10n.selectedSeatsLabel,
             style: const TextStyle(color: Colors.white70, fontSize: 14),
             children: [
               TextSpan(
-                text: '$count seats',
+                text: l10n.seatsCount('$count'),
                 style: const TextStyle(
-                  color:      Colors.white,
+                  color: Colors.white,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -84,9 +93,9 @@ class _SelectedSeatsInfo extends StatelessWidget {
         ),
         const SizedBox(height: 2),
         Text(
-          labels.isEmpty ? 'No seats selected' : labels,
+          labels.isEmpty ? l10n.noSeatsSelected : labels,
           style: const TextStyle(
-            color:    ColorsManager.accentCyan,
+            color: ColorsManager.accentCyan,
             fontSize: 12,
           ),
         ),
@@ -99,24 +108,25 @@ class _SelectedSeatsInfo extends StatelessWidget {
 // _TotalPriceInfo
 // ─────────────────────────────────────────────────────────────────
 class _TotalPriceInfo extends StatelessWidget {
+  final AppLocalizations l10n;
   final double total;
 
-  const _TotalPriceInfo({required this.total});
+  const _TotalPriceInfo({required this.l10n, required this.total});
 
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
-        const Text(
-          'Total',
-          style: TextStyle(color: Colors.white54, fontSize: 12),
+        Text(
+          l10n.totalLabel,
+          style: const TextStyle(color: Colors.white54, fontSize: 12),
         ),
         Text(
-          'EGP ${total.toStringAsFixed(0)}',
+          '${l10n.egp} ${total.toStringAsFixed(0)}',
           style: const TextStyle(
-            color:      Colors.white,
-            fontSize:   20,
+            color: Colors.white,
+            fontSize: 20,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -129,24 +139,29 @@ class _TotalPriceInfo extends StatelessWidget {
 // _ContinueButton — gradient when active, muted when disabled
 // ─────────────────────────────────────────────────────────────────
 class _ContinueButton extends StatelessWidget {
-  final bool         enabled;
+  final String label;
+  final bool enabled;
   final VoidCallback onPressed;
 
-  const _ContinueButton({required this.enabled, required this.onPressed});
+  const _ContinueButton({
+    required this.label,
+    required this.enabled,
+    required this.onPressed,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
       child: SizedBox(
-        width:  double.infinity,
+        width: double.infinity,
         height: 54,
         child: ElevatedButton(
           onPressed: enabled ? onPressed : null,
           style: ElevatedButton.styleFrom(
-            padding:         EdgeInsets.zero,
+            padding: EdgeInsets.zero,
             backgroundColor: Colors.transparent,
-            shadowColor:     Colors.transparent,
+            shadowColor: Colors.transparent,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(27),
             ),
@@ -160,23 +175,23 @@ class _ContinueButton extends StatelessWidget {
                         ColorsManager.accentCyan,
                       ],
                       begin: Alignment.centerLeft,
-                      end:   Alignment.centerRight,
+                      end: Alignment.centerRight,
                     )
-                  : LinearGradient(colors: [
-                      ColorsManager.seatContainerBg,
-                      ColorsManager.seatContainerBg,
-                    ]),
+                  : const LinearGradient(
+                      colors: [
+                        ColorsManager.seatContainerBg,
+                        ColorsManager.seatContainerBg,
+                      ],
+                    ),
               borderRadius: BorderRadius.circular(27),
             ),
             child: Container(
               alignment: Alignment.center,
               child: Text(
-                'Continue',
+                label,
                 style: TextStyle(
-                  color: enabled
-                      ? ColorsManager.seatBg
-                      : Colors.white38,
-                  fontSize:   17,
+                  color: enabled ? ColorsManager.seatBg : Colors.white38,
+                  fontSize: 17,
                   fontWeight: FontWeight.bold,
                 ),
               ),

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:transportation_app/core/helper/extensions.dart';
+import 'package:transportation_app/core/l10n/app_localizations.dart';
 import 'package:transportation_app/core/routing/routes.dart';
 import 'package:transportation_app/core/theming/colors.dart';
 import 'package:transportation_app/features/multidestination/presentation/cubit/multi_destination_booking_cubit.dart';
@@ -86,7 +88,7 @@ class _MultiDestinationPassengerFormScreenState
         };
 
         if (_isTrainPerLeg[legIndex]) {
-          pass['idType'] = 'NationalId';
+          pass['idType'] = c.selectedIdType;
           pass['idNumber'] = c.nationalIdController.text.trim();
         }
 
@@ -119,9 +121,9 @@ class _MultiDestinationPassengerFormScreenState
       backgroundColor: ColorsManager.seatBg,
       appBar: AppBar(
         backgroundColor: ColorsManager.surfaceDark,
-        title: const Text(
-          'Passenger Details',
-          style: TextStyle(color: Colors.white, fontSize: 16),
+        title: Text(
+          AppLocalizations.of(context)!.passengerDetails,
+          style: const TextStyle(color: Colors.white, fontSize: 16),
         ),
         iconTheme: const IconThemeData(color: Colors.white),
       ),
@@ -216,9 +218,9 @@ class _MultiDestinationPassengerFormScreenState
                                 ? const CircularProgressIndicator(
                                     color: Colors.white,
                                   )
-                                : const Text(
-                                    'Add to Cart',
-                                    style: TextStyle(
+                                : Text(
+                                    AppLocalizations.of(context)!.addToCart,
+                                    style: const TextStyle(
                                       color: Colors.white,
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold,
@@ -280,7 +282,7 @@ class _LegHeader extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Leg ${legIndex + 1} — $seatCount Passenger${seatCount != 1 ? 's' : ''}',
+                  '${AppLocalizations.of(context)!.legN('${legIndex + 1}')} — ${AppLocalizations.of(context)!.passengersCount('$seatCount')}',
                   style: const TextStyle(
                     color: ColorsManager.accentCyan,
                     fontSize: 13,
@@ -292,14 +294,17 @@ class _LegHeader extends StatelessWidget {
                   textDirection: TextDirection.ltr,
                   children: [
                     ..._buildGovSubList(
-                      summary.fromGov,
-                      summary.fromSub ?? " ",
+                      summary.fromGov.toLocalizedGov(context),
+                      (summary.fromSub ?? " ").toLocalizedStation(context),
                     ),
                     const Text(
                       ' ➔ ',
                       style: TextStyle(color: Colors.white70, fontSize: 12),
                     ),
-                    ..._buildGovSubList(summary.toGov, summary.toSub ?? " "),
+                    ..._buildGovSubList(
+                      summary.toGov.toLocalizedGov(context),
+                      (summary.toSub ?? " ").toLocalizedStation(context),
+                    ),
                   ],
                 ),
               ],
@@ -311,12 +316,14 @@ class _LegHeader extends StatelessWidget {
   }
 }
 
-// ── Per-passenger controllers ─────────────────────────────────────────────────
+// ── Per-passenger controllers ────────────────────────────────────────────────────────────────
 class _PassengerControllers {
   final nameController = TextEditingController();
   final nationalIdController = TextEditingController();
   final phoneController = TextEditingController();
   final emailController = TextEditingController();
+  // 'NationalId' | 'Passport'
+  String selectedIdType = 'NationalId';
 
   void dispose() {
     nameController.dispose();
@@ -326,8 +333,8 @@ class _PassengerControllers {
   }
 }
 
-// ── Single passenger card ─────────────────────────────────────────────────────
-class _PassengerCard extends StatelessWidget {
+// ── Single passenger card ────────────────────────────────────────────────────────────────
+class _PassengerCard extends StatefulWidget {
   final int index;
   final String seatNumber;
   final _PassengerControllers controllers;
@@ -341,7 +348,13 @@ class _PassengerCard extends StatelessWidget {
   });
 
   @override
+  State<_PassengerCard> createState() => _PassengerCardState();
+}
+
+class _PassengerCardState extends State<_PassengerCard> {
+  @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(16),
@@ -357,7 +370,7 @@ class _PassengerCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Passenger $index',
+                loc.passengerN('${widget.index}'),
                 style: const TextStyle(
                   color: ColorsManager.accentCyan,
                   fontSize: 14,
@@ -365,55 +378,82 @@ class _PassengerCard extends StatelessWidget {
                 ),
               ),
               Text(
-                'Seat $seatNumber',
+                loc.seatLabel(widget.seatNumber),
                 style: const TextStyle(color: Colors.white70, fontSize: 12),
               ),
             ],
           ),
           const SizedBox(height: 12),
           TextFormField(
-            controller: controllers.nameController,
+            controller: widget.controllers.nameController,
             style: const TextStyle(color: Colors.white, fontSize: 14),
             decoration: _inputDecoration(
-              label: 'Full Name',
+              label: loc.fullName,
               icon: Icons.person_outline,
             ),
             validator: (v) =>
-                (v == null || v.trim().isEmpty) ? 'Required' : null,
+                (v == null || v.trim().isEmpty) ? loc.requiredField : null,
           ),
           const SizedBox(height: 12),
-          if (isTrain) ...[
-            TextFormField(
-              controller: controllers.nationalIdController,
-              keyboardType: TextInputType.number,
-              style: const TextStyle(color: Colors.white, fontSize: 14),
+          // ── ID Type Dropdown + ID Number — ONLY for train legs ──
+          if (widget.isTrain) ...[
+            DropdownButtonFormField<String>(
+              value: widget.controllers.selectedIdType,
               decoration: _inputDecoration(
-                label: 'National ID',
+                label: loc.idTypeLabel,
                 icon: Icons.badge_outlined,
               ),
+              dropdownColor: ColorsManager.surfaceDark,
+              style: const TextStyle(color: Colors.white, fontSize: 14),
+              items: [
+                DropdownMenuItem(value: 'NationalId', child: Text(loc.idTypeNationalId)),
+                DropdownMenuItem(value: 'Passport', child: Text(loc.idTypePassport)),
+              ],
+              onChanged: (val) {
+                if (val != null) {
+                  setState(() {
+                    widget.controllers.selectedIdType = val;
+                    widget.controllers.nationalIdController.clear();
+                  });
+                }
+              },
+            ),
+            const SizedBox(height: 12),
+            TextFormField(
+              controller: widget.controllers.nationalIdController,
+              keyboardType: widget.controllers.selectedIdType == 'NationalId'
+                  ? TextInputType.number
+                  : TextInputType.text,
+              style: const TextStyle(color: Colors.white, fontSize: 14),
+              decoration: _inputDecoration(
+                label: widget.controllers.selectedIdType == 'NationalId'
+                    ? loc.idNumberLabel
+                    : loc.passportNumberLabel,
+                icon: Icons.credit_card_outlined,
+              ),
               validator: (v) =>
-                  (v == null || v.trim().isEmpty) ? 'Required' : null,
+                  (v == null || v.trim().isEmpty) ? loc.requiredField : null,
             ),
             const SizedBox(height: 12),
           ],
           TextFormField(
-            controller: controllers.phoneController,
+            controller: widget.controllers.phoneController,
             keyboardType: TextInputType.phone,
             style: const TextStyle(color: Colors.white, fontSize: 14),
             decoration: _inputDecoration(
-              label: 'Phone Number',
+              label: loc.phoneNumberLabel,
               icon: Icons.phone_outlined,
             ),
             validator: (v) =>
-                (v == null || v.trim().isEmpty) ? 'Required' : null,
+                (v == null || v.trim().isEmpty) ? loc.requiredField : null,
           ),
           const SizedBox(height: 12),
           TextFormField(
-            controller: controllers.emailController,
+            controller: widget.controllers.emailController,
             keyboardType: TextInputType.emailAddress,
             style: const TextStyle(color: Colors.white, fontSize: 14),
             decoration: _inputDecoration(
-              label: 'Email Address (Optional)',
+              label: loc.emailOptional,
               icon: Icons.email_outlined,
             ),
           ),

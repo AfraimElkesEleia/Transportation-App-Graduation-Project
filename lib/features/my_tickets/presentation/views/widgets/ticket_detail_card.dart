@@ -3,12 +3,18 @@ import 'package:transportation_app/core/theming/colors.dart';
 import 'package:transportation_app/features/profile/domain/entities/ticket_entity.dart';
 import 'package:transportation_app/core/helper/extensions.dart';
 import 'package:transportation_app/core/routing/routes.dart';
+import 'package:intl/intl.dart';
+import 'package:transportation_app/core/l10n/app_localizations.dart';
 
 class TicketDetailCard extends StatelessWidget {
   final TicketEntity ticket;
   final bool showUrgency;
 
-  const TicketDetailCard({super.key, required this.ticket, this.showUrgency = false});
+  const TicketDetailCard({
+    super.key,
+    required this.ticket,
+    this.showUrgency = false,
+  });
 
   Color get _agencyColor {
     final n = ticket.agencyName.toLowerCase();
@@ -33,24 +39,28 @@ class TicketDetailCard extends StatelessWidget {
     }
   }
 
-  String _fmtDate(DateTime d) {
-    const months = [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec',
-    ];
-    final h = d.hour.toString().padLeft(2, '0');
-    final m = d.minute.toString().padLeft(2, '0');
-    return '${d.day.toString().padLeft(2, '0')} ${months[d.month - 1]}  $h:$m';
+  String _getLocalizedStatus(BuildContext context, String status) {
+    final l10n = AppLocalizations.of(context);
+    if (l10n == null) return status;
+    switch (status.toLowerCase()) {
+      case 'confirmed':
+        return l10n.statusConfirmed;
+      case 'pending':
+        return l10n.statusPending;
+      case 'completed':
+        return l10n.statusCompleted;
+      case 'cancelled':
+        return l10n.statusCancelled;
+      default:
+        return status;
+    }
+  }
+
+  String _fmtDate(BuildContext context, DateTime d) {
+    return DateFormat(
+      'dd MMM  HH:mm',
+      context.isArabic ? 'ar' : 'en',
+    ).format(d);
   }
 
   @override
@@ -101,7 +111,9 @@ class TicketDetailCard extends StatelessWidget {
                         ),
                       ),
                       child: Text(
-                        ticket.agencyName,
+                        context.isArabic
+                            ? (ticket.agencyNameAr ?? ticket.agencyName)
+                            : ticket.agencyName,
                         style: TextStyle(
                           color: _agencyColor,
                           fontSize: 11,
@@ -113,7 +125,9 @@ class TicketDetailCard extends StatelessWidget {
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    ticket.className,
+                    context.isArabic
+                        ? (ticket.classNameAr ?? ticket.className)
+                        : ticket.className,
                     style: const TextStyle(color: Colors.white54, fontSize: 12),
                   ),
                   const Spacer(),
@@ -128,7 +142,7 @@ class TicketDetailCard extends StatelessWidget {
                       border: Border.all(color: _statusColor.withOpacity(0.4)),
                     ),
                     child: Text(
-                      ticket.status,
+                      _getLocalizedStatus(context, ticket.status),
                       style: TextStyle(
                         color: _statusColor,
                         fontSize: 11,
@@ -150,7 +164,16 @@ class TicketDetailCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          ticket.originGovernorate,
+                          AppLocalizations.of(context)?.from ?? 'From',
+                          style: const TextStyle(
+                            color: Colors.white54,
+                            fontSize: 10,
+                          ),
+                        ),
+                        Text(
+                          (ticket.originGovernorateAr ??
+                                  ticket.originGovernorate)
+                              .toLocalizedGov(context),
                           style: const TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.w900,
@@ -170,7 +193,11 @@ class TicketDetailCard extends StatelessWidget {
                             const SizedBox(width: 4),
                             Expanded(
                               child: Text(
-                                ticket.originStation,
+                                (context.isArabic
+                                        ? (ticket.originStationNameAr ??
+                                              ticket.originStation)
+                                        : ticket.originStation)
+                                    .toLocalizedStation(context),
                                 style: const TextStyle(
                                   color: ColorsManager.accentCyan,
                                   fontWeight: FontWeight.w500,
@@ -183,7 +210,7 @@ class TicketDetailCard extends StatelessWidget {
                         ),
                         const SizedBox(height: 6),
                         Text(
-                          _fmtDate(ticket.boardingTime),
+                          _fmtDate(context, ticket.boardingTime),
                           style: const TextStyle(
                             color: Colors.white54,
                             fontSize: 11,
@@ -217,7 +244,16 @@ class TicketDetailCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
                         Text(
-                          ticket.destinationGovernorate,
+                          AppLocalizations.of(context)?.to ?? 'To',
+                          style: const TextStyle(
+                            color: Colors.white54,
+                            fontSize: 10,
+                          ),
+                        ),
+                        Text(
+                          (ticket.destinationGovernorateAr ??
+                                  ticket.destinationGovernorate)
+                              .toLocalizedGov(context),
                           style: const TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.w900,
@@ -239,7 +275,11 @@ class TicketDetailCard extends StatelessWidget {
                             const SizedBox(width: 4),
                             Flexible(
                               child: Text(
-                                ticket.destinationStation,
+                                (context.isArabic
+                                        ? (ticket.destinationStationNameAr ??
+                                              ticket.destinationStation)
+                                        : ticket.destinationStation)
+                                    .toLocalizedStation(context),
                                 style: const TextStyle(
                                   color: ColorsManager.accentCyan,
                                   fontWeight: FontWeight.w500,
@@ -253,7 +293,7 @@ class TicketDetailCard extends StatelessWidget {
                         ),
                         const SizedBox(height: 6),
                         Text(
-                          _fmtDate(ticket.dropoffTime),
+                          _fmtDate(context, ticket.dropoffTime),
                           style: const TextStyle(
                             color: Colors.white54,
                             fontSize: 11,
@@ -289,16 +329,18 @@ class TicketDetailCard extends StatelessWidget {
                 children: [
                   _InfoChip(
                     icon: Icons.event_seat,
-                    label: '${ticket.seatsBooked} seat(s)',
+                    label:
+                        '${ticket.seatsBooked} ${AppLocalizations.of(context)?.seat ?? "seat(s)"}',
                   ),
                   const SizedBox(width: 8),
                   _InfoChip(
                     icon: Icons.people_alt_outlined,
-                    label: '${ticket.passengers.length} pax',
+                    label:
+                        '${ticket.passengers.length} ${AppLocalizations.of(context)?.pax ?? "pax"}',
                   ),
                   const Spacer(),
                   Text(
-                    '${ticket.totalPrice.toStringAsFixed(0)} EGP',
+                    '${ticket.totalPrice.toStringAsFixed(0)} ${AppLocalizations.of(context)?.egp ?? "EGP"}',
                     style: const TextStyle(
                       color: ColorsManager.accentCyan,
                       fontWeight: FontWeight.bold,
@@ -395,7 +437,9 @@ class _UrgencyBannerState extends State<_UrgencyBanner> {
           child: Row(
             children: [
               Icon(
-                isUrgent ? Icons.directions_run_rounded : Icons.schedule_rounded,
+                isUrgent
+                    ? Icons.directions_run_rounded
+                    : Icons.schedule_rounded,
                 color: color,
                 size: 16,
               ),

@@ -26,11 +26,17 @@ class TicketEntity extends Equatable {
   final int seatsBooked;
   final DateTime bookingDate;
   final String agencyName;
+  final String? agencyNameAr;
   final String className;
+  final String? classNameAr;
   final String originGovernorate;
+  final String? originGovernorateAr;
   final String originStation;
+  final String? originStationNameAr;
   final String destinationGovernorate;
+  final String? destinationGovernorateAr;
   final String destinationStation;
+  final String? destinationStationNameAr;
   final DateTime boardingTime;
   final DateTime dropoffTime;
   final bool isMarketplacePurchase;
@@ -47,11 +53,17 @@ class TicketEntity extends Equatable {
     required this.seatsBooked,
     required this.bookingDate,
     required this.agencyName,
+    this.agencyNameAr,
     required this.className,
+    this.classNameAr,
     required this.originGovernorate,
+    this.originGovernorateAr,
     required this.originStation,
+    this.originStationNameAr,
     required this.destinationGovernorate,
+    this.destinationGovernorateAr,
     required this.destinationStation,
+    this.destinationStationNameAr,
     required this.boardingTime,
     required this.dropoffTime,
     required this.isMarketplacePurchase,

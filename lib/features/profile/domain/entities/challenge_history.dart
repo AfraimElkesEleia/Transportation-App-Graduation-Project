@@ -1,7 +1,9 @@
 class ChallengeHistory {
   final int challengeId;
   final String title;
+  final String? titleAr;
   final String description;
+  final String? descriptionAr;
   final String type;
   final String frequency;   // "OneTime" | "Monthly"
   final int currentProgress;
@@ -12,7 +14,9 @@ class ChallengeHistory {
   const ChallengeHistory({
     required this.challengeId,
     required this.title,
+    this.titleAr,
     required this.description,
+    this.descriptionAr,
     required this.type,
     required this.frequency,
     required this.currentProgress,

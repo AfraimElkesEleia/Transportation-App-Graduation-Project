@@ -1,11 +1,15 @@
 class RouteStopsModel {
   final String stationName;
+  final String? arabicName;
+  final String? governorateAr;
   final String? arrivalTime;
   final String? departureTime;
   final int stopSequence;
 
   RouteStopsModel({
     required this.stationName,
+    this.arabicName,
+    this.governorateAr,
     required this.arrivalTime,
     required this.departureTime,
     required this.stopSequence,
@@ -13,6 +17,8 @@ class RouteStopsModel {
   factory RouteStopsModel.fromJson(Map<String, dynamic> json) {
     return RouteStopsModel(
       stationName: json['stationName'] as String? ?? '',
+      arabicName: json['arabicName'] as String?,
+      governorateAr: json['governorateAr'] as String?,
       arrivalTime: json['arrivalTime'] as String? ?? '',
       departureTime: json['departureTime'] as String? ?? '',
       stopSequence: json['stopSequence'] as int,

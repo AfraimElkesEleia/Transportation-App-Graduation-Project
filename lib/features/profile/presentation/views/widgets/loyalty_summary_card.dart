@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:transportation_app/core/l10n/app_localizations.dart';
 import 'package:transportation_app/core/theming/colors.dart';
 
 class LoyaltySummaryCard extends StatelessWidget {
@@ -13,29 +14,35 @@ class LoyaltySummaryCard extends StatelessWidget {
     this.nextExpiryDate,
   });
 
-  String _expiryLabel() {
+  String _expiryLabel(AppLocalizations loc) {
     if (nextExpiryDate == null || expiringAmount <= 0) return '';
     final expiry = DateTime.parse(nextExpiryDate!).toLocal();
     final diff = expiry.difference(DateTime.now());
-    if (diff.inDays <= 0) return '$expiringAmount pts have expired';
-    if (diff.inDays == 1) return '$expiringAmount pts expire tomorrow';
-    
+    final n = '$expiringAmount';
+
+    if (diff.inDays <= 0) return loc.ptsExpired(n);
+    if (diff.inDays == 1) return loc.ptsExpireTomorrow(n);
+
     if (diff.inDays < 30) {
-      return '$expiringAmount pts expire in ${diff.inDays} days';
+      final d = diff.inDays == 1 ? loc.oneDay : loc.daysPlural('${diff.inDays}');
+      return loc.ptsExpireInDays(n, d);
     }
-    
+
     final months = diff.inDays ~/ 30;
     final days = diff.inDays % 30;
-    String mStr = months == 1 ? '1 month' : '$months months';
-    String dStr = days == 1 ? '1 day' : '$days days';
-    return days > 0
-        ? '$expiringAmount pts expire in $mStr and $dStr'
-        : '$expiringAmount pts expire in $mStr';
+    final mStr = months == 1 ? loc.oneMonth : loc.monthsPlural('$months');
+
+    if (days > 0) {
+      final dStr = days == 1 ? loc.oneDay : loc.daysPlural('$days');
+      return loc.ptsExpireInMonthsDays(n, mStr, dStr);
+    }
+    return loc.ptsExpireInMonths(n, mStr);
   }
 
   @override
   Widget build(BuildContext context) {
-    final expiryText = _expiryLabel();
+    final loc = AppLocalizations.of(context)!;
+    final expiryText = _expiryLabel(loc);
 
     return Container(
       width: double.infinity,
@@ -48,9 +55,9 @@ class LoyaltySummaryCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Current Balance',
-            style: TextStyle(color: Colors.white70, fontSize: 14),
+          Text(
+            loc.availableBalance,
+            style: const TextStyle(color: Colors.white70, fontSize: 14),
           ),
           const SizedBox(height: 8),
           Row(
@@ -58,7 +65,7 @@ class LoyaltySummaryCard extends StatelessWidget {
               const Icon(Icons.stars_rounded, color: Color(0xFFFFD700), size: 32),
               const SizedBox(width: 12),
               Text(
-                '$pointsBalance pts',
+                '$pointsBalance ${loc.pts}',
                 style: const TextStyle(
                   color: Colors.white,
                   fontSize: 28,
@@ -79,11 +86,21 @@ class LoyaltySummaryCard extends StatelessWidget {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Icon(Icons.warning_amber_rounded, color: Colors.orange, size: 16),
+                  const Icon(
+                    Icons.warning_amber_rounded,
+                    color: Colors.orange,
+                    size: 16,
+                  ),
                   const SizedBox(width: 8),
-                  Text(
-                    expiryText,
-                    style: const TextStyle(color: Colors.orange, fontSize: 13, fontWeight: FontWeight.w500),
+                  Flexible(
+                    child: Text(
+                      expiryText,
+                      style: const TextStyle(
+                        color: Colors.orange,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
                   ),
                 ],
               ),

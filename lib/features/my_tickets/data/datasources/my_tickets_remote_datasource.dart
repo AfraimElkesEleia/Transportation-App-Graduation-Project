@@ -14,6 +14,10 @@ abstract class MyTicketsRemoteDatasource {
     required String expiryDate,
     required String cvv,
   });
+  Future<String> getQrPayload({
+    required int bookingId,
+    required int passengerId,
+  });
   Future<Map<String, dynamic>> getActiveListings({
     int pageNumber = 1,
     int pageSize = 10,
@@ -117,6 +121,25 @@ class MyTicketsRemoteDatasourceImpl implements MyTicketsRemoteDatasource {
       if (body['success'] != true) {
         throw ServerException(message: body['message'] ?? 'Deposit failed');
       }
+    } on DioException catch (e) {
+      _handleDio(e);
+    }
+  }
+
+  @override
+  Future<String> getQrPayload({
+    required int bookingId,
+    required int passengerId,
+  }) async {
+    try {
+      final res = await dio.get('/Bookings/$bookingId/passengers/$passengerId/qr-payload');
+      final body = res.data as Map<String, dynamic>;
+      if (body['success'] != true) {
+        throw ServerException(
+          message: body['message'] ?? 'Failed to get QR payload',
+        );
+      }
+      return body['data'] as String;
     } on DioException catch (e) {
       _handleDio(e);
     }
@@ -231,11 +254,17 @@ class MyTicketsRemoteDatasourceImpl implements MyTicketsRemoteDatasource {
           DateTime.tryParse(json['bookingDate'] as String? ?? '') ??
           DateTime.now(),
       agencyName: json['agencyName'] as String? ?? '',
+      agencyNameAr: json['agencyNameAr'] as String?,
       className: json['className'] as String? ?? '',
+      classNameAr: json['classNameAr'] as String?,
       originGovernorate: json['originGov'] as String? ?? 'Cairo',
+      originGovernorateAr: json['originGovernorateAr'] as String?,
       originStation: json['originStation'] as String? ?? '',
+      originStationNameAr: json['originStationNameAr'] as String?,
       destinationGovernorate: json['destinationGov'] as String? ?? 'Alexandria',
+      destinationGovernorateAr: json['destinationGovernorateAr'] as String?,
       destinationStation: json['destinationStation'] as String? ?? '',
+      destinationStationNameAr: json['destinationStationNameAr'] as String?,
       boardingTime:
           DateTime.tryParse(json['boardingTime'] as String? ?? '') ??
           DateTime.now(),

@@ -9,7 +9,7 @@ class StationsCubit extends Cubit<StationsState> {
   StationsCubit({required this.getStationsUseCase}) : super(StationsInitial());
 
   Future<void> loadStations() async {
-    if (state is StationsLoaded) return;  // already loaded — no re-fetch
+    if (state is StationsLoaded) return;
     emit(StationsLoading());
     final result = await getStationsUseCase(NoParams());
     result.fold(
@@ -18,7 +18,6 @@ class StationsCubit extends Cubit<StationsState> {
     );
   }
 
-  /// Force a reload (used by pull-to-refresh). Ignores the cache guard.
   Future<void> refresh() async {
     emit(StationsLoading());
     final result = await getStationsUseCase(NoParams());

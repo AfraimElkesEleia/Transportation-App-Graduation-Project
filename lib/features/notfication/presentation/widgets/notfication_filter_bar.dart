@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:transportation_app/core/l10n/app_localizations.dart';
 import 'package:transportation_app/core/theming/colors.dart';
 import 'package:transportation_app/features/notfication/presentation/cubit/notfication_state.dart';
 
-/// Horizontal scrollable filter chips: All | Marketplace | Unread (with badge).
+/// Horizontal scrollable filter chips: All | Unread (with badge) | Marketplace.
 class NotificationFilterBar extends StatelessWidget {
   final NotificationFilter active;
   final int unreadCount;
@@ -17,6 +18,7 @@ class NotificationFilterBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
     return SizedBox(
       height: 40,
       child: ListView(
@@ -24,22 +26,22 @@ class NotificationFilterBar extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 16),
         children: [
           _Chip(
-            label: 'All',
-            isActive: active == NotificationFilter.all,
-            onTap: () => onChanged(NotificationFilter.all),
+            label: loc.filterUnread,
+            badge: unreadCount > 0 ? unreadCount : null,
+            isActive: active == NotificationFilter.unread,
+            onTap: () => onChanged(NotificationFilter.unread),
           ),
           const SizedBox(width: 8),
           _Chip(
-            label: 'Marketplace',
+            label: loc.filterMarketplace,
             isActive: active == NotificationFilter.marketplace,
             onTap: () => onChanged(NotificationFilter.marketplace),
           ),
           const SizedBox(width: 8),
           _Chip(
-            label: 'Unread',
-            badge: unreadCount > 0 ? unreadCount : null,
-            isActive: active == NotificationFilter.unread,
-            onTap: () => onChanged(NotificationFilter.unread),
+            label: loc.filterAll,
+            isActive: active == NotificationFilter.all,
+            onTap: () => onChanged(NotificationFilter.all),
           ),
         ],
       ),

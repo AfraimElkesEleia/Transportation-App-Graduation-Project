@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:transportation_app/core/helper/extensions.dart';
+import 'package:transportation_app/core/l10n/app_localizations.dart';
 import 'package:transportation_app/core/theming/colors.dart';
 import 'package:transportation_app/features/profile/domain/entities/profile_entity.dart';
 
@@ -8,6 +10,7 @@ class ChallengesSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -44,9 +47,9 @@ class ChallengesSection extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 12),
-              const Text(
-                'Active Challenges',
-                style: TextStyle(
+              Text(
+                loc.activeChallengesTitle,
+                style: const TextStyle(
                   color: Colors.white70,
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
@@ -70,7 +73,17 @@ class _ChallengeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
     final progress = challenge.currentProgress / challenge.goalValue;
+
+    // Localized title & description based on current locale
+    final title = context.isArabic
+        ? (challenge.titleAr ?? challenge.title)
+        : challenge.title;
+    final description = context.isArabic
+        ? (challenge.descriptionAr ?? challenge.description ?? '')
+        : (challenge.description ?? '');
+
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(16),
@@ -82,16 +95,26 @@ class _ChallengeCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            challenge.title,
+            title,
             style: const TextStyle(
               color: Colors.white,
               fontSize: 16,
               fontWeight: FontWeight.bold,
             ),
           ),
+          if (description.isNotEmpty) ...[
+            const SizedBox(height: 4),
+            Text(
+              description,
+              style: const TextStyle(color: Colors.white70, fontSize: 13),
+            ),
+          ],
           const SizedBox(height: 8),
           Text(
-            '${challenge.currentProgress} / ${challenge.goalValue} trips',
+            loc.challengeProgressLabel(
+              '${challenge.currentProgress}',
+              '${challenge.goalValue}',
+            ),
             style: const TextStyle(color: Colors.white70, fontSize: 14),
           ),
           const SizedBox(height: 12),
@@ -102,7 +125,7 @@ class _ChallengeCard extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            'Reward: ${challenge.rewardPoints} points',
+            loc.challengeRewardLabel('${challenge.rewardPoints}'),
             style: const TextStyle(
               color: Color(0xFFFFD700),
               fontSize: 14,

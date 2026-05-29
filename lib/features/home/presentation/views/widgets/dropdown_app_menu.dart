@@ -1,6 +1,7 @@
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:transportation_app/core/theming/colors.dart';
+import 'package:transportation_app/core/helper/extensions.dart';
 import 'package:transportation_app/features/home/domain/entities/station_entity.dart';
 import 'package:transportation_app/features/home/domain/entities/station_group_entity.dart';
 
@@ -39,14 +40,15 @@ class DropdownAppMenu<T> extends StatelessWidget {
   }
 
   String _nameAr(T item) {
-    if (item is StationGroupEntity) return ''; 
+    if (item is StationGroupEntity)
+      return item.governorateAr ?? item.governorate;
     if (item is StationEntity) return item.arabicName;
     return '';
   }
 
-  String _displayValue(T? item) {
-    if (item == null) return 'Any station';
-    return _nameEn(item);
+  String _displayValue(BuildContext context, T? item) {
+    if (item == null) return context.isArabic ? 'أي محطة' : 'Any station';
+    return context.isArabic ? _nameAr(item) : _nameEn(item);
   }
 
   List<T?> _buildList(String filter) {
@@ -90,17 +92,18 @@ class DropdownAppMenu<T> extends StatelessWidget {
     return DropdownSearch<T?>(
       items: (filter, _) => _buildList(filter),
       compareFn: (a, b) => _compare(a, b),
-      itemAsString: (item) => _displayValue(item),
+      itemAsString: (item) => _displayValue(context, item),
       selectedItem: selectedItem,
 
       onChanged: (value) {
+        // controller text should probably be what was selected
         controller.text = value != null ? _nameEn(value) : '';
         onSelected?.call(value);
       },
 
       dropdownBuilder: (context, selectedItem) {
         return Text(
-          _displayValue(selectedItem),
+          _displayValue(context, selectedItem),
           style: TextStyle(
             color: selectedItem != null ? Colors.white : Colors.white38,
             fontSize: 14,
@@ -233,8 +236,8 @@ class DropdownAppMenu<T> extends StatelessWidget {
             );
           }
 
-          final en = _nameEn(item);
-          final ar = _nameAr(item);
+          final en = context.isArabic ? _nameAr(item) : _nameEn(item);
+          final ar = context.isArabic ? _nameEn(item) : _nameAr(item);
 
           // ── Trailing badge — station count for groups ───────
           Widget? trailing;

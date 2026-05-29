@@ -2,6 +2,8 @@
 import 'package:flutter/material.dart';
 import 'package:transportation_app/core/theming/colors.dart';
 import 'package:transportation_app/features/search/data/model/route_stops_model.dart';
+import 'package:transportation_app/core/l10n/app_localizations.dart';
+import 'package:transportation_app/core/helper/extensions.dart';
 
 class TripExpandableSection extends StatefulWidget {
   final List<RouteStopsModel> routeStops;
@@ -61,7 +63,9 @@ class _TripExpandableSectionState extends State<TripExpandableSection>
             ),
           ),
           label: Text(
-            _isExpanded ? 'Hide Stops' : 'Show Stops',
+            _isExpanded
+                ? AppLocalizations.of(context)!.hideStops
+                : AppLocalizations.of(context)!.showStops,
             style: const TextStyle(
               color: ColorsManager.accentCyan,
               fontSize: 12,
@@ -110,9 +114,9 @@ class _ExpandableContent extends StatelessWidget {
           children: [
             const Divider(color: ColorsManager.borderSubtle),
             const SizedBox(height: 12),
-            const Text(
-              'Route Stops',
-              style: TextStyle(
+            Text(
+              AppLocalizations.of(context)!.routeStops,
+              style: const TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.bold,
                 fontSize: 14,
@@ -152,19 +156,31 @@ class _StopRow extends StatelessWidget {
           ),
           const SizedBox(width: 12),
 
-          // Station name
+          // Station name — use Arabic name from API when available
           Expanded(
-            child: Text(
-              stop.stationName,
-              style: TextStyle(
-                color: stop.isOrigin || stop.isDestination
-                    ? Colors.white
-                    : Colors.white70,
-                fontSize: 13,
-                fontWeight: stop.isOrigin || stop.isDestination
-                    ? FontWeight.w600
-                    : FontWeight.normal,
-              ),
+            child: Builder(
+              builder: (context) {
+                final isAr = context.isArabic;
+                final displayName = isAr &&
+                        stop.arabicName != null &&
+                        stop.arabicName!.isNotEmpty
+                    ? stop.arabicName!
+                    : stop.stationName.toLocalizedStation(context);
+                return Text(
+                  displayName,
+                  textDirection:
+                      isAr ? TextDirection.rtl : TextDirection.ltr,
+                  style: TextStyle(
+                    color: stop.isOrigin || stop.isDestination
+                        ? Colors.white
+                        : Colors.white70,
+                    fontSize: 13,
+                    fontWeight: stop.isOrigin || stop.isDestination
+                        ? FontWeight.w600
+                        : FontWeight.normal,
+                  ),
+                );
+              },
             ),
           ),
 

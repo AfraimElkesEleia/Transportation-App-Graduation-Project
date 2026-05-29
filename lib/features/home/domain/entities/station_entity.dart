@@ -6,6 +6,7 @@ class StationEntity extends Equatable {
   final String englishName;
   final String slug;
   final String city;
+  final String? governorateAr;
 
   const StationEntity({
     required this.id,
@@ -13,6 +14,7 @@ class StationEntity extends Equatable {
     required this.englishName,
     required this.slug,
     required this.city,
+    this.governorateAr,
   });
 
   String get displayName => '$englishName ($arabicName)';

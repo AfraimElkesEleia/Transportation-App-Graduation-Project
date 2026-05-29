@@ -4,6 +4,9 @@ class ChallengeModel extends ChallengeEntity {
   const ChallengeModel({
     required super.challengeId,
     required super.title,
+    super.titleAr,
+    super.description,
+    super.descriptionAr,
     required super.type,
     required super.currentProgress,
     required super.goalValue,
@@ -14,6 +17,9 @@ class ChallengeModel extends ChallengeEntity {
     return ChallengeModel(
       challengeId: json['challengeId'] as int? ?? 0,
       title: json['title'] as String? ?? '',
+      titleAr: json['titleAr'] as String?,
+      description: json['description'] as String?,
+      descriptionAr: json['descriptionAr'] as String?,
       type: json['type'] as int? ?? 0,
       currentProgress: json['currentProgress'] as int? ?? 0,
       goalValue: json['goalValue'] as int? ?? 1,

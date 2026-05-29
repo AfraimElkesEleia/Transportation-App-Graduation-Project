@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:transportation_app/core/l10n/app_localizations.dart';
 import 'package:transportation_app/core/theming/colors.dart';
 import 'package:transportation_app/features/booking/domain/entities/seat_map.dart';
 import 'package:transportation_app/features/booking/presentation/cubit/seat_map_cubit.dart';
@@ -62,7 +63,7 @@ class _EmbeddedSeatSelectionState extends State<EmbeddedSeatSelection> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                'You can only select exactly ${widget.enforcedSeatCount} seats for Leg 2.',
+                AppLocalizations.of(context)!.canOnlySelectNSeats('${widget.enforcedSeatCount}'),
               ),
               backgroundColor: Colors.red,
             ),
@@ -76,9 +77,9 @@ class _EmbeddedSeatSelectionState extends State<EmbeddedSeatSelection> {
 
   void _proceed() {
     if (_selectedSeats.isEmpty) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Please select a seat')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(AppLocalizations.of(context)!.pleaseSelectSeat)),
+      );
       return;
     }
     if (widget.enforcedSeatCount != null &&
@@ -86,7 +87,7 @@ class _EmbeddedSeatSelectionState extends State<EmbeddedSeatSelection> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            'Please pick exactly ${widget.enforcedSeatCount} seats',
+            AppLocalizations.of(context)!.selectExactlyNSeats('${widget.enforcedSeatCount}'),
           ),
           backgroundColor: Colors.red,
         ),
@@ -112,7 +113,7 @@ class _EmbeddedSeatSelectionState extends State<EmbeddedSeatSelection> {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(
-                  'Please select exactly ${widget.enforcedSeatCount} passengers',
+                  AppLocalizations.of(context)!.pleaseSelectNPassengers('${widget.enforcedSeatCount}'),
                 ),
                 backgroundColor: Colors.red,
               ),
@@ -167,9 +168,9 @@ class _EmbeddedSeatSelectionState extends State<EmbeddedSeatSelection> {
               icon: const Icon(Icons.arrow_back, color: Colors.white),
               onPressed: widget.onCancel,
             ),
-            const Text(
-              'Select Seats',
-              style: TextStyle(
+            Text(
+              AppLocalizations.of(context)!.selectSeats,
+              style: const TextStyle(
                 color: Colors.white,
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
@@ -192,7 +193,10 @@ class _EmbeddedSeatSelectionState extends State<EmbeddedSeatSelection> {
               borderRadius: BorderRadius.circular(8),
             ),
             child: Text(
-              'Required: ${widget.enforcedSeatCount} seats. Selected: ${_selectedSeats.length}',
+              AppLocalizations.of(context)!.requiredCountSeats(
+                '${widget.enforcedSeatCount}',
+                '${_selectedSeats.length}',
+              ),
               style: const TextStyle(color: Colors.white70, fontSize: 13),
               textAlign: TextAlign.center,
             ),

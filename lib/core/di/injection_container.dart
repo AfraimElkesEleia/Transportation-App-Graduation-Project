@@ -9,6 +9,7 @@ import 'package:transportation_app/features/my_tickets/data/repositories/my_tick
 import 'package:transportation_app/features/my_tickets/domain/repositories/my_tickets_repository.dart';
 import 'package:transportation_app/features/my_tickets/presentation/cubit/my_tickets_cubit.dart';
 import 'package:transportation_app/features/my_tickets/presentation/cubit/marketplace_cubit.dart';
+import 'package:transportation_app/features/my_tickets/presentation/cubit/passenger_boarding_pass_cubit.dart';
 import 'package:transportation_app/features/notfication/data/datasources/notfication_remote_datasource.dart';
 import 'package:transportation_app/features/notfication/presentation/cubit/notfication_cubit.dart';
 import 'package:transportation_app/core/notfications/fcm_token_datasource.dart';
@@ -173,6 +174,9 @@ Future<void> init() async {
   );
   sl.registerFactory(
     () => MarketplaceCubit(repository: sl<MyTicketsRepository>()),
+  );
+  sl.registerFactory(
+    () => PassengerBoardingPassCubit(repository: sl<MyTicketsRepository>()),
   );
 
   // ── Loyalty Hub feature ─────────────────────────────────────────────

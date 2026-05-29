@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:transportation_app/core/theming/colors.dart';
 import 'package:transportation_app/features/home/domain/entities/search_params.dart';
+import 'package:transportation_app/core/helper/extensions.dart';
 
 class SearchHeader extends StatelessWidget {
   final SearchParams? params;
@@ -16,8 +17,10 @@ class SearchHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final from = params?.fromDisplayName ?? '—';
-    final to = params?.toDisplayName ?? '—';
+    final fromRaw = params?.fromDisplayName ?? '—';
+    final from = fromRaw == '—' ? '—' : fromRaw.toLocalizedGov(context).toLocalizedStation(context);
+    final toRaw = params?.toDisplayName ?? '—';
+    final to = toRaw == '—' ? '—' : toRaw.toLocalizedGov(context).toLocalizedStation(context);
     final date = params?.travelDate ?? '';
 
     return Padding(

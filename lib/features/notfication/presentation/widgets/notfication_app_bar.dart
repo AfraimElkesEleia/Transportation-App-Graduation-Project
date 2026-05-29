@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:transportation_app/core/l10n/app_localizations.dart';
 import 'package:transportation_app/core/theming/colors.dart';
 import 'package:transportation_app/features/notfication/presentation/cubit/notfication_cubit.dart';
 import 'package:transportation_app/features/notfication/presentation/cubit/notfication_state.dart';
@@ -9,6 +10,7 @@ class NotficationAppBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
       child: Row(
@@ -33,11 +35,11 @@ class NotficationAppBar extends StatelessWidget {
           ),
 
           // Title
-          const Expanded(
+          Expanded(
             child: Text(
-              'Notifications',
+              loc.notifications,
               textAlign: TextAlign.center,
-              style: TextStyle(
+              style: const TextStyle(
                 color: Colors.white,
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
@@ -56,7 +58,7 @@ class NotficationAppBar extends StatelessWidget {
                     ? () => context.read<NotificationCubit>().markAllRead()
                     : null,
                 child: Text(
-                  'Mark all read',
+                  loc.markAllRead,
                   style: TextStyle(
                     color: hasUnread ? ColorsManager.cyanBlue : Colors.grey,
                     fontSize: 13,

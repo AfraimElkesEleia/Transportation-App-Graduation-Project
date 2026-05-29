@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:transportation_app/core/helper/extensions.dart';
+import 'package:transportation_app/core/l10n/app_localizations.dart';
 import 'package:transportation_app/core/theming/colors.dart';
 import 'package:transportation_app/features/notfication/domain/entities/app_notfication.dart';
 import 'package:transportation_app/features/notfication/presentation/widgets/notfication_type_config.dart';
@@ -63,17 +65,29 @@ class NotificationCard extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           Expanded(
-                            child: Text(
-                              notification.title,
-                              style: TextStyle(
-                                color: notification.isRead
-                                    ? ColorsManager.textMuted
-                                    : Colors.white,
-                                fontSize: 14,
-                                fontWeight: notification.isRead
-                                    ? FontWeight.w500
-                                    : FontWeight.w700,
-                              ),
+                            child: Builder(
+                              builder: (context) {
+                                // Fallback to English when Arabic is null or empty
+                                final arTitle = notification.titleAr;
+                                final displayTitle =
+                                    context.isArabic &&
+                                        arTitle != null &&
+                                        arTitle.isNotEmpty
+                                    ? arTitle
+                                    : notification.title;
+                                return Text(
+                                  displayTitle,
+                                  style: TextStyle(
+                                    color: notification.isRead
+                                        ? ColorsManager.textMuted
+                                        : Colors.white,
+                                    fontSize: 14,
+                                    fontWeight: notification.isRead
+                                        ? FontWeight.w500
+                                        : FontWeight.w700,
+                                  ),
+                                );
+                              },
                             ),
                           ),
                           if (!notification.isRead)
@@ -89,15 +103,27 @@ class NotificationCard extends StatelessWidget {
                         ],
                       ),
                       const SizedBox(height: 4),
-                      Text(
-                        notification.body,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          color: ColorsManager.textMuted,
-                          fontSize: 12,
-                          height: 1.4,
-                        ),
+                      Builder(
+                        builder: (context) {
+                          // Fallback to English when Arabic is null or empty
+                          final arBody = notification.messageAr;
+                          final displayBody =
+                              context.isArabic &&
+                                  arBody != null &&
+                                  arBody.isNotEmpty
+                              ? arBody
+                              : notification.body;
+                          return Text(
+                            displayBody,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              color: ColorsManager.textMuted,
+                              fontSize: 12,
+                              height: 1.4,
+                            ),
+                          );
+                        },
                       ),
                       const SizedBox(height: 6),
                       Text(
@@ -128,9 +154,20 @@ class NotificationCard extends StatelessWidget {
   }
 
   String _month(int m) => const [
-        '', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-        'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
-      ][m];
+    '',
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec',
+  ][m];
 }
 
 // ── Type icon bubble ──────────────────────────────────────────────────────────
@@ -150,11 +187,7 @@ class _TypeIcon extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: color.withOpacity(0.25)),
       ),
-      child: Icon(
-        NotificationTypeConfig.getIcon(type),
-        color: color,
-        size: 20,
-      ),
+      child: Icon(NotificationTypeConfig.getIcon(type), color: color, size: 20),
     );
   }
 }
@@ -173,16 +206,25 @@ class _DismissBackground extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: const Color(0xFFFF5252).withOpacity(0.3)),
       ),
-      child: const Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(Icons.delete_rounded, color: Color(0xFFFF5252), size: 22),
-          SizedBox(height: 4),
-          Text(
-            'Dismiss',
-            style: TextStyle(color: Color(0xFFFF5252), fontSize: 11),
-          ),
-        ],
+      child: Builder(
+        builder: (context) {
+          final loc = AppLocalizations.of(context)!;
+          return Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(
+                Icons.delete_rounded,
+                color: Color(0xFFFF5252),
+                size: 22,
+              ),
+              const SizedBox(height: 4),
+              Text(
+                loc.dismiss,
+                style: const TextStyle(color: Color(0xFFFF5252), fontSize: 11),
+              ),
+            ],
+          );
+        },
       ),
     );
   }

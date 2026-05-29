@@ -50,8 +50,12 @@ class AuthInterceptor extends Interceptor {
       if (refreshed) {
         final newToken = await _tokenManager.getAccessToken();
         err.requestOptions.headers['Authorization'] = 'Bearer $newToken';
-        final retried = await dio.fetch(err.requestOptions);
-        return handler.resolve(retried);
+        try {
+          final retried = await dio.fetch(err.requestOptions);
+          return handler.resolve(retried);
+        } on DioException catch (retryError) {
+          return handler.next(retryError);
+        }
       } else if (!isPublic) {
         _forceLogout();
       }

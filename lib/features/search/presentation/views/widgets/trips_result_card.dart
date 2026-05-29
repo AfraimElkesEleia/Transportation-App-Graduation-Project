@@ -6,6 +6,7 @@ import 'package:transportation_app/features/search/domain/entities/coach_class_e
 import 'package:transportation_app/features/search/domain/entities/floor_group.dart';
 import 'package:transportation_app/features/search/domain/entities/trip_result_entity.dart';
 import 'package:transportation_app/features/search/presentation/views/widgets/trip_expandable_part.dart';
+import 'package:transportation_app/core/l10n/app_localizations.dart';
 
 class TripResultCard extends StatelessWidget {
   final TripResultEntity trip;
@@ -32,10 +33,10 @@ class TripResultCard extends StatelessWidget {
     return Icons.directions_bus;
   }
 
-  String _fmt(DateTime? dt) {
+  String _fmt(DateTime? dt, {String am = 'AM', String pm = 'PM'}) {
     if (dt == null) return '--:--';
     final hour = dt.hour == 0 ? 12 : (dt.hour > 12 ? dt.hour - 12 : dt.hour);
-    final period = dt.hour >= 12 ? 'PM' : 'AM';
+    final period = dt.hour >= 12 ? pm : am;
     final minute = dt.minute.toString().padLeft(2, '0');
     return '${hour.toString().padLeft(2, '0')}:$minute\n $period';
   }
@@ -65,7 +66,16 @@ class TripResultCard extends StatelessWidget {
           const SizedBox(height: 20),
 
           // ── Times row
-          _TimesRow(trip: trip, fmt: _fmt, isNextDay: _isNextDay),
+          Builder(
+            builder: (context) {
+              final loc = AppLocalizations.of(context)!;
+              return _TimesRow(
+                trip: trip,
+                fmt: (dt) => _fmt(dt, am: loc.amLabel, pm: loc.pmLabel),
+                isNextDay: _isNextDay,
+              );
+            },
+          ),
 
           // ── Available classes
           // if (trip.availableClasses.isNotEmpty) ...[
@@ -140,7 +150,9 @@ class _AgencyRow extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                trip.agencyName,
+                context.isArabic
+                    ? (trip.agencyNameAr ?? trip.agencyName)
+                    : trip.agencyName,
                 style: const TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
@@ -160,12 +172,12 @@ class _AgencyRow extends StatelessWidget {
         Column(
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            const Text(
-              'from',
-              style: TextStyle(color: Colors.white38, fontSize: 11),
+            Text(
+              AppLocalizations.of(context)!.from,
+              style: const TextStyle(color: Colors.white38, fontSize: 11),
             ),
             Text(
-              'EGP ${trip.lowestPrice.toStringAsFixed(0)}',
+              '${AppLocalizations.of(context)!.egp} ${trip.lowestPrice.toStringAsFixed(0)}',
               style: const TextStyle(
                 color: ColorsManager.accentCyan,
                 fontWeight: FontWeight.bold,
@@ -207,14 +219,25 @@ class _TimesRow extends StatelessWidget {
                 fontSize: 28,
               ),
             ),
-            Text(
-              trip.originStationName.isNotEmpty
-                  ? trip.originStationName
-                  : trip.originGovernorate.toUpperCase(),
-              style: const TextStyle(
-                color: ColorsManager.textMuted,
-                fontSize: 11,
-              ),
+            Builder(
+              builder: (context) {
+                final originStation = context.isArabic
+                    ? (trip.originStationNameAr ?? trip.originStationName)
+                    : trip.originStationName;
+                final originGov = context.isArabic
+                    ? (trip.originGovernorateAr ?? trip.originGovernorate)
+                    : trip.originGovernorate;
+                final originText = originStation.isNotEmpty
+                    ? originStation.toLocalizedStation(context)
+                    : originGov.toLocalizedGov(context).toUpperCase();
+                return Text(
+                  originText,
+                  style: const TextStyle(
+                    color: ColorsManager.textMuted,
+                    fontSize: 11,
+                  ),
+                );
+              },
             ),
           ],
         ),
@@ -264,9 +287,13 @@ class _TimesRow extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 4),
-                const Text(
-                  'Direct',
-                  style: TextStyle(
+                Text(
+                  trip.hasRouteStops
+                      ? AppLocalizations.of(
+                          context,
+                        )!.stopsCount('${trip.safeRouteStops.length}')
+                      : AppLocalizations.of(context)!.directTrip,
+                  style: const TextStyle(
                     color: ColorsManager.textMuted,
                     fontSize: 11,
                   ),
@@ -293,14 +320,27 @@ class _TimesRow extends StatelessWidget {
             ),
             Row(
               children: [
-                Text(
-                  trip.destinationStationName.isNotEmpty
-                      ? trip.destinationStationName
-                      : trip.destinationGovernorate.toUpperCase(),
-                  style: const TextStyle(
-                    color: ColorsManager.textMuted,
-                    fontSize: 11,
-                  ),
+                Builder(
+                  builder: (context) {
+                    final destStation = context.isArabic
+                        ? (trip.destinationStationNameAr ??
+                              trip.destinationStationName)
+                        : trip.destinationStationName;
+                    final destGov = context.isArabic
+                        ? (trip.destinationGovernorateAr ??
+                              trip.destinationGovernorate)
+                        : trip.destinationGovernorate;
+                    final destText = destStation.isNotEmpty
+                        ? destStation.toLocalizedStation(context)
+                        : destGov.toLocalizedGov(context).toUpperCase();
+                    return Text(
+                      destText,
+                      style: const TextStyle(
+                        color: ColorsManager.textMuted,
+                        fontSize: 11,
+                      ),
+                    );
+                  },
                 ),
                 if (isNextDay(trip.departureTime, trip.arrivalTime)) ...[
                   const SizedBox(width: 4),
@@ -339,6 +379,23 @@ class _FloorGroupTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
+    final isAr = context.isArabic;
+
+    // Pick the best display name for the class group
+    final displayName =
+        isAr &&
+            floor.classes.isNotEmpty &&
+            floor.classes.first.classNameAr != null &&
+            floor.classes.first.classNameAr!.isNotEmpty
+        ? floor.classes.first.classNameAr!
+        : floor.groupName;
+
+    // Localized floor badge
+    final floorBadge = floor.floorNumber != null
+        ? loc.floorLabel('${floor.floorNumber}')
+        : loc.standardClass;
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
       child: Row(
@@ -348,9 +405,7 @@ class _FloorGroupTile extends StatelessWidget {
             constraints: const BoxConstraints(maxWidth: 120),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-
               children: [
-                // "Horus - Prestige"
                 Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 10,
@@ -364,23 +419,21 @@ class _FloorGroupTile extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        floor.groupName,
+                        displayName,
                         style: const TextStyle(
                           color: Colors.white70,
                           fontSize: 13,
                           height: 1.3,
                         ),
                       ),
-                      if (floor.floorNumber != null) ...[
-                        const SizedBox(height: 2),
-                        Text(
-                          floor.label,
-                          style: const TextStyle(
-                            color: ColorsManager.accentCyan,
-                            fontSize: 11,
-                          ),
+                      const SizedBox(height: 2),
+                      Text(
+                        floorBadge,
+                        style: const TextStyle(
+                          color: ColorsManager.accentCyan,
+                          fontSize: 11,
                         ),
-                      ],
+                      ),
                     ],
                   ),
                 ),
@@ -391,7 +444,7 @@ class _FloorGroupTile extends StatelessWidget {
 
           // ── Total seats (combined Single + Double) ───
           Text(
-            '${floor.totalSeats} seats',
+            loc.seatsCount('${floor.totalSeats}'),
             style: TextStyle(
               color: floor.totalSeats < 5
                   ? Colors.orangeAccent
@@ -403,7 +456,7 @@ class _FloorGroupTile extends StatelessWidget {
 
           // ── Price ────────────────────────────────────
           Text(
-            'EGP ${floor.lowestPrice.toStringAsFixed(0)}',
+            '${AppLocalizations.of(context)!.egp} ${floor.lowestPrice.toStringAsFixed(0)}',
             style: const TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.bold,
@@ -436,7 +489,9 @@ class _FloorGroupTile extends StatelessWidget {
                 elevation: 0,
               ),
               child: Text(
-                floor.hasSeats ? 'Book' : 'Full',
+                floor.hasSeats
+                    ? AppLocalizations.of(context)!.book
+                    : AppLocalizations.of(context)!.fullSeats,
                 style: TextStyle(
                   color: floor.hasSeats ? Colors.white : Colors.white38,
                   fontWeight: FontWeight.bold,

@@ -5,14 +5,18 @@ class NotficationModel {
   final bool isRead;
   final DateTime createdAt;
   final String title;
+  final String? titleAr;
   final String message;
+  final String? messageAr;
   final String type;
   const NotficationModel({
     required this.id,
     required this.isRead,
     required this.createdAt,
     required this.title,
+    this.titleAr,
     required this.message,
+    this.messageAr,
     required this.type,
   });
 
@@ -22,7 +26,9 @@ class NotficationModel {
       isRead: json['isRead'] as bool? ?? false,
       createdAt: DateTime.parse(json['createdAt'] as String),
       title: json['title'] as String? ?? '',
+      titleAr: json['titleAr'] as String?,
       message: json['message'] as String? ?? '',
+      messageAr: json['messageAr'] as String?,
       type: json['type'] as String? ?? 'Marketplace',
     );
   }
@@ -30,7 +36,9 @@ class NotficationModel {
     id: id.toString(),
     type: _mapType(type),
     title: title,
+    titleAr: titleAr,
     body: message,
+    messageAr: messageAr,
     receivedAt: createdAt,
     isRead: isRead,
     payload: {'type': type},

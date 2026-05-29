@@ -4,6 +4,7 @@ class CoachClassModel extends CoachClassEntity {
   const CoachClassModel({
     required super.coachClassId,
     required super.className,
+    super.classNameAr,
     required super.remainingSeats,
     required super.price,
   });
@@ -12,6 +13,7 @@ class CoachClassModel extends CoachClassEntity {
     return CoachClassModel(
       coachClassId: json['coachClassId'] as int,
       className: json['className'] as String? ?? '', 
+      classNameAr: json['classNameAr'] as String?,
       remainingSeats: json['remainingSeats'] as int,
       price: (json['price'] as num).toDouble(),
     );

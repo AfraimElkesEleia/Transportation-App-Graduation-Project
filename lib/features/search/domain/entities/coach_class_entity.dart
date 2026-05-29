@@ -3,12 +3,14 @@ import 'package:equatable/equatable.dart';
 class CoachClassEntity extends Equatable {
   final int coachClassId;
   final String className;
+  final String? classNameAr;
   final int remainingSeats;
   final double price;
 
   const CoachClassEntity({
     required this.coachClassId,
     required this.className,
+    this.classNameAr,
     required this.remainingSeats,
     required this.price,
   });

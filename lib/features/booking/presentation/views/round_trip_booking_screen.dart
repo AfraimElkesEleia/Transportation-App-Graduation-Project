@@ -15,6 +15,7 @@ import 'package:transportation_app/features/search/presentation/views/widgets/se
 import 'package:transportation_app/features/search/presentation/views/widgets/trips_result_card.dart';
 import 'package:transportation_app/features/search/presentation/views/widgets/filter_bottom_sheet.dart';
 import 'package:transportation_app/core/l10n/app_localizations.dart';
+import 'package:transportation_app/core/helper/extensions.dart';
 
 class RoundTripBookingScreen extends StatefulWidget {
   final SearchParams activeParams;
@@ -261,13 +262,20 @@ class _RoundTripBookingScreenState extends State<RoundTripBookingScreen> {
                   Wrap(
                     crossAxisAlignment: WrapCrossAlignment.center,
                     children: [
-                      Text(
-                        state.selectedOutboundTrip!.originStationName,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
+                      Builder(
+                        builder: (context) {
+                          final originStation = context.isArabic ? (state.selectedOutboundTrip!.originStationNameAr ?? state.selectedOutboundTrip!.originStationName) : state.selectedOutboundTrip!.originStationName;
+                          final originGov = context.isArabic ? (state.selectedOutboundTrip!.originGovernorateAr ?? state.selectedOutboundTrip!.originGovernorate) : state.selectedOutboundTrip!.originGovernorate;
+                          final originText = originStation.isNotEmpty ? originStation.toLocalizedStation(context) : originGov.toLocalizedGov(context).toUpperCase();
+                          return Text(
+                            originText,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          );
+                        }
                       ),
                       const Padding(
                         padding: EdgeInsets.symmetric(horizontal: 8.0),
@@ -277,13 +285,20 @@ class _RoundTripBookingScreenState extends State<RoundTripBookingScreen> {
                           size: 16,
                         ),
                       ),
-                      Text(
-                        state.selectedOutboundTrip!.destinationStationName,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
+                      Builder(
+                        builder: (context) {
+                          final destStation = context.isArabic ? (state.selectedOutboundTrip!.destinationStationNameAr ?? state.selectedOutboundTrip!.destinationStationName) : state.selectedOutboundTrip!.destinationStationName;
+                          final destGov = context.isArabic ? (state.selectedOutboundTrip!.destinationGovernorateAr ?? state.selectedOutboundTrip!.destinationGovernorate) : state.selectedOutboundTrip!.destinationGovernorate;
+                          final destText = destStation.isNotEmpty ? destStation.toLocalizedStation(context) : destGov.toLocalizedGov(context).toUpperCase();
+                          return Text(
+                            destText,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          );
+                        }
                       ),
                     ],
                   ),
@@ -472,7 +487,7 @@ class _RoundTripBookingScreenState extends State<RoundTripBookingScreen> {
                     ),
                   ),
                   Text(
-                    'EGP $grand',
+                    '${AppLocalizations.of(context)!.egp} $grand',
                     style: const TextStyle(
                       color: ColorsManager.accentCyan,
                       fontSize: 24,
@@ -750,27 +765,46 @@ class _SummaryLegInfo extends StatelessWidget {
           Wrap(
             crossAxisAlignment: WrapCrossAlignment.center,
             children: [
-              Text(
-                trip.originStationName,
-                style: const TextStyle(color: Colors.white, fontSize: 16),
+              Builder(
+                builder: (context) {
+                  final originStation = context.isArabic ? (trip.originStationNameAr ?? trip.originStationName) : trip.originStationName;
+                  final originGov = context.isArabic ? (trip.originGovernorateAr ?? trip.originGovernorate) : trip.originGovernorate;
+                  final originText = originStation.isNotEmpty ? originStation.toLocalizedStation(context) : originGov.toLocalizedGov(context).toUpperCase();
+                  return Text(
+                    originText,
+                    style: const TextStyle(color: Colors.white, fontSize: 16),
+                  );
+                }
               ),
               const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 8.0),
                 child: Icon(Icons.arrow_forward, color: Colors.white, size: 16),
               ),
-              Text(
-                trip.destinationStationName,
-                style: const TextStyle(color: Colors.white, fontSize: 16),
+              Builder(
+                builder: (context) {
+                  final destStation = context.isArabic ? (trip.destinationStationNameAr ?? trip.destinationStationName) : trip.destinationStationName;
+                  final destGov = context.isArabic ? (trip.destinationGovernorateAr ?? trip.destinationGovernorate) : trip.destinationGovernorate;
+                  final destText = destStation.isNotEmpty ? destStation.toLocalizedStation(context) : destGov.toLocalizedGov(context).toUpperCase();
+                  return Text(
+                    destText,
+                    style: const TextStyle(color: Colors.white, fontSize: 16),
+                  );
+                }
               ),
             ],
           ),
           const SizedBox(height: 4),
-          Text(
-            '${trip.agencyName} - ${c.className}',
-            style: const TextStyle(
-              color: ColorsManager.textMuted,
-              fontSize: 13,
-            ),
+          Builder(
+            builder: (context) {
+              final agencyName = context.isArabic ? (trip.agencyNameAr ?? trip.agencyName) : trip.agencyName;
+              return Text(
+                '$agencyName - ${c.className}',
+                style: const TextStyle(
+                  color: ColorsManager.textMuted,
+                  fontSize: 13,
+                ),
+              );
+            }
           ),
           const SizedBox(height: 12),
           Row(
@@ -781,7 +815,7 @@ class _SummaryLegInfo extends StatelessWidget {
                 style: const TextStyle(color: Colors.white70),
               ),
               Text(
-                'EGP $total',
+                '${AppLocalizations.of(context)!.egp} $total',
                 style: const TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,

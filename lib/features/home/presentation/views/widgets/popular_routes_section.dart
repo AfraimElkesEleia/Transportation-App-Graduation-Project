@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:transportation_app/core/l10n/app_localizations.dart';
 import 'package:transportation_app/core/widgets/app_shimmer.dart';
 import 'package:transportation_app/core/routing/routes.dart';
 import 'package:transportation_app/core/theming/colors.dart';
@@ -21,14 +22,15 @@ class PopularRoutesSection extends StatelessWidget {
         if (state is! PopularRoutesLoaded || state.routes.isEmpty) {
           return const SizedBox.shrink();
         }
+        final loc = AppLocalizations.of(context)!;
         return Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                '🔥 Popular Routes',
-                style: TextStyle(
+              Text(
+                loc.popularRoutes,
+                style: const TextStyle(
                   color: Colors.white,
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
@@ -36,7 +38,7 @@ class PopularRoutesSection extends StatelessWidget {
               ),
               const SizedBox(height: 12),
               SizedBox(
-                height: 100, // Fixed height for horizontal list
+                height: 100,
                 child: ListView.builder(
                   scrollDirection: Axis.horizontal,
                   itemCount: state.routes.length,
@@ -62,24 +64,86 @@ class _RouteCard extends StatelessWidget {
 
   const _RouteCard({required this.route});
 
+  Future<void> _onTap(BuildContext context) async {
+    final loc = AppLocalizations.of(context)!;
+    final now = DateTime.now();
+
+    // First selectable date is tomorrow
+    final firstDate = DateTime(now.year, now.month, now.day + 1);
+    final lastDate = DateTime(now.year + 1, now.month, now.day);
+
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: firstDate,
+      firstDate: firstDate,
+      lastDate: lastDate,
+      helpText: loc.selectTravelDate,
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: const ColorScheme.dark(
+              primary: ColorsManager.cyanBlue,
+              onPrimary: Colors.white,
+              surface: Color(0xFF11255E),
+              onSurface: Colors.white,
+            ),
+            dialogTheme: const DialogThemeData(
+              backgroundColor: Color(0xFF0A1744),
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+
+    if (picked == null) return; // user cancelled
+
+    // Double-check: picked must not be today
+    final isToday =
+        picked.year == now.year &&
+        picked.month == now.month &&
+        picked.day == now.day;
+
+    if (isToday) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(loc.dateCannotBeToday),
+            backgroundColor: Colors.redAccent,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+      return;
+    }
+
+    if (!context.mounted) return;
+
+    final travelDate =
+        '${picked.year}-'
+        '${picked.month.toString().padLeft(2, '0')}-'
+        '${picked.day.toString().padLeft(2, '0')}';
+
+    final searchParams = SearchParams(
+      fromDisplayName: route.originGov,
+      toDisplayName: route.destinationGov,
+      fromGovernorate: route.originGov,
+      toGovernorate: route.destinationGov,
+      travelDate: travelDate,
+      passengers: 1,
+    );
+
+    Navigator.pushNamed(
+      context,
+      AppRoutes.searchScreen,
+      arguments: searchParams,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () {
-        final searchParams = SearchParams(
-          fromDisplayName: route.originGov,
-          toDisplayName: route.destinationGov,
-          fromGovernorate: route.originGov,
-          toGovernorate: route.destinationGov,
-          travelDate: DateTime.now().toIso8601String().split('T').first,
-          passengers: 1,
-        );
-        Navigator.pushNamed(
-          context,
-          AppRoutes.searchScreen,
-          arguments: searchParams,
-        );
-      },
+      onTap: () => _onTap(context),
       child: Container(
         width: 280,
         padding: const EdgeInsets.all(16),
@@ -131,6 +195,12 @@ class _RouteCard extends StatelessWidget {
                   ),
                 ],
               ),
+            ),
+            // Calendar icon hint
+            const Icon(
+              Icons.calendar_today_outlined,
+              color: ColorsManager.cyanBlue,
+              size: 18,
             ),
           ],
         ),

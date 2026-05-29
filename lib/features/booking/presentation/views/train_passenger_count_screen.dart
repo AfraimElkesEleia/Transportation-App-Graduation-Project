@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:transportation_app/core/l10n/app_localizations.dart';
 import 'package:transportation_app/core/theming/colors.dart';
 import 'package:transportation_app/features/booking/presentation/views/widgets/seat_app_bar.dart';
 import 'package:transportation_app/features/search/domain/entities/coach_class_entity.dart';
@@ -49,9 +50,9 @@ class _TrainPassengerCountScreenState extends State<TrainPassengerCountScreen> {
             // ── Train icon ──
             const Icon(Icons.train, color: Colors.white24, size: 72),
             const SizedBox(height: 20),
-            const Text(
-              'How many passengers?',
-              style: TextStyle(
+            Text(
+              AppLocalizations.of(context)!.howManyPassengers,
+              style: const TextStyle(
                 color: Colors.white,
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
@@ -59,7 +60,7 @@ class _TrainPassengerCountScreenState extends State<TrainPassengerCountScreen> {
             ),
             const SizedBox(height: 8),
             Text(
-              'EGP ${widget.coachClass.price.toStringAsFixed(0)} per seat',
+              '${AppLocalizations.of(context)!.egp} ${widget.coachClass.price.toStringAsFixed(0)} ${AppLocalizations.of(context)!.perSeat}',
               style: const TextStyle(
                 color: ColorsManager.textMuted,
                 fontSize: 14,
@@ -95,7 +96,7 @@ class _TrainPassengerCountScreenState extends State<TrainPassengerCountScreen> {
             ),
             const SizedBox(height: 8),
             Text(
-              '${widget.coachClass.remainingSeats} seats available',
+              AppLocalizations.of(context)!.seatsAvailable('${widget.coachClass.remainingSeats}'),
               style: const TextStyle(
                 color: ColorsManager.textMuted,
                 fontSize: 13,
@@ -110,12 +111,12 @@ class _TrainPassengerCountScreenState extends State<TrainPassengerCountScreen> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
-                    'Total',
-                    style: TextStyle(color: Colors.white54, fontSize: 14),
+                  Text(
+                    AppLocalizations.of(context)!.totalLabel,
+                    style: const TextStyle(color: Colors.white54, fontSize: 14),
                   ),
                   Text(
-                    'EGP ${total.toStringAsFixed(0)}',
+                    '${AppLocalizations.of(context)!.egp} ${total.toStringAsFixed(0)}',
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 24,
@@ -140,7 +141,7 @@ class _TrainPassengerCountScreenState extends State<TrainPassengerCountScreen> {
                     elevation: 0,
                   ),
                   child: Text(
-                    'Continue with $_count Passenger${_count > 1 ? 's' : ''}',
+                    AppLocalizations.of(context)!.continueWithNPassengers('$_count'),
                     style: const TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,

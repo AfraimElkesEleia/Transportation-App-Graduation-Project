@@ -10,7 +10,7 @@ Frontend integration guide for Flutter and Angular teams.
 - **Authentication Scheme:** `JWT Bearer`
 - **Primary Wrapper:** `ApiResponse<T>` / `ApiResponse`
 - **Validation:** FluentValidation + validation filter
-- **Unhandled exceptions:** RFC `ProblemDetails`
+- **Unhandled exceptions:** `ApiResponse` error payload (with optional `errorCode`)
 
 ### Standard Success Wrapper
 
@@ -32,9 +32,18 @@ Frontend integration guide for Flutter and Angular teams.
   "message": "Validation failed",
   "data": null,
   "errors": ["Error message"],
+  "errorCode": "VALIDATION_ERROR",
   "timestamp": "2026-03-06T12:00:00Z"
 }
 ```
+
+### Error Code Contract
+
+- `errorCode` is an optional machine-readable token for client localization or branching.
+- Common codes currently used:
+  - `VALIDATION_ERROR`
+  - `INSUFFICIENT_WALLET_BALANCE`
+  - `SEAT_ALREADY_BOOKED`
 
 ### Date & Time Contract
 
@@ -758,6 +767,8 @@ No request body.
         "challengeId": 1,
         "title": "Frequent Traveler",
         "description": "Take 4 trips this month to earn bonus points.",
+        "titleAr": "مسافر دائم",
+        "descriptionAr": "قم بأربع رحلات هذا الشهر لتحصل على نقاط إضافية.",
         "type": 1,
         "frequency": 2,
         "currentProgress": 2,
@@ -877,14 +888,16 @@ No request body.
   "data": [
     {
       "governorate": "Cairo",
+      "governorateAr": "القاهرة",
       "stations": [
-        { "id": 101, "arabicName": "?????", "englishName": "ramses", "slug": "ramses", "city": "Cairo" }
+        { "id": 101, "arabicName": "رمسيس", "englishName": "Ramses", "slug": "ramses", "city": "Cairo", "governorateAr": "القاهرة" }
       ]
     },
     {
       "governorate": "Alexandria",
+      "governorateAr": "الإسكندرية",
       "stations": [
-        { "id": 201, "arabicName": "???? ????", "englishName": "sidi-gaber", "slug": "sidi-gaber", "city": "Alexandria" }
+        { "id": 201, "arabicName": "سيدي جابر", "englishName": "Sidi Gaber", "slug": "sidi-gaber", "city": "Alexandria", "governorateAr": "الإسكندرية" }
       ]
     }
   ],
@@ -963,6 +976,13 @@ Query string parameters:
 - `departureTime` / `arrivalTime`: global occurrence-level schedule-local trip start and end times, serialized without timezone suffix.
 - `timestamp` in wrapper remains UTC (`Z`).
 
+### Localization Fields
+- `agencyNameAr`, `originStationNameAr`, `destinationStationNameAr`
+- `originGovernorateAr`, `destinationGovernorateAr`
+- `routeStops[].arabicName`, `routeStops[].governorateAr`
+- `availableClasses[].classNameAr`
+- `originStationName`, `destinationStationName`, and `routeStops[].stationName` are English display names derived from the slug.
+
 ### Response Example (200 OK)
 ```json
 {
@@ -974,27 +994,36 @@ Query string parameters:
         "tripOccurrenceId": 1001,
         "tripId": 200,
         "agencyName": "GoBus",
+        "agencyNameAr": "جو باص",
         "boardingTime": "2026-03-20T07:20:00",
         "dropoffTime": "2026-03-20T10:00:00",
         "departureTime": "2026-03-20T07:00:00",
         "arrivalTime": "2026-03-20T10:40:00",
         "totalDurationMinutes": 160,
         "originStationId": 101,
-        "originStationName": "رمسيس",
+        "originStationName": "Ramses",
+        "originStationNameAr": "رمسيس",
         "originGovernorate": "Cairo",
+        "originGovernorateAr": "القاهرة",
         "destinationStationId": 201,
-        "destinationStationName": "سيدي جابر",
+        "destinationStationName": "Sidi Gaber",
+        "destinationStationNameAr": "سيدي جابر",
         "destinationGovernorate": "Alexandria",
+        "destinationGovernorateAr": "الإسكندرية",
         "startingPrice": 180.0,
         "routeStops": [
           {
-            "stationName": "رمسيس",
+            "stationName": "Ramses",
+            "arabicName": "رمسيس",
+            "governorateAr": "القاهرة",
             "arrivalTime": null,
             "departureTime": "07:20:00",
             "stopSequence": 1
           },
           {
-            "stationName": "سيدي جابر",
+            "stationName": "Sidi Gaber",
+            "arabicName": "سيدي جابر",
+            "governorateAr": "الإسكندرية",
             "arrivalTime": "10:00:00",
             "departureTime": null,
             "stopSequence": 5
@@ -1004,6 +1033,7 @@ Query string parameters:
           {
             "coachClassId": 1,
             "className": "Business",
+            "classNameAr": "درجة رجال الاعمال",
             "remainingSeats": 14,
             "price": 180.0
           }
@@ -1116,48 +1146,58 @@ Query string parameters:
             "tripOccurrenceId": 5011,
             "tripId": 310,
             "agencyName": "GoBus",
+            "agencyNameAr": "جو باص",
             "boardingTime": "2026-03-20T06:30:00",
             "dropoffTime": "2026-03-20T09:30:00",
             "departureTime": "2026-03-20T06:00:00",
             "arrivalTime": "2026-03-20T10:00:00",
             "totalDurationMinutes": 180,
             "originStationId": 101,
-            "originStationName": "رمسيس",
+            "originStationName": "Ramses",
+            "originStationNameAr": "رمسيس",
             "originGovernorate": "Cairo",
+            "originGovernorateAr": "القاهرة",
             "destinationStationId": 220,
-            "destinationStationName": "المنيا",
+            "destinationStationName": "Minya",
+            "destinationStationNameAr": "المنيا",
             "destinationGovernorate": "Minya",
+            "destinationGovernorateAr": "المنيا",
             "startingPrice": 180.0,
             "routeStops": [
-              { "stationName": "رمسيس", "arrivalTime": null, "departureTime": "06:30:00", "stopSequence": 1 },
-              { "stationName": "المنيا", "arrivalTime": "09:30:00", "departureTime": null, "stopSequence": 4 }
+              { "stationName": "Ramses", "arabicName": "رمسيس", "governorateAr": "القاهرة", "arrivalTime": null, "departureTime": "06:30:00", "stopSequence": 1 },
+              { "stationName": "Minya", "arabicName": "المنيا", "governorateAr": "المنيا", "arrivalTime": "09:30:00", "departureTime": null, "stopSequence": 4 }
             ],
             "availableClasses": [
-              { "coachClassId": 1, "className": "Business", "remainingSeats": 9, "price": 180.0 }
+              { "coachClassId": 1, "className": "Business", "classNameAr": "درجة رجال الاعمال", "remainingSeats": 9, "price": 180.0 }
             ]
           },
           {
             "tripOccurrenceId": 9912,
             "tripId": 777,
             "agencyName": "Egyptian National Railways",
+            "agencyNameAr": "السكة الحديد",
             "boardingTime": "2026-03-20T11:05:00",
             "dropoffTime": "2026-03-20T16:30:00",
             "departureTime": "2026-03-20T10:30:00",
             "arrivalTime": "2026-03-20T17:10:00",
             "totalDurationMinutes": 325,
             "originStationId": 220,
-            "originStationName": "المنيا",
+            "originStationName": "Minya",
+            "originStationNameAr": "المنيا",
             "originGovernorate": "Minya",
+            "originGovernorateAr": "المنيا",
             "destinationStationId": 880,
-            "destinationStationName": "أسوان",
+            "destinationStationName": "Aswan",
+            "destinationStationNameAr": "أسوان",
             "destinationGovernorate": "Aswan",
+            "destinationGovernorateAr": "أسوان",
             "startingPrice": 240.0,
             "routeStops": [
-              { "stationName": "المنيا", "arrivalTime": null, "departureTime": "11:05:00", "stopSequence": 2 },
-              { "stationName": "أسوان", "arrivalTime": "16:30:00", "departureTime": null, "stopSequence": 7 }
+              { "stationName": "Minya", "arabicName": "المنيا", "governorateAr": "المنيا", "arrivalTime": null, "departureTime": "11:05:00", "stopSequence": 2 },
+              { "stationName": "Aswan", "arabicName": "أسوان", "governorateAr": "أسوان", "arrivalTime": "16:30:00", "departureTime": null, "stopSequence": 7 }
             ],
             "availableClasses": [
-              { "coachClassId": 2, "className": "Second Class", "remainingSeats": 22, "price": 240.0 }
+              { "coachClassId": 2, "className": "Second Class", "classNameAr": "الدرجة الثانية", "remainingSeats": 22, "price": 240.0 }
             ]
           }
         ]
@@ -1206,6 +1246,7 @@ Base route: `/api/occurrences`
       {
         "coachClassId": 1,
         "className": "Business",
+        "classNameAr": "درجة رجال الاعمال",
         "totalSeats": 36,
         "remainingSeats": 12,
         "layoutType": "2x1",
@@ -1250,6 +1291,7 @@ Base route: `/api/occurrences`
 ### Response Field Highlights
 | Field                           | Type      | Description                                            |
 | ------------------------------- | --------- | ------------------------------------------------------ |
+| classes[].classNameAr           | string?   | Arabic display name for the coach class                |
 | classes[].layoutType            | string?   | Optional layout descriptor such as `2x1`, `2x2`, etc.  |
 | classes[].deckCount             | int       | Number of decks for this class layout                  |
 | classes[].seatMapJson           | string?   | Serialized layout metadata for advanced seat rendering |
@@ -1322,6 +1364,7 @@ Base route: `/api/Bookings`
 - **ENR agency:** seats are auto-assigned; each passenger must provide `passengerName`, `idType`, and `idNumber`.
 - For ENR, passenger ID numbers must be unique in the same request and cannot already exist on active pending/confirmed bookings for the same occurrence.
 - If seats are taken concurrently, API returns conflict and asks client to refresh seat map.
+- Seat conflicts return `errorCode = "SEAT_ALREADY_BOOKED"`.
 
 ### Response Example (200 OK)
 ```json
@@ -1336,7 +1379,9 @@ Base route: `/api/Bookings`
       "seatsBooked": 2,
       "holdExpiresAt": "2026-03-20T07:10:00Z",
       "agencyName": "GoBus",
+      "agencyNameAr": "جو باص",
       "className": "Business",
+      "classNameAr": "درجة رجال الاعمال",
       "origin": "رمسيس",
       "originGov": "Cairo",
       "destination": "سيدي جابر",
@@ -1395,6 +1440,8 @@ Base route: `/api/Bookings`
 - Earned points are pending until departure and expire 4 months after departure.
 - Returns 400 if the cart is empty/expired or wallet balance is insufficient.
 - Returns 409 on seat concurrency conflicts.
+- Insufficient wallet balance returns `errorCode = "INSUFFICIENT_WALLET_BALANCE"`.
+- Seat conflicts return `errorCode = "SEAT_ALREADY_BOOKED"`.
 
 ### Response Example (200 OK)
 ```json
@@ -1433,7 +1480,9 @@ No request body.
         "seatsBooked": 2,
         "holdExpiresAt": "2026-03-31T00:15:00Z",
         "agencyName": "GoBus",
+        "agencyNameAr": "جو باص",
         "className": "Business",
+        "classNameAr": "درجة رجال الاعمال",
         "origin": "رمسيس",
         "originGov": "Cairo",
         "destination": "سيدي جابر",
@@ -1542,7 +1591,9 @@ No request body.
       "activeListingId": null,
       "isOfferedForResale": false,
       "agencyName": "GoBus",
+      "agencyNameAr": "جو باص",
       "className": "Business",
+      "classNameAr": "درجة رجال الاعمال",
       "originStation": "رمسيس",
       "destinationStation": "سيدي جابر",
       "boardingTime": "2026-04-02T07:20:00",
@@ -1567,6 +1618,93 @@ No request body.
   "timestamp": "2026-03-31T00:10:00Z"
 }
 ```
+
+## 9.6 Boarding Pass QR (Overview)
+
+This feature provides a stateless, HMAC-SHA256-signed boarding pass string which the passenger client renders as a QR code. The driver's device submits the scanned string to the server for cryptographic verification and receives passenger seat details on success.
+
+### Security & Configuration
+- The signing key is configured in `BoardingPassSettings:QrSecretKey` in `appsettings.json` (use secrets in production).
+- The payload embeds the `userId` and an expiration Unix timestamp. Verification checks both the HMAC signature and that the embedded `userId` matches the current `Booking.UserId` to prevent replay after marketplace transfers.
+
+### Payload Format
+
+Unsigned raw data (pipe-separated):
+
+`GP|{bookingId}|{passengerId}|{userId}|{expUnix}`
+
+Final payload returned to clients:
+
+`GP|{bookingId}|{passengerId}|{userId}|{expUnix}|{signatureBase64}`
+
+Where `signatureBase64` = Base64(HMAC-SHA256(secret, rawData)).
+
+## 9.7 Generate Boarding Pass (Passenger)
+### Endpoint Overview
+- **Method:** `GET`
+- **URL:** `/api/Bookings/{bookingId}/passengers/{passengerId}/qr-payload`
+- **Business Use Case:** Returns a signed QR payload string for a specific passenger under a confirmed booking.
+
+### Authentication / Authorization
+- **JWT Required:** Yes
+- **Role Required:** Authenticated user (must be owner of the booking)
+
+### Path Parameters
+| Field       | Type | Required | Notes                                   |
+| ----------- | ---- | -------- | --------------------------------------- |
+| bookingId   | int  | Yes      | Booking identifier (must be Confirmed)  |
+| passengerId | int  | Yes      | Passenger identifier inside the booking |
+
+### Request Payload
+No request body.
+
+### Response Example (200 OK)
+```json
+{
+  "success": true,
+  "message": "Boarding pass generated successfully.",
+  "data": "GP|1024|5001|15|1713268800|QmFzZTY0U2lnbmF0dXJl...",
+  "errors": null,
+  "timestamp": "2026-05-18T10:00:00Z"
+}
+```
+
+### Errors
+- **400 Bad Request:** Invalid booking/passenger or booking not confirmed.
+- **401 Unauthorized:** Missing or invalid JWT.
+
+## 9.8 Verify Boarding Pass (Driver)
+### Endpoint Overview
+- **Method:** `POST`
+- **URL:** `/api/Bookings/verify-pass`
+- **Business Use Case:** Driver device verifies a scanned boarding pass payload and receives passenger seat details.
+
+### Authentication / Authorization
+- **JWT Required:** Yes
+- **Role Required:** Driver/Conductor app (authenticated)
+
+### Request Payload
+```json
+{ "payload": "GP|1024|5001|15|1713268800|QmFzZTY0U2lnbmF0dXJl..." }
+```
+
+### Response Example (200 OK)
+```json
+{
+  "success": true,
+  "message": "Boarding pass verified successfully.",
+  "data": {
+    "passengerName": "Ali Hassan",
+    "seatNumber": "7"
+  },
+  "errors": null,
+  "timestamp": "2026-05-18T10:01:00Z"
+}
+```
+
+### Errors
+- **400 Bad Request:** Malformed payload or expired pass.
+- **401 Unauthorized:** Signature mismatch or ticket ownership invalid (`Ticket Ownership Invalid - This ticket has been transferred.`).
 
 ---
 
@@ -1640,7 +1778,7 @@ No request body.
     {
       "id": 51,
       "amount": -360.0,
-      "type": "TicketPurchase",
+      "type": "TICKET_PURCHASE",
       "description": "Checkout for multiple trips.",
       "bookingId": null,
       "createdAt": "2026-03-31T00:10:00Z"
@@ -1648,7 +1786,7 @@ No request body.
     {
       "id": 50,
       "amount": 500.0,
-      "type": "Deposit",
+      "type": "DEPOSIT",
       "description": "Deposit via simulated card ending in 4242",
       "bookingId": null,
       "createdAt": "2026-03-31T01:20:00Z"
@@ -1658,6 +1796,9 @@ No request body.
   "timestamp": "2026-03-31T01:21:00Z"
 }
 ```
+
+### Notes
+- `type` is a stable uppercase token derived from the wallet transaction enum (for example: `TICKET_PURCHASE`, `DEPOSIT`, `REFUND`).
 
 ---
 
@@ -1743,6 +1884,8 @@ Base route: `/api/Loyalty`
         "challengeId": 5,
         "title": "Frequent Traveler",
         "description": "Take 4 trips this month to earn bonus points.",
+        "titleAr": "مسافر دائم",
+        "descriptionAr": "قم بأربع رحلات هذا الشهر لتحصل على نقاط إضافية.",
         "type": "TotalTrips",
         "frequency": "Monthly",
         "currentProgress": 2,
@@ -1754,6 +1897,8 @@ Base route: `/api/Loyalty`
         "challengeId": 1,
         "title": "Welcome Quest",
         "description": "Complete your first booking to earn welcome points.",
+        "titleAr": "مهمة الترحيب",
+        "descriptionAr": "أكمل أول حجز لك لتحصل على نقاط ترحيبية.",
         "type": "TotalTrips",
         "frequency": "OneTime",
         "currentProgress": 1,
@@ -1974,13 +2119,13 @@ Base route: `/api/Marketplace`
 ```
 
 ### Request Field Reference
-| Field                | Type   | Required | Notes                                                    |
-| -------------------- | ------ | -------- | -------------------------------------------------------- |
-| passengers           | array  | Yes      | Must match `SeatsBooked` count                           |
-| passengers[].passengerName | string | Yes | Required for each passenger                              |
-| passengers[].idType  | string | No       | Optional: NationalId, Passport, DrivingLicense, StudentId, Other |
-| passengers[].idNumber | string | Conditional | Required when `idType` is provided                      |
-| passengers[].seatNumber | string | No | Ignored for marketplace purchase (seat is preserved)     |
+| Field                      | Type   | Required    | Notes                                                            |
+| -------------------------- | ------ | ----------- | ---------------------------------------------------------------- |
+| passengers                 | array  | Yes         | Must match `SeatsBooked` count                                   |
+| passengers[].passengerName | string | Yes         | Required for each passenger                                      |
+| passengers[].idType        | string | No          | Optional: NationalId, Passport, DrivingLicense, StudentId, Other |
+| passengers[].idNumber      | string | Conditional | Required when `idType` is provided                               |
+| passengers[].seatNumber    | string | No          | Ignored for marketplace purchase (seat is preserved)             |
 
 ### Notes
 - Backward-compatible alias: `/api/Marketplace/buy/{listingId}`
@@ -2042,12 +2187,15 @@ Query string parameters:
         "sellerName": "Ahmed Hassan",
         "seatsCount": 2,
         "tripDetails": {
-          "origin": "Ramses",
-          "destination": "Sidi Gaber",
+          "origin": "رمسيس",
+          "destination": "سيدي جابر",
           "originGov": "Cairo",
           "destinationGov": "Alexandria",
+          "agencyName": "GoBus",
+          "agencyNameAr": "جو باص",
           "time": "2026-04-02T07:20:00",
-          "class": "GoBus - Business"
+          "class": "GoBus - Business",
+          "classNameAr": "درجة رجال الاعمال"
         }
       }
     ],
@@ -2065,6 +2213,7 @@ Query string parameters:
 - If no listings exist, the message is "No active marketplace listings found." and items list is empty.
 - `tripDetails.time` is a schedule-local timestamp without timezone suffix.
 - `tripDetails.originGov` and `tripDetails.destinationGov` come from the normalized station governorate data.
+- `tripDetails.agencyNameAr` and `tripDetails.classNameAr` are optional Arabic display values.
 - `seatsCount` indicates the total number of seats included in the booking bundle offered for resale.
 - Filters are optional and combined with AND logic.
 - `travelDate` matches the schedule-local date portion of the trip departure.
@@ -2123,15 +2272,19 @@ All endpoints require authenticated JWT user context.
       "id": 102,
       "title": "Boarding Soon!",
       "message": "Your bus boards at 07:45 PM from Ramses.",
-      "type": "Boarding",
+      "titleAr": "حان وقت الركوب!",
+      "messageAr": "تنطلق رحلتك الساعة 07:45 PM من رمسيس.",
+      "type": "BOARDING_SOON",
       "isRead": false,
       "createdAt": "2026-05-09T19:30:00"
     },
     {
       "id": 101,
       "title": "Points Earned! 🎉",
-      "message": "You just earned 25 points for Earned from 1-leg Booking!",
-      "type": "Gamification",
+      "message": "You just earned 25 points for your booking!",
+      "titleAr": "لقد كسبت نقاط! 🎉",
+      "messageAr": "لقد كسبت 25 نقطة لإتمام حجزك!",
+      "type": "POINTS_EARNED",
       "isRead": true,
       "createdAt": "2026-05-09T11:15:00"
     }
@@ -2140,6 +2293,10 @@ All endpoints require authenticated JWT user context.
   "timestamp": "2026-05-09T19:30:10Z"
 }
 ```
+
+### Notes
+- `title` / `message` contain the English content.
+- `titleAr` / `messageAr` contain the Arabic content when available.
 
 ## 14.2 Mark One Notification As Read
 ### Endpoint Overview
@@ -2205,14 +2362,16 @@ Client method name:
 - `ReceiveNotification(title, message, type)`
 
 ### Current Notification Types
-- `Marketplace`
+- `TICKET_SOLD`
   - Trigger: seller ticket sold in marketplace buy flow.
   - Sample title: `Ticket Sold!`
-- `Gamification`
-  - Trigger 1: checkout points earned.
-  - Trigger 2: challenge completion reward granted.
+- `POINTS_EARNED`
+  - Trigger: checkout points earned.
   - Sample title: `Points Earned! 🎉`
-- `Boarding`
+- `CHALLENGE_COMPLETED`
+  - Trigger: challenge completion reward granted.
+  - Sample title: `Challenge Completed! 🏆`
+- `BOARDING_SOON`
   - Trigger: jobs endpoint processing bookings boarding in the next 15 minutes.
   - Sample title: `Boarding Soon!`
 
@@ -2220,65 +2379,67 @@ Client method name:
 
 # Quick Endpoint Index
 
-| Method   | URL                                   |               Auth | Description                                                    |
-| -------- | ------------------------------------- | -----------------: | -------------------------------------------------------------- |
-| `POST`   | `/api/Auth/register`                  |                 No | Register user and return tokens                                |
-| `POST`   | `/api/Auth/login`                     |                 No | Login and return tokens                                        |
-| `POST`   | `/api/Auth/refresh`                   |                 No | Refresh access token                                           |
-| `POST`   | `/api/Auth/revoke`                    |                 No | Revoke one refresh token                                       |
-| `POST`   | `/api/Auth/revoke-all`                |                Yes | Revoke all active refresh tokens                               |
-| `GET`    | `/api/Auth/me`                        |                Yes | Return current JWT claim info                                  |
-| `POST`   | `/api/Auth/send-verification-email`   |                 No | Send verification email                                        |
-| `POST`   | `/api/Auth/verify-email`              |                 No | Confirm email token                                            |
-| `POST`   | `/api/Auth/forgot-password`           |                 No | Send reset link                                                |
-| `POST`   | `/api/Auth/reset-password`            |                 No | Reset password                                                 |
-| `POST`   | `/api/Auth/change-password`           |                Yes | Change password                                                |
-| `GET`    | `/api/Countries`                      |                 No | List countries                                                 |
-| `POST`   | `/api/Seed/init-identity`             |     No (currently) | Initialize identity roles/admin                                |
-| `POST`   | `/api/Seed/import-master-stations`    |     No (currently) | Import master stations                                         |
-| `POST`   | `/api/Seed/import-horus`              |     No (currently) | Import Horus trips                                             |
-| `POST`   | `/api/Seed/import-gobus`              |     No (currently) | Import GoBus trips                                             |
-| `POST`   | `/api/Seed/import-bluebus`            |     No (currently) | Import BlueBus trips                                           |
-| `POST`   | `/api/Seed/import-trains`             |     No (currently) | Import train trips                                             |
-| `POST`   | `/api/Seed/generate-occurrences`      |     No (currently) | Generate future occurrences                                    |
-| `POST`   | `/api/Jobs/generate-occurrences`      | Secret query param | Generate future occurrences (scheduler endpoint)               |
-| `POST`   | `/api/Jobs/process-completed-trips`   | Secret query param | Mark eligible trips as completed                               |
-| `POST`   | `/api/Jobs/release-expired-holds`     | Secret query param | Release expired holds and restore inventory                    |
-| `POST`   | `/api/Jobs/process-boarding-alerts`   | Secret query param | Send one-time boarding alerts for trips boarding soon          |
-| `POST`   | `/api/Jobs/expire-points`             | Secret query param | Expire old loyalty point transactions                          |
-| `POST`   | `/api/Jobs/reset-monthly-challenges`  | Secret query param | Reset and reassign monthly challenges                          |
-| `POST`   | `/api/Jobs/seed-challenges`           | Secret query param | Seed the static monthly challenges                             |
-| `GET`    | `/api/Notifications`                  |                Yes | Retrieve latest notifications inbox entries                    |
-| `PATCH`  | `/api/Notifications/{id}/read`        |                Yes | Mark one notification as read                                  |
-| `PATCH`  | `/api/Notifications/read-all`         |                Yes | Mark all unread notifications as read                          |
-| `WS`     | `/hubs/notifications`                 |          JWT (Hub) | Subscribe to real-time notifications via `ReceiveNotification` |
-| `GET`    | `/api/admin/users`                    |        Yes (Admin) | List all users                                                 |
-| `GET`    | `/api/admin/users/{id}`               |        Yes (Admin) | Get user detail                                                |
-| `PATCH`  | `/api/admin/users/{id}/toggle-status` |        Yes (Admin) | Toggle user active status                                      |
-| `POST`   | `/api/admin/users/{id}/roles`         |        Yes (Admin) | Assign role                                                    |
-| `DELETE` | `/api/admin/users/{id}`               |        Yes (Admin) | Delete user                                                    |
-| `GET`    | `/api/Users/me`                       |                Yes | Get profile with loyalty stats and active challenges           |
-| `PUT`    | `/api/Users/me`                       |                Yes | Update profile                                                 |
-| `POST`   | `/api/Users/me/profile-picture`       |                Yes | Upload profile picture                                         |
-| `POST`   | `/api/Users/fcm-token`                |                Yes | Register/update user device token for offline push             |
-| `GET`    | `/api/Loyalty/history`                |                Yes | Retrieve loyalty point ledger history (latest first)           |
-| `GET`    | `/api/Loyalty/challenges`             |                Yes | Retrieve paged active and completed challenge history          |
-| `GET`    | `/api/Stations`                       |                 No | Get grouped stations                                           |
-| `GET`    | `/api/trips/search`                   |                 No | Preferred paginated direct-trip search route                   |
-| `GET`    | `/api/Search`                         |                 No | Backward-compatible alias for direct-trip search               |
-| `GET`    | `/api/trips/search/indirect`          |                 No | Preferred 1-stop indirect search route                         |
-| `GET`    | `/api/Search/indirect`                |                 No | Backward-compatible alias for indirect search                  |
-| `GET`    | `/api/Search/popular-routes`          |                 No | Retrieve top 3 popular governorate routes (cached 1h)          |
-| `GET`    | `/api/occurrences/{id}/seats`         |                 No | Get real-time seat map with available/pending/booked states    |
-| `POST`   | `/api/Bookings/cart`                  |                Yes | Add trip to cart with 10-minute seat soft-lock                 |
-| `POST`   | `/api/Bookings/cart/add`              |                Yes | Backward-compatible add-to-cart alias                          |
-| `GET`    | `/api/Bookings/cart`                  |                Yes | Retrieve current active cart                                   |
-| `DELETE` | `/api/Bookings/{bookingId}`           |                Yes | Cancel a pending booking hold and release held seats           |
-| `POST`   | `/api/Bookings/checkout`              |                Yes | Checkout all valid pending cart items with one wallet charge   |
-| `GET`    | `/api/Bookings/my-tickets`            |                Yes | Retrieve user's ticket history (non-pending bookings)          |
-| `POST`   | `/api/Marketplace/list`               |                Yes | List ticket for resale                                         |
-| `POST`   | `/api/Marketplace/listings/{listingId}/buy` |             Yes | Purchase listed ticket (alias: `/api/Marketplace/buy/{listingId}`) |
-| `GET`    | `/api/Marketplace/active`             |                 No | Retrieve paged active marketplace listings                     |
-| `POST`   | `/api/Marketplace/cancel/{listingId}` |                Yes | Cancel an active marketplace listing                           |
-| `POST`   | `/api/Wallet/deposit`                 |                Yes | Deposit wallet funds and write ledger entry                    |
-| `GET`    | `/api/Wallet/history`                 |                Yes | Retrieve wallet transaction history (newest first)             |
+| Method   | URL                                                             |               Auth | Description                                                        |
+| -------- | --------------------------------------------------------------- | -----------------: | ------------------------------------------------------------------ |
+| `POST`   | `/api/Auth/register`                                            |                 No | Register user and return tokens                                    |
+| `POST`   | `/api/Auth/login`                                               |                 No | Login and return tokens                                            |
+| `POST`   | `/api/Auth/refresh`                                             |                 No | Refresh access token                                               |
+| `POST`   | `/api/Auth/revoke`                                              |                 No | Revoke one refresh token                                           |
+| `POST`   | `/api/Auth/revoke-all`                                          |                Yes | Revoke all active refresh tokens                                   |
+| `GET`    | `/api/Auth/me`                                                  |                Yes | Return current JWT claim info                                      |
+| `POST`   | `/api/Auth/send-verification-email`                             |                 No | Send verification email                                            |
+| `POST`   | `/api/Auth/verify-email`                                        |                 No | Confirm email token                                                |
+| `POST`   | `/api/Auth/forgot-password`                                     |                 No | Send reset link                                                    |
+| `POST`   | `/api/Auth/reset-password`                                      |                 No | Reset password                                                     |
+| `POST`   | `/api/Auth/change-password`                                     |                Yes | Change password                                                    |
+| `GET`    | `/api/Countries`                                                |                 No | List countries                                                     |
+| `POST`   | `/api/Seed/init-identity`                                       |     No (currently) | Initialize identity roles/admin                                    |
+| `POST`   | `/api/Seed/import-master-stations`                              |     No (currently) | Import master stations                                             |
+| `POST`   | `/api/Seed/import-horus`                                        |     No (currently) | Import Horus trips                                                 |
+| `POST`   | `/api/Seed/import-gobus`                                        |     No (currently) | Import GoBus trips                                                 |
+| `POST`   | `/api/Seed/import-bluebus`                                      |     No (currently) | Import BlueBus trips                                               |
+| `POST`   | `/api/Seed/import-trains`                                       |     No (currently) | Import train trips                                                 |
+| `POST`   | `/api/Seed/generate-occurrences`                                |     No (currently) | Generate future occurrences                                        |
+| `POST`   | `/api/Jobs/generate-occurrences`                                | Secret query param | Generate future occurrences (scheduler endpoint)                   |
+| `POST`   | `/api/Jobs/process-completed-trips`                             | Secret query param | Mark eligible trips as completed                                   |
+| `POST`   | `/api/Jobs/release-expired-holds`                               | Secret query param | Release expired holds and restore inventory                        |
+| `POST`   | `/api/Jobs/process-boarding-alerts`                             | Secret query param | Send one-time boarding alerts for trips boarding soon              |
+| `POST`   | `/api/Jobs/expire-points`                                       | Secret query param | Expire old loyalty point transactions                              |
+| `POST`   | `/api/Jobs/reset-monthly-challenges`                            | Secret query param | Reset and reassign monthly challenges                              |
+| `POST`   | `/api/Jobs/seed-challenges`                                     | Secret query param | Seed the static monthly challenges                                 |
+| `GET`    | `/api/Notifications`                                            |                Yes | Retrieve latest notifications inbox entries                        |
+| `PATCH`  | `/api/Notifications/{id}/read`                                  |                Yes | Mark one notification as read                                      |
+| `PATCH`  | `/api/Notifications/read-all`                                   |                Yes | Mark all unread notifications as read                              |
+| `WS`     | `/hubs/notifications`                                           |          JWT (Hub) | Subscribe to real-time notifications via `ReceiveNotification`     |
+| `GET`    | `/api/admin/users`                                              |        Yes (Admin) | List all users                                                     |
+| `GET`    | `/api/admin/users/{id}`                                         |        Yes (Admin) | Get user detail                                                    |
+| `PATCH`  | `/api/admin/users/{id}/toggle-status`                           |        Yes (Admin) | Toggle user active status                                          |
+| `POST`   | `/api/admin/users/{id}/roles`                                   |        Yes (Admin) | Assign role                                                        |
+| `DELETE` | `/api/admin/users/{id}`                                         |        Yes (Admin) | Delete user                                                        |
+| `GET`    | `/api/Users/me`                                                 |                Yes | Get profile with loyalty stats and active challenges               |
+| `PUT`    | `/api/Users/me`                                                 |                Yes | Update profile                                                     |
+| `POST`   | `/api/Users/me/profile-picture`                                 |                Yes | Upload profile picture                                             |
+| `POST`   | `/api/Users/fcm-token`                                          |                Yes | Register/update user device token for offline push                 |
+| `GET`    | `/api/Loyalty/history`                                          |                Yes | Retrieve loyalty point ledger history (latest first)               |
+| `GET`    | `/api/Loyalty/challenges`                                       |                Yes | Retrieve paged active and completed challenge history              |
+| `GET`    | `/api/Stations`                                                 |                 No | Get grouped stations                                               |
+| `GET`    | `/api/trips/search`                                             |                 No | Preferred paginated direct-trip search route                       |
+| `GET`    | `/api/Search`                                                   |                 No | Backward-compatible alias for direct-trip search                   |
+| `GET`    | `/api/trips/search/indirect`                                    |                 No | Preferred 1-stop indirect search route                             |
+| `GET`    | `/api/Search/indirect`                                          |                 No | Backward-compatible alias for indirect search                      |
+| `GET`    | `/api/Search/popular-routes`                                    |                 No | Retrieve top 3 popular governorate routes (cached 1h)              |
+| `GET`    | `/api/occurrences/{id}/seats`                                   |                 No | Get real-time seat map with available/pending/booked states        |
+| `POST`   | `/api/Bookings/cart`                                            |                Yes | Add trip to cart with 10-minute seat soft-lock                     |
+| `POST`   | `/api/Bookings/cart/add`                                        |                Yes | Backward-compatible add-to-cart alias                              |
+| `GET`    | `/api/Bookings/cart`                                            |                Yes | Retrieve current active cart                                       |
+| `DELETE` | `/api/Bookings/{bookingId}`                                     |                Yes | Cancel a pending booking hold and release held seats               |
+| `POST`   | `/api/Bookings/checkout`                                        |                Yes | Checkout all valid pending cart items with one wallet charge       |
+| `GET`    | `/api/Bookings/my-tickets`                                      |                Yes | Retrieve user's ticket history (non-pending bookings)              |
+| `GET`    | `/api/Bookings/{bookingId}/passengers/{passengerId}/qr-payload` |                Yes | Generate boarding pass QR payload                                  |
+| `POST`   | `/api/Bookings/verify-pass`                                     |                Yes | Verify boarding pass QR payload                                    |
+| `POST`   | `/api/Marketplace/list`                                         |                Yes | List ticket for resale                                             |
+| `POST`   | `/api/Marketplace/listings/{listingId}/buy`                     |                Yes | Purchase listed ticket (alias: `/api/Marketplace/buy/{listingId}`) |
+| `GET`    | `/api/Marketplace/active`                                       |                 No | Retrieve paged active marketplace listings                         |
+| `POST`   | `/api/Marketplace/cancel/{listingId}`                           |                Yes | Cancel an active marketplace listing                               |
+| `POST`   | `/api/Wallet/deposit`                                           |                Yes | Deposit wallet funds and write ledger entry                        |
+| `GET`    | `/api/Wallet/history`                                           |                Yes | Retrieve wallet transaction history (newest first)                 |

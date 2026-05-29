@@ -13,6 +13,11 @@ abstract class MyTicketsRepository {
     required String cvv,
   });
 
+  ResultFuture<String> getQrPayload({
+    required int bookingId,
+    required int passengerId,
+  });
+
   ResultFuture<Map<String, dynamic>> getActiveListings({
     int pageNumber = 1,
     int pageSize = 10,

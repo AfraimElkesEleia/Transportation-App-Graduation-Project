@@ -698,7 +698,7 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
-  String get popularRoutes => 'مسارات شائعة';
+  String get popularRoutes => '🔥 رحلات شائعة';
 
   @override
   String get latestNews => 'أحدث الأخبار';
@@ -898,4 +898,346 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get confirmPasswordHint => 'أعد إدخال كلمة المرور';
+
+  @override
+  String get directTrip => 'مباشر';
+
+  @override
+  String stopsCount(String count) {
+    return '$count توقف';
+  }
+
+  @override
+  String get hideStops => 'إخفاء المحطات';
+
+  @override
+  String get showStops => 'عرض المحطات';
+
+  @override
+  String get routeStops => 'محطات الرحلة';
+
+  @override
+  String get howManyPassengers => 'كم عدد المسافرين؟';
+
+  @override
+  String get perSeat => 'لكل مقعد';
+
+  @override
+  String seatsAvailable(String n) {
+    return '$n مقاعد متاحة';
+  }
+
+  @override
+  String continueWithNPassengers(String n) {
+    return 'متابعة مع $n مسافر';
+  }
+
+  @override
+  String get useLoyaltyPoints => '💎 استخدم نقاط الولاء';
+
+  @override
+  String get noPointsYet => 'ليس لديك أي نقاط بعد. أكمل رحلات لكسب النقاط!';
+
+  @override
+  String get pointsCantBeApplied =>
+      'لا يمكن تطبيق النقاط - إجمالي السلة منخفض جداً (الحد الأدنى 10 جنيهات).';
+
+  @override
+  String needMorePoints(String points) {
+    return 'تحتاج إلى 20 نقطة على الأقل للخصم (= خصم 1 جنيه). لديك حالياً $points نقطة. استمر في الحجز لكسب المزيد!';
+  }
+
+  @override
+  String get ptsLabel => 'نقطة';
+
+  @override
+  String get pointsInfo => 'ℹ️ 20 نقطة = 1 جنيه';
+
+  @override
+  String get pointsUsed => 'النقاط المستخدمة';
+
+  @override
+  String get discount => 'الخصم';
+
+  @override
+  String get remainingAfter => 'المتبقي بعد الخصم';
+
+  @override
+  String get finalTotal => 'الإجمالي النهائي';
+
+  @override
+  String ptsValue(String n) {
+    return '$n نقطة';
+  }
+
+  @override
+  String get from => 'من';
+
+  @override
+  String get book => 'حجز';
+
+  @override
+  String get fullSeats => 'مكتمل';
+
+  @override
+  String get skip => 'تخطي';
+
+  @override
+  String get ticketDetails => 'تفاصيل التذكرة';
+
+  @override
+  String ticketClass(String className) {
+    return 'درجة $className';
+  }
+
+  @override
+  String get to => 'إلى';
+
+  @override
+  String get departure => 'المغادرة';
+
+  @override
+  String get arrival => 'الوصول';
+
+  @override
+  String get bookingRef => 'رقم الحجز';
+
+  @override
+  String get passengersAndSeats => 'المسافرون والمقاعد';
+
+  @override
+  String get tapPassengerInfo => 'انقر على المسافر لعرض بطاقة الصعود';
+
+  @override
+  String idNum(String id) {
+    return 'الرقم القومي: $id';
+  }
+
+  @override
+  String seatNum(String seat) {
+    return 'مقعد $seat';
+  }
+
+  @override
+  String get seat => 'مقعد';
+
+  @override
+  String get pax => 'مسافر';
+
+  @override
+  String get passengerDetails => 'بيانات المسافرين';
+
+  @override
+  String get fullName => 'الاسم الكامل';
+
+  @override
+  String get nationalId => 'الرقم القومي';
+
+  @override
+  String get emailOptional => 'البريد الإلكتروني (اختياري)';
+
+  @override
+  String get requiredField => 'مطلوب';
+
+  @override
+  String get addToCart => 'أضف إلى السلة';
+
+  @override
+  String get bookNow => 'احجز الآن';
+
+  @override
+  String passengerN(String n) {
+    return 'مسافر $n';
+  }
+
+  @override
+  String seatLabel(String n) {
+    return 'المقعد: $n';
+  }
+
+  @override
+  String passengersCount(String n) {
+    return '$n مسافر';
+  }
+
+  @override
+  String get selectSeats => 'اختر المقاعد';
+
+  @override
+  String get selectedSeatsLabel => 'المحدد: ';
+
+  @override
+  String seatsCount(String n) {
+    return '$n مقاعد';
+  }
+
+  @override
+  String get totalLabel => 'الإجمالي';
+
+  @override
+  String get continueBtn => 'متابعة';
+
+  @override
+  String get noSeatsSelected => 'لم يتم اختيار مقاعد';
+
+  @override
+  String get travellingWithFamily => 'هل تسافر مع العائلة؟';
+
+  @override
+  String get autoFill => 'تعبئة تلقائية';
+
+  @override
+  String get autoFilled => 'تم التعبئة ✔';
+
+  @override
+  String get reFill => 'إعادة التعبئة';
+
+  @override
+  String get fillSeat1Info =>
+      'أكمل المقعد الأول، ثم انسخ الاسم والهاتف للمقاعد الأخرى.';
+
+  @override
+  String get addEntireJourneyToCart => 'أضف الرحلة بالكامل إلى السلة';
+
+  @override
+  String get buildJourney => 'ابنِ رحلتك';
+
+  @override
+  String get suggestedTransferRoute => 'مسار التحويل المقترح';
+
+  @override
+  String get transferAt => 'تحويل في';
+
+  @override
+  String legN(String n) {
+    return 'الجزء $n';
+  }
+
+  @override
+  String get journeyAddedToCart => 'تمت إضافة الرحلة إلى السلة بنجاح!';
+
+  @override
+  String get bookingSuccessful => 'تم الحجز بنجاح!';
+
+  @override
+  String get indirectTripAddedToCart =>
+      'تمت إضافة الرحلة غير المباشرة إلى السلة بنجاح!';
+
+  @override
+  String get pleaseSelectSeat => 'الرجاء اختيار مقعد';
+
+  @override
+  String selectExactlyNSeats(String n) {
+    return 'الرجاء اختيار $n مقاعد بالضبط';
+  }
+
+  @override
+  String canOnlySelectNSeats(String n) {
+    return 'يمكنك اختيار $n مقعد فقط لهذا الجزء.';
+  }
+
+  @override
+  String pleaseSelectNPassengers(String n) {
+    return 'الرجاء اختيار $n مسافرين بالضبط';
+  }
+
+  @override
+  String get fillNamePhoneFirst =>
+      'الرجاء تعبئة الاسم والهاتف للمسافر الأول أولاً.';
+
+  @override
+  String filledNSeats(String n, String name) {
+    return 'تمت تعبئة $n مقعد بـ \"$name\"';
+  }
+
+  @override
+  String requiredCountSeats(String n, String m) {
+    return 'مطلوب: $n مقاعد. تم اختيار: $m';
+  }
+
+  @override
+  String get idTypeLabel => 'نوع الهوية';
+
+  @override
+  String get idTypeNationalId => 'بطاقة قومية';
+
+  @override
+  String get idTypePassport => 'جواز سفر';
+
+  @override
+  String get idNumberLabel => 'رقم البطاقة القومية';
+
+  @override
+  String get passportNumberLabel => 'رقم جواز السفر';
+
+  @override
+  String get activeChallengesTitle => 'التحديات النشطة';
+
+  @override
+  String challengeProgressLabel(String current, String goal) {
+    return '$current / $goal رحلة';
+  }
+
+  @override
+  String challengeRewardLabel(String points) {
+    return 'المكافأة: $points نقطة';
+  }
+
+  @override
+  String get challengeMonthly => 'شهري';
+
+  @override
+  String get challengeOneTime => 'مرة واحدة';
+
+  @override
+  String challengePts(String pts) {
+    return '+$pts نقطة';
+  }
+
+  @override
+  String challengeProgress(String current, String goal) {
+    return '$current / $goal';
+  }
+
+  @override
+  String get amLabel => 'ص';
+
+  @override
+  String get pmLabel => 'م';
+
+  @override
+  String floorLabel(String n) {
+    return 'الطابق $n';
+  }
+
+  @override
+  String get standardClass => 'عادي';
+
+  @override
+  String get dateCannotBeToday =>
+      'لا يمكن أن يكون تاريخ السفر اليوم. يرجى اختيار تاريخ مستقبلي.';
+
+  @override
+  String get selectTravelDate => 'اختر تاريخ السفر';
+
+  @override
+  String get search => 'بحث';
+
+  @override
+  String get notifications => 'الإشعارات';
+
+  @override
+  String get markAllRead => 'تحديد الكل كمقروء';
+
+  @override
+  String get filterAll => 'الكل';
+
+  @override
+  String get filterUnread => 'غير مقروء';
+
+  @override
+  String get filterMarketplace => 'السوق';
+
+  @override
+  String get dismiss => 'إغلاق';
 }

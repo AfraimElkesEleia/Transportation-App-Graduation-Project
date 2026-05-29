@@ -699,7 +699,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get popularRoutes => 'Popular Routes';
+  String get popularRoutes => '🔥 Popular Routes';
 
   @override
   String get latestNews => 'Latest News';
@@ -900,4 +900,348 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get confirmPasswordHint => 'Re-enter your password';
+
+  @override
+  String get directTrip => 'Direct';
+
+  @override
+  String stopsCount(String count) {
+    return '$count Stops';
+  }
+
+  @override
+  String get hideStops => 'Hide Stops';
+
+  @override
+  String get showStops => 'Show Stops';
+
+  @override
+  String get routeStops => 'Route Stops';
+
+  @override
+  String get howManyPassengers => 'How many passengers?';
+
+  @override
+  String get perSeat => 'per seat';
+
+  @override
+  String seatsAvailable(String n) {
+    return '$n seats available';
+  }
+
+  @override
+  String continueWithNPassengers(String n) {
+    return 'Continue with $n Passenger(s)';
+  }
+
+  @override
+  String get useLoyaltyPoints => '💎 Use Loyalty Points';
+
+  @override
+  String get noPointsYet =>
+      'You don\'t have any points yet. Complete trips to earn points!';
+
+  @override
+  String get pointsCantBeApplied =>
+      'Points can\'t be applied — cart total is too low (10 EGP minimum final price).';
+
+  @override
+  String needMorePoints(String points) {
+    return 'You need at least 20 pts to redeem (= 1.00 EGP off). You currently have $points pts. Keep booking to earn more!';
+  }
+
+  @override
+  String get ptsLabel => 'pts';
+
+  @override
+  String get pointsInfo => 'ℹ️ 20 pts = 1.00 EGP';
+
+  @override
+  String get pointsUsed => 'Points used';
+
+  @override
+  String get discount => 'Discount';
+
+  @override
+  String get remainingAfter => 'Remaining after';
+
+  @override
+  String get finalTotal => 'Final total';
+
+  @override
+  String ptsValue(String n) {
+    return '$n pts';
+  }
+
+  @override
+  String get from => 'From';
+
+  @override
+  String get book => 'Book';
+
+  @override
+  String get fullSeats => 'Full';
+
+  @override
+  String get skip => 'Skip';
+
+  @override
+  String get ticketDetails => 'Ticket Details';
+
+  @override
+  String ticketClass(String className) {
+    return '$className Class';
+  }
+
+  @override
+  String get to => 'To';
+
+  @override
+  String get departure => 'Departure';
+
+  @override
+  String get arrival => 'Arrival';
+
+  @override
+  String get bookingRef => 'Booking Ref';
+
+  @override
+  String get passengersAndSeats => 'Passengers & Seats';
+
+  @override
+  String get tapPassengerInfo =>
+      'Tap on a passenger to view their boarding pass';
+
+  @override
+  String idNum(String id) {
+    return 'ID: $id';
+  }
+
+  @override
+  String seatNum(String seat) {
+    return 'Seat $seat';
+  }
+
+  @override
+  String get seat => 'seat(s)';
+
+  @override
+  String get pax => 'pax';
+
+  @override
+  String get passengerDetails => 'Passenger Details';
+
+  @override
+  String get fullName => 'Full Name';
+
+  @override
+  String get nationalId => 'National ID';
+
+  @override
+  String get emailOptional => 'Email Address (Optional)';
+
+  @override
+  String get requiredField => 'Required';
+
+  @override
+  String get addToCart => 'Add to Cart';
+
+  @override
+  String get bookNow => 'Book Now';
+
+  @override
+  String passengerN(String n) {
+    return 'Passenger $n';
+  }
+
+  @override
+  String seatLabel(String n) {
+    return 'Seat: $n';
+  }
+
+  @override
+  String passengersCount(String n) {
+    return '$n Passenger(s)';
+  }
+
+  @override
+  String get selectSeats => 'Select Seats';
+
+  @override
+  String get selectedSeatsLabel => 'Selected: ';
+
+  @override
+  String seatsCount(String n) {
+    return '$n seats';
+  }
+
+  @override
+  String get totalLabel => 'Total';
+
+  @override
+  String get continueBtn => 'Continue';
+
+  @override
+  String get noSeatsSelected => 'No seats selected';
+
+  @override
+  String get travellingWithFamily => 'Travelling with family?';
+
+  @override
+  String get autoFill => 'Auto-fill';
+
+  @override
+  String get autoFilled => 'Auto-filled ✔';
+
+  @override
+  String get reFill => 'Re-fill';
+
+  @override
+  String get fillSeat1Info =>
+      'Fill seat 1, then copy name & phone to all other seats.';
+
+  @override
+  String get addEntireJourneyToCart => 'Add Entire Journey to Cart';
+
+  @override
+  String get buildJourney => 'Build Journey';
+
+  @override
+  String get suggestedTransferRoute => 'Suggested Transfer Route';
+
+  @override
+  String get transferAt => 'Transfer at';
+
+  @override
+  String legN(String n) {
+    return 'Leg $n';
+  }
+
+  @override
+  String get journeyAddedToCart => 'Journey added to cart successfully!';
+
+  @override
+  String get bookingSuccessful => 'Booking successful!';
+
+  @override
+  String get indirectTripAddedToCart =>
+      'Indirect Trip successfully added to Cart!';
+
+  @override
+  String get pleaseSelectSeat => 'Please select a seat';
+
+  @override
+  String selectExactlyNSeats(String n) {
+    return 'Please pick exactly $n seats';
+  }
+
+  @override
+  String canOnlySelectNSeats(String n) {
+    return 'You can only select $n seats for this leg.';
+  }
+
+  @override
+  String pleaseSelectNPassengers(String n) {
+    return 'Please select exactly $n passengers';
+  }
+
+  @override
+  String get fillNamePhoneFirst =>
+      'Please fill in Name and Phone for the first passenger first.';
+
+  @override
+  String filledNSeats(String n, String name) {
+    return 'Filled $n seat(s) with \"$name\"';
+  }
+
+  @override
+  String requiredCountSeats(String n, String m) {
+    return 'Required: $n seats. Selected: $m';
+  }
+
+  @override
+  String get idTypeLabel => 'ID Type';
+
+  @override
+  String get idTypeNationalId => 'National ID';
+
+  @override
+  String get idTypePassport => 'Passport';
+
+  @override
+  String get idNumberLabel => 'ID Number';
+
+  @override
+  String get passportNumberLabel => 'Passport Number';
+
+  @override
+  String get activeChallengesTitle => 'Active Challenges';
+
+  @override
+  String challengeProgressLabel(String current, String goal) {
+    return '$current / $goal trips';
+  }
+
+  @override
+  String challengeRewardLabel(String points) {
+    return 'Reward: $points points';
+  }
+
+  @override
+  String get challengeMonthly => 'Monthly';
+
+  @override
+  String get challengeOneTime => 'One-Time';
+
+  @override
+  String challengePts(String pts) {
+    return '+$pts pts';
+  }
+
+  @override
+  String challengeProgress(String current, String goal) {
+    return '$current / $goal';
+  }
+
+  @override
+  String get amLabel => 'AM';
+
+  @override
+  String get pmLabel => 'PM';
+
+  @override
+  String floorLabel(String n) {
+    return 'Floor $n';
+  }
+
+  @override
+  String get standardClass => 'Standard';
+
+  @override
+  String get dateCannotBeToday =>
+      'Travel date cannot be today. Please select a future date.';
+
+  @override
+  String get selectTravelDate => 'Select Travel Date';
+
+  @override
+  String get search => 'Search';
+
+  @override
+  String get notifications => 'Notifications';
+
+  @override
+  String get markAllRead => 'Mark all read';
+
+  @override
+  String get filterAll => 'All';
+
+  @override
+  String get filterUnread => 'Unread';
+
+  @override
+  String get filterMarketplace => 'Marketplace';
+
+  @override
+  String get dismiss => 'Dismiss';
 }

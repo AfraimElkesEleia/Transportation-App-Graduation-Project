@@ -7,6 +7,7 @@ import 'package:transportation_app/core/validators/app_validators.dart';
 import 'package:transportation_app/core/widgets/app_gradient_button.dart';
 import 'package:transportation_app/core/widgets/app_text_form_field.dart';
 import 'package:transportation_app/core/widgets/auth_background.dart';
+import 'package:transportation_app/core/widgets/language_toggle_button.dart';
 import 'package:transportation_app/features/login/presentation/cubit/login_cubit/login_cubit.dart';
 import 'package:transportation_app/features/login/presentation/cubit/login_cubit/login_states.dart';
 import 'package:transportation_app/features/login/presentation/widgets/auth_headline.dart';
@@ -82,6 +83,11 @@ class _LoginScreenState extends State<LoginScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 50),
+              Align(
+                alignment: AlignmentDirectional.centerEnd,
+                child: const LanguageToggleButton(),
+              ),
+              const SizedBox(height: 8),
               const AuthAccentBar(),
               const SizedBox(height: 10),
               AuthHeadline(

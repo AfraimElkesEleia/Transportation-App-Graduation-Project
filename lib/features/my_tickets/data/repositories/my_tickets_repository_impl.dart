@@ -75,6 +75,25 @@ class MyTicketsRepositoryImpl implements MyTicketsRepository {
   }
 
   @override
+  ResultFuture<String> getQrPayload({
+    required int bookingId,
+    required int passengerId,
+  }) async {
+    try {
+      return Right(await remoteDatasource.getQrPayload(
+        bookingId: bookingId,
+        passengerId: passengerId,
+      ));
+    } on ServerException catch (e) {
+      return Left(ServerFailure(message: e.message));
+    } on NetworkException {
+      return Left(const NetworkFailure());
+    } on UnauthorizedException catch (e) {
+      return Left(UnauthorizedFailure(message: e.message));
+    }
+  }
+
+  @override
   ResultFuture<Map<String, dynamic>> getActiveListings({
     int pageNumber = 1,
     int pageSize = 10,
