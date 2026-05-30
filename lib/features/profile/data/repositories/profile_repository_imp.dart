@@ -119,7 +119,7 @@ class ProfileRepositoryImp extends ProfileRepository {
       );
       return const Right(null);
     } on ServerException catch (e) {
-      return Left(ServerFailure(message: e.message));
+      return Left(ServerFailure(message: e.message, errors: e.errors));
     } on NetworkException {
       return Left(const NetworkFailure());
     }

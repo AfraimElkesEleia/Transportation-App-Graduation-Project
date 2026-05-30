@@ -88,7 +88,12 @@ class ProfileCubit extends Cubit<ProfileState> {
       ),
     );
     if (isClosed) return;
-    result.fold((failure) => emit(WalletDepositFailure(failure.message)), (_) {
+    result.fold((failure) {
+      final message = failure.errors.isNotEmpty
+          ? failure.errors.join('\n')
+          : failure.message;
+      emit(WalletDepositFailure(message));
+    }, (_) {
       emit(WalletDepositSuccess());
       loadProfile();
     });

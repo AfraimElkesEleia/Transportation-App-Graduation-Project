@@ -159,6 +159,11 @@
   "txTicketPurchase": "شراء تذكرة",
   "txRedemption": "استرداد",
   "txReward": "مكافأة",
+  "txChallengeReward": "مكافأة تحدي",
+  "txBookingEarned": "مكافأة حجز",
+  "txStatusAvailable": "متاح",
+  "txStatusSpent": "مُستخدم",
+  "txStatusExpired": "منتهي الصلاحية",
   "welcome": "!مرحباً",
   "whereToGoToday": "أين تريد الذهاب اليوم؟",
   "searchTrip": "بحث عن رحلة",
@@ -534,5 +539,8 @@
   "filterAll": "الكل",
   "filterUnread": "غير مقروء",
   "filterMarketplace": "السوق",
-  "dismiss": "إغلاق"
+  "dismiss": "إغلاق",
+  "seatLegendAvailable": "متاح",
+  "seatLegendSelected": "محدد",
+  "seatLegendTaken": "محجوز"
 }

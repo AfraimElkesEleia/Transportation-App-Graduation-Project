@@ -194,6 +194,11 @@
   "txTicketPurchase": "Ticket Purchase",
   "txRedemption": "Redemption",
   "txReward": "Reward",
+  "txChallengeReward": "Challenge Reward",
+  "txBookingEarned": "Booking Reward",
+  "txStatusAvailable": "Available",
+  "txStatusSpent": "Spent",
+  "txStatusExpired": "Expired",
   "welcome": "Welcome!",
   "whereToGoToday": "Where would you like to go today?",
   "searchTrip": "Search Trip",
@@ -661,5 +666,8 @@
   "filterAll": "All",
   "filterUnread": "Unread",
   "filterMarketplace": "Marketplace",
-  "dismiss": "Dismiss"
+  "dismiss": "Dismiss",
+  "seatLegendAvailable": "Available",
+  "seatLegendSelected": "Selected",
+  "seatLegendTaken": "Taken"
 }

@@ -507,6 +507,21 @@ class AppLocalizationsEn extends AppLocalizations {
   String get txReward => 'Reward';
 
   @override
+  String get txChallengeReward => 'Challenge Reward';
+
+  @override
+  String get txBookingEarned => 'Booking Reward';
+
+  @override
+  String get txStatusAvailable => 'Available';
+
+  @override
+  String get txStatusSpent => 'Spent';
+
+  @override
+  String get txStatusExpired => 'Expired';
+
+  @override
   String get welcome => 'Welcome!';
 
   @override
@@ -1244,4 +1259,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get dismiss => 'Dismiss';
+
+  @override
+  String get seatLegendAvailable => 'Available';
+
+  @override
+  String get seatLegendSelected => 'Selected';
+
+  @override
+  String get seatLegendTaken => 'Taken';
 }

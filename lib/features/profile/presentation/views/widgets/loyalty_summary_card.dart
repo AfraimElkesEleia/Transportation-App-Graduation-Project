@@ -42,6 +42,7 @@ class LoyaltySummaryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
+    final isAr = Directionality.of(context) == TextDirection.rtl;
     final expiryText = _expiryLabel(loc);
 
     return Container(
@@ -53,7 +54,8 @@ class LoyaltySummaryCard extends StatelessWidget {
         border: Border.all(color: ColorsManager.borderDim),
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment:
+            isAr ? CrossAxisAlignment.end : CrossAxisAlignment.start,
         children: [
           Text(
             loc.availableBalance,
@@ -61,8 +63,14 @@ class LoyaltySummaryCard extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Row(
+            mainAxisAlignment:
+                isAr ? MainAxisAlignment.end : MainAxisAlignment.start,
             children: [
-              const Icon(Icons.stars_rounded, color: Color(0xFFFFD700), size: 32),
+              const Icon(
+                Icons.stars_rounded,
+                color: Color(0xFFFFD700),
+                size: 32,
+              ),
               const SizedBox(width: 12),
               Text(
                 '$pointsBalance ${loc.pts}',

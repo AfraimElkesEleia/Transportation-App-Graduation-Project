@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:transportation_app/core/routing/routes.dart';
 import 'package:transportation_app/core/theming/colors.dart';
 import 'package:transportation_app/features/my_tickets/presentation/cubit/marketplace_cubit.dart';
 import 'package:transportation_app/features/my_tickets/presentation/cubit/marketplace_states.dart';
+
+// ── ID type options (Train only — National ID & Passport) ────────────────────
+const _kIdTypes = ['NationalId', 'Passport'];
+
+const _kIdTypeLabels = {'NationalId': 'National ID', 'Passport': 'Passport'};
 
 class MarketplacePassengerFormScreen extends StatefulWidget {
   final Map<String, dynamic> item;
@@ -26,13 +31,11 @@ class _MarketplacePassengerFormScreenState
   @override
   void initState() {
     super.initState();
-    final trip = widget.item['tripDetails'] as Map<String, dynamic>? ?? {};
-    final agencyName =
-        widget.item['agencyName'] as String? ??
-        widget.item['agency'] as String? ??
-        '';
-    isTrain = agencyName.toUpperCase().contains('ENR');
-    seatsBooked = widget.item['seatsCount'] as int? ?? 1;
+    isTrain = _detectTrain(widget.item);
+    seatsBooked =
+        widget.item['seatsCount'] as int? ??
+        widget.item['seatsBooked'] as int? ??
+        1;
 
     _controllers = List.generate(seatsBooked, (_) => _PassengerControllers());
     _controllers.first.nameController.addListener(_onFirstChanged);
@@ -53,6 +56,35 @@ class _MarketplacePassengerFormScreenState
     super.dispose();
   }
 
+  /// Determines whether the listing is a train booking.
+  ///
+  /// Checks [item['agencyName']] at the root level first, then falls back to
+  /// [item['tripDetails']['agencyName']] in case the API nests it differently.
+  /// Primary match: exact value "Egyptian National Railways".
+  /// Fallback matches: NATIONAL RAIL, RAILWAY, TRAIN keywords.
+  static bool _detectTrain(Map<String, dynamic> item) {
+    // Try root-level agencyName first, then inside tripDetails
+    final agencyName =
+        (item['agencyName'] as String? ??
+                item['agency'] as String? ??
+                (item['tripDetails'] as Map<String, dynamic>?)?['agencyName']
+                    as String? ??
+                '')
+            .toUpperCase();
+
+    // Explicit transportType field (if API provides it)
+    final transportType = (item['transportType'] as String? ?? '')
+        .toUpperCase();
+
+    return transportType == 'TRAIN' ||
+        agencyName == 'EGYPTIAN NATIONAL RAILWAYS' ||
+        agencyName.contains('NATIONAL RAIL') ||
+        agencyName.contains('RAILWAY') ||
+        agencyName.contains('TRAIN') ||
+        agencyName.contains('ENR');
+  }
+
+  /// Auto-fill all seats with first passenger's Name & Phone (Bus only).
   void _autofill() {
     final srcName = _controllers.first.nameController.text.trim();
     final srcPhone = _controllers.first.phoneController.text.trim();
@@ -108,13 +140,17 @@ class _MarketplacePassengerFormScreenState
 
     final passengers = List.generate(seatsBooked, (i) {
       final c = _controllers[i];
-      final Map<String, dynamic> payload = {};
-      payload['passengerName'] = c.nameController.text.trim();
-      final idNum = c.idController.text.trim();
-      if (idNum.isNotEmpty || isTrain) {
-        payload['idNumber'] = idNum;
-        payload['idType'] = 'NationalId';
+      final Map<String, dynamic> payload = {
+        'passengerName': c.nameController.text.trim(),
+      };
+
+      if (isTrain) {
+        // idType is always set for Train; idNumber required by API when idType present
+        payload['idType'] = c.selectedIdType;
+        final idNum = c.idController.text.trim();
+        if (idNum.isNotEmpty) payload['idNumber'] = idNum;
       }
+      // Bus: no ID fields sent at all
       return payload;
     });
 
@@ -134,17 +170,40 @@ class _MarketplacePassengerFormScreenState
             if (state is MarketplaceBoughtState) {
               Navigator.pop(context); // Go back to marketplace
             } else if (state is MarketplaceBuyErrorState) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(state.message),
-                  backgroundColor: Colors.red,
-                ),
-              );
+              ScaffoldMessenger.of(context)
+                ..hideCurrentSnackBar()
+                ..showSnackBar(
+                  SnackBar(
+                    content: Row(
+                      children: [
+                        const Icon(
+                          Icons.error_outline,
+                          color: Colors.white,
+                          size: 18,
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Text(
+                            state.message,
+                            style: const TextStyle(color: Colors.white),
+                          ),
+                        ),
+                      ],
+                    ),
+                    backgroundColor: const Color(0xFFB00020),
+                    behavior: SnackBarBehavior.floating,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    margin: const EdgeInsets.all(16),
+                    duration: const Duration(seconds: 4),
+                  ),
+                );
             }
           },
           child: Column(
             children: [
-              _FormAppBar(),
+              _FormAppBar(isTrain: isTrain),
               Expanded(
                 child: Form(
                   key: _formKey,
@@ -154,6 +213,10 @@ class _MarketplacePassengerFormScreenState
                       vertical: 16,
                     ),
                     children: [
+                      // Transport type badge
+                      _TransportBadge(isTrain: isTrain),
+                      const SizedBox(height: 16),
+
                       ...List.generate(seatsBooked, (index) {
                         final widgets = <Widget>[
                           _PassengerCard(
@@ -163,6 +226,7 @@ class _MarketplacePassengerFormScreenState
                           ),
                         ];
 
+                        // Auto-fill banner: bus only, first seat, multi-seat
                         if (index == 0 && !isTrain && seatsBooked > 1) {
                           widgets.add(
                             _AutofillBanner(
@@ -186,21 +250,85 @@ class _MarketplacePassengerFormScreenState
   }
 }
 
+// ── Per-passenger state container ─────────────────────────────────────────────
 class _PassengerControllers {
   final nameController = TextEditingController();
   final idController = TextEditingController();
   final phoneController = TextEditingController();
-  final emailController = TextEditingController();
+  String selectedIdType = 'NationalId'; // default for Train
 
   void dispose() {
     nameController.dispose();
     idController.dispose();
     phoneController.dispose();
-    emailController.dispose();
   }
 }
 
+// ── Transport type badge ──────────────────────────────────────────────────────
+class _TransportBadge extends StatelessWidget {
+  final bool isTrain;
+  const _TransportBadge({required this.isTrain});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      decoration: BoxDecoration(
+        color: isTrain
+            ? const Color(0xFF1A3A6A).withOpacity(0.8)
+            : const Color(0xFF1A3A2A).withOpacity(0.8),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: isTrain
+              ? ColorsManager.accentCyan.withOpacity(0.4)
+              : ColorsManager.successGreen.withOpacity(0.4),
+        ),
+      ),
+      child: Row(
+        children: [
+          Icon(
+            isTrain ? Icons.train_rounded : Icons.directions_bus_rounded,
+            color: isTrain
+                ? ColorsManager.accentCyan
+                : ColorsManager.successGreen,
+            size: 20,
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  isTrain ? 'Train Booking' : 'Bus Booking',
+                  style: TextStyle(
+                    color: isTrain
+                        ? ColorsManager.accentCyan
+                        : ColorsManager.successGreen,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 13,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  isTrain
+                      ? 'Name, ID type & number required for each passenger'
+                      : 'Name & phone number required for each passenger',
+                  style: const TextStyle(color: Colors.white54, fontSize: 11),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ── App bar ───────────────────────────────────────────────────────────────────
 class _FormAppBar extends StatelessWidget {
+  final bool isTrain;
+  const _FormAppBar({required this.isTrain});
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -223,15 +351,29 @@ class _FormAppBar extends StatelessWidget {
               ),
             ),
           ),
-          const Expanded(
-            child: Text(
-              'Passenger Details',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 17,
-                fontWeight: FontWeight.bold,
-              ),
-              textAlign: TextAlign.center,
+          Expanded(
+            child: Column(
+              children: [
+                const Text(
+                  'Passenger Details',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 17,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                Text(
+                  isTrain ? 'Train' : 'Bus',
+                  style: TextStyle(
+                    color: isTrain
+                        ? ColorsManager.accentCyan
+                        : ColorsManager.successGreen,
+                    fontSize: 12,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
             ),
           ),
           const SizedBox(width: 42),
@@ -241,6 +383,7 @@ class _FormAppBar extends StatelessWidget {
   }
 }
 
+// ── Passenger card ────────────────────────────────────────────────────────────
 class _PassengerCard extends StatefulWidget {
   final String label;
   final _PassengerControllers controllers;
@@ -270,44 +413,133 @@ class _PassengerCardState extends State<_PassengerCard> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            widget.label,
-            style: const TextStyle(
-              color: ColorsManager.accentCyan,
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
-            ),
+          // Header
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: ColorsManager.accentCyan.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: const Icon(
+                  Icons.person_rounded,
+                  color: ColorsManager.accentCyan,
+                  size: 16,
+                ),
+              ),
+              const SizedBox(width: 10),
+              Text(
+                widget.label,
+                style: const TextStyle(
+                  color: ColorsManager.accentCyan,
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 14),
+
+          // ── Full Name ──
           _buildTextField(
             controller: widget.controllers.nameController,
             label: 'Full Name',
             icon: Icons.person_outline,
-            validator: (v) =>
-                (v == null || v.trim().isEmpty) ? 'Required' : null,
-          ),
-          const SizedBox(height: 12),
-          _buildTextField(
-            controller: widget.controllers.idController,
-            label: widget.isTrain ? 'National ID' : 'National ID (Optional)',
-            icon: Icons.badge_outlined,
-            keyboardType: TextInputType.number,
-            validator: (v) => widget.isTrain && (v == null || v.trim().isEmpty)
-                ? 'Required'
+            validator: (v) => (v == null || v.trim().isEmpty)
+                ? 'Full name is required'
                 : null,
           ),
           const SizedBox(height: 12),
+
+          if (widget.isTrain) ...[
+            // ── ID Type dropdown ──
+            _buildIdTypeDropdown(),
+            const SizedBox(height: 12),
+
+            // ── ID Number ──
+            _buildTextField(
+              controller: widget.controllers.idController,
+              label: 'ID Number',
+              icon: Icons.badge_outlined,
+              keyboardType: TextInputType.text,
+              inputFormatters: [
+                FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z0-9]')),
+              ],
+              validator: (v) => (v == null || v.trim().isEmpty)
+                  ? 'ID number is required'
+                  : null,
+            ),
+            const SizedBox(height: 12),
+          ],
+
+          // ── Phone Number (both Train and Bus) ──
           _buildTextField(
             controller: widget.controllers.phoneController,
             label: 'Phone Number',
             icon: Icons.phone_outlined,
             keyboardType: TextInputType.phone,
-            validator: (v) =>
-                (v == null || v.trim().isEmpty) ? 'Required' : null,
+            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+            validator: (v) => (v == null || v.trim().isEmpty)
+                ? 'Phone number is required'
+                : null,
           ),
-          const SizedBox(height: 12),
         ],
       ),
+    );
+  }
+
+  Widget _buildIdTypeDropdown() {
+    return DropdownButtonFormField<String>(
+      value: widget.controllers.selectedIdType,
+      dropdownColor: ColorsManager.seatContainerBg,
+      style: const TextStyle(color: Colors.white, fontSize: 14),
+      decoration: InputDecoration(
+        labelText: 'ID Type',
+        labelStyle: const TextStyle(
+          color: ColorsManager.textMuted,
+          fontSize: 13,
+        ),
+        prefixIcon: const Icon(
+          Icons.credit_card_rounded,
+          color: ColorsManager.textMuted,
+          size: 20,
+        ),
+        filled: true,
+        fillColor: ColorsManager.seatContainerBg,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide.none,
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: ColorsManager.accentCyan),
+        ),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 14,
+        ),
+      ),
+      icon: const Icon(
+        Icons.keyboard_arrow_down_rounded,
+        color: ColorsManager.textMuted,
+      ),
+      items: _kIdTypes.map((type) {
+        return DropdownMenuItem<String>(
+          value: type,
+          child: Text(
+            _kIdTypeLabels[type] ?? type,
+            style: const TextStyle(color: Colors.white),
+          ),
+        );
+      }).toList(),
+      onChanged: (val) {
+        if (val != null) {
+          setState(() => widget.controllers.selectedIdType = val);
+        }
+      },
+      validator: (v) =>
+          (v == null || v.isEmpty) ? 'Please select ID type' : null,
     );
   }
 
@@ -316,12 +548,14 @@ class _PassengerCardState extends State<_PassengerCard> {
     required String label,
     required IconData icon,
     TextInputType keyboardType = TextInputType.text,
+    List<TextInputFormatter>? inputFormatters,
     String? Function(String?)? validator,
   }) {
     return TextFormField(
       controller: controller,
       keyboardType: keyboardType,
       validator: validator,
+      inputFormatters: inputFormatters,
       style: const TextStyle(color: Colors.white, fontSize: 14),
       decoration: InputDecoration(
         labelText: label,
@@ -344,6 +578,10 @@ class _PassengerCardState extends State<_PassengerCard> {
           borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(color: Colors.redAccent),
         ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Colors.redAccent),
+        ),
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 16,
           vertical: 14,
@@ -353,6 +591,7 @@ class _PassengerCardState extends State<_PassengerCard> {
   }
 }
 
+// ── Bottom action bar ─────────────────────────────────────────────────────────
 class _FormBottomButtons extends StatelessWidget {
   final double totalPrice;
   final VoidCallback onBuyNow;
@@ -432,6 +671,7 @@ class _FormBottomButtons extends StatelessWidget {
   }
 }
 
+// ── Auto-fill banner (Bus multi-seat) ─────────────────────────────────────────
 class _AutofillBanner extends StatelessWidget {
   final bool autofilled;
   final VoidCallback onAutofill;
@@ -471,7 +711,7 @@ class _AutofillBanner extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  autofilled ? 'Auto-filled \u2714' : 'Travelling with family?',
+                  autofilled ? 'Auto-filled ✔' : 'Travelling with family?',
                   style: TextStyle(
                     color: autofilled
                         ? ColorsManager.successGreen

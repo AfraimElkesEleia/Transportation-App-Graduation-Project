@@ -1058,6 +1058,36 @@ abstract class AppLocalizations {
   /// **'Reward'**
   String get txReward;
 
+  /// No description provided for @txChallengeReward.
+  ///
+  /// In en, this message translates to:
+  /// **'Challenge Reward'**
+  String get txChallengeReward;
+
+  /// No description provided for @txBookingEarned.
+  ///
+  /// In en, this message translates to:
+  /// **'Booking Reward'**
+  String get txBookingEarned;
+
+  /// No description provided for @txStatusAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Available'**
+  String get txStatusAvailable;
+
+  /// No description provided for @txStatusSpent.
+  ///
+  /// In en, this message translates to:
+  /// **'Spent'**
+  String get txStatusSpent;
+
+  /// No description provided for @txStatusExpired.
+  ///
+  /// In en, this message translates to:
+  /// **'Expired'**
+  String get txStatusExpired;
+
   /// No description provided for @welcome.
   ///
   /// In en, this message translates to:
@@ -2377,6 +2407,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Dismiss'**
   String get dismiss;
+
+  /// No description provided for @seatLegendAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Available'**
+  String get seatLegendAvailable;
+
+  /// No description provided for @seatLegendSelected.
+  ///
+  /// In en, this message translates to:
+  /// **'Selected'**
+  String get seatLegendSelected;
+
+  /// No description provided for @seatLegendTaken.
+  ///
+  /// In en, this message translates to:
+  /// **'Taken'**
+  String get seatLegendTaken;
 }
 
 class _AppLocalizationsDelegate

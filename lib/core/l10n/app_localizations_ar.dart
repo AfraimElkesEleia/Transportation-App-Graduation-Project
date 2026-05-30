@@ -507,6 +507,21 @@ class AppLocalizationsAr extends AppLocalizations {
   String get txReward => 'مكافأة';
 
   @override
+  String get txChallengeReward => 'مكافأة تحدي';
+
+  @override
+  String get txBookingEarned => 'مكافأة حجز';
+
+  @override
+  String get txStatusAvailable => 'متاح';
+
+  @override
+  String get txStatusSpent => 'مُستخدم';
+
+  @override
+  String get txStatusExpired => 'منتهي الصلاحية';
+
+  @override
   String get welcome => '!مرحباً';
 
   @override
@@ -1240,4 +1255,13 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get dismiss => 'إغلاق';
+
+  @override
+  String get seatLegendAvailable => 'متاح';
+
+  @override
+  String get seatLegendSelected => 'محدد';
+
+  @override
+  String get seatLegendTaken => 'محجوز';
 }

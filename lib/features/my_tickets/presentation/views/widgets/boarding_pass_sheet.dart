@@ -161,7 +161,12 @@ class _BoardingPassSheetState extends State<_BoardingPassSheet> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      _originCode(context.isArabic ? (t.originGovernorateAr ?? t.originGovernorate) : t.originGovernorate),
+                                      _originCode(
+                                        context.isArabic
+                                            ? (t.originGovernorateAr ??
+                                                  t.originGovernorate)
+                                            : t.originGovernorate,
+                                      ),
                                       style: const TextStyle(
                                         color: Colors.white,
                                         fontSize: 36,
@@ -170,7 +175,10 @@ class _BoardingPassSheetState extends State<_BoardingPassSheet> {
                                       ),
                                     ),
                                     Text(
-                                      context.isArabic ? (t.originGovernorateAr ?? t.originGovernorate) : t.originGovernorate,
+                                      context.isArabic
+                                          ? (t.originGovernorateAr ??
+                                                t.originGovernorate)
+                                          : t.originGovernorate,
                                       style: const TextStyle(
                                         color: Colors.white60,
                                         fontSize: 13,
@@ -178,7 +186,10 @@ class _BoardingPassSheetState extends State<_BoardingPassSheet> {
                                     ),
                                     if (t.originStation.isNotEmpty)
                                       Text(
-                                        context.isArabic ? (t.originStationNameAr ?? t.originStation) : t.originStation,
+                                        context.isArabic
+                                            ? (t.originStationNameAr ??
+                                                  t.originStation)
+                                            : t.originStation,
                                         style: const TextStyle(
                                           color: Colors.white38,
                                           fontSize: 11,
@@ -245,7 +256,9 @@ class _BoardingPassSheetState extends State<_BoardingPassSheet> {
                                     ),
                                     const SizedBox(height: 4),
                                     Text(
-                                      context.isArabic ? (t.agencyNameAr ?? t.agencyName) : t.agencyName,
+                                      context.isArabic
+                                          ? (t.agencyNameAr ?? t.agencyName)
+                                          : t.agencyName,
                                       style: const TextStyle(
                                         color: Colors.white38,
                                         fontSize: 11,
@@ -260,7 +273,12 @@ class _BoardingPassSheetState extends State<_BoardingPassSheet> {
                                   crossAxisAlignment: CrossAxisAlignment.end,
                                   children: [
                                     Text(
-                                      _originCode(context.isArabic ? (t.destinationGovernorateAr ?? t.destinationGovernorate) : t.destinationGovernorate),
+                                      _originCode(
+                                        context.isArabic
+                                            ? (t.destinationGovernorateAr ??
+                                                  t.destinationGovernorate)
+                                            : t.destinationGovernorate,
+                                      ),
                                       style: const TextStyle(
                                         color: Colors.white,
                                         fontSize: 36,
@@ -269,7 +287,10 @@ class _BoardingPassSheetState extends State<_BoardingPassSheet> {
                                       ),
                                     ),
                                     Text(
-                                      context.isArabic ? (t.destinationGovernorateAr ?? t.destinationGovernorate) : t.destinationGovernorate,
+                                      context.isArabic
+                                          ? (t.destinationGovernorateAr ??
+                                                t.destinationGovernorate)
+                                          : t.destinationGovernorate,
                                       style: const TextStyle(
                                         color: Colors.white60,
                                         fontSize: 13,
@@ -277,7 +298,10 @@ class _BoardingPassSheetState extends State<_BoardingPassSheet> {
                                     ),
                                     if (t.destinationStation.isNotEmpty)
                                       Text(
-                                        context.isArabic ? (t.destinationStationNameAr ?? t.destinationStation) : t.destinationStation,
+                                        context.isArabic
+                                            ? (t.destinationStationNameAr ??
+                                                  t.destinationStation)
+                                            : t.destinationStation,
                                         style: const TextStyle(
                                           color: Colors.white38,
                                           fontSize: 11,
@@ -578,7 +602,11 @@ class _BoardingPassSheetState extends State<_BoardingPassSheet> {
                   crossAxisAlignment: pw.CrossAxisAlignment.start,
                   children: [
                     pw.Text(
-                      _originCode(context.isArabic ? (t.originGovernorateAr ?? t.originGovernorate) : t.originGovernorate),
+                      _originCode(
+                        context.isArabic
+                            ? (t.originGovernorateAr ?? t.originGovernorate)
+                            : t.originGovernorate,
+                      ),
                       style: pw.TextStyle(
                         fontSize: 36,
                         fontWeight: pw.FontWeight.bold,
@@ -613,7 +641,12 @@ class _BoardingPassSheetState extends State<_BoardingPassSheet> {
                   crossAxisAlignment: pw.CrossAxisAlignment.end,
                   children: [
                     pw.Text(
-                      _originCode(context.isArabic ? (t.destinationGovernorateAr ?? t.destinationGovernorate) : t.destinationGovernorate),
+                      _originCode(
+                        context.isArabic
+                            ? (t.destinationGovernorateAr ??
+                                  t.destinationGovernorate)
+                            : t.destinationGovernorate,
+                      ),
                       style: pw.TextStyle(
                         fontSize: 36,
                         fontWeight: pw.FontWeight.bold,

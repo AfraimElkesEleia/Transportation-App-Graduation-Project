@@ -78,15 +78,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     );
   }
 
-  String get _initials {
-    final first = widget.profile.firstName;
-    final last = widget.profile.lastName;
-    if (first.isNotEmpty && last.isNotEmpty) {
-      return '${first[0]}${last[0]}'.toUpperCase();
-    }
-    return first.isNotEmpty ? first[0].toUpperCase() : '?';
-  }
-
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -95,9 +86,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         child: BlocConsumer<ProfileCubit, ProfileState>(
           listener: (context, state) {
             if (state is ProfilePictureUploadSuccess) {
-              setState(
-                () => _uploadedImageUrl = ApiConstants.mediaUrl(state.newUrl),
-              );
+              setState(() => _uploadedImageUrl = state.newUrl);
               _updateProfile();
             }
 
@@ -185,12 +174,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           children: [
                             // ── Profile picture picker ───────
                             ProfilePicturePicker(
-                              currentImageUrl:
-                                  ApiConstants.mediaUrl(_uploadedImageUrl) ??
-                                  ApiConstants.mediaUrl(
+                              currentImageUrl: ApiConstants.mediaUrl(
+                                _uploadedImageUrl ??
                                     widget.profile.profilePictureUrl,
-                                  ),
-                              initials: _initials,
+                              ),
+                              initials: widget.profile.initials,
                               onImagePicked: (path) {
                                 setState(() => _newImagePath = path);
                               },
@@ -198,7 +186,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
                             if (isUploadingPicture) ...[
                               const SizedBox(height: 12),
-                               Row(
+                              Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   SizedBox(
@@ -223,7 +211,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
                             if (_uploadedImageUrl != null) ...[
                               const SizedBox(height: 8),
-                               Row(
+                              Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Icon(
@@ -291,85 +279,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                               ],
                             ),
                             const SizedBox(height: 20),
-
-                            // ── Points Section ─────────────────
-                            ProfileSectionContainer(
-                              title: l10n.loyaltyPoints,
-                              icon: Icons.stars_rounded,
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.all(16),
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xFF1A2A3A),
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        l10n.earnedPointsPending,
-                                        style: const TextStyle(
-                                          color: Colors.white70,
-                                          fontSize: 14,
-                                        ),
-                                      ),
-                                      const SizedBox(height: 12),
-                                      Text(
-                                        l10n.pointsBalanceIs((widget.profile.loyaltyPointsBalance ?? 0).toString()),
-                                        style: const TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                      const SizedBox(height: 4),
-                                      if (widget.profile.expiringPointsAmount != null && widget.profile.expiringPointsAmount! > 0)
-                                        Text(
-                                          l10n.expiringSoonCard(
-                                            widget.profile.expiringPointsAmount.toString(),
-                                            widget.profile.nextExpiryDate ?? '',
-                                          ),
-                                          style: const TextStyle(
-                                            color: Colors.orangeAccent,
-                                            fontSize: 14,
-                                          ),
-                                        ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-
-                            const SizedBox(height: 20),
-                            ProfileSectionContainer(
-                              title: l10n.fixedDetails,
-                              icon: Icons.lock_outline,
-                              children: [
-                                _buildReadOnly(
-                                  l10n.countryLabel,
-                                  widget.profile.countryName,
-                                ),
-                                const SizedBox(height: 4),
-                                Row(
-                                  children: [
-                                    const Icon(
-                                      Icons.info_outline,
-                                      color: Colors.white38,
-                                      size: 14,
-                                    ),
-                                    const SizedBox(width: 6),
-                                    Text(
-                                      l10n.countryCannotBeChanged,
-                                      style: const TextStyle(
-                                        color: Colors.white38,
-                                        fontSize: 12,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
+                            // ── Fixed Details Section ──────────
+                            _FixedDetailsSection(profile: widget.profile),
                             const SizedBox(height: 32),
 
                             // ── Save button ──────────────────
@@ -451,6 +362,35 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           label,
         ).copyWith(filled: true, fillColor: const Color(0xFF1A2A3A)),
       ),
+    );
+  }
+}
+
+class _FixedDetailsSection extends StatelessWidget {
+  final ProfileEntity profile;
+
+  const _FixedDetailsSection({required this.profile});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return ProfileSectionContainer(
+      title: l10n.fixedDetails,
+      icon: Icons.lock_outline,
+      children: [
+        _buildReadOnly(l10n.countryLabel, profile.countryName),
+        const SizedBox(height: 4),
+        Row(
+          children: [
+            const Icon(Icons.info_outline, color: Colors.white38, size: 14),
+            const SizedBox(width: 6),
+            Text(
+              l10n.countryCannotBeChanged,
+              style: const TextStyle(color: Colors.white38, fontSize: 12),
+            ),
+          ],
+        ),
+      ],
     );
   }
 

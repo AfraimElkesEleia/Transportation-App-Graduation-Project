@@ -114,6 +114,13 @@ class ProfileEntity extends Equatable {
   String get fullName =>
       '$firstName $lastName $familyName'.replaceAll(RegExp(r'\s+'), ' ').trim();
 
+  String get initials {
+    if (firstName.isNotEmpty && lastName.isNotEmpty) {
+      return '${firstName[0]}${lastName[0]}'.toUpperCase();
+    }
+    return firstName.isNotEmpty ? firstName[0].toUpperCase() : '?';
+  }
+
   @override
   List<Object?> get props => [userId, email];
 }

@@ -10,13 +10,16 @@ class WalletSection extends StatelessWidget {
   const WalletSection({super.key, this.balance});
 
   void _showChargeSheet(BuildContext context) {
+    // Capture the parent ScaffoldMessenger before entering the modal route,
+    // so snackbars are shown on the underlying scaffold (not the sheet overlay).
+    final messenger = ScaffoldMessenger.of(context);
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (_) => BlocProvider.value(
         value: context.read<ProfileCubit>(),
-        child: const _ChargeWalletSheet(),
+        child: _ChargeWalletSheet(parentMessenger: messenger),
       ),
     );
   }
@@ -220,7 +223,8 @@ class _ActionBtn extends StatelessWidget {
 
 // ── Charge Bottom Sheet ──────────────────────────────────────────────
 class _ChargeWalletSheet extends StatefulWidget {
-  const _ChargeWalletSheet();
+  final ScaffoldMessengerState? parentMessenger;
+  const _ChargeWalletSheet({this.parentMessenger});
 
   @override
   State<_ChargeWalletSheet> createState() => _ChargeWalletSheetState();
@@ -256,20 +260,45 @@ class _ChargeWalletSheetState extends State<_ChargeWalletSheet> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final messenger = widget.parentMessenger ?? ScaffoldMessenger.of(context);
     return BlocListener<ProfileCubit, ProfileState>(
       listener: (context, state) {
         if (state is WalletDepositSuccess) {
           Navigator.pop(context);
-          ScaffoldMessenger.of(context).showSnackBar(
+          messenger.showSnackBar(
             SnackBar(
               content: Text(l10n.walletChargedSuccessfully),
               backgroundColor: Colors.green,
+              behavior: SnackBarBehavior.floating,
             ),
           );
         } else if (state is WalletDepositFailure) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(state.message), backgroundColor: Colors.red),
-          );
+          messenger
+            ..hideCurrentSnackBar()
+            ..showSnackBar(
+              SnackBar(
+                content: Row(
+                  children: [
+                    const Icon(Icons.error_outline,
+                        color: Colors.white, size: 18),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        state.message,
+                        style: const TextStyle(color: Colors.white),
+                      ),
+                    ),
+                  ],
+                ),
+                backgroundColor: const Color(0xFFB00020),
+                behavior: SnackBarBehavior.floating,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                margin: const EdgeInsets.all(16),
+                duration: const Duration(seconds: 4),
+              ),
+            );
         }
       },
       child: DraggableScrollableSheet(

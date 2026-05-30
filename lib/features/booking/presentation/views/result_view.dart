@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:transportation_app/core/l10n/app_localizations.dart';
 import 'package:transportation_app/core/routing/routes.dart';
 import 'package:transportation_app/core/theming/colors.dart';
 import 'package:transportation_app/features/booking/domain/entities/seat_map.dart';
@@ -55,7 +56,7 @@ class _SeatSelectionScreenState extends State<SeatSelectionScreen> {
     final seats = _selectedSeats.toList();
     if (seats.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please select at least one seat')),
+        SnackBar(content: Text(AppLocalizations.of(context)!.pleaseSelectSeat)),
       );
       return;
     }

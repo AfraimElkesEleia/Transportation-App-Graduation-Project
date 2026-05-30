@@ -16,6 +16,32 @@ class TripTimesRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isAr = Localizations.localeOf(context).languageCode == 'ar';
+
+    final originLabel = isAr
+        ? (trip.originStationNameAr != null &&
+                  trip.originStationNameAr!.isNotEmpty
+              ? trip.originStationNameAr!
+              : (trip.originGovernorateAr != null &&
+                        trip.originGovernorateAr!.isNotEmpty
+                    ? trip.originGovernorateAr!
+                    : trip.originGovernorate))
+        : (trip.originStationName.isNotEmpty
+              ? trip.originStationName
+              : trip.originGovernorate);
+
+    final destinationLabel = isAr
+        ? (trip.destinationStationNameAr != null &&
+                  trip.destinationStationNameAr!.isNotEmpty
+              ? trip.destinationStationNameAr!
+              : (trip.destinationGovernorateAr != null &&
+                        trip.destinationGovernorateAr!.isNotEmpty
+                    ? trip.destinationGovernorateAr!
+                    : trip.destinationGovernorate))
+        : (trip.destinationStationName.isNotEmpty
+              ? trip.destinationStationName
+              : trip.destinationGovernorate);
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Row(
@@ -24,9 +50,7 @@ class TripTimesRow extends StatelessWidget {
           // ── Departure ──
           _TimeColumn(
             time: _fmt(trip.departureTime),
-            label: trip.originStationName.isNotEmpty
-                ? trip.originStationName
-                : trip.originGovernorate,
+            label: originLabel,
             alignment: CrossAxisAlignment.start,
           ),
 
@@ -50,9 +74,7 @@ class TripTimesRow extends StatelessWidget {
           // ── Arrival ──
           _TimeColumn(
             time: _fmt(trip.arrivalTime),
-            label: trip.destinationStationName.isNotEmpty
-                ? trip.destinationStationName
-                : trip.destinationGovernorate,
+            label: destinationLabel,
             alignment: CrossAxisAlignment.end,
           ),
         ],
