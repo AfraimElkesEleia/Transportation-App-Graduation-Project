@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
+import 'package:transportation_app/core/l10n/locale_box.dart';
 import 'package:transportation_app/core/notfications/notfication_permission_manager.dart';
 
 class LocalAlarmScheduler {
@@ -36,10 +38,18 @@ class LocalAlarmScheduler {
       if (localExpiresAt.isBefore(DateTime.now())) return;
       triggerAt = DateTime.now().add(const Duration(seconds: 5));
     }
+
+    final box = Hive.box(LocaleBox.boxName);
+    final isAr = (box.get(LocaleBox.localeKey) as String? ?? 'ar') == 'ar';
+    final title = isAr ? '⏰ أوشكت صلاحية الجلسة على الانتهاء!' : '⏰ Seats About to Be Released!';
+    final body = isAr
+        ? 'تنتهي صلاحية سلتك خلال 3 دقائق. أكمل الدفع الآن.'
+        : 'Your cart expires in 3 minutes. Complete checkout now.';
+
     await _plugin.zonedSchedule(
       id: 1001,
-      title: '⏰ Seats About to Be Released!',
-      body: 'Your cart expires in 3 minutes. Complete checkout now.',
+      title: title,
+      body: body,
       scheduledDate: tz.TZDateTime.from(triggerAt, tz.local),
       notificationDetails: const NotificationDetails(
         android: AndroidNotificationDetails(
