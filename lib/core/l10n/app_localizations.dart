@@ -521,8 +521,8 @@ abstract class AppLocalizations {
   /// No description provided for @askingPrice.
   ///
   /// In en, this message translates to:
-  /// **'Asking price (max {n} EGP)'**
-  String askingPrice(String n);
+  /// **'Asking price'**
+  String get askingPrice;
 
   /// No description provided for @listTicketBtn.
   ///
@@ -2279,7 +2279,7 @@ abstract class AppLocalizations {
   /// No description provided for @idNumberLabel.
   ///
   /// In en, this message translates to:
-  /// **'ID Number'**
+  /// **'National ID Number'**
   String get idNumberLabel;
 
   /// No description provided for @passportNumberLabel.
@@ -2425,6 +2425,420 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Taken'**
   String get seatLegendTaken;
+
+  /// No description provided for @idTypeNone.
+  ///
+  /// In en, this message translates to:
+  /// **'None'**
+  String get idTypeNone;
+
+  /// No description provided for @passportNumberHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. A12345678'**
+  String get passportNumberHint;
+
+  /// No description provided for @signupTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Create\nAccount.'**
+  String get signupTitle;
+
+  /// No description provided for @joinFutureOfTravel.
+  ///
+  /// In en, this message translates to:
+  /// **'Join the future of travel'**
+  String get joinFutureOfTravel;
+
+  /// No description provided for @ticketMarketplace.
+  ///
+  /// In en, this message translates to:
+  /// **'Ticket Marketplace'**
+  String get ticketMarketplace;
+
+  /// No description provided for @findDealsFromTravelers.
+  ///
+  /// In en, this message translates to:
+  /// **'Find great deals from other travelers'**
+  String get findDealsFromTravelers;
+
+  /// No description provided for @filtersActive.
+  ///
+  /// In en, this message translates to:
+  /// **'Filters (active)'**
+  String get filtersActive;
+
+  /// No description provided for @avgDiscount.
+  ///
+  /// In en, this message translates to:
+  /// **'Avg. Discount'**
+  String get avgDiscount;
+
+  /// No description provided for @totalListings.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Listings'**
+  String get totalListings;
+
+  /// No description provided for @noListingsFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No listings found.'**
+  String get noListingsFound;
+
+  /// No description provided for @tryRemovingFilters.
+  ///
+  /// In en, this message translates to:
+  /// **'Try removing some filters.'**
+  String get tryRemovingFilters;
+
+  /// No description provided for @clearFilters.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear Filters'**
+  String get clearFilters;
+
+  /// No description provided for @buyTicket.
+  ///
+  /// In en, this message translates to:
+  /// **'Buy Ticket'**
+  String get buyTicket;
+
+  /// No description provided for @buyNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Buy Now'**
+  String get buyNow;
+
+  /// No description provided for @agencyLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Agency'**
+  String get agencyLabel;
+
+  /// No description provided for @originLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Origin'**
+  String get originLabel;
+
+  /// No description provided for @destinationLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Destination'**
+  String get destinationLabel;
+
+  /// No description provided for @dateLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Date'**
+  String get dateLabel;
+
+  /// No description provided for @timeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Time'**
+  String get timeLabel;
+
+  /// No description provided for @classLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Class'**
+  String get classLabel;
+
+  /// No description provided for @priceLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Price'**
+  String get priceLabel;
+
+  /// No description provided for @areYouSureBuyTicket.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to buy this ticket?'**
+  String get areYouSureBuyTicket;
+
+  /// No description provided for @ticketPurchasedSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'Ticket purchased successfully!'**
+  String get ticketPurchasedSuccessfully;
+
+  /// No description provided for @listingCancelledSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'Listing cancelled successfully!'**
+  String get listingCancelledSuccessfully;
+
+  /// No description provided for @filterFrom.
+  ///
+  /// In en, this message translates to:
+  /// **'From: {gov}'**
+  String filterFrom(String gov);
+
+  /// No description provided for @filterTo.
+  ///
+  /// In en, this message translates to:
+  /// **'To: {gov}'**
+  String filterTo(String gov);
+
+  /// No description provided for @filterDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Date: {date}'**
+  String filterDate(String date);
+
+  /// No description provided for @filterListings.
+  ///
+  /// In en, this message translates to:
+  /// **'Filter Listings'**
+  String get filterListings;
+
+  /// No description provided for @resetAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset All'**
+  String get resetAll;
+
+  /// No description provided for @originGovernorate.
+  ///
+  /// In en, this message translates to:
+  /// **'Origin Governorate'**
+  String get originGovernorate;
+
+  /// No description provided for @destinationGovernorate.
+  ///
+  /// In en, this message translates to:
+  /// **'Destination Governorate'**
+  String get destinationGovernorate;
+
+  /// No description provided for @travelDateFilter.
+  ///
+  /// In en, this message translates to:
+  /// **'Travel Date'**
+  String get travelDateFilter;
+
+  /// No description provided for @anyDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Any date'**
+  String get anyDate;
+
+  /// No description provided for @applyFilters.
+  ///
+  /// In en, this message translates to:
+  /// **'Apply Filters'**
+  String get applyFilters;
+
+  /// No description provided for @hintCairo.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. Cairo'**
+  String get hintCairo;
+
+  /// No description provided for @hintAlexandria.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. Alexandria'**
+  String get hintAlexandria;
+
+  /// No description provided for @forgotPasswordSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your email and we\'ll send you a reset link'**
+  String get forgotPasswordSubtitle;
+
+  /// No description provided for @sendResetLink.
+  ///
+  /// In en, this message translates to:
+  /// **'Send Reset Link'**
+  String get sendResetLink;
+
+  /// No description provided for @emailSentTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Check your inbox!'**
+  String get emailSentTitle;
+
+  /// No description provided for @emailSentMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'If your email is registered, you will receive a password reset link shortly. Check your spam folder if you don\'t see it.'**
+  String get emailSentMessage;
+
+  /// No description provided for @emailSendError.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not send email'**
+  String get emailSendError;
+
+  /// No description provided for @backToLogin.
+  ///
+  /// In en, this message translates to:
+  /// **'Back to Login'**
+  String get backToLogin;
+
+  /// No description provided for @reportIssue.
+  ///
+  /// In en, this message translates to:
+  /// **'Report an Issue'**
+  String get reportIssue;
+
+  /// No description provided for @reportIssueTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Report an Issue'**
+  String get reportIssueTitle;
+
+  /// No description provided for @reportIssueHeaderTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'We\'re here to help'**
+  String get reportIssueHeaderTitle;
+
+  /// No description provided for @reportIssueHeaderSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Describe your issue and our team will get back to you.'**
+  String get reportIssueHeaderSubtitle;
+
+  /// No description provided for @issueCategoryLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Issue Category'**
+  String get issueCategoryLabel;
+
+  /// No description provided for @issueCategoryPayment.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment'**
+  String get issueCategoryPayment;
+
+  /// No description provided for @issueCategoryTrip.
+  ///
+  /// In en, this message translates to:
+  /// **'Trip Experience'**
+  String get issueCategoryTrip;
+
+  /// No description provided for @issueCategoryAppBug.
+  ///
+  /// In en, this message translates to:
+  /// **'App Bug'**
+  String get issueCategoryAppBug;
+
+  /// No description provided for @issueCategoryAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Account Issue'**
+  String get issueCategoryAccount;
+
+  /// No description provided for @issueCategoryOther.
+  ///
+  /// In en, this message translates to:
+  /// **'Other'**
+  String get issueCategoryOther;
+
+  /// No description provided for @issueTitleLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Title'**
+  String get issueTitleLabel;
+
+  /// No description provided for @issueTitleHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Brief summary of your issue'**
+  String get issueTitleHint;
+
+  /// No description provided for @issueTitleRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Title is required'**
+  String get issueTitleRequired;
+
+  /// No description provided for @issueDescriptionLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Description'**
+  String get issueDescriptionLabel;
+
+  /// No description provided for @issueDescriptionHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Please describe your issue in detail...'**
+  String get issueDescriptionHint;
+
+  /// No description provided for @issueDescriptionRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Description is required'**
+  String get issueDescriptionRequired;
+
+  /// No description provided for @issueDescriptionTooShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Please provide at least 10 characters'**
+  String get issueDescriptionTooShort;
+
+  /// No description provided for @issueSubmitBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Submit Report'**
+  String get issueSubmitBtn;
+
+  /// No description provided for @issueSubmittedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Report Submitted!'**
+  String get issueSubmittedTitle;
+
+  /// No description provided for @issueSubmittedBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Thank you for reaching out. Our support team will review your issue and respond as soon as possible.'**
+  String get issueSubmittedBody;
+
+  /// No description provided for @issueDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get issueDone;
+
+  /// No description provided for @requestRefund.
+  ///
+  /// In en, this message translates to:
+  /// **'Request Refund'**
+  String get requestRefund;
+
+  /// No description provided for @refundAlreadyRequested.
+  ///
+  /// In en, this message translates to:
+  /// **'Refund Requested'**
+  String get refundAlreadyRequested;
+
+  /// No description provided for @refundConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Request Refund?'**
+  String get refundConfirmTitle;
+
+  /// No description provided for @refundConfirmBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to request a refund for this booking? Your wallet will be credited once the request is approved.'**
+  String get refundConfirmBody;
+
+  /// No description provided for @refundSubmitted.
+  ///
+  /// In en, this message translates to:
+  /// **'Refund request submitted successfully.'**
+  String get refundSubmitted;
+
+  /// No description provided for @refundRequesting.
+  ///
+  /// In en, this message translates to:
+  /// **'Submitting refund request...'**
+  String get refundRequesting;
 }
 
 class _AppLocalizationsDelegate

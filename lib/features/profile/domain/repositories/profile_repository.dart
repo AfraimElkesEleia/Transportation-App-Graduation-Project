@@ -22,4 +22,5 @@ abstract class ProfileRepository {
   ResultFuture<List<TicketEntity>> getMyTickets();
   ResultFuture<List<WalletTransactionEntity>> getWalletHistory();
   ResultVoid logout();
+  ResultVoid updateLanguage({required String languageCode});
 }

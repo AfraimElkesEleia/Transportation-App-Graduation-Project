@@ -4,7 +4,6 @@ import 'dart:ui' as ui;
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:transportation_app/core/helper/extensions.dart';
-import 'package:transportation_app/core/helper/extensions.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';

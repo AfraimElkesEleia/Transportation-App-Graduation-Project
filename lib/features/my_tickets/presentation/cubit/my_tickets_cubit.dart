@@ -85,4 +85,14 @@ class MyTicketsCubit extends Cubit<MyTicketsState> {
       },
     );
   }
+
+  // ── Refund ────────────────────────────────────────────────────────
+  Future<void> requestRefund({required int bookingId}) async {
+    emit(RefundRequestingState());
+    final result = await repository.requestRefund(bookingId: bookingId);
+    result.fold(
+      (failure) => emit(RefundRequestErrorState(failure.message)),
+      (_) => emit(RefundRequestedState()),
+    );
+  }
 }

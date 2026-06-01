@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:transportation_app/core/l10n/app_localizations.dart';
 import 'package:transportation_app/core/routing/routes.dart';
-import 'package:transportation_app/core/theming/colors.dart';
 import 'package:transportation_app/features/profile/domain/entities/profile_entity.dart';
 
 class LoyaltyPointsCard extends StatefulWidget {
@@ -42,8 +41,6 @@ class _LoyaltyPointsCardState extends State<LoyaltyPointsCard> {
       }
     }
     
-    final challenges = widget.profile?.activeChallenges ?? [];
-
     return GestureDetector(
       onTap: () {
         Navigator.pushNamed(context, AppRoutes.loyaltyHub, arguments: {

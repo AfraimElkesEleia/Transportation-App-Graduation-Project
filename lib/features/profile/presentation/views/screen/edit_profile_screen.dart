@@ -374,11 +374,31 @@ class _FixedDetailsSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+
+    // Resolve id type label
+    String? idTypeLabel;
+    if (profile.idType == 1) {
+      idTypeLabel = l10n.idTypeNationalId;
+    } else if (profile.idType == 2) {
+      idTypeLabel = l10n.idTypePassport;
+    }
+
     return ProfileSectionContainer(
       title: l10n.fixedDetails,
       icon: Icons.lock_outline,
       children: [
         _buildReadOnly(l10n.countryLabel, profile.countryName),
+        if (idTypeLabel != null) ...[
+          const SizedBox(height: 4),
+          _buildReadOnly(l10n.idTypeLabel, idTypeLabel),
+        ],
+        if (profile.idNumber != null && profile.idNumber!.isNotEmpty) ...[
+          const SizedBox(height: 4),
+          _buildReadOnly(
+            profile.idType == 2 ? l10n.passportNumberLabel : l10n.idNumberLabel,
+            profile.idNumber!,
+          ),
+        ],
         const SizedBox(height: 4),
         Row(
           children: [

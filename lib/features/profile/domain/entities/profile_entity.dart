@@ -55,6 +55,8 @@ class ProfileEntity extends Equatable {
   final int? expiringPointsAmount;
   final String? nextExpiryDate;
   final List<ChallengeEntity>? activeChallenges;
+  final int? idType;      // 1 = National ID, 2 = Passport
+  final String? idNumber;
   const ProfileEntity({
     required this.userId,
     required this.firstName,
@@ -73,6 +75,8 @@ class ProfileEntity extends Equatable {
     this.expiringPointsAmount,
     this.nextExpiryDate,
     this.activeChallenges,
+    this.idType,
+    this.idNumber,
   });
 
   ProfileEntity copyWith({
@@ -89,6 +93,8 @@ class ProfileEntity extends Equatable {
     int? expiringPointsAmount,
     String? nextExpiryDate,
     List<ChallengeEntity>? activeChallenges,
+    int? idType,
+    String? idNumber,
   }) {
     return ProfileEntity(
       userId: userId,
@@ -108,6 +114,8 @@ class ProfileEntity extends Equatable {
       expiringPointsAmount: expiringPointsAmount ?? this.expiringPointsAmount,
       nextExpiryDate: nextExpiryDate ?? this.nextExpiryDate,
       activeChallenges: activeChallenges ?? this.activeChallenges,
+      idType: idType ?? this.idType,
+      idNumber: idNumber ?? this.idNumber,
     );
   }
 

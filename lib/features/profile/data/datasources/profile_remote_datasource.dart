@@ -24,6 +24,7 @@ abstract class ProfileRemoteDatasource {
   });
   Future<List<TicketEntity>> getMyTickets();
   Future<List<WalletTransactionEntity>> getWalletHistory();
+  Future<void> updateLanguage({required String languageCode});
 }
 
 class ProfileRemoteDatasourceImpl implements ProfileRemoteDatasource {
@@ -231,6 +232,24 @@ class ProfileRemoteDatasourceImpl implements ProfileRemoteDatasource {
               DateTime.now(),
         );
       }).toList();
+    } on DioException catch (e) {
+      _handleDio(e);
+    }
+  }
+
+  @override
+  Future<void> updateLanguage({required String languageCode}) async {
+    try {
+      final res = await dio.put(
+        ApiConstants.changeLanguage,
+        data: {'language': languageCode},
+      );
+      final body = res.data as Map<String, dynamic>;
+      if (body['success'] != true) {
+        throw ServerException(
+          message: body['message'] ?? 'Failed to update language',
+        );
+      }
     } on DioException catch (e) {
       _handleDio(e);
     }

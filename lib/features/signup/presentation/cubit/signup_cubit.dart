@@ -19,7 +19,8 @@ class SignupCubit extends Cubit<SignupState> {
     required int gender,
     required String dateOfBirth,
     required String countryCode,
-    String? nationalIdNumber,
+    int? idType,
+    String? idNumber,
     String? imagePath,
   }) async {
     emit(SignupLoading());
@@ -36,7 +37,8 @@ class SignupCubit extends Cubit<SignupState> {
         gender: gender,
         dateOfBirth: dateOfBirth,
         countryCode: countryCode,
-        nationalIdNumber: nationalIdNumber,
+        idType: idType,
+        idNumber: idNumber,
       ),
     );
 

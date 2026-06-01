@@ -69,7 +69,7 @@
   "totalPrice": "الإجمالي:",
   "sell": "بيع",
   "listForSale": "أضف التذكرة للبيع",
-  "askingPrice": "سعر الطلب (حد أقصى {n} جنيه)",
+  "askingPrice": "سعر الطلب",
   "listTicketBtn": "أدرج التذكرة",
   "cancelListing": "إلغاء الإدراج",
   "cancelListingMsg": "هذا الحجز مُدرج حالياً في السوق...",
@@ -542,5 +542,100 @@
   "dismiss": "إغلاق",
   "seatLegendAvailable": "متاح",
   "seatLegendSelected": "محدد",
-  "seatLegendTaken": "محجوز"
+  "seatLegendTaken": "محجوز",
+  "idTypeNone": "بدون",
+  "passportNumberHint": "مثال: A12345678",
+  "signupTitle": "إنشاء\nحساب.",
+  "joinFutureOfTravel": "انضم إلى مستقبل السفر",
+  "ticketMarketplace": "سوق التذاكر",
+  "findDealsFromTravelers": "ابحث عن أفضل العروض من المسافرين",
+  "filtersActive": "تصفية (مفعّلة)",
+  "avgDiscount": "متوسط الخصم",
+  "totalListings": "إجمالي العروض",
+  "noListingsFound": "لا توجد عروض.",
+  "tryRemovingFilters": "حاول إزالة بعض الفلاتر.",
+  "clearFilters": "مسح الفلاتر",
+  "buyTicket": "شراء التذكرة",
+  "buyNow": "اشترِ الآن",
+  "agencyLabel": "الوكالة",
+  "originLabel": "نقطة الانطلاق",
+  "destinationLabel": "الوجهة",
+  "dateLabel": "التاريخ",
+  "timeLabel": "الوقت",
+  "classLabel": "الدرجة",
+  "priceLabel": "السعر",
+  "areYouSureBuyTicket": "هل أنت متأكد من شراء هذه التذكرة؟",
+  "ticketPurchasedSuccessfully": "تم شراء التذكرة بنجاح!",
+  "listingCancelledSuccessfully": "تم إلغاء الإدراج بنجاح!",
+  "filterFrom": "من: {gov}",
+  "@filterFrom": {
+    "placeholders": {
+      "gov": {
+        "type": "String"
+      }
+    }
+  },
+  "filterTo": "إلى: {gov}",
+  "@filterTo": {
+    "placeholders": {
+      "gov": {
+        "type": "String"
+      }
+    }
+  },
+  "filterDate": "التاريخ: {date}",
+  "@filterDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "filterListings": "تصفية العروض",
+  "resetAll": "إعادة ضبط الكل",
+  "originGovernorate": "محافظة الانطلاق",
+  "destinationGovernorate": "محافظة الوجهة",
+  "travelDateFilter": "تاريخ السفر",
+  "anyDate": "أي تاريخ",
+  "applyFilters": "تطبيق الفلاتر",
+  "hintCairo": "مثال: القاهرة",
+  "hintAlexandria": "مثال: الإسكندرية",
+  "forgotPasswordSubtitle": "أدخل بريدك الإلكتروني وسنرسل لك رابط إعادة التعيين",
+  "sendResetLink": "إرسال رابط الإعادة",
+  "emailSentTitle": "تحقق من بريدك الوارد!",
+  "emailSentMessage": "إذا كان بريدك الإلكتروني مسجلاً، ستستقبل رابط إعادة تعيين كلمة المرور قريباً.",
+  "emailSendError": "تعذّر إرسال البريد الإلكتروني",
+  "backToLogin": "العودة لتسجيل الدخول",
+  "idTypeLabel": "نوع الهوية",
+  "idTypeNationalId": "بطاقة هوية وطنية",
+  "idTypePassport": "جواز سفر",
+  "idNumberLabel": "رقم بطاقة الهوية",
+  "passportNumberLabel": "رقم جواز السفر",
+  "reportIssue": "الإبلاغ عن مشكلة",
+  "reportIssueTitle": "الإبلاغ عن مشكلة",
+  "reportIssueHeaderTitle": "نحن هنا للمساعدة",
+  "reportIssueHeaderSubtitle": "صف مشكلتك وسيتواصل معك فريقنا في أقرب وقت.",
+  "issueCategoryLabel": "فئة المشكلة",
+  "issueCategoryPayment": "الدفع",
+  "issueCategoryTrip": "تجربة الرحلة",
+  "issueCategoryAppBug": "خطأ في التطبيق",
+  "issueCategoryAccount": "مشكلة في الحساب",
+  "issueCategoryOther": "أخرى",
+  "issueTitleLabel": "العنوان",
+  "issueTitleHint": "ملخص قصير لمشكلتك",
+  "issueTitleRequired": "العنوان مطلوب",
+  "issueDescriptionLabel": "الوصف",
+  "issueDescriptionHint": "يرجى وصف مشكلتك بالتفصيل...",
+  "issueDescriptionRequired": "الوصف مطلوب",
+  "issueDescriptionTooShort": "يرجى كتابة 10 أحرف على الأقل",
+  "issueSubmitBtn": "إرسال التقرير",
+  "issueSubmittedTitle": "تم إرسال التقرير!",
+  "issueSubmittedBody": "شكراً لتواصلك معنا. سيقوم فريق الدعم بمراجعة مشكلتك والرد عليك في أقرب وقت ممكن.",
+  "issueDone": "تم",
+  "requestRefund": "طلب استرداد",
+  "refundAlreadyRequested": "تم طلب الاسترداد",
+  "refundConfirmTitle": "طلب استرداد المبلغ؟",
+  "refundConfirmBody": "هل أنت متأكد من طلب استرداد المبلغ لهذا الحجز؟ سيتم إضافة المبلغ إلى محفظتك بعد الموافقة على الطلب.",
+  "refundSubmitted": "تم إرسال طلب الاسترداد بنجاح.",
+  "refundRequesting": "جاري إرسال طلب الاسترداد..."
 }

@@ -23,4 +23,6 @@ abstract class AppRoutes {
   static const loyaltyHub = '/loyalty_hub';
   static const notificationsScreen = '/notifications_screen';
   static const marketplacePassengerFormScreen = '/marketplace_passenger_form_screen';
+  static const String forgotPasswordScreen = '/forgot_password_screen';
+  static const String reportIssueScreen = '/report_issue_screen';
 }

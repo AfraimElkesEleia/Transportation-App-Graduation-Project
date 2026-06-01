@@ -33,6 +33,8 @@ class ApiConstants {
   static const String notifications = '/Notifications';
   static String readNotification(String id) => '/Notifications/$id/read';
   static const String readAllNotifications = '/Notifications/read-all';
+  static const String changeLanguage = '/Users/language';
+  static const String supportTickets = '/Support/tickets';
   static const String fcmToken = '/Users/fcm-token';
   static String? mediaUrl(String? path) {
     if (path == null || path.isEmpty) return null;

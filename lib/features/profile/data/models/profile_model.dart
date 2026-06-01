@@ -47,34 +47,45 @@ class ProfileModel extends ProfileEntity {
     super.expiringPointsAmount,
     super.nextExpiryDate,
     super.activeChallenges,
+    super.idType,
+    super.idNumber,
   });
-  static String? _buildImageUrl(String? path) {
-  if (path == null || path.isEmpty) return null;
-  if (path.startsWith('http')) return path;  // already full URL
-  return 'http://rehlabussines-001-site1.anytempurl.com/$path';
-}
+
+  static int? _parseIdType(dynamic value) {
+    if (value == null) return null;
+    if (value is int) return value;
+    if (value is String) {
+      final clean = value.toLowerCase().replaceAll(RegExp(r'[^a-z0-9]'), '');
+      if (clean == 'nationalid' || clean == '1') return 1;
+      if (clean == 'passport' || clean == '2') return 2;
+      return int.tryParse(value);
+    }
+    return null;
+  }
 
   factory ProfileModel.fromJson(Map<String, dynamic> json) {
     return ProfileModel(
-      userId:            json['userId']               as int,
-      firstName:         json['firstName']            as String,
-      lastName:          json['lastName']             as String,
-      familyName:        json['familyName']           as String,
-      email:             json['email']                as String,
-      phoneNumber:       json['phoneNumber']          as String,
-      gender:            json['gender']               as String? ?? '',
-      countryCode:       json['countryCode']          as String? ?? '',
-      countryName:       json['countryName']          as String? ?? '',
-      profilePictureUrl: json['profilePictureUrl']    as String?,
-      totalTrips:        json['totalTripsCount']      as int?,
-      totalDistanceKm:   (json['totalDistanceTraveled'] as num?)?.toDouble(),
-      walletBalance:     (json['walletBalance']       as num?)?.toDouble(),
+      userId: json['userId'] as int,
+      firstName: json['firstName'] as String,
+      lastName: json['lastName'] as String,
+      familyName: json['familyName'] as String,
+      email: json['email'] as String,
+      phoneNumber: json['phoneNumber'] as String,
+      gender: json['gender'] as String? ?? '',
+      countryCode: json['countryCode'] as String? ?? '',
+      countryName: json['countryName'] as String? ?? '',
+      profilePictureUrl: json['profilePictureUrl'] as String?,
+      totalTrips: json['totalTripsCount'] as int?,
+      totalDistanceKm: (json['totalDistanceTraveled'] as num?)?.toDouble(),
+      walletBalance: (json['walletBalance'] as num?)?.toDouble(),
       loyaltyPointsBalance: json['loyaltyPointsBalance'] as int?,
       expiringPointsAmount: json['expiringPointsAmount'] as int?,
       nextExpiryDate: json['nextExpiryDate'] as String?,
       activeChallenges: (json['activeChallenges'] as List<dynamic>?)
           ?.map((e) => ChallengeModel.fromJson(e as Map<String, dynamic>))
           .toList(),
+      idType: _parseIdType(json['idType']),
+      idNumber: json['idNumber'] as String?,
     );
   }
 }

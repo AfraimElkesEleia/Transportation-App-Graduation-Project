@@ -148,4 +148,18 @@ class ProfileRepositoryImp extends ProfileRepository {
       return Left(const NetworkFailure());
     }
   }
+
+  @override
+  ResultVoid updateLanguage({required String languageCode}) async {
+    try {
+      await remoteDataSource.updateLanguage(languageCode: languageCode);
+      return const Right(null);
+    } on UnauthorizedException catch (e) {
+      return Left(UnauthorizedFailure(message: e.message));
+    } on ServerException catch (e) {
+      return Left(ServerFailure(message: e.message, errors: e.errors));
+    } on NetworkException {
+      return Left(const NetworkFailure());
+    }
+  }
 }

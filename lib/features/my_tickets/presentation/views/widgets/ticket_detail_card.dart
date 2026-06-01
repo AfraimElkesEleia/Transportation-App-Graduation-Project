@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:transportation_app/core/theming/colors.dart';
+import 'package:transportation_app/features/my_tickets/presentation/cubit/my_tickets_cubit.dart';
 import 'package:transportation_app/features/profile/domain/entities/ticket_entity.dart';
 import 'package:transportation_app/core/helper/extensions.dart';
 import 'package:transportation_app/core/routing/routes.dart';
@@ -67,7 +69,13 @@ class TicketDetailCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        context.pushNamed(AppRoutes.ticketDetailsScreen, arguments: ticket);
+        context.pushNamed(
+          AppRoutes.ticketDetailsScreen,
+          arguments: {
+            'ticket': ticket,
+            'cubit': context.read<MyTicketsCubit>(),
+          },
+        );
       },
       child: Container(
         margin: const EdgeInsets.only(bottom: 14),

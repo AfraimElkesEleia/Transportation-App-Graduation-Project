@@ -31,6 +31,7 @@ abstract class MyTicketsRemoteDatasource {
   });
   Future<void> buyTicket({required int listingId, required List<Map<String, dynamic>> passengers});
   Future<void> cancelListing({required int listingId});
+  Future<void> requestRefund({required int bookingId});
 }
 
 class MyTicketsRemoteDatasourceImpl implements MyTicketsRemoteDatasource {
@@ -232,6 +233,21 @@ class MyTicketsRemoteDatasourceImpl implements MyTicketsRemoteDatasource {
     }
   }
 
+  @override
+  Future<void> requestRefund({required int bookingId}) async {
+    try {
+      final res = await dio.post('/Bookings/$bookingId/refund-request');
+      final body = res.data as Map<String, dynamic>;
+      if (body['success'] != true) {
+        throw ServerException(
+          message: body['message'] ?? 'Failed to submit refund request',
+        );
+      }
+    } on DioException catch (e) {
+      _handleDio(e);
+    }
+  }
+
   TicketEntity _parseTicket(Map<String, dynamic> json) {
     final passengers = (json['passengers'] as List<dynamic>? ?? [])
         .map(
@@ -278,6 +294,7 @@ class MyTicketsRemoteDatasourceImpl implements MyTicketsRemoteDatasource {
           json['marketplaceListingId'] as int? ??
           json['listingId'] as int?,
       passengers: passengers,
+      refundStatus: json['refundStatus'] as String?,
     );
   }
 

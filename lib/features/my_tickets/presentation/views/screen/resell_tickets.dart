@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:transportation_app/core/l10n/app_localizations.dart';
-import 'dart:ui' as ui;
 import 'package:transportation_app/core/theming/colors.dart';
 import 'package:transportation_app/features/my_tickets/presentation/cubit/marketplace_cubit.dart';
 import 'package:transportation_app/features/my_tickets/presentation/cubit/marketplace_states.dart';
@@ -200,7 +199,6 @@ class _ResellTicketsScreenState extends State<ResellTicketsScreen> {
     TicketEntity ticket,
     String ticketKey,
   ) {
-    final maxAskingPrice = ticket.totalPrice;
     final priceCtrl = TextEditingController(
       text: ticket.totalPrice.round().toString(),
     );
@@ -296,7 +294,7 @@ class _ResellTicketsScreenState extends State<ResellTicketsScreen> {
               ),
               const SizedBox(height: 16),
               Text(
-                '${AppLocalizations.of(context)!.askingPrice} (${maxAskingPrice.round()} EGP)',
+                AppLocalizations.of(context)!.askingPrice,
                 style: const TextStyle(color: Colors.white70, fontSize: 13),
               ),
               const SizedBox(height: 8),
@@ -341,19 +339,6 @@ class _ResellTicketsScreenState extends State<ResellTicketsScreen> {
           ElevatedButton(
             onPressed: () {
               final price = double.tryParse(priceCtrl.text.trim()) ?? 0.0;
-              if (price <= 0 || price > maxAskingPrice) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      price <= 0
-                          ? 'Price must be greater than 0.'
-                          : 'Max price is ${maxAskingPrice.round()} EGP.',
-                    ),
-                    backgroundColor: Colors.orange,
-                  ),
-                );
-                return;
-              }
               Navigator.pop(ctx);
               setState(() => _pendingTicketKey = ticketKey);
               context.read<MarketplaceCubit>().listTicket(

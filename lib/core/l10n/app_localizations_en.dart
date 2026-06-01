@@ -221,9 +221,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get listForSale => 'List Ticket for Sale';
 
   @override
-  String askingPrice(String n) {
-    return 'Asking price (max $n EGP)';
-  }
+  String get askingPrice => 'Asking price';
 
   @override
   String get listTicketBtn => 'List Ticket';
@@ -1184,7 +1182,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get idTypePassport => 'Passport';
 
   @override
-  String get idNumberLabel => 'ID Number';
+  String get idNumberLabel => 'National ID Number';
 
   @override
   String get passportNumberLabel => 'Passport Number';
@@ -1268,4 +1266,223 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get seatLegendTaken => 'Taken';
+
+  @override
+  String get idTypeNone => 'None';
+
+  @override
+  String get passportNumberHint => 'e.g. A12345678';
+
+  @override
+  String get signupTitle => 'Create\nAccount.';
+
+  @override
+  String get joinFutureOfTravel => 'Join the future of travel';
+
+  @override
+  String get ticketMarketplace => 'Ticket Marketplace';
+
+  @override
+  String get findDealsFromTravelers => 'Find great deals from other travelers';
+
+  @override
+  String get filtersActive => 'Filters (active)';
+
+  @override
+  String get avgDiscount => 'Avg. Discount';
+
+  @override
+  String get totalListings => 'Total Listings';
+
+  @override
+  String get noListingsFound => 'No listings found.';
+
+  @override
+  String get tryRemovingFilters => 'Try removing some filters.';
+
+  @override
+  String get clearFilters => 'Clear Filters';
+
+  @override
+  String get buyTicket => 'Buy Ticket';
+
+  @override
+  String get buyNow => 'Buy Now';
+
+  @override
+  String get agencyLabel => 'Agency';
+
+  @override
+  String get originLabel => 'Origin';
+
+  @override
+  String get destinationLabel => 'Destination';
+
+  @override
+  String get dateLabel => 'Date';
+
+  @override
+  String get timeLabel => 'Time';
+
+  @override
+  String get classLabel => 'Class';
+
+  @override
+  String get priceLabel => 'Price';
+
+  @override
+  String get areYouSureBuyTicket => 'Are you sure you want to buy this ticket?';
+
+  @override
+  String get ticketPurchasedSuccessfully => 'Ticket purchased successfully!';
+
+  @override
+  String get listingCancelledSuccessfully => 'Listing cancelled successfully!';
+
+  @override
+  String filterFrom(String gov) {
+    return 'From: $gov';
+  }
+
+  @override
+  String filterTo(String gov) {
+    return 'To: $gov';
+  }
+
+  @override
+  String filterDate(String date) {
+    return 'Date: $date';
+  }
+
+  @override
+  String get filterListings => 'Filter Listings';
+
+  @override
+  String get resetAll => 'Reset All';
+
+  @override
+  String get originGovernorate => 'Origin Governorate';
+
+  @override
+  String get destinationGovernorate => 'Destination Governorate';
+
+  @override
+  String get travelDateFilter => 'Travel Date';
+
+  @override
+  String get anyDate => 'Any date';
+
+  @override
+  String get applyFilters => 'Apply Filters';
+
+  @override
+  String get hintCairo => 'e.g. Cairo';
+
+  @override
+  String get hintAlexandria => 'e.g. Alexandria';
+
+  @override
+  String get forgotPasswordSubtitle =>
+      'Enter your email and we\'ll send you a reset link';
+
+  @override
+  String get sendResetLink => 'Send Reset Link';
+
+  @override
+  String get emailSentTitle => 'Check your inbox!';
+
+  @override
+  String get emailSentMessage =>
+      'If your email is registered, you will receive a password reset link shortly. Check your spam folder if you don\'t see it.';
+
+  @override
+  String get emailSendError => 'Could not send email';
+
+  @override
+  String get backToLogin => 'Back to Login';
+
+  @override
+  String get reportIssue => 'Report an Issue';
+
+  @override
+  String get reportIssueTitle => 'Report an Issue';
+
+  @override
+  String get reportIssueHeaderTitle => 'We\'re here to help';
+
+  @override
+  String get reportIssueHeaderSubtitle =>
+      'Describe your issue and our team will get back to you.';
+
+  @override
+  String get issueCategoryLabel => 'Issue Category';
+
+  @override
+  String get issueCategoryPayment => 'Payment';
+
+  @override
+  String get issueCategoryTrip => 'Trip Experience';
+
+  @override
+  String get issueCategoryAppBug => 'App Bug';
+
+  @override
+  String get issueCategoryAccount => 'Account Issue';
+
+  @override
+  String get issueCategoryOther => 'Other';
+
+  @override
+  String get issueTitleLabel => 'Title';
+
+  @override
+  String get issueTitleHint => 'Brief summary of your issue';
+
+  @override
+  String get issueTitleRequired => 'Title is required';
+
+  @override
+  String get issueDescriptionLabel => 'Description';
+
+  @override
+  String get issueDescriptionHint => 'Please describe your issue in detail...';
+
+  @override
+  String get issueDescriptionRequired => 'Description is required';
+
+  @override
+  String get issueDescriptionTooShort =>
+      'Please provide at least 10 characters';
+
+  @override
+  String get issueSubmitBtn => 'Submit Report';
+
+  @override
+  String get issueSubmittedTitle => 'Report Submitted!';
+
+  @override
+  String get issueSubmittedBody =>
+      'Thank you for reaching out. Our support team will review your issue and respond as soon as possible.';
+
+  @override
+  String get issueDone => 'Done';
+
+  @override
+  String get requestRefund => 'Request Refund';
+
+  @override
+  String get refundAlreadyRequested => 'Refund Requested';
+
+  @override
+  String get refundConfirmTitle => 'Request Refund?';
+
+  @override
+  String get refundConfirmBody =>
+      'Are you sure you want to request a refund for this booking? Your wallet will be credited once the request is approved.';
+
+  @override
+  String get refundSubmitted => 'Refund request submitted successfully.';
+
+  @override
+  String get refundRequesting => 'Submitting refund request...';
 }

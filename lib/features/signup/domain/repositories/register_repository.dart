@@ -13,6 +13,7 @@ abstract class RegisterRepository {
     required int gender,
     required String dateOfBirth,
     required String countryCode,
-    String? nationalIdNumber,
+    int? idType,
+    String? idNumber,
   });
 }

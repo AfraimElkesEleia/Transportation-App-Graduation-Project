@@ -101,7 +101,8 @@ Base route: `/api/Auth`
   "familyName": "Mohamed",
   "gender": 1,
   "dateOfBirth": "1995-05-15",
-  "nationalIdNumber": "29805151234567",
+  "idType": 1,
+  "idNumber": "29805151234567",
   "countryCode": "EG"
 }
 ```
@@ -118,7 +119,8 @@ Base route: `/api/Auth`
 | familyName       | string | Yes      | Max 100                  |
 | gender           | int    | Yes      | 1=Male,2=Female,3=Other  |
 | dateOfBirth      | date   | Yes      | At least 16 years old    |
-| nationalIdNumber | string | No       | 14 digits if provided    |
+| idType           | int    | No       | 1=NationalId,2=Passport,3=DrivingLicense,4=StudentId,5=Other |
+| idNumber         | string | Conditional | Required when `idType` is provided. NationalId must be 14 digits; other types max 50 |
 | countryCode      | string | Yes      | 2 chars, must exist      |
 
 ### Response Example (200 OK)
@@ -660,7 +662,8 @@ No request body.
     "fullName": "Ahmed Mohamed Hassan",
     "email": "user@example.com",
     "phone": "+201234567890",
-    "nationalIdNumber": "29805151234567",
+    "idType": 1,
+    "idNumber": "29805151234567",
     "totalTripsCount": 5,
     "totalDistanceTraveled": 1200.5,
     "createdAt": "2026-03-01T10:00:00Z",
@@ -726,6 +729,39 @@ No request body.
 { "success": true, "message": "User deleted successfully.", "data": null, "errors": null, "timestamp": "2026-03-06T12:00:00Z" }
 ```
 
+## 4.6 Process Booking Refund Request
+Base route: `/api/admin`
+
+### Endpoint Overview
+- **Method:** `PUT`
+- **URL:** `/api/admin/bookings/{bookingId}/refund`
+- **Business Use Case:** Approves or rejects a pending refund request and applies wallet refund when approved.
+
+### Authentication / Authorization
+- **JWT Required:** Yes
+- **Role Required:** Admin
+
+### Request Payload
+```json
+{ "isApproved": true }
+```
+
+### Request Field Reference
+| Field      | Type | Required | Notes                                |
+| ---------- | ---- | -------- | ------------------------------------ |
+| isApproved | bool | Yes      | `true` = approve, `false` = reject   |
+
+### Rules
+- Booking must exist and be in `RefundStatus = Requested`.
+- If approved: booking is cancelled, payment marked refunded, wallet balance credited, and a refund ledger entry is recorded.
+- If rejected: refund status becomes `Rejected`.
+- User receives a localized notification based on preferred language.
+
+### Response Example (200 OK)
+```json
+{ "success": true, "message": "Refund request approved.", "data": null, "errors": null, "timestamp": "2026-05-31T12:00:00Z" }
+```
+
 ---
 
 # 5. User Profile API
@@ -756,6 +792,9 @@ No request body.
     "phoneNumber": "+201234567890",
     "gender": "Male",
     "profilePictureUrl": "images/profiles/abcd.jpg",
+    "idType": "NationalId",
+    "idNumber": "29805151234567",
+    "preferredLanguage": "en",
     "countryCode": "EG",
     "countryName": "Egypt",
     "totalTripsCount": 12,
@@ -863,6 +902,27 @@ No request body.
 ### Notes
 - If the token already exists for a different user, it is reassigned to the current user.
 - If the token exists for the same user, only `LastUsedAt` is updated.
+
+## 5.5 Update Preferred Language
+### Endpoint Overview
+- **Method:** `PUT`
+- **URL:** `/api/Users/language`
+- **Business Use Case:** Sets the authenticated user's preferred language for server-side localized push notifications.
+### Authentication / Authorization
+- **JWT Required:** Yes
+- **Role Required:** Authenticated user
+### Request Payload
+```json
+{ "language": "ar" }
+```
+### Request Field Reference
+| Field    | Type   | Required | Notes                                        |
+| -------- | ------ | -------- | -------------------------------------------- |
+| language | string | Yes      | Use `ar` for Arabic; any other value uses `en` |
+### Response Example (200 OK)
+```json
+{ "success": true, "message": "Language updated successfully.", "data": null, "errors": null, "timestamp": "2026-05-31T00:00:00Z" }
+```
 
 ---
 
@@ -1619,7 +1679,35 @@ No request body.
 }
 ```
 
-## 9.6 Boarding Pass QR (Overview)
+## 9.6 Request Refund
+### Endpoint Overview
+- **Method:** `POST`
+- **URL:** `/api/Bookings/{bookingId}/refund-request`
+- **Business Use Case:** Submits a refund request for a confirmed booking owned by the authenticated user.
+
+### Authentication / Authorization
+- **JWT Required:** Yes
+- **Role Required:** Authenticated user
+
+### Request Payload
+No request body.
+
+### Path Parameters
+| Field     | Type | Required | Notes                 |
+| --------- | ---- | -------- | --------------------- |
+| bookingId | int  | Yes      | Booking identifier    |
+
+### Rules
+- Booking must belong to the authenticated user and be in `Confirmed` status.
+- Refund request must not already be pending.
+- Trip departure time must be in the future (schedule-local).
+
+### Response Example (200 OK)
+```json
+{ "success": true, "message": "Refund request submitted successfully.", "data": null, "errors": null, "timestamp": "2026-05-31T12:00:00Z" }
+```
+
+## 9.7 Boarding Pass QR (Overview)
 
 This feature provides a stateless, HMAC-SHA256-signed boarding pass string which the passenger client renders as a QR code. The driver's device submits the scanned string to the server for cryptographic verification and receives passenger seat details on success.
 
@@ -1639,7 +1727,7 @@ Final payload returned to clients:
 
 Where `signatureBase64` = Base64(HMAC-SHA256(secret, rawData)).
 
-## 9.7 Generate Boarding Pass (Passenger)
+## 9.8 Generate Boarding Pass (Passenger)
 ### Endpoint Overview
 - **Method:** `GET`
 - **URL:** `/api/Bookings/{bookingId}/passengers/{passengerId}/qr-payload`
@@ -1673,7 +1761,7 @@ No request body.
 - **400 Bad Request:** Invalid booking/passenger or booking not confirmed.
 - **401 Unauthorized:** Missing or invalid JWT.
 
-## 9.8 Verify Boarding Pass (Driver)
+## 9.9 Verify Boarding Pass (Driver)
 ### Endpoint Overview
 - **Method:** `POST`
 - **URL:** `/api/Bookings/verify-pass`
@@ -2075,7 +2163,7 @@ Base route: `/api/Marketplace`
 | Field       | Type    | Required | Notes                                        |
 | ----------- | ------- | -------- | -------------------------------------------- |
 | bookingId   | int     | Yes      | Must be a confirmed booking                  |
-| askingPrice | decimal | Yes      | Must be > 0 and below original booking price |
+| askingPrice | decimal | Yes      | Must be > 0                                  |
 
 ### Listing Rules
 - Only the booking owner can list a ticket.
@@ -2083,7 +2171,6 @@ Base route: `/api/Marketplace`
 - Booking must not have `IsMarketplacePurchase = true` (tickets purchased from the marketplace cannot be resold).
 - Booking must not already have an active listing.
 - All passengers in the booking are offered for resale together.
-- Asking price must be strictly less than the original booking price.
 
 ### Response Example (200 OK)
 ```json
@@ -2122,9 +2209,9 @@ Base route: `/api/Marketplace`
 | Field                      | Type   | Required    | Notes                                                            |
 | -------------------------- | ------ | ----------- | ---------------------------------------------------------------- |
 | passengers                 | array  | Yes         | Must match `SeatsBooked` count                                   |
-| passengers[].passengerName | string | Yes         | Required for each passenger                                      |
-| passengers[].idType        | string | No          | Optional: NationalId, Passport, DrivingLicense, StudentId, Other |
-| passengers[].idNumber      | string | Conditional | Required when `idType` is provided                               |
+| passengers[].passengerName | string | Conditional | Required for ENR agency                                          |
+| passengers[].idType        | string | Conditional | Required for ENR agency. Allowed: NationalId, Passport, DrivingLicense, StudentId, Other |
+| passengers[].idNumber      | string | Conditional | Required for ENR agency                                          |
 | passengers[].seatNumber    | string | No          | Ignored for marketplace purchase (seat is preserved)             |
 
 ### Notes
@@ -2136,6 +2223,8 @@ Base route: `/api/Marketplace`
 - Trip departure must be in the future.
 - Buyer wallet balance must cover `askingPrice`.
 - `passengers` count must exactly match `SeatsBooked`.
+- For ENR agencies, each passenger must provide `passengerName`, `idType`, and `idNumber`.
+- For ENR, passenger ID numbers must be unique in the request and not already assigned to active pending/confirmed bookings for the same occurrence.
 - The entire booking (all passengers) is transferred to the buyer.
 - Contact info is updated from the buyer profile.
 - Passenger details are replaced in-seat-order; seat numbers remain unchanged.
@@ -2342,6 +2431,7 @@ Delivery model:
 - Notifications are persisted to the inbox first.
 - Then pushed live to online clients through SignalR.
 - Offline delivery uses stored FCM device tokens registered via `/api/Users/fcm-token`.
+- FCM `notification` title/body is localized using the user's preferred language set via `/api/Users/language` (defaults to `en`).
 
 ### Authentication
 - Connection requires authenticated JWT user context.
@@ -2374,6 +2464,184 @@ Client method name:
 - `BOARDING_SOON`
   - Trigger: jobs endpoint processing bookings boarding in the next 15 minutes.
   - Sample title: `Boarding Soon!`
+- `REFUND_APPROVED`
+  - Trigger: admin approves a pending refund request.
+  - Sample title: `Refund Approved`
+- `REFUND_REJECTED`
+  - Trigger: admin rejects a pending refund request.
+  - Sample title: `Refund Rejected`
+
+---
+
+# 16. Support Tickets API
+
+Base route (User): `/api/Support`
+
+Base route (Admin): `/api/admin/support`
+
+User endpoints require authenticated JWT user context.
+
+Admin endpoints require Admin role.
+
+## 16.1 Create Support Ticket
+### Endpoint Overview
+- **Method:** `POST`
+- **URL:** `/api/Support/tickets`
+- **Business Use Case:** Submits a new support ticket for the authenticated user.
+
+### Authentication / Authorization
+- **JWT Required:** Yes
+- **Role Required:** Authenticated user
+
+### Request Payload
+```json
+{
+  "title": "Payment failed",
+  "description": "Wallet deposit returned an error.",
+  "issueCategory": 1
+}
+```
+
+### Request Field Reference
+| Field         | Type   | Required | Notes                                                       |
+| ------------- | ------ | -------- | ----------------------------------------------------------- |
+| title         | string | Yes      | Max 200                                                     |
+| description   | string | Yes      | Max 1000                                                    |
+| issueCategory | int    | Yes      | 1=Payment,2=TripExperience,3=AppBug,4=AccountIssue,5=Other   |
+
+### Response Example (200 OK)
+```json
+{
+  "success": true,
+  "message": "Support ticket created successfully.",
+  "data": {
+    "ticketId": 1001,
+    "title": "Payment failed",
+    "description": "Wallet deposit returned an error.",
+    "category": "Payment",
+    "status": "Open",
+    "createdAt": "2026-05-31T12:00:00Z",
+    "updatedAt": null
+  },
+  "errors": null,
+  "timestamp": "2026-05-31T12:00:00Z"
+}
+```
+
+### Notes
+- `status` starts as `Open`.
+- `category` and `status` are enum string values.
+
+## 16.2 Get My Tickets
+### Endpoint Overview
+- **Method:** `GET`
+- **URL:** `/api/Support/tickets`
+- **Business Use Case:** Returns the authenticated user's support tickets, newest first.
+
+### Authentication / Authorization
+- **JWT Required:** Yes
+- **Role Required:** Authenticated user
+
+### Response Example (200 OK)
+```json
+{
+  "success": true,
+  "message": "Support tickets retrieved successfully.",
+  "data": [
+    {
+      "ticketId": 1001,
+      "title": "Payment failed",
+      "description": "Wallet deposit returned an error.",
+      "category": "Payment",
+      "status": "Open",
+      "createdAt": "2026-05-31T12:00:00Z",
+      "updatedAt": null
+    }
+  ],
+  "errors": null,
+  "timestamp": "2026-05-31T12:00:00Z"
+}
+```
+
+## 16.3 Admin - Get All Tickets
+### Endpoint Overview
+- **Method:** `GET`
+- **URL:** `/api/admin/support/tickets`
+- **Business Use Case:** Lists all support tickets with user contact details, newest first.
+
+### Authentication / Authorization
+- **JWT Required:** Yes
+- **Role Required:** Admin
+
+### Response Example (200 OK)
+```json
+{
+  "success": true,
+  "message": "Support tickets retrieved successfully.",
+  "data": [
+    {
+      "ticketId": 1001,
+      "title": "Payment failed",
+      "description": "Wallet deposit returned an error.",
+      "category": "Payment",
+      "status": "Open",
+      "createdAt": "2026-05-31T12:00:00Z",
+      "updatedAt": null,
+      "userId": 15,
+      "userFullName": "Ahmed Mohamed Hassan",
+      "userEmail": "user@example.com",
+      "userPhone": "+201234567890"
+    }
+  ],
+  "errors": null,
+  "timestamp": "2026-05-31T12:00:00Z"
+}
+```
+
+## 16.4 Admin - Update Ticket Status
+### Endpoint Overview
+- **Method:** `PUT`
+- **URL:** `/api/admin/support/tickets/{ticketId}/status`
+- **Business Use Case:** Updates the ticket status and refreshes the updated timestamp.
+
+### Authentication / Authorization
+- **JWT Required:** Yes
+- **Role Required:** Admin
+
+### Request Payload
+```json
+{
+  "status": 2
+}
+```
+
+### Request Field Reference
+| Field  | Type | Required | Notes                                      |
+| ------ | ---- | -------- | ------------------------------------------ |
+| status | int  | Yes      | 1=Open,2=InProgress,3=Resolved,4=Closed    |
+
+### Response Example (200 OK)
+```json
+{
+  "success": true,
+  "message": "Support ticket status updated successfully.",
+  "data": {
+    "ticketId": 1001,
+    "title": "Payment failed",
+    "description": "Wallet deposit returned an error.",
+    "category": "Payment",
+    "status": "InProgress",
+    "createdAt": "2026-05-31T12:00:00Z",
+    "updatedAt": "2026-05-31T12:30:00Z",
+    "userId": 15,
+    "userFullName": "Ahmed Mohamed Hassan",
+    "userEmail": "user@example.com",
+    "userPhone": "+201234567890"
+  },
+  "errors": null,
+  "timestamp": "2026-05-31T12:30:00Z"
+}
+```
 
 ---
 
@@ -2416,10 +2684,16 @@ Client method name:
 | `PATCH`  | `/api/admin/users/{id}/toggle-status`                           |        Yes (Admin) | Toggle user active status                                          |
 | `POST`   | `/api/admin/users/{id}/roles`                                   |        Yes (Admin) | Assign role                                                        |
 | `DELETE` | `/api/admin/users/{id}`                                         |        Yes (Admin) | Delete user                                                        |
+| `GET`    | `/api/admin/support/tickets`                                    |        Yes (Admin) | List all support tickets                                           |
+| `PUT`    | `/api/admin/support/tickets/{ticketId}/status`                  |        Yes (Admin) | Update support ticket status                                       |
+| `PUT`    | `/api/admin/bookings/{bookingId}/refund`                        |        Yes (Admin) | Approve or reject pending booking refund request                   |
 | `GET`    | `/api/Users/me`                                                 |                Yes | Get profile with loyalty stats and active challenges               |
 | `PUT`    | `/api/Users/me`                                                 |                Yes | Update profile                                                     |
 | `POST`   | `/api/Users/me/profile-picture`                                 |                Yes | Upload profile picture                                             |
 | `POST`   | `/api/Users/fcm-token`                                          |                Yes | Register/update user device token for offline push                 |
+| `PUT`    | `/api/Users/language`                                           |                Yes | Update preferred language for localized push notifications         |
+| `POST`   | `/api/Support/tickets`                                          |                Yes | Create support ticket                                              |
+| `GET`    | `/api/Support/tickets`                                          |                Yes | Retrieve user's support tickets                                    |
 | `GET`    | `/api/Loyalty/history`                                          |                Yes | Retrieve loyalty point ledger history (latest first)               |
 | `GET`    | `/api/Loyalty/challenges`                                       |                Yes | Retrieve paged active and completed challenge history              |
 | `GET`    | `/api/Stations`                                                 |                 No | Get grouped stations                                               |
@@ -2435,6 +2709,7 @@ Client method name:
 | `DELETE` | `/api/Bookings/{bookingId}`                                     |                Yes | Cancel a pending booking hold and release held seats               |
 | `POST`   | `/api/Bookings/checkout`                                        |                Yes | Checkout all valid pending cart items with one wallet charge       |
 | `GET`    | `/api/Bookings/my-tickets`                                      |                Yes | Retrieve user's ticket history (non-pending bookings)              |
+| `POST`   | `/api/Bookings/{bookingId}/refund-request`                      |                Yes | Request a refund for a confirmed booking                           |
 | `GET`    | `/api/Bookings/{bookingId}/passengers/{passengerId}/qr-payload` |                Yes | Generate boarding pass QR payload                                  |
 | `POST`   | `/api/Bookings/verify-pass`                                     |                Yes | Verify boarding pass QR payload                                    |
 | `POST`   | `/api/Marketplace/list`                                         |                Yes | List ticket for resale                                             |

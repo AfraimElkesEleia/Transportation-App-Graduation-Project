@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:transportation_app/core/l10n/app_localizations.dart';
 import 'package:transportation_app/core/theming/colors.dart';
 import 'package:transportation_app/features/my_tickets/presentation/cubit/marketplace_cubit.dart';
 import 'package:transportation_app/features/my_tickets/presentation/cubit/marketplace_states.dart';
@@ -43,6 +44,7 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final profileState = context.watch<ProfileCubit>().state;
     final currentUserId = profileState is ProfileLoaded
         ? profileState.profile.userId
@@ -57,20 +59,20 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
           icon: const Icon(Icons.arrow_back, color: ColorsManager.accentCyan),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Column(
+        title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Ticket Marketplace',
-              style: TextStyle(
+              l10n.ticketMarketplace,
+              style: const TextStyle(
                 color: Colors.white,
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
               ),
             ),
             Text(
-              'Find great deals from other travelers',
-              style: TextStyle(color: Colors.white70, fontSize: 12),
+              l10n.findDealsFromTravelers,
+              style: const TextStyle(color: Colors.white70, fontSize: 12),
             ),
           ],
         ),
@@ -82,10 +84,11 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
             current is MarketplaceListedState ||
             current is MarketplaceListErrorState,
         listener: (context, state) {
+          final l10n = AppLocalizations.of(context)!;
           if (state is MarketplaceBoughtState) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Ticket purchased successfully!'),
+              SnackBar(
+                content: Text(l10n.ticketPurchasedSuccessfully),
                 backgroundColor: Colors.green,
               ),
             );
@@ -99,8 +102,8 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
             );
           } else if (state is MarketplaceListedState) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Listing cancelled successfully!'),
+              SnackBar(
+                content: Text(l10n.listingCancelledSuccessfully),
                 backgroundColor: Colors.green,
               ),
             );
@@ -150,7 +153,7 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
                                   : Colors.white,
                             ),
                             label: Text(
-                              isFilterActive ? 'Filters (active)' : 'Filters',
+                              isFilterActive ? l10n.filtersActive : l10n.filters,
                               style: TextStyle(
                                 color: isFilterActive
                                     ? ColorsManager.accentCyan
@@ -213,7 +216,7 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
                         if (filter.originGovernorate != null &&
                             filter.originGovernorate!.isNotEmpty)
                           _ActiveFilterChip(
-                            label: 'From: ${filter.originGovernorate}',
+                            label: l10n.filterFrom(filter.originGovernorate!),
                             onRemove: () => cubit.fetchActiveListings(
                               filter: filter.copyWith(clearOrigin: true),
                             ),
@@ -221,15 +224,16 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
                         if (filter.destinationGovernorate != null &&
                             filter.destinationGovernorate!.isNotEmpty)
                           _ActiveFilterChip(
-                            label: 'To: ${filter.destinationGovernorate}',
+                            label: l10n.filterTo(filter.destinationGovernorate!),
                             onRemove: () => cubit.fetchActiveListings(
                               filter: filter.copyWith(clearDestination: true),
                             ),
                           ),
                         if (filter.travelDate != null)
                           _ActiveFilterChip(
-                            label:
-                                'Date: ${filter.travelDate!.day}/${filter.travelDate!.month}/${filter.travelDate!.year}',
+                            label: l10n.filterDate(
+                              '${filter.travelDate!.day}/${filter.travelDate!.month}/${filter.travelDate!.year}',
+                            ),
                             onRemove: () => cubit.fetchActiveListings(
                               filter: filter.copyWith(clearDate: true),
                             ),
@@ -259,13 +263,13 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
                                 (state is MarketplaceLoadedState && count > 0)
                                 ? _avgDiscount(state.listings)
                                 : '—',
-                            label: 'Avg. Discount',
+                            label: l10n.avgDiscount,
                             color: Colors.amber,
                           ),
                           MarketplaceStatBox(
                             icon: Icons.groups,
                             value: '$count',
-                            label: 'Total Listings',
+                            label: l10n.totalListings,
                             color: Colors.blueAccent,
                           ),
                         ],
@@ -307,9 +311,10 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
                         const SizedBox(height: 16),
                         TextButton(
                           onPressed: () => cubit.fetchActiveListings(),
-                          child: const Text(
-                            'Retry',
-                            style: TextStyle(color: ColorsManager.accentCyan),
+                          child: Text(
+                            l10n.retry,
+                            style: const TextStyle(
+                                color: ColorsManager.accentCyan),
                           ),
                         ),
                       ],
@@ -330,9 +335,9 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
                             size: 64,
                           ),
                           const SizedBox(height: 16),
-                          const Text(
-                            'No listings found.',
-                            style: TextStyle(
+                          Text(
+                            l10n.noListingsFound,
+                            style: const TextStyle(
                               color: Colors.white54,
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
@@ -340,9 +345,9 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
                           ),
                           if (isFilterActive) ...[
                             const SizedBox(height: 8),
-                            const Text(
-                              'Try removing some filters.',
-                              style: TextStyle(
+                            Text(
+                              l10n.tryRemovingFilters,
+                              style: const TextStyle(
                                 color: Colors.white30,
                                 fontSize: 13,
                               ),
@@ -356,9 +361,9 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
                                 Icons.filter_alt_off,
                                 color: ColorsManager.accentCyan,
                               ),
-                              label: const Text(
-                                'Clear Filters',
-                                style: TextStyle(
+                              label: Text(
+                                l10n.clearFilters,
+                                style: const TextStyle(
                                   color: ColorsManager.accentCyan,
                                 ),
                               ),
@@ -500,24 +505,25 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
     final dt = DateTime.tryParse(timeStr) ?? DateTime.now();
     final className = _cleanClassName(trip['class'] as String? ?? 'Standard');
     final newPrice = (item['askingPrice'] as num? ?? 0).toDouble();
-    final id = item['listingId'] as int;
 
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
+      builder: (ctx) {
+        final l10n = AppLocalizations.of(ctx)!;
+        return AlertDialog(
         backgroundColor: ColorsManager.cardBg,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Row(
+        title: Row(
           children: [
-            Icon(
+            const Icon(
               Icons.shopping_cart,
               color: ColorsManager.accentCyan,
               size: 22,
             ),
-            SizedBox(width: 8),
+            const SizedBox(width: 8),
             Text(
-              'Buy Ticket',
-              style: TextStyle(color: Colors.white, fontSize: 18),
+              l10n.buyTicket,
+              style: const TextStyle(color: Colors.white, fontSize: 18),
             ),
           ],
         ),
@@ -527,37 +533,37 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Agency: ${item['agencyName'] ?? 'Unknown'}',
+                '${l10n.agencyLabel}: ${item['agencyName'] ?? 'Unknown'}',
                 style: const TextStyle(color: Colors.white70),
               ),
               const SizedBox(height: 8),
               if (originDisplay.isNotEmpty)
                 Text(
-                  'Origin: $originDisplay',
+                  '${l10n.originLabel}: $originDisplay',
                   style: const TextStyle(color: Colors.white70),
                 ),
               if (destinationDisplay.isNotEmpty)
                 Text(
-                  'Destination: $destinationDisplay',
+                  '${l10n.destinationLabel}: $destinationDisplay',
                   style: const TextStyle(color: Colors.white70),
                 ),
               const SizedBox(height: 8),
               Text(
-                'Date: ${dt.day}/${dt.month}/${dt.year}',
+                '${l10n.dateLabel}: ${dt.day}/${dt.month}/${dt.year}',
                 style: const TextStyle(color: Colors.white70),
               ),
               Text(
-                'Time: ${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}',
-                style: const TextStyle(color: Colors.white70),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'Class: $className',
+                '${l10n.timeLabel}: ${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}',
                 style: const TextStyle(color: Colors.white70),
               ),
               const SizedBox(height: 8),
               Text(
-                'Price: $newPrice EGP',
+                '${l10n.classLabel}: $className',
+                style: const TextStyle(color: Colors.white70),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                '${l10n.priceLabel}: $newPrice EGP',
                 style: const TextStyle(
                   color: ColorsManager.successGreen,
                   fontSize: 16,
@@ -565,9 +571,9 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
                 ),
               ),
               const SizedBox(height: 16),
-              const Text(
-                'Are you sure you want to buy this ticket?',
-                style: TextStyle(color: Colors.white),
+              Text(
+                l10n.areYouSureBuyTicket,
+                style: const TextStyle(color: Colors.white),
               ),
             ],
           ),
@@ -575,9 +581,9 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text(
-              'Cancel',
-              style: TextStyle(color: Colors.white38),
+            child: Text(
+              l10n.cancel,
+              style: const TextStyle(color: Colors.white38),
             ),
           ),
           ElevatedButton(
@@ -595,16 +601,17 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
                 borderRadius: BorderRadius.circular(10),
               ),
             ),
-            child: const Text(
-              'Buy Now',
-              style: TextStyle(
+            child: Text(
+              l10n.buyNow,
+              style: const TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.bold,
               ),
             ),
           ),
         ],
-      ),
+      );
+      },
     );
   }
 }

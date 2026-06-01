@@ -9,7 +9,9 @@ import 'package:transportation_app/features/home/domain/entities/search_params.d
 import 'package:transportation_app/features/home/domain/usecases/get_stations_use_case.dart';
 import 'package:transportation_app/features/home/presentation/cubit/stations_cubit.dart';
 import 'package:transportation_app/features/login/presentation/cubit/login_cubit/login_cubit.dart';
+import 'package:transportation_app/features/login/presentation/cubit/password_cubit/password_cubit.dart';
 import 'package:transportation_app/features/login/presentation/screens/login_screen.dart';
+import 'package:transportation_app/features/login/presentation/screens/forgot_password_screen.dart';
 import 'package:transportation_app/features/multidestination/presentation/screens/multidestination_screen.dart';
 import 'package:transportation_app/features/multidestination/presentation/screens/multidestination_summary_screen.dart';
 import 'package:transportation_app/features/multidestination/presentation/cubit/multi_destination_booking_cubit.dart';
@@ -49,6 +51,8 @@ import 'package:transportation_app/features/signup/presentation/cubit/signup_cub
 import 'package:transportation_app/features/signup/presentation/screen/sign_up_screen.dart';
 import 'package:transportation_app/features/profile/presentation/cubit/loyalty_hub_cubit/loyalty_hub_cubit.dart';
 import 'package:transportation_app/features/profile/presentation/views/screen/loyalty_hub_screen.dart';
+import 'package:transportation_app/features/support/cubit/support_cubit.dart';
+import 'package:transportation_app/features/support/screens/report_issue_screen.dart';
 
 class AppRouter {
   Route<dynamic>? generateRoute(RouteSettings settings) {
@@ -133,6 +137,13 @@ class AppRouter {
           builder: (_) => BlocProvider(
             create: (context) => sl<LoginCubit>(),
             child: LoginScreen(),
+          ),
+        );
+      case AppRoutes.forgotPasswordScreen:
+        return MaterialPageRoute(
+          builder: (_) => BlocProvider(
+            create: (_) => sl<PasswordCubit>(),
+            child: const ForgotPasswordScreen(),
           ),
         );
       case AppRoutes.signUpScreen:
@@ -268,22 +279,15 @@ class AppRouter {
             child: const RoundTripPassengerFormScreen(),
           ),
         );
-      case AppRoutes.multidestinationScreen:
-        return MaterialPageRoute(
-          builder: (_) => MultiBlocProvider(
-            providers: [
-              BlocProvider(
-                create: (c) =>
-                    StationsCubit(getStationsUseCase: sl<GetStationsUseCase>())..loadStations(),
-              ),
-            ],
-            child: MultidestinationScreen(),
-          ),
-        );
       case AppRoutes.ticketDetailsScreen:
-        final ticket = settings.arguments as TicketEntity;
+        final args = settings.arguments as Map<String, dynamic>;
+        final ticket = args['ticket'] as TicketEntity;
+        final myTicketsCubit = args['cubit'] as MyTicketsCubit;
         return MaterialPageRoute(
-          builder: (_) => TicketDetailsScreen(ticket: ticket),
+          builder: (_) => BlocProvider.value(
+            value: myTicketsCubit,
+            child: TicketDetailsScreen(ticket: ticket),
+          ),
         );
       case AppRoutes.loyaltyHub:
         final args = settings.arguments as Map<String, dynamic>? ?? {};
@@ -302,6 +306,13 @@ class AppRouter {
           builder: (_) => BlocProvider.value(
             value: sl<NotificationCubit>()..loadNotifications(),
             child: const NotificationInboxScreen(),
+          ),
+        );
+      case AppRoutes.reportIssueScreen:
+        return MaterialPageRoute(
+          builder: (_) => BlocProvider(
+            create: (_) => sl<SupportCubit>(),
+            child: const ReportIssueScreen(),
           ),
         );
       default:

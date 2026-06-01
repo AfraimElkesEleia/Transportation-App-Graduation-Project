@@ -43,6 +43,7 @@ class TicketEntity extends Equatable {
   final bool isOfferedForResale;
   final int? marketplaceListingId;
   final List<TicketPassengerEntity> passengers;
+  final String? refundStatus;
 
   const TicketEntity({
     required this.bookingId,
@@ -70,6 +71,7 @@ class TicketEntity extends Equatable {
     this.isOfferedForResale = false,
     this.marketplaceListingId,
     required this.passengers,
+    this.refundStatus,
   });
 
   bool get isUpcoming =>
@@ -83,6 +85,9 @@ class TicketEntity extends Equatable {
     final diff = boardingTime.difference(now);
     return diff.inSeconds >= 0 && diff.inHours < 5 && status == 'Confirmed';
   }
+
+  /// Returns true when a refund has already been requested (status == 'Requested').
+  bool get isRefundRequested => refundStatus == 'Requested';
 
   @override
   List<Object?> get props => [bookingId];

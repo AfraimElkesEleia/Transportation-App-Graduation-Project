@@ -15,7 +15,8 @@ abstract class AuthRemoteDataSource {
     required int gender,
     required String dateOfBirth,
     required String countryCode,
-    String? nationalIdNumber,
+    int? idType,
+    String? idNumber,
   });
 }
 
@@ -52,7 +53,8 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     required int gender,
     required String dateOfBirth,
     required String countryCode,
-    String? nationalIdNumber,
+    int? idType,
+    String? idNumber,
   }) async {
     try {
       final response = await dio.post(
@@ -68,7 +70,8 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
           'gender': gender,
           'dateOfBirth': dateOfBirth,
           'countryCode': countryCode,
-          if (nationalIdNumber != null) 'nationalIdNumber': nationalIdNumber,
+          if (idType != null) 'idType': idType,
+          if (idNumber != null && idNumber.isNotEmpty) 'idNumber': idNumber,
         },
       );
       final data = _validateAndExtract(response);

@@ -77,3 +77,15 @@ class WalletDepositErrorState extends MyTicketsState {
   @override
   List<Object?> get props => [message];
 }
+
+// ── Refund states ─────────────────────────────────────────────────────
+class RefundRequestingState extends MyTicketsState {}
+
+class RefundRequestedState extends MyTicketsState {}
+
+class RefundRequestErrorState extends MyTicketsState {
+  final String message;
+  const RefundRequestErrorState(this.message);
+  @override
+  List<Object?> get props => [message];
+}

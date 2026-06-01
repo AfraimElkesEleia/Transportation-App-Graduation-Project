@@ -221,9 +221,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get listForSale => 'أضف التذكرة للبيع';
 
   @override
-  String askingPrice(String n) {
-    return 'سعر الطلب (حد أقصى $n جنيه)';
-  }
+  String get askingPrice => 'سعر الطلب';
 
   @override
   String get listTicketBtn => 'أدرج التذكرة';
@@ -1174,13 +1172,13 @@ class AppLocalizationsAr extends AppLocalizations {
   String get idTypeLabel => 'نوع الهوية';
 
   @override
-  String get idTypeNationalId => 'بطاقة قومية';
+  String get idTypeNationalId => 'بطاقة هوية وطنية';
 
   @override
   String get idTypePassport => 'جواز سفر';
 
   @override
-  String get idNumberLabel => 'رقم البطاقة القومية';
+  String get idNumberLabel => 'رقم بطاقة الهوية';
 
   @override
   String get passportNumberLabel => 'رقم جواز السفر';
@@ -1264,4 +1262,222 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get seatLegendTaken => 'محجوز';
+
+  @override
+  String get idTypeNone => 'بدون';
+
+  @override
+  String get passportNumberHint => 'مثال: A12345678';
+
+  @override
+  String get signupTitle => 'إنشاء\nحساب.';
+
+  @override
+  String get joinFutureOfTravel => 'انضم إلى مستقبل السفر';
+
+  @override
+  String get ticketMarketplace => 'سوق التذاكر';
+
+  @override
+  String get findDealsFromTravelers => 'ابحث عن أفضل العروض من المسافرين';
+
+  @override
+  String get filtersActive => 'تصفية (مفعّلة)';
+
+  @override
+  String get avgDiscount => 'متوسط الخصم';
+
+  @override
+  String get totalListings => 'إجمالي العروض';
+
+  @override
+  String get noListingsFound => 'لا توجد عروض.';
+
+  @override
+  String get tryRemovingFilters => 'حاول إزالة بعض الفلاتر.';
+
+  @override
+  String get clearFilters => 'مسح الفلاتر';
+
+  @override
+  String get buyTicket => 'شراء التذكرة';
+
+  @override
+  String get buyNow => 'اشترِ الآن';
+
+  @override
+  String get agencyLabel => 'الوكالة';
+
+  @override
+  String get originLabel => 'نقطة الانطلاق';
+
+  @override
+  String get destinationLabel => 'الوجهة';
+
+  @override
+  String get dateLabel => 'التاريخ';
+
+  @override
+  String get timeLabel => 'الوقت';
+
+  @override
+  String get classLabel => 'الدرجة';
+
+  @override
+  String get priceLabel => 'السعر';
+
+  @override
+  String get areYouSureBuyTicket => 'هل أنت متأكد من شراء هذه التذكرة؟';
+
+  @override
+  String get ticketPurchasedSuccessfully => 'تم شراء التذكرة بنجاح!';
+
+  @override
+  String get listingCancelledSuccessfully => 'تم إلغاء الإدراج بنجاح!';
+
+  @override
+  String filterFrom(String gov) {
+    return 'من: $gov';
+  }
+
+  @override
+  String filterTo(String gov) {
+    return 'إلى: $gov';
+  }
+
+  @override
+  String filterDate(String date) {
+    return 'التاريخ: $date';
+  }
+
+  @override
+  String get filterListings => 'تصفية العروض';
+
+  @override
+  String get resetAll => 'إعادة ضبط الكل';
+
+  @override
+  String get originGovernorate => 'محافظة الانطلاق';
+
+  @override
+  String get destinationGovernorate => 'محافظة الوجهة';
+
+  @override
+  String get travelDateFilter => 'تاريخ السفر';
+
+  @override
+  String get anyDate => 'أي تاريخ';
+
+  @override
+  String get applyFilters => 'تطبيق الفلاتر';
+
+  @override
+  String get hintCairo => 'مثال: القاهرة';
+
+  @override
+  String get hintAlexandria => 'مثال: الإسكندرية';
+
+  @override
+  String get forgotPasswordSubtitle =>
+      'أدخل بريدك الإلكتروني وسنرسل لك رابط إعادة التعيين';
+
+  @override
+  String get sendResetLink => 'إرسال رابط الإعادة';
+
+  @override
+  String get emailSentTitle => 'تحقق من بريدك الوارد!';
+
+  @override
+  String get emailSentMessage =>
+      'إذا كان بريدك الإلكتروني مسجلاً، ستستقبل رابط إعادة تعيين كلمة المرور قريباً.';
+
+  @override
+  String get emailSendError => 'تعذّر إرسال البريد الإلكتروني';
+
+  @override
+  String get backToLogin => 'العودة لتسجيل الدخول';
+
+  @override
+  String get reportIssue => 'الإبلاغ عن مشكلة';
+
+  @override
+  String get reportIssueTitle => 'الإبلاغ عن مشكلة';
+
+  @override
+  String get reportIssueHeaderTitle => 'نحن هنا للمساعدة';
+
+  @override
+  String get reportIssueHeaderSubtitle =>
+      'صف مشكلتك وسيتواصل معك فريقنا في أقرب وقت.';
+
+  @override
+  String get issueCategoryLabel => 'فئة المشكلة';
+
+  @override
+  String get issueCategoryPayment => 'الدفع';
+
+  @override
+  String get issueCategoryTrip => 'تجربة الرحلة';
+
+  @override
+  String get issueCategoryAppBug => 'خطأ في التطبيق';
+
+  @override
+  String get issueCategoryAccount => 'مشكلة في الحساب';
+
+  @override
+  String get issueCategoryOther => 'أخرى';
+
+  @override
+  String get issueTitleLabel => 'العنوان';
+
+  @override
+  String get issueTitleHint => 'ملخص قصير لمشكلتك';
+
+  @override
+  String get issueTitleRequired => 'العنوان مطلوب';
+
+  @override
+  String get issueDescriptionLabel => 'الوصف';
+
+  @override
+  String get issueDescriptionHint => 'يرجى وصف مشكلتك بالتفصيل...';
+
+  @override
+  String get issueDescriptionRequired => 'الوصف مطلوب';
+
+  @override
+  String get issueDescriptionTooShort => 'يرجى كتابة 10 أحرف على الأقل';
+
+  @override
+  String get issueSubmitBtn => 'إرسال التقرير';
+
+  @override
+  String get issueSubmittedTitle => 'تم إرسال التقرير!';
+
+  @override
+  String get issueSubmittedBody =>
+      'شكراً لتواصلك معنا. سيقوم فريق الدعم بمراجعة مشكلتك والرد عليك في أقرب وقت ممكن.';
+
+  @override
+  String get issueDone => 'تم';
+
+  @override
+  String get requestRefund => 'طلب استرداد';
+
+  @override
+  String get refundAlreadyRequested => 'تم طلب الاسترداد';
+
+  @override
+  String get refundConfirmTitle => 'طلب استرداد المبلغ؟';
+
+  @override
+  String get refundConfirmBody =>
+      'هل أنت متأكد من طلب استرداد المبلغ لهذا الحجز؟ سيتم إضافة المبلغ إلى محفظتك بعد الموافقة على الطلب.';
+
+  @override
+  String get refundSubmitted => 'تم إرسال طلب الاسترداد بنجاح.';
+
+  @override
+  String get refundRequesting => 'جاري إرسال طلب الاسترداد...';
 }

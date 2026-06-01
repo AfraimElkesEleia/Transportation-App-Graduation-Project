@@ -27,7 +27,11 @@ import 'package:transportation_app/features/login/data/datasources/login_remote_
 import 'package:transportation_app/features/login/data/repositories/login_repository_imp.dart';
 import 'package:transportation_app/features/login/domain/repositories/login_repository.dart';
 import 'package:transportation_app/features/login/domain/usecase/login_usecase.dart';
+import 'package:transportation_app/features/login/domain/usecase/forgot_password_usecase.dart';
+import 'package:transportation_app/features/login/domain/usecase/reset_password_usecase.dart';
+import 'package:transportation_app/features/login/domain/usecase/change_password_usecase.dart';
 import 'package:transportation_app/features/login/presentation/cubit/login_cubit/login_cubit.dart';
+import 'package:transportation_app/features/login/presentation/cubit/password_cubit/password_cubit.dart';
 import 'package:transportation_app/features/profile/data/datasources/profile_remote_datasource.dart';
 import 'package:transportation_app/features/profile/data/repositories/profile_repository_imp.dart';
 import 'package:transportation_app/features/profile/domain/repositories/profile_repository.dart';
@@ -56,6 +60,7 @@ import 'package:transportation_app/features/signup/data/repositories/signup_repo
 import 'package:transportation_app/features/signup/domain/repositories/register_repository.dart';
 import 'package:transportation_app/features/signup/domain/usecases/register_use_case.dart';
 import 'package:transportation_app/features/signup/presentation/cubit/signup_cubit.dart';
+import 'package:transportation_app/features/support/cubit/support_cubit.dart';
 
 final sl = GetIt.instance;
 
@@ -94,6 +99,15 @@ Future<void> init() async {
   sl.registerLazySingleton<LoginRemoteDataSource>(
     () => LoginRemoteDataSourceImpl(dio: DioClient.getInstance()),
   );
+  // ── Password (forgot / reset / change) ────────────────────────────
+  sl.registerLazySingleton(() => ForgotPasswordUsecase(loginRepository: sl<LoginRepository>()));
+  sl.registerLazySingleton(() => ResetPasswordUsecase(loginRepository: sl<LoginRepository>()));
+  sl.registerLazySingleton(() => ChangePasswordUseCase(sl<LoginRepository>()));
+  sl.registerFactory(() => PasswordCubit(
+    forgotPasswordUseCase: sl<ForgotPasswordUsecase>(),
+    resetPasswordUseCase: sl<ResetPasswordUsecase>(),
+    changePasswordUseCase: sl<ChangePasswordUseCase>(),
+  ));
   sl.registerLazySingleton<ProfileRemoteDatasource>(
     () => ProfileRemoteDatasourceImpl(dio: DioClient.getInstance()),
   );
@@ -197,5 +211,10 @@ Future<void> init() async {
   );
   sl.registerLazySingleton<FcmTokenDatasource>(
     () => FcmTokenDatasource(DioClient.getInstance()),
+  );
+
+  // ── Support Tickets ─────────────────────────────────────────────────
+  sl.registerFactory<SupportCubit>(
+    () => SupportCubit(DioClient.getInstance()),
   );
 }

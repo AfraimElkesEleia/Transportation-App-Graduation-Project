@@ -83,6 +83,23 @@ class AppValidators {
   }
 
   // ─────────────────────────────────────────────
+  // PASSPORT NUMBER  (optional — only validates if non-empty)
+  // ─────────────────────────────────────────────
+
+  /// Passport number: max 50 alphanumeric characters.
+  /// Returns null (valid) when the field is left empty because it is optional.
+  static String? passportNumber(String? value) {
+    if (value == null || value.trim().isEmpty) return null;
+    if (value.trim().length > 50) {
+      return 'Passport number must be at most 50 characters.';
+    }
+    if (!RegExp(r'^[a-zA-Z0-9\- ]+$').hasMatch(value.trim())) {
+      return 'Passport number can only contain letters, digits, spaces, or hyphens.';
+    }
+    return null;
+  }
+
+  // ─────────────────────────────────────────────
   // DATE OF BIRTH
   // ─────────────────────────────────────────────
 

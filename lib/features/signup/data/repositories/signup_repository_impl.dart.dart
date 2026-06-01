@@ -28,7 +28,8 @@ class SignupRepositoryImpl implements RegisterRepository {
     required int gender,
     required String dateOfBirth,
     required String countryCode,
-    String? nationalIdNumber,
+    int? idType,
+    String? idNumber,
   }) async {
     try {
       final result = await remoteDataSource.register(
@@ -42,7 +43,8 @@ class SignupRepositoryImpl implements RegisterRepository {
         gender: gender,
         dateOfBirth: dateOfBirth,
         countryCode: countryCode,
-        nationalIdNumber: nationalIdNumber,
+        idType: idType,
+        idNumber: idNumber,
       );
       await tokenManager.saveTokens(
         accessToken: result.accessToken,

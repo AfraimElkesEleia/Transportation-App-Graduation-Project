@@ -165,4 +165,18 @@ class MyTicketsRepositoryImpl implements MyTicketsRepository {
       return Left(UnauthorizedFailure(message: e.message));
     }
   }
+
+  @override
+  ResultVoid requestRefund({required int bookingId}) async {
+    try {
+      await remoteDatasource.requestRefund(bookingId: bookingId);
+      return const Right(null);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(message: e.message));
+    } on NetworkException {
+      return Left(const NetworkFailure());
+    } on UnauthorizedException catch (e) {
+      return Left(UnauthorizedFailure(message: e.message));
+    }
+  }
 }

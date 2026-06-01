@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:transportation_app/core/l10n/app_localizations.dart';
+import 'package:transportation_app/core/routing/routes.dart';
 
 class RememberMeRow extends StatelessWidget {
   const RememberMeRow({super.key, required this.value, required this.onChanged});
@@ -29,7 +30,8 @@ class RememberMeRow extends StatelessWidget {
         ),
         const Spacer(),
         GestureDetector(
-          onTap: () {}, 
+          onTap: () =>
+              Navigator.pushNamed(context, AppRoutes.forgotPasswordScreen),
           child: Text(
             l10n.forgotPassword,
             style: TextStyle(

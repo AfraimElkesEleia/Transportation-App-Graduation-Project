@@ -76,14 +76,7 @@
   "totalPrice": "Total price:",
   "sell": "Sell",
   "listForSale": "List Ticket for Sale",
-  "askingPrice": "Asking price (max {n} EGP)",
-  "@askingPrice": {
-    "placeholders": {
-      "n": {
-        "type": "String"
-      }
-    }
-  },
+  "askingPrice": "Asking price",
   "listTicketBtn": "List Ticket",
   "cancelListing": "Cancel Listing",
   "cancelListingMsg": "This booking is currently listed...",
@@ -669,5 +662,100 @@
   "dismiss": "Dismiss",
   "seatLegendAvailable": "Available",
   "seatLegendSelected": "Selected",
-  "seatLegendTaken": "Taken"
+  "seatLegendTaken": "Taken",
+  "idTypeNone": "None",
+  "passportNumberHint": "e.g. A12345678",
+  "signupTitle": "Create\nAccount.",
+  "joinFutureOfTravel": "Join the future of travel",
+  "ticketMarketplace": "Ticket Marketplace",
+  "findDealsFromTravelers": "Find great deals from other travelers",
+  "filtersActive": "Filters (active)",
+  "avgDiscount": "Avg. Discount",
+  "totalListings": "Total Listings",
+  "noListingsFound": "No listings found.",
+  "tryRemovingFilters": "Try removing some filters.",
+  "clearFilters": "Clear Filters",
+  "buyTicket": "Buy Ticket",
+  "buyNow": "Buy Now",
+  "agencyLabel": "Agency",
+  "originLabel": "Origin",
+  "destinationLabel": "Destination",
+  "dateLabel": "Date",
+  "timeLabel": "Time",
+  "classLabel": "Class",
+  "priceLabel": "Price",
+  "areYouSureBuyTicket": "Are you sure you want to buy this ticket?",
+  "ticketPurchasedSuccessfully": "Ticket purchased successfully!",
+  "listingCancelledSuccessfully": "Listing cancelled successfully!",
+  "filterFrom": "From: {gov}",
+  "@filterFrom": {
+    "placeholders": {
+      "gov": {
+        "type": "String"
+      }
+    }
+  },
+  "filterTo": "To: {gov}",
+  "@filterTo": {
+    "placeholders": {
+      "gov": {
+        "type": "String"
+      }
+    }
+  },
+  "filterDate": "Date: {date}",
+  "@filterDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "filterListings": "Filter Listings",
+  "resetAll": "Reset All",
+  "originGovernorate": "Origin Governorate",
+  "destinationGovernorate": "Destination Governorate",
+  "travelDateFilter": "Travel Date",
+  "anyDate": "Any date",
+  "applyFilters": "Apply Filters",
+  "hintCairo": "e.g. Cairo",
+  "hintAlexandria": "e.g. Alexandria",
+  "forgotPasswordSubtitle": "Enter your email and we'll send you a reset link",
+  "sendResetLink": "Send Reset Link",
+  "emailSentTitle": "Check your inbox!",
+  "emailSentMessage": "If your email is registered, you will receive a password reset link shortly. Check your spam folder if you don't see it.",
+  "emailSendError": "Could not send email",
+  "backToLogin": "Back to Login",
+  "idTypeLabel": "ID Type",
+  "idTypeNationalId": "National ID",
+  "idTypePassport": "Passport",
+  "idNumberLabel": "National ID Number",
+  "passportNumberLabel": "Passport Number",
+  "reportIssue": "Report an Issue",
+  "reportIssueTitle": "Report an Issue",
+  "reportIssueHeaderTitle": "We're here to help",
+  "reportIssueHeaderSubtitle": "Describe your issue and our team will get back to you.",
+  "issueCategoryLabel": "Issue Category",
+  "issueCategoryPayment": "Payment",
+  "issueCategoryTrip": "Trip Experience",
+  "issueCategoryAppBug": "App Bug",
+  "issueCategoryAccount": "Account Issue",
+  "issueCategoryOther": "Other",
+  "issueTitleLabel": "Title",
+  "issueTitleHint": "Brief summary of your issue",
+  "issueTitleRequired": "Title is required",
+  "issueDescriptionLabel": "Description",
+  "issueDescriptionHint": "Please describe your issue in detail...",
+  "issueDescriptionRequired": "Description is required",
+  "issueDescriptionTooShort": "Please provide at least 10 characters",
+  "issueSubmitBtn": "Submit Report",
+  "issueSubmittedTitle": "Report Submitted!",
+  "issueSubmittedBody": "Thank you for reaching out. Our support team will review your issue and respond as soon as possible.",
+  "issueDone": "Done",
+  "requestRefund": "Request Refund",
+  "refundAlreadyRequested": "Refund Requested",
+  "refundConfirmTitle": "Request Refund?",
+  "refundConfirmBody": "Are you sure you want to request a refund for this booking? Your wallet will be credited once the request is approved.",
+  "refundSubmitted": "Refund request submitted successfully.",
+  "refundRequesting": "Submitting refund request..."
 }

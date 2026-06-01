@@ -16,6 +16,7 @@ import 'package:transportation_app/features/login/presentation/widgets/sign_up_r
 import 'package:transportation_app/core/di/injection_container.dart';
 import 'package:transportation_app/core/notfications/signalr_service.dart';
 import 'package:transportation_app/core/utils/token_manager.dart';
+import 'package:transportation_app/core/l10n/locale_cubit.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -61,6 +62,7 @@ class _LoginScreenState extends State<LoginScreen> {
               tokenFactory: () async =>
                   await sl<TokenManager>().getAccessToken() ?? '',
             );
+            context.read<LocaleCubit>().syncLanguageWithBackend();
             context.pushNamedAndRemoveuntil(
               AppRoutes.homeScreen,
               predicate: (_) => false,
@@ -100,21 +102,21 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: Column(
                   children: [
                     AppTextFormField(
-                      label:           l10n.emailLabel,
-                      hint:            l10n.emailHint,
-                      prefixIcon:      Icons.email,
-                      keyboardType:    TextInputType.emailAddress,
-                      controller:      _emailController,
+                      label: l10n.emailLabel,
+                      hint: l10n.emailHint,
+                      prefixIcon: Icons.email,
+                      keyboardType: TextInputType.emailAddress,
+                      controller: _emailController,
                       textInputAction: TextInputAction.next,
                       validator: AppValidators.email,
                     ),
                     const SizedBox(height: 20),
                     AppTextFormField(
-                      label:           l10n.passwordLabel,
-                      hint:            l10n.passwordHint,
-                      prefixIcon:      Icons.lock,
-                      obscureText:     true,
-                      controller:      _passwordController,
+                      label: l10n.passwordLabel,
+                      hint: l10n.passwordHint,
+                      prefixIcon: Icons.lock,
+                      obscureText: true,
+                      controller: _passwordController,
                       textInputAction: TextInputAction.done,
                       onFieldSubmitted: (_) => _handleLogin(),
                       validator: (value) {
@@ -133,7 +135,7 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               const SizedBox(height: 20),
               AppGradientButton(
-                label:     l10n.signIn,
+                label: l10n.signIn,
                 onPressed: _handleLogin,
                 isLoading: state is LoginLoading,
               ),
