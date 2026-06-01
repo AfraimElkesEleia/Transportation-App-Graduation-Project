@@ -101,19 +101,6 @@ class SeatMapCubit extends Cubit<SeatMapState> {
         final cart = await datasource.getCart();
         await datasource.checkout(pointsToRedeem: pointsToRedeem);
         
-        if (cart != null) {
-          for (final item in cart.items) {
-            if (item.boardingTime != null) {
-              try {
-                await LocalAlarmScheduler.scheduleBoardingReminder(
-                  bookingId: item.bookingId.toString(),
-                  boardingTime: item.boardingTime!,
-                  routeLabel: '${item.originGov} → ${item.destinationGov}',
-                );
-              } catch (_) {}
-            }
-          }
-        }
         await LocalAlarmScheduler.cancelCartExpiry();
         
         if (!isClosed) emit(CartSuccess());

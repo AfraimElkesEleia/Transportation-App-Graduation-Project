@@ -60,46 +60,4 @@ class LocalAlarmScheduler {
   static Future<void> cancelCartExpiry() async {
     await _plugin.cancel(id: 1001);
   }
-
-  static Future<void> scheduleBoardingReminder({
-    required String bookingId,
-    required DateTime boardingTime,
-    required String routeLabel,
-  }) async {
-    await _initTimezone();
-    await NotficationPermissionManager.requestExactAlarmIfNeeded();
-    final localBoardingTime = boardingTime.isUtc
-        ? boardingTime.toLocal()
-        : boardingTime;
-    DateTime triggerAt = localBoardingTime.subtract(
-      const Duration(minutes: 30),
-    );
-    if (triggerAt.isBefore(DateTime.now())) {
-      if (localBoardingTime.isBefore(DateTime.now())) return;
-      triggerAt = DateTime.now().add(const Duration(seconds: 5));
-    }
-    final notificationId = bookingId.hashCode;
-    await _plugin.zonedSchedule(
-      id: notificationId,
-      title: '🚌 Boarding Soon!',
-      body: '$routeLabel departs in 30 minutes.',
-      scheduledDate: tz.TZDateTime.from(triggerAt, tz.local),
-      notificationDetails: const NotificationDetails(
-        android: AndroidNotificationDetails(
-          'rehla_urgent',
-          'Urgent Alerts',
-          channelDescription: 'Urgent cart expiry and boarding reminders',
-          importance: Importance.max,
-          priority: Priority.max,
-        ),
-        iOS: DarwinNotificationDetails(),
-      ),
-      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-      payload: 'booking_$bookingId',
-    );
-  }
-
-  static Future<void> cancelBoardingReminder(String bookingId) async {
-    await _plugin.cancel(id: bookingId.hashCode);
-  }
 }

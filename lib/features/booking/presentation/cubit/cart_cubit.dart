@@ -40,17 +40,6 @@ class CartCubit extends Cubit<CartState> {
     try {
       await datasource.checkout(pointsToRedeem: pointsToRedeem);
       await LocalAlarmScheduler.cancelCartExpiry();
-      if (currentState is CartLoaded) {
-        for (final item in currentState.cart.items) {
-          if (item.boardingTime != null) {
-            await LocalAlarmScheduler.scheduleBoardingReminder(
-              bookingId: item.bookingId.toString(),
-              boardingTime: item.boardingTime!,
-              routeLabel: '${item.originGov} → ${item.destinationGov}',
-            );
-          }
-        }
-      }
       emit(CheckoutSuccess());
     } on ServerException catch (e) {
       emit(CheckoutError(e.message));
@@ -65,7 +54,6 @@ class CartCubit extends Cubit<CartState> {
     emit(CartItemCancelling(bookingId));
     try {
       await datasource.cancelCartItem(bookingId);
-      await LocalAlarmScheduler.cancelBoardingReminder(bookingId.toString());
       await fetchCart();
     } on ServerException catch (e) {
       emit(CartItemCancelError(e.message));
