@@ -1485,4 +1485,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get refundRequesting => 'Submitting refund request...';
+
+  @override
+  String get refundAccepted => 'Refund Accepted';
+
+  @override
+  String get refundRejected => 'Refund Rejected';
 }

@@ -29,6 +29,9 @@ class TicketDetailCard extends StatelessWidget {
   }
 
   Color get _statusColor {
+    if (ticket.refundStatus == 'Accepted' || ticket.refundStatus == 'Approved') {
+      return Colors.red;
+    }
     switch (ticket.status.toLowerCase()) {
       case 'confirmed':
         return ColorsManager.successGreen;
@@ -44,6 +47,9 @@ class TicketDetailCard extends StatelessWidget {
   String _getLocalizedStatus(BuildContext context, String status) {
     final l10n = AppLocalizations.of(context);
     if (l10n == null) return status;
+    if (ticket.refundStatus == 'Accepted' || ticket.refundStatus == 'Approved') {
+      return l10n.statusCancelled;
+    }
     switch (status.toLowerCase()) {
       case 'confirmed':
         return l10n.statusConfirmed;

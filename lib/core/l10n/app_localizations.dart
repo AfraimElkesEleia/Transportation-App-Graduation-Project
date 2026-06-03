@@ -2839,6 +2839,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Submitting refund request...'**
   String get refundRequesting;
+
+  /// No description provided for @refundAccepted.
+  ///
+  /// In en, this message translates to:
+  /// **'Refund Accepted'**
+  String get refundAccepted;
+
+  /// No description provided for @refundRejected.
+  ///
+  /// In en, this message translates to:
+  /// **'Refund Rejected'**
+  String get refundRejected;
 }
 
 class _AppLocalizationsDelegate

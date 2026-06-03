@@ -21,6 +21,34 @@ class TicketDetailsScreen extends StatefulWidget {
 class _TicketDetailsScreenState extends State<TicketDetailsScreen> {
   late TicketEntity _ticket;
 
+  Color get _statusColor {
+    if (_ticket.refundStatus == 'Accepted' || _ticket.refundStatus == 'Approved' || _ticket.status.toLowerCase() == 'cancelled') {
+      return Colors.red;
+    }
+    if (_ticket.status.toLowerCase() == 'completed') {
+      return ColorsManager.brightBlue;
+    }
+    return ColorsManager.successGreen;
+  }
+
+  String _getLocalizedStatus(AppLocalizations l10n, String status) {
+    if (_ticket.refundStatus == 'Accepted' || _ticket.refundStatus == 'Approved') {
+      return l10n.statusCancelled;
+    }
+    switch (status.toLowerCase()) {
+      case 'confirmed':
+        return l10n.statusConfirmed;
+      case 'pending':
+        return l10n.statusPending;
+      case 'completed':
+        return l10n.statusCompleted;
+      case 'cancelled':
+        return l10n.statusCancelled;
+      default:
+        return status;
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -165,12 +193,11 @@ class _TicketDetailsScreenState extends State<TicketDetailsScreen> {
       },
       builder: (context, state) {
         final isRequesting = state is RefundRequestingState;
-        final alreadyRequested = _ticket.isRefundRequested;
 
-        // Show refund button only for confirmed upcoming trips
+        // Show refund button only for confirmed upcoming trips or if refund is requested/accepted/rejected
         final canRequestRefund =
-            _ticket.status == 'Confirmed' &&
-            _ticket.boardingTime.isAfter(DateTime.now());
+            _ticket.boardingTime.isAfter(DateTime.now()) &&
+            (_ticket.status == 'Confirmed' || _ticket.refundStatus != null);
 
         return Scaffold(
           backgroundColor: ColorsManager.darkBlue,
@@ -227,20 +254,20 @@ class _TicketDetailsScreenState extends State<TicketDetailsScreen> {
                               vertical: 4,
                             ),
                             decoration: BoxDecoration(
-                              color: ColorsManager.successGreen.withOpacity(
+                              color: _statusColor.withOpacity(
                                 0.15,
                               ),
                               borderRadius: BorderRadius.circular(8),
                               border: Border.all(
-                                color: ColorsManager.successGreen.withOpacity(
+                                color: _statusColor.withOpacity(
                                   0.4,
                                 ),
                               ),
                             ),
                             child: Text(
-                              _ticket.status,
-                              style: const TextStyle(
-                                color: ColorsManager.successGreen,
+                              _getLocalizedStatus(l10n, _ticket.status),
+                              style: TextStyle(
+                                color: _statusColor,
                                 fontSize: 12,
                                 fontWeight: FontWeight.w700,
                               ),
@@ -442,7 +469,7 @@ class _TicketDetailsScreenState extends State<TicketDetailsScreen> {
                     child: _RefundButton(
                       l10n: l10n,
                       isRequesting: isRequesting,
-                      alreadyRequested: alreadyRequested,
+                      refundStatus: _ticket.refundStatus,
                       onPressed: () async {
                         final confirmed = await _showRefundConfirmDialog(l10n);
                         if (confirmed && context.mounted) {
@@ -593,19 +620,20 @@ class _TicketDetailsScreenState extends State<TicketDetailsScreen> {
 class _RefundButton extends StatelessWidget {
   final AppLocalizations l10n;
   final bool isRequesting;
-  final bool alreadyRequested;
+  final String? refundStatus;
   final VoidCallback onPressed;
 
   const _RefundButton({
     required this.l10n,
     required this.isRequesting,
-    required this.alreadyRequested,
+    this.refundStatus,
     required this.onPressed,
   });
 
   @override
   Widget build(BuildContext context) {
-    final isDisabled = alreadyRequested || isRequesting;
+    final hasStatus = refundStatus == 'Requested' || refundStatus == 'Accepted' || refundStatus == 'Approved' || refundStatus == 'Rejected';
+    final isDisabled = hasStatus || isRequesting;
 
     return AnimatedContainer(
       duration: const Duration(milliseconds: 300),
@@ -657,7 +685,37 @@ class _RefundButton extends StatelessWidget {
                       fontSize: 15,
                     ),
                   ),
-                ] else if (alreadyRequested) ...[
+                ] else if (refundStatus == 'Accepted' || refundStatus == 'Approved') ...[
+                  const Icon(
+                    Icons.check_circle,
+                    color: ColorsManager.successGreen,
+                    size: 20,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    l10n.refundAccepted,
+                    style: const TextStyle(
+                      color: ColorsManager.successGreen,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 15,
+                    ),
+                  ),
+                ] else if (refundStatus == 'Rejected') ...[
+                  const Icon(
+                    Icons.cancel,
+                    color: Colors.red,
+                    size: 20,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    l10n.refundRejected,
+                    style: const TextStyle(
+                      color: Colors.red,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 15,
+                    ),
+                  ),
+                ] else if (refundStatus == 'Requested') ...[
                   const Icon(
                     Icons.check_circle_outline,
                     color: Colors.white54,

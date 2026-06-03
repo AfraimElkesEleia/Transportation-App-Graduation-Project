@@ -5,6 +5,7 @@ import 'package:transportation_app/core/routing/routes.dart';
 import 'package:transportation_app/core/theming/colors.dart';
 import 'package:transportation_app/features/booking/presentation/cubit/seat_map_cubit.dart';
 import 'package:transportation_app/features/booking/presentation/cubit/seat_map_state.dart';
+import 'package:transportation_app/features/profile/domain/entities/profile_entity.dart';
 import 'package:transportation_app/features/profile/presentation/cubit/profile_cubit/profile_cubit.dart';
 import 'package:transportation_app/features/profile/presentation/cubit/profile_cubit/profile_states.dart';
 import 'package:transportation_app/features/search/domain/entities/coach_class_entity.dart';
@@ -51,6 +52,42 @@ class _PassengerFormScreenState extends State<PassengerFormScreen> {
     // Listen on first passenger fields to reset _autofilled badge when user edits
     _controllers.first.nameController.addListener(_onFirstChanged);
     _controllers.first.phoneController.addListener(_onFirstChanged);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        final profileState = context.read<ProfileCubit>().state;
+        if (profileState is ProfileLoaded) {
+          _prefillFromProfile(profileState.profile);
+        }
+      }
+    });
+  }
+
+  void _prefillFromProfile(ProfileEntity profile) {
+    if (_controllers.isNotEmpty) {
+      final first = _controllers.first;
+      if (first.nameController.text.trim().isEmpty) {
+        first.nameController.text = profile.fullName;
+      }
+      if (first.phoneController.text.trim().isEmpty) {
+        first.phoneController.text = profile.phoneNumber;
+      }
+      if (first.emailController.text.trim().isEmpty) {
+        first.emailController.text = profile.email;
+      }
+      if (widget.isTrain) {
+        if (profile.idNumber != null && profile.idNumber!.isNotEmpty) {
+          if (first.idController.text.trim().isEmpty) {
+            first.idController.text = profile.idNumber!;
+          }
+          if (profile.idType != null) {
+            setState(() {
+              first.selectedIdType = profile.idType == 2 ? 'Passport' : 'NationalId';
+            });
+          }
+        }
+      }
+    }
   }
 
   void _onFirstChanged() {
@@ -193,46 +230,57 @@ class _PassengerFormScreenState extends State<PassengerFormScreen> {
     return Scaffold(
       backgroundColor: ColorsManager.seatBg,
       body: SafeArea(
-        child: BlocListener<SeatMapCubit, SeatMapState>(
-          listener: (context, state) {
-            if (state is CartSuccess) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Success!'),
-                  backgroundColor: Colors.green,
-                ),
-              );
-              Navigator.pushNamedAndRemoveUntil(
-                context,
-                AppRoutes.cartScreen,
-                (route) => route.isFirst,
-              );
-            }
-            if (state is CartError) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(state.message),
-                  backgroundColor: Colors.red,
-                ),
-              );
-            }
-            if (state is CartAddedButCheckoutFailed) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(
-                    'Ticket added to cart, but checkout failed: ${state.message}',
-                  ),
-                  backgroundColor: Colors.orange,
-                  duration: const Duration(seconds: 4),
-                ),
-              );
-              Navigator.pushNamedAndRemoveUntil(
-                context,
-                AppRoutes.cartScreen,
-                (route) => route.isFirst,
-              );
-            }
-          },
+        child: MultiBlocListener(
+          listeners: [
+            BlocListener<SeatMapCubit, SeatMapState>(
+              listener: (context, state) {
+                if (state is CartSuccess) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Success!'),
+                      backgroundColor: Colors.green,
+                    ),
+                  );
+                  Navigator.pushNamedAndRemoveUntil(
+                    context,
+                    AppRoutes.cartScreen,
+                    (route) => route.isFirst,
+                  );
+                }
+                if (state is CartError) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(state.message),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
+                if (state is CartAddedButCheckoutFailed) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        'Ticket added to cart, but checkout failed: ${state.message}',
+                      ),
+                      backgroundColor: Colors.orange,
+                      duration: const Duration(seconds: 4),
+                    ),
+                  );
+                  Navigator.pushNamedAndRemoveUntil(
+                    context,
+                    AppRoutes.cartScreen,
+                    (route) => route.isFirst,
+                  );
+                }
+              },
+            ),
+            BlocListener<ProfileCubit, ProfileState>(
+              listener: (context, state) {
+                if (state is ProfileLoaded) {
+                  _prefillFromProfile(state.profile);
+                }
+              },
+            ),
+          ],
           child: Column(
             children: [
               // ── App bar ──

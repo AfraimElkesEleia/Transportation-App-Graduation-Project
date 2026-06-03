@@ -198,14 +198,14 @@ class _MyTicketsState extends State<MyTickets>
                       tabChildren = [errorView, errorView, errorView];
                     } else if (state is TicketsLoadedState) {
                       final upcoming = state.tickets
-                          .where((t) => t.isUpcoming)
+                          .where((t) => t.isUpcoming && t.refundStatus != 'Accepted' && t.refundStatus != 'Approved')
                           .toList();
 
                       final activeNow = state.tickets
-                          .where((t) => t.isActiveNow)
+                          .where((t) => t.isActiveNow && t.refundStatus != 'Accepted' && t.refundStatus != 'Approved')
                           .toList();
                       final past = state.tickets
-                          .where((t) => t.isPast)
+                          .where((t) => t.isPast || t.refundStatus == 'Accepted' || t.refundStatus == 'Approved')
                           .toList();
 
                       tabChildren = [

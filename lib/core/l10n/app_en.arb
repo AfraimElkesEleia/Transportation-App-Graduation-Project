@@ -757,5 +757,7 @@
   "refundConfirmTitle": "Request Refund?",
   "refundConfirmBody": "Are you sure you want to request a refund for this booking? Your wallet will be credited once the request is approved.",
   "refundSubmitted": "Refund request submitted successfully.",
-  "refundRequesting": "Submitting refund request..."
+  "refundRequesting": "Submitting refund request...",
+  "refundAccepted": "Refund Accepted",
+  "refundRejected": "Refund Rejected"
 }

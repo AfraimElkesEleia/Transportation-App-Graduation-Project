@@ -7,6 +7,9 @@ import 'package:transportation_app/core/theming/colors.dart';
 import 'package:transportation_app/features/multidestination/presentation/cubit/multi_destination_booking_cubit.dart';
 import 'package:transportation_app/features/multidestination/presentation/cubit/multi_destination_booking_state.dart';
 import 'package:transportation_app/features/multidestination/presentation/screens/multidestination_summary_screen.dart';
+import 'package:transportation_app/features/profile/domain/entities/profile_entity.dart';
+import 'package:transportation_app/features/profile/presentation/cubit/profile_cubit/profile_cubit.dart';
+import 'package:transportation_app/features/profile/presentation/cubit/profile_cubit/profile_states.dart';
 import 'package:transportation_app/features/search/domain/entities/trip_result_entity.dart';
 
 class MultiDestinationPassengerFormScreen extends StatefulWidget {
@@ -48,6 +51,43 @@ class _MultiDestinationPassengerFormScreenState
       _legCount,
       (i) => List.generate(_seatCounts[i], (_) => _PassengerControllers()),
     );
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        final profileState = context.read<ProfileCubit>().state;
+        if (profileState is ProfileLoaded) {
+          _prefillFromProfile(profileState.profile);
+        }
+      }
+    });
+  }
+
+  void _prefillFromProfile(ProfileEntity profile) {
+    if (_controllers.isNotEmpty && _controllers.first.isNotEmpty) {
+      final first = _controllers.first.first;
+      if (first.nameController.text.trim().isEmpty) {
+        first.nameController.text = profile.fullName;
+      }
+      if (first.phoneController.text.trim().isEmpty) {
+        first.phoneController.text = profile.phoneNumber;
+      }
+      if (first.emailController.text.trim().isEmpty) {
+        first.emailController.text = profile.email;
+      }
+      final firstLegIsTrain = _isTrainPerLeg.isNotEmpty && _isTrainPerLeg.first;
+      if (firstLegIsTrain) {
+        if (profile.idNumber != null && profile.idNumber!.isNotEmpty) {
+          if (first.nationalIdController.text.trim().isEmpty) {
+            first.nationalIdController.text = profile.idNumber!;
+          }
+          if (profile.idType != null) {
+            setState(() {
+              first.selectedIdType = profile.idType == 2 ? 'Passport' : 'NationalId';
+            });
+          }
+        }
+      }
+    }
   }
 
   bool _isTrain(TripResultEntity? trip) {
@@ -127,114 +167,120 @@ class _MultiDestinationPassengerFormScreenState
         ),
         iconTheme: const IconThemeData(color: Colors.white),
       ),
-      body:
-          BlocConsumer<
-            MultiDestinationBookingCubit,
-            MultiDestinationBookingState
-          >(
-            listenWhen: (prev, current) =>
-                prev.isAddingToCart != current.isAddingToCart ||
-                current.cartSuccess ||
-                current.cartError != null,
-            listener: (context, state) {
-              if (state.cartSuccess) {
-                Navigator.pushNamedAndRemoveUntil(
-                  context,
-                  AppRoutes.cartScreen,
-                  (route) => route.settings.name == AppRoutes.homeScreen,
-                );
-              } else if (state.cartError != null) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(state.cartError!),
-                    backgroundColor: Colors.red,
-                  ),
-                );
-              }
-            },
-            builder: (context, state) {
-              return SafeArea(
-                child: Form(
-                  key: _formKey,
-                  child: Column(
-                    children: [
-                      Expanded(
-                        child: ListView(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 20,
-                            vertical: 16,
-                          ),
-                          children: [
-                            for (
-                              int legIndex = 0;
-                              legIndex < _legCount;
-                              legIndex++
-                            ) ...[
-                              // ── Leg header ──────────────────────────────
-                              _LegHeader(
-                                legIndex: legIndex,
-                                seatCount: _seatCounts[legIndex],
-                                summary: state.legSummaries[legIndex],
-                              ),
-                              const SizedBox(height: 10),
-
-                              // ── Passenger cards for this leg ─────────────
-                              for (
-                                int pIndex = 0;
-                                pIndex < _seatCounts[legIndex];
-                                pIndex++
-                              )
-                                _PassengerCard(
-                                  index: pIndex + 1,
-                                  seatNumber: state
-                                      .selectedSeats[legIndex]![pIndex]
-                                      .toString(),
-                                  controllers: _controllers[legIndex][pIndex],
-                                  isTrain: _isTrainPerLeg[legIndex],
-                                ),
-
-                              const SizedBox(height: 8),
-                            ],
-                          ],
-                        ),
-                      ),
-
-                      // ── Submit button ─────────────────────────────────────
-                      Container(
-                        padding: const EdgeInsets.all(16),
-                        color: ColorsManager.surfaceDark,
-                        child: SizedBox(
-                          width: double.infinity,
-                          height: 52,
-                          child: ElevatedButton(
-                            onPressed: state.isAddingToCart ? null : _submit,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: ColorsManager.buttonBlue,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(26),
-                              ),
-                            ),
-                            child: state.isAddingToCart
-                                ? const CircularProgressIndicator(
-                                    color: Colors.white,
-                                  )
-                                : Text(
-                                    AppLocalizations.of(context)!.addToCart,
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
+      body: BlocListener<ProfileCubit, ProfileState>(
+        listener: (context, profileState) {
+          if (profileState is ProfileLoaded) {
+            _prefillFromProfile(profileState.profile);
+          }
+        },
+        child: BlocConsumer<
+          MultiDestinationBookingCubit,
+          MultiDestinationBookingState
+        >(
+          listenWhen: (prev, current) =>
+              prev.isAddingToCart != current.isAddingToCart ||
+              current.cartSuccess ||
+              current.cartError != null,
+          listener: (context, state) {
+            if (state.cartSuccess) {
+              Navigator.pushNamedAndRemoveUntil(
+                context,
+                AppRoutes.cartScreen,
+                (route) => route.settings.name == AppRoutes.homeScreen,
+              );
+            } else if (state.cartError != null) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(state.cartError!),
+                  backgroundColor: Colors.red,
                 ),
               );
-            },
-          ),
+            }
+          },
+          builder: (context, state) {
+            return SafeArea(
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  children: [
+                    Expanded(
+                      child: ListView(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 16,
+                        ),
+                        children: [
+                          for (
+                            int legIndex = 0;
+                            legIndex < _legCount;
+                            legIndex++
+                          ) ...[
+                            // ── Leg header ──────────────────────────────
+                            _LegHeader(
+                              legIndex: legIndex,
+                              seatCount: _seatCounts[legIndex],
+                              summary: state.legSummaries[legIndex],
+                            ),
+                            const SizedBox(height: 10),
+
+                            // ── Passenger cards for this leg ─────────────
+                            for (
+                              int pIndex = 0;
+                              pIndex < _seatCounts[legIndex];
+                              pIndex++
+                            )
+                              _PassengerCard(
+                                index: pIndex + 1,
+                                seatNumber: state
+                                    .selectedSeats[legIndex]![pIndex]
+                                    .toString(),
+                                controllers: _controllers[legIndex][pIndex],
+                                isTrain: _isTrainPerLeg[legIndex],
+                              ),
+
+                            const SizedBox(height: 8),
+                          ],
+                        ],
+                      ),
+                    ),
+
+                    // ── Submit button ─────────────────────────────────────
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      color: ColorsManager.surfaceDark,
+                      child: SizedBox(
+                        width: double.infinity,
+                        height: 52,
+                        child: ElevatedButton(
+                          onPressed: state.isAddingToCart ? null : _submit,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: ColorsManager.buttonBlue,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(26),
+                            ),
+                          ),
+                          child: state.isAddingToCart
+                              ? const CircularProgressIndicator(
+                                  color: Colors.white,
+                                )
+                              : Text(
+                                  AppLocalizations.of(context)!.addToCart,
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        ),
+      ),
     );
   }
 }

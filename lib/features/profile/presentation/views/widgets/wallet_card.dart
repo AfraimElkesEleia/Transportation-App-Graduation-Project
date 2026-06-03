@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:transportation_app/core/theming/colors.dart';
-import 'package:transportation_app/features/my_tickets/presentation/cubit/my_tickets_cubit.dart';
-import 'package:transportation_app/features/my_tickets/presentation/cubit/my_tickets_states.dart';
+import 'package:transportation_app/features/profile/presentation/cubit/profile_cubit/profile_cubit.dart';
+import 'package:transportation_app/features/profile/presentation/cubit/profile_cubit/profile_states.dart';
 
 /// Premium wallet balance card with Charge + History actions.
 class WalletCard extends StatelessWidget {
-  const WalletCard({super.key});
+  final double? balance;
+  const WalletCard({super.key, this.balance});
 
   void _showChargeSheet(BuildContext context) {
     showModalBottomSheet(
@@ -14,20 +15,20 @@ class WalletCard extends StatelessWidget {
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (_) => BlocProvider.value(
-        value: context.read<MyTicketsCubit>(),
+        value: context.read<ProfileCubit>(),
         child: const _ChargeWalletSheet(),
       ),
     );
   }
 
   void _showHistorySheet(BuildContext context) {
-    context.read<MyTicketsCubit>().fetchWalletHistory();
+    context.read<ProfileCubit>().loadWalletHistory();
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (_) => BlocProvider.value(
-        value: context.read<MyTicketsCubit>(),
+        value: context.read<ProfileCubit>(),
         child: const _WalletHistorySheet(),
       ),
     );
@@ -81,27 +82,14 @@ class WalletCard extends StatelessWidget {
           const SizedBox(height: 20),
 
           // Balance
-          BlocBuilder<MyTicketsCubit, MyTicketsState>(
+          BlocBuilder<ProfileCubit, ProfileState>(
             buildWhen: (_, c) =>
-                c is WalletBalanceLoadingState ||
-                c is WalletBalanceLoadedState ||
-                c is WalletDepositedState ||
-                c is WalletBalanceErrorState,
+                c is ProfileLoading ||
+                c is ProfileLoaded,
             builder: (context, state) {
-              if (state is WalletBalanceLoadingState) {
-                return const SizedBox(
-                  height: 52,
-                  child: Center(
-                    child: CircularProgressIndicator(
-                        strokeWidth: 2, color: ColorsManager.accentCyan),
-                  ),
-                );
-              }
-              final balance = state is WalletBalanceLoadedState
-                  ? state.balance
-                  : state is WalletDepositedState
-                      ? state.newBalance
-                      : context.read<MyTicketsCubit>().cachedBalance;
+              final bal = state is ProfileLoaded
+                  ? (state.profile.walletBalance ?? 0.0)
+                  : (balance ?? 0.0);
 
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -113,7 +101,7 @@ class WalletCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       Text(
-                        balance.toStringAsFixed(2),
+                        bal.toStringAsFixed(2),
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 36,
@@ -265,7 +253,7 @@ class _ChargeWalletSheetState extends State<_ChargeWalletSheet>
 
   void _submit() {
     if (!_formKey.currentState!.validate()) return;
-    final cubit = context.read<MyTicketsCubit>();
+    final cubit = context.read<ProfileCubit>();
     if (_tab.index == 0) {
       Navigator.pop(context);
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
@@ -288,15 +276,14 @@ class _ChargeWalletSheetState extends State<_ChargeWalletSheet>
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<MyTicketsCubit, MyTicketsState>(
+    return BlocListener<ProfileCubit, ProfileState>(
       listener: (context, state) {
-        if (state is WalletDepositedState) {
+        if (state is WalletDepositSuccess) {
           Navigator.pop(context);
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-              content: Text(
-                  'Wallet charged! New balance: ${state.newBalance.toStringAsFixed(2)} EGP'),
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+              content: Text('Wallet charged successfully!'),
               backgroundColor: Colors.green));
-        } else if (state is WalletDepositErrorState) {
+        } else if (state is WalletDepositFailure) {
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
               content: Text(state.message), backgroundColor: Colors.red));
         }
@@ -361,9 +348,9 @@ class _ChargeWalletSheetState extends State<_ChargeWalletSheet>
               ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(20, 0, 20, 32),
-                child: BlocBuilder<MyTicketsCubit, MyTicketsState>(
+                child: BlocBuilder<ProfileCubit, ProfileState>(
                   builder: (context, state) {
-                    final loading = state is WalletDepositingState;
+                    final loading = state is WalletDepositLoading;
                     return SizedBox(
                       width: double.infinity,
                       height: 52,
@@ -689,24 +676,24 @@ class _WalletHistorySheet extends StatelessWidget {
                     fontWeight: FontWeight.bold)),
             const SizedBox(height: 16),
             Expanded(
-              child: BlocBuilder<MyTicketsCubit, MyTicketsState>(
+              child: BlocBuilder<ProfileCubit, ProfileState>(
                 buildWhen: (_, c) =>
-                    c is WalletHistoryLoadingState ||
-                    c is WalletHistoryLoadedState ||
-                    c is WalletHistoryErrorState,
+                    c is WalletHistoryLoading ||
+                    c is WalletHistoryLoaded ||
+                    c is WalletHistoryError,
                 builder: (context, state) {
-                  if (state is WalletHistoryLoadingState) {
+                  if (state is WalletHistoryLoading) {
                     return const Center(
                         child: CircularProgressIndicator(
                             color: ColorsManager.accentCyan));
                   }
-                  if (state is WalletHistoryErrorState) {
+                  if (state is WalletHistoryError) {
                     return Center(
                         child: Text(state.message,
                             style: const TextStyle(
                                 color: Colors.white54)));
                   }
-                  if (state is WalletHistoryLoadedState) {
+                  if (state is WalletHistoryLoaded) {
                     if (state.transactions.isEmpty) {
                       return const Center(
                           child: Text('No transactions yet',

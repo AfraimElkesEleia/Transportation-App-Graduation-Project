@@ -251,9 +251,16 @@ class AppRouter {
         final args = settings.arguments as Map<String, dynamic>;
         final state = args['state'] as dynamic;
         return MaterialPageRoute(
-          builder: (_) => BlocProvider(
-            create: (_) =>
-                SeatMapCubit(datasource: sl<BookingRemoteDatasource>()),
+          builder: (_) => MultiBlocProvider(
+            providers: [
+              BlocProvider(
+                create: (_) =>
+                    SeatMapCubit(datasource: sl<BookingRemoteDatasource>()),
+              ),
+              BlocProvider(
+                create: (_) => sl<ProfileCubit>()..loadProfile(),
+              ),
+            ],
             child: IndirectPassengerFormScreen(bookingState: state),
           ),
         );

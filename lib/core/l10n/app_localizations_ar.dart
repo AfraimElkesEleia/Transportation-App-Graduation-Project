@@ -1480,4 +1480,10 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get refundRequesting => 'جاري إرسال طلب الاسترداد...';
+
+  @override
+  String get refundAccepted => 'تم قبول الاسترداد';
+
+  @override
+  String get refundRejected => 'تم رفض الاسترداد';
 }

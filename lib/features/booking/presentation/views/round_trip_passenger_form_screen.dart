@@ -7,6 +7,7 @@ import 'package:transportation_app/core/theming/colors.dart';
 import 'package:transportation_app/features/booking/presentation/cubit/round_trip_booking_cubit.dart';
 import 'package:transportation_app/features/booking/presentation/cubit/round_trip_booking_state.dart';
 import 'package:transportation_app/features/booking/presentation/views/widgets/points_redemption_widget.dart';
+import 'package:transportation_app/features/profile/domain/entities/profile_entity.dart';
 import 'package:transportation_app/features/profile/presentation/cubit/profile_cubit/profile_cubit.dart';
 import 'package:transportation_app/features/profile/presentation/cubit/profile_cubit/profile_states.dart';
 import 'package:transportation_app/features/search/domain/entities/trip_result_entity.dart';
@@ -39,6 +40,71 @@ class _RoundTripPassengerFormScreenState extends State<RoundTripPassengerFormScr
 
     _outboundControllers = List.generate(_outboundCount, (_) => _PassengerControllers());
     _returnControllers   = List.generate(_returnCount,   (_) => _PassengerControllers());
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        final profileState = context.read<ProfileCubit>().state;
+        if (profileState is ProfileLoaded) {
+          _prefillFromProfile(profileState.profile);
+        }
+      }
+    });
+  }
+
+  void _prefillFromProfile(ProfileEntity profile) {
+    final state = context.read<RoundTripBookingCubit>().state;
+    final isTrain = _isTrain(state.selectedOutboundTrip) ||
+                    _isTrain(state.selectedReturnTrip);
+
+    if (_outboundControllers.isNotEmpty) {
+      final first = _outboundControllers.first;
+      if (first.nameController.text.trim().isEmpty) {
+        first.nameController.text = profile.fullName;
+      }
+      if (first.phoneController.text.trim().isEmpty) {
+        first.phoneController.text = profile.phoneNumber;
+      }
+      if (first.emailController.text.trim().isEmpty) {
+        first.emailController.text = profile.email;
+      }
+      if (isTrain) {
+        if (profile.idNumber != null && profile.idNumber!.isNotEmpty) {
+          if (first.idController.text.trim().isEmpty) {
+            first.idController.text = profile.idNumber!;
+          }
+          if (profile.idType != null) {
+            setState(() {
+              first.selectedIdType = profile.idType == 2 ? 'Passport' : 'NationalId';
+            });
+          }
+        }
+      }
+    }
+
+    if (_returnControllers.isNotEmpty) {
+      final first = _returnControllers.first;
+      if (first.nameController.text.trim().isEmpty) {
+        first.nameController.text = profile.fullName;
+      }
+      if (first.phoneController.text.trim().isEmpty) {
+        first.phoneController.text = profile.phoneNumber;
+      }
+      if (first.emailController.text.trim().isEmpty) {
+        first.emailController.text = profile.email;
+      }
+      if (isTrain) {
+        if (profile.idNumber != null && profile.idNumber!.isNotEmpty) {
+          if (first.idController.text.trim().isEmpty) {
+            first.idController.text = profile.idNumber!;
+          }
+          if (profile.idType != null) {
+            setState(() {
+              first.selectedIdType = profile.idType == 2 ? 'Passport' : 'NationalId';
+            });
+          }
+        }
+      }
+    }
   }
 
   @override
@@ -120,7 +186,13 @@ class _RoundTripPassengerFormScreenState extends State<RoundTripPassengerFormScr
     return Scaffold(
       backgroundColor: ColorsManager.seatBg,
       body: SafeArea(
-        child: BlocConsumer<RoundTripBookingCubit, RoundTripBookingState>(
+        child: BlocListener<ProfileCubit, ProfileState>(
+          listener: (context, profileState) {
+            if (profileState is ProfileLoaded) {
+              _prefillFromProfile(profileState.profile);
+            }
+          },
+          child: BlocConsumer<RoundTripBookingCubit, RoundTripBookingState>(
           listenWhen: (prev, current) =>
               prev.cartError != current.cartError ||
               prev.cartSuccess != current.cartSuccess,
@@ -232,7 +304,8 @@ class _RoundTripPassengerFormScreenState extends State<RoundTripPassengerFormScr
           },
         ),
       ),
-    );
+    ),
+  );
   }
 }
 
