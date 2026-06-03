@@ -2851,6 +2851,78 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Refund Rejected'**
   String get refundRejected;
+
+  /// No description provided for @expires.
+  ///
+  /// In en, this message translates to:
+  /// **'Expires'**
+  String get expires;
+
+  /// No description provided for @expired.
+  ///
+  /// In en, this message translates to:
+  /// **'Expired'**
+  String get expired;
+
+  /// No description provided for @cancelTripTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel this trip?'**
+  String get cancelTripTitle;
+
+  /// No description provided for @cancelTripMsg.
+  ///
+  /// In en, this message translates to:
+  /// **'Your seat hold will be released and inventory restored. This cannot be undone.'**
+  String get cancelTripMsg;
+
+  /// No description provided for @keepIt.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep It'**
+  String get keepIt;
+
+  /// No description provided for @cancelTripBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel Trip'**
+  String get cancelTripBtn;
+
+  /// No description provided for @insufficientFunds.
+  ///
+  /// In en, this message translates to:
+  /// **'Insufficient funds.'**
+  String get insufficientFunds;
+
+  /// No description provided for @insufficientFundsDetail.
+  ///
+  /// In en, this message translates to:
+  /// **'Insufficient funds. Your wallet balance is {balance} EGP, but checkout total is {total} EGP.'**
+  String insufficientFundsDetail(String balance, String total);
+
+  /// No description provided for @checkoutFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Checkout failed'**
+  String get checkoutFailed;
+
+  /// No description provided for @ticketAddedButCheckoutFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Ticket added to cart, but checkout failed: {error}'**
+  String ticketAddedButCheckoutFailed(String error);
+
+  /// No description provided for @originalPrice.
+  ///
+  /// In en, this message translates to:
+  /// **'Original price: {price} {currency}'**
+  String originalPrice(String price, String currency);
+
+  /// No description provided for @seatsTakenError.
+  ///
+  /// In en, this message translates to:
+  /// **'One or more selected seats were just taken. Please refresh the seat map.'**
+  String get seatsTakenError;
 }
 
 class _AppLocalizationsDelegate

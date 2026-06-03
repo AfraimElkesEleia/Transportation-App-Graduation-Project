@@ -639,5 +639,17 @@
   "refundSubmitted": "تم إرسال طلب الاسترداد بنجاح.",
   "refundRequesting": "جاري إرسال طلب الاسترداد...",
   "refundAccepted": "تم قبول الاسترداد",
-  "refundRejected": "تم رفض الاسترداد"
+  "refundRejected": "تم رفض الاسترداد",
+  "expires": "ينتهي خلال",
+  "expired": "منتهية",
+  "cancelTripTitle": "إلغاء هذه الرحلة؟",
+  "cancelTripMsg": "سيتم إلغاء حجز المقعد واستعادة المخزون. لا يمكن التراجع عن هذا الإجراء.",
+  "keepIt": "الاحتفاظ بها",
+  "cancelTripBtn": "إلغاء الرحلة",
+  "insufficientFunds": "رصيد غير كافٍ.",
+  "insufficientFundsDetail": "رصيد غير كافٍ. رصيد محفظتك هو {balance} جنيه، ولكن إجمالي الدفع هو {total} جنيه.",
+  "checkoutFailed": "فشل إتمام الدفع",
+  "ticketAddedButCheckoutFailed": "تمت إضافة التذكرة إلى السلة، ولكن فشل إتمام الدفع: {error}",
+  "originalPrice": "السعر الأصلي: {price} {currency}",
+  "seatsTakenError": "تم حجز واحد أو أكثر من المقاعد المختارة للتو. يرجى تحديث خريطة المقاعد."
 }

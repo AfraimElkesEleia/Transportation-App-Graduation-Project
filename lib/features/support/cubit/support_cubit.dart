@@ -39,6 +39,7 @@ class SupportCubit extends Cubit<SupportState> {
           'issueCategory': issueCategory,
         },
       );
+      if (isClosed) return;
       final body = res.data as Map<String, dynamic>;
       if (body['success'] != true) {
         final errors =
@@ -53,6 +54,7 @@ class SupportCubit extends Cubit<SupportState> {
       }
       emit(SupportSuccess());
     } on DioException catch (e) {
+      if (isClosed) return;
       if (e.type == DioExceptionType.connectionError ||
           e.type == DioExceptionType.receiveTimeout ||
           e.type == DioExceptionType.connectionTimeout) {
@@ -67,6 +69,7 @@ class SupportCubit extends Cubit<SupportState> {
       final msg = body?['message'] ?? 'Server error. Please try again.';
       emit(SupportError(msg));
     } catch (_) {
+      if (isClosed) return;
       emit(SupportError('An unexpected error occurred.'));
     }
   }

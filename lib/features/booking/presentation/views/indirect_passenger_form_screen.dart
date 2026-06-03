@@ -25,6 +25,7 @@ class _IndirectPassengerFormScreenState
     extends State<IndirectPassengerFormScreen> {
   final _formKey = GlobalKey<FormState>();
   late final List<_PassengerControllers> _controllers;
+  bool _autofilled = false;
 
   @override
   void initState() {
@@ -33,6 +34,11 @@ class _IndirectPassengerFormScreenState
       widget.bookingState.requiredSeatCount,
       (_) => _PassengerControllers(),
     );
+
+    if (_controllers.isNotEmpty) {
+      _controllers.first.nameController.addListener(_onFirstChanged);
+      _controllers.first.phoneController.addListener(_onFirstChanged);
+    }
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
@@ -73,8 +79,70 @@ class _IndirectPassengerFormScreenState
     }
   }
 
+  void _onFirstChanged() {
+    if (_autofilled) setState(() => _autofilled = false);
+  }
+
+  void _autofill() {
+    final srcName = _controllers.first.nameController.text.trim();
+    final srcPhone = _controllers.first.phoneController.text.trim();
+
+    if (srcName.isEmpty || srcPhone.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Row(
+            children: [
+              const Icon(
+                Icons.warning_amber_rounded,
+                color: Colors.white,
+                size: 18,
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(AppLocalizations.of(context)!.fillNamePhoneFirst),
+              ),
+            ],
+          ),
+          backgroundColor: Colors.orange.shade700,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      return;
+    }
+
+    for (int i = 1; i < _controllers.length; i++) {
+      _controllers[i].nameController.text = srcName;
+      _controllers[i].phoneController.text = srcPhone;
+    }
+    setState(() => _autofilled = true);
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            const Icon(Icons.check_circle, color: Colors.white, size: 18),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                AppLocalizations.of(
+                  context,
+                )!.filledNSeats('${_controllers.length - 1}', srcName),
+              ),
+            ),
+          ],
+        ),
+        backgroundColor: Colors.green.shade700,
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
+
   @override
   void dispose() {
+    if (_controllers.isNotEmpty) {
+      _controllers.first.nameController.removeListener(_onFirstChanged);
+      _controllers.first.phoneController.removeListener(_onFirstChanged);
+    }
     for (final c in _controllers) {
       c.dispose();
     }
@@ -208,16 +276,35 @@ class _IndirectPassengerFormScreenState
             Expanded(
               child: Form(
                 key: _formKey,
-                child: ListView.builder(
+                child: ListView(
                   padding: const EdgeInsets.all(16),
-                  itemCount: widget.bookingState.requiredSeatCount,
-                  itemBuilder: (_, index) {
-                    return _PassengerCard(
-                      label: 'Passenger ${index + 1}',
-                      controllers: _controllers[index],
-                      hasTrainAnywhere: hasTrain,
-                    );
-                  },
+                  children: [
+                    ...() {
+                      final widgets = <Widget>[];
+                      for (int index = 0; index < widget.bookingState.requiredSeatCount; index++) {
+                        widgets.add(
+                          _PassengerCard(
+                            label: 'Passenger ${index + 1}',
+                            controllers: _controllers[index],
+                            hasTrainAnywhere: hasTrain,
+                          ),
+                        );
+
+                        // Show autofill banner after the FIRST card for bus only with 2+ seats
+                        if (index == 0 &&
+                            !hasTrain &&
+                            widget.bookingState.requiredSeatCount > 1) {
+                          widgets.add(
+                            _AutofillBanner(
+                              autofilled: _autofilled,
+                              onAutofill: _autofill,
+                            ),
+                          );
+                        }
+                      }
+                      return widgets;
+                    }(),
+                  ],
                 ),
               ),
             ),
@@ -413,6 +500,99 @@ class _PassengerCardState extends State<_PassengerCard> {
             ),
           ),
           const SizedBox(height: 12),
+        ],
+      ),
+    );
+  }
+}
+
+class _AutofillBanner extends StatelessWidget {
+  final bool autofilled;
+  final VoidCallback onAutofill;
+
+  const _AutofillBanner({required this.autofilled, required this.onAutofill});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      decoration: BoxDecoration(
+        color: ColorsManager.surfaceDark,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: ColorsManager.accentCyan.withAlpha(80),
+          width: 1.2,
+        ),
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: ColorsManager.accentCyan.withAlpha(25),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: const Icon(
+              Icons.family_restroom_rounded,
+              color: ColorsManager.accentCyan,
+              size: 22,
+            ),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  autofilled
+                      ? AppLocalizations.of(context)!.autoFilled
+                      : AppLocalizations.of(context)!.travellingWithFamily,
+                  style: TextStyle(
+                    color: autofilled
+                        ? ColorsManager.successGreen
+                        : Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 13,
+                  ),
+                ),
+                const SizedBox(height: 3),
+                Text(
+                  AppLocalizations.of(context)!.fillSeat1Info,
+                  style: const TextStyle(color: Colors.white54, fontSize: 11),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 8),
+          OutlinedButton(
+            onPressed: onAutofill,
+            style: OutlinedButton.styleFrom(
+              side: BorderSide(
+                color: autofilled
+                    ? ColorsManager.successGreen
+                    : ColorsManager.accentCyan,
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              minimumSize: Size.zero,
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            ),
+            child: Text(
+              autofilled
+                  ? AppLocalizations.of(context)!.reFill
+                  : AppLocalizations.of(context)!.autoFill,
+              style: TextStyle(
+                color: autofilled
+                    ? ColorsManager.successGreen
+                    : ColorsManager.accentCyan,
+                fontWeight: FontWeight.bold,
+                fontSize: 12,
+              ),
+            ),
+          ),
         ],
       ),
     );

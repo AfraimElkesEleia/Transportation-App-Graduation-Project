@@ -759,5 +759,44 @@
   "refundSubmitted": "Refund request submitted successfully.",
   "refundRequesting": "Submitting refund request...",
   "refundAccepted": "Refund Accepted",
-  "refundRejected": "Refund Rejected"
+  "refundRejected": "Refund Rejected",
+  "expires": "Expires",
+  "expired": "Expired",
+  "cancelTripTitle": "Cancel this trip?",
+  "cancelTripMsg": "Your seat hold will be released and inventory restored. This cannot be undone.",
+  "keepIt": "Keep It",
+  "cancelTripBtn": "Cancel Trip",
+  "insufficientFunds": "Insufficient funds.",
+  "insufficientFundsDetail": "Insufficient funds. Your wallet balance is {balance} EGP, but checkout total is {total} EGP.",
+  "@insufficientFundsDetail": {
+    "placeholders": {
+      "balance": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "checkoutFailed": "Checkout failed",
+  "ticketAddedButCheckoutFailed": "Ticket added to cart, but checkout failed: {error}",
+  "@ticketAddedButCheckoutFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "originalPrice": "Original price: {price} {currency}",
+  "@originalPrice": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      },
+      "currency": {
+        "type": "String"
+      }
+    }
+  },
+  "seatsTakenError": "One or more selected seats were just taken. Please refresh the seat map."
 }

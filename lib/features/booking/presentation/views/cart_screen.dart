@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:transportation_app/core/l10n/app_localizations.dart';
 import 'package:transportation_app/core/theming/colors.dart';
+import 'package:transportation_app/core/utils/error_localizer.dart';
 import 'package:transportation_app/core/widgets/app_shimmer.dart';
 import 'package:transportation_app/core/widgets/basic_container.dart';
 import 'package:transportation_app/features/booking/presentation/cubit/cart_cubit.dart';
@@ -92,7 +93,7 @@ class _CartScreenState extends State<CartScreen> {
                     } else if (state is CheckoutError) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          content: Text(state.message),
+                          content: Text(ErrorLocalizer.localize(context, state.message)),
                           backgroundColor: Colors.red,
                         ),
                       );
@@ -114,7 +115,7 @@ class _CartScreenState extends State<CartScreen> {
                       return _buildEmptyCart(l10n);
                     }
                     if (state is CartError) {
-                      return _buildError(state.message, l10n);
+                      return _buildError(ErrorLocalizer.localize(context, state.message), l10n);
                     }
                     if (state is CartLoaded) {
                       return _buildCartList(state);

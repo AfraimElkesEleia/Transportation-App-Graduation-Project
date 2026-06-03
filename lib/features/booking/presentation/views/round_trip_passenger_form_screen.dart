@@ -16,10 +16,12 @@ class RoundTripPassengerFormScreen extends StatefulWidget {
   const RoundTripPassengerFormScreen({super.key});
 
   @override
-  State<RoundTripPassengerFormScreen> createState() => _RoundTripPassengerFormScreenState();
+  State<RoundTripPassengerFormScreen> createState() =>
+      _RoundTripPassengerFormScreenState();
 }
 
-class _RoundTripPassengerFormScreenState extends State<RoundTripPassengerFormScreen> {
+class _RoundTripPassengerFormScreenState
+    extends State<RoundTripPassengerFormScreen> {
   final _formKey = GlobalKey<FormState>();
 
   // Separate passenger controller lists per leg
@@ -31,15 +33,41 @@ class _RoundTripPassengerFormScreenState extends State<RoundTripPassengerFormScr
 
   int _selectedPoints = 0;
 
+  bool _outboundAutofilled = false;
+  bool _returnAutofilled = false;
+
   @override
   void initState() {
     super.initState();
     final state = context.read<RoundTripBookingCubit>().state;
     _outboundCount = state.selectedOutboundSeats.length;
-    _returnCount   = state.selectedReturnSeats.length;
+    _returnCount = state.selectedReturnSeats.length;
 
-    _outboundControllers = List.generate(_outboundCount, (_) => _PassengerControllers());
-    _returnControllers   = List.generate(_returnCount,   (_) => _PassengerControllers());
+    _outboundControllers = List.generate(
+      _outboundCount,
+      (_) => _PassengerControllers(),
+    );
+    _returnControllers = List.generate(
+      _returnCount,
+      (_) => _PassengerControllers(),
+    );
+
+    if (_outboundControllers.isNotEmpty) {
+      _outboundControllers.first.nameController.addListener(
+        _onOutboundFirstChanged,
+      );
+      _outboundControllers.first.phoneController.addListener(
+        _onOutboundFirstChanged,
+      );
+    }
+    if (_returnControllers.isNotEmpty) {
+      _returnControllers.first.nameController.addListener(
+        _onReturnFirstChanged,
+      );
+      _returnControllers.first.phoneController.addListener(
+        _onReturnFirstChanged,
+      );
+    }
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
@@ -53,8 +81,8 @@ class _RoundTripPassengerFormScreenState extends State<RoundTripPassengerFormScr
 
   void _prefillFromProfile(ProfileEntity profile) {
     final state = context.read<RoundTripBookingCubit>().state;
-    final isTrain = _isTrain(state.selectedOutboundTrip) ||
-                    _isTrain(state.selectedReturnTrip);
+    final outboundIsTrain = _isTrain(state.selectedOutboundTrip);
+    final returnIsTrain = _isTrain(state.selectedReturnTrip);
 
     if (_outboundControllers.isNotEmpty) {
       final first = _outboundControllers.first;
@@ -67,14 +95,16 @@ class _RoundTripPassengerFormScreenState extends State<RoundTripPassengerFormScr
       if (first.emailController.text.trim().isEmpty) {
         first.emailController.text = profile.email;
       }
-      if (isTrain) {
+      if (outboundIsTrain) {
         if (profile.idNumber != null && profile.idNumber!.isNotEmpty) {
           if (first.idController.text.trim().isEmpty) {
             first.idController.text = profile.idNumber!;
           }
           if (profile.idType != null) {
             setState(() {
-              first.selectedIdType = profile.idType == 2 ? 'Passport' : 'NationalId';
+              first.selectedIdType = profile.idType == 2
+                  ? 'Passport'
+                  : 'NationalId';
             });
           }
         }
@@ -92,14 +122,16 @@ class _RoundTripPassengerFormScreenState extends State<RoundTripPassengerFormScr
       if (first.emailController.text.trim().isEmpty) {
         first.emailController.text = profile.email;
       }
-      if (isTrain) {
+      if (returnIsTrain) {
         if (profile.idNumber != null && profile.idNumber!.isNotEmpty) {
           if (first.idController.text.trim().isEmpty) {
             first.idController.text = profile.idNumber!;
           }
           if (profile.idType != null) {
             setState(() {
-              first.selectedIdType = profile.idType == 2 ? 'Passport' : 'NationalId';
+              first.selectedIdType = profile.idType == 2
+                  ? 'Passport'
+                  : 'NationalId';
             });
           }
         }
@@ -107,10 +139,146 @@ class _RoundTripPassengerFormScreenState extends State<RoundTripPassengerFormScr
     }
   }
 
+  void _onOutboundFirstChanged() {
+    if (_outboundAutofilled) setState(() => _outboundAutofilled = false);
+  }
+
+  void _onReturnFirstChanged() {
+    if (_returnAutofilled) setState(() => _returnAutofilled = false);
+  }
+
+  void _autofillOutbound() {
+    final srcName = _outboundControllers.first.nameController.text.trim();
+    final srcPhone = _outboundControllers.first.phoneController.text.trim();
+
+    if (srcName.isEmpty || srcPhone.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Row(
+            children: [
+              const Icon(
+                Icons.warning_amber_rounded,
+                color: Colors.white,
+                size: 18,
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(AppLocalizations.of(context)!.fillNamePhoneFirst),
+              ),
+            ],
+          ),
+          backgroundColor: Colors.orange.shade700,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      return;
+    }
+
+    for (int i = 1; i < _outboundControllers.length; i++) {
+      _outboundControllers[i].nameController.text = srcName;
+      _outboundControllers[i].phoneController.text = srcPhone;
+    }
+    setState(() => _outboundAutofilled = true);
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            const Icon(Icons.check_circle, color: Colors.white, size: 18),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                AppLocalizations.of(
+                  context,
+                )!.filledNSeats('${_outboundControllers.length - 1}', srcName),
+              ),
+            ),
+          ],
+        ),
+        backgroundColor: Colors.green.shade700,
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
+
+  void _autofillReturn() {
+    final srcName = _returnControllers.first.nameController.text.trim();
+    final srcPhone = _returnControllers.first.phoneController.text.trim();
+
+    if (srcName.isEmpty || srcPhone.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Row(
+            children: [
+              const Icon(
+                Icons.warning_amber_rounded,
+                color: Colors.white,
+                size: 18,
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(AppLocalizations.of(context)!.fillNamePhoneFirst),
+              ),
+            ],
+          ),
+          backgroundColor: Colors.orange.shade700,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      return;
+    }
+
+    for (int i = 1; i < _returnControllers.length; i++) {
+      _returnControllers[i].nameController.text = srcName;
+      _returnControllers[i].phoneController.text = srcPhone;
+    }
+    setState(() => _returnAutofilled = true);
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            const Icon(Icons.check_circle, color: Colors.white, size: 18),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                AppLocalizations.of(
+                  context,
+                )!.filledNSeats('${_returnControllers.length - 1}', srcName),
+              ),
+            ),
+          ],
+        ),
+        backgroundColor: Colors.green.shade700,
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
+
   @override
   void dispose() {
-    for (final c in _outboundControllers) { c.dispose(); }
-    for (final c in _returnControllers)   { c.dispose(); }
+    if (_outboundControllers.isNotEmpty) {
+      _outboundControllers.first.nameController.removeListener(
+        _onOutboundFirstChanged,
+      );
+      _outboundControllers.first.phoneController.removeListener(
+        _onOutboundFirstChanged,
+      );
+    }
+    if (_returnControllers.isNotEmpty) {
+      _returnControllers.first.nameController.removeListener(
+        _onReturnFirstChanged,
+      );
+      _returnControllers.first.phoneController.removeListener(
+        _onReturnFirstChanged,
+      );
+    }
+    for (final c in _outboundControllers) {
+      c.dispose();
+    }
+    for (final c in _returnControllers) {
+      c.dispose();
+    }
     super.dispose();
   }
 
@@ -134,7 +302,9 @@ class _RoundTripPassengerFormScreenState extends State<RoundTripPassengerFormScr
       final c = _outboundControllers[i];
       outboundPassengers.add({
         'passengerName': c.nameController.text.trim(),
-        'idNumber': c.idController.text.trim().isEmpty ? 'N/A' : c.idController.text.trim(),
+        'idNumber': c.idController.text.trim().isEmpty
+            ? 'N/A'
+            : c.idController.text.trim(),
         'idType': c.selectedIdType,
         'seatNumber': state.selectedOutboundSeats[i],
       });
@@ -145,15 +315,23 @@ class _RoundTripPassengerFormScreenState extends State<RoundTripPassengerFormScr
       final c = _returnControllers[i];
       returnPassengers.add({
         'passengerName': c.nameController.text.trim(),
-        'idNumber': c.idController.text.trim().isEmpty ? 'N/A' : c.idController.text.trim(),
+        'idNumber': c.idController.text.trim().isEmpty
+            ? 'N/A'
+            : c.idController.text.trim(),
         'idType': c.selectedIdType,
         'seatNumber': state.selectedReturnSeats[i],
       });
     }
 
-    final contactName = _outboundControllers.isNotEmpty ? _outboundControllers.first.nameController.text.trim() : 'Unknown';
-    final contactPhone = _outboundControllers.isNotEmpty ? _outboundControllers.first.phoneController.text.trim() : 'Unknown';
-    final contactEmail = _outboundControllers.isNotEmpty ? _outboundControllers.first.emailController.text.trim() : '';
+    final contactName = _outboundControllers.isNotEmpty
+        ? _outboundControllers.first.nameController.text.trim()
+        : 'Unknown';
+    final contactPhone = _outboundControllers.isNotEmpty
+        ? _outboundControllers.first.phoneController.text.trim()
+        : 'Unknown';
+    final contactEmail = _outboundControllers.isNotEmpty
+        ? _outboundControllers.first.emailController.text.trim()
+        : '';
 
     if (bookNow) {
       cubit.bookNowRoundTrip(
@@ -177,12 +355,6 @@ class _RoundTripPassengerFormScreenState extends State<RoundTripPassengerFormScr
 
   @override
   Widget build(BuildContext context) {
-    int loyaltyBalance = 0;
-    final profileState = context.watch<ProfileCubit>().state;
-    if (profileState is ProfileLoaded) {
-      loyaltyBalance = profileState.profile.loyaltyPointsBalance ?? 0;
-    }
-
     return Scaffold(
       backgroundColor: ColorsManager.seatBg,
       body: SafeArea(
@@ -193,119 +365,152 @@ class _RoundTripPassengerFormScreenState extends State<RoundTripPassengerFormScr
             }
           },
           child: BlocConsumer<RoundTripBookingCubit, RoundTripBookingState>(
-          listenWhen: (prev, current) =>
-              prev.cartError != current.cartError ||
-              prev.cartSuccess != current.cartSuccess,
-          listener: (context, state) {
-            if (state.cartSuccess) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(AppLocalizations.of(context)!.journeyAddedToCart),
-                  backgroundColor: Colors.green,
-                ),
-              );
-              Navigator.pushNamedAndRemoveUntil(
-                context,
-                AppRoutes.cartScreen,
-                (route) => route.isFirst,
-              );
-            } else if (state.checkoutSuccess) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(AppLocalizations.of(context)!.bookingSuccessful),
-                  backgroundColor: Colors.green,
-                ),
-              );
-              Navigator.pushNamedAndRemoveUntil(
-                context,
-                AppRoutes.cartScreen,
-                (route) => route.isFirst,
-              );
-            } else if (state.cartError != null) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(state.cartError!),
-                  backgroundColor: Colors.red,
-                ),
-              );
-            }
-          },
-          builder: (context, state) {
-            final isTrain = _isTrain(state.selectedOutboundTrip) ||
-                            _isTrain(state.selectedReturnTrip);
-            final outPrice = state.selectedOutboundClass?.price ?? 0;
-            final retPrice = state.selectedReturnClass?.price ?? 0;
-            final cartTotal = (outPrice * _outboundCount) + (retPrice * _returnCount);
+            listenWhen: (prev, current) =>
+                prev.cartError != current.cartError ||
+                prev.cartSuccess != current.cartSuccess,
+            listener: (context, state) {
+              if (state.cartSuccess) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      AppLocalizations.of(context)!.journeyAddedToCart,
+                    ),
+                    backgroundColor: Colors.green,
+                  ),
+                );
+                Navigator.pushNamedAndRemoveUntil(
+                  context,
+                  AppRoutes.cartScreen,
+                  (route) => route.isFirst,
+                );
+              } else if (state.checkoutSuccess) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      AppLocalizations.of(context)!.bookingSuccessful,
+                    ),
+                    backgroundColor: Colors.green,
+                  ),
+                );
+                Navigator.pushNamedAndRemoveUntil(
+                  context,
+                  AppRoutes.cartScreen,
+                  (route) => route.isFirst,
+                );
+              } else if (state.cartError != null) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(state.cartError!),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+              }
+            },
+            builder: (context, state) {
+              // Per-leg train check — ID fields should only appear for train legs
+              final outboundIsTrain = _isTrain(state.selectedOutboundTrip);
+              final returnIsTrain = _isTrain(state.selectedReturnTrip);
+              final outPrice = state.selectedOutboundClass?.price ?? 0;
+              final retPrice = state.selectedReturnClass?.price ?? 0;
+              final cartTotal =
+                  (outPrice * _outboundCount) + (retPrice * _returnCount);
+              // Read loyalty balance here so it rebuilds with ProfileCubit
+              final profileState = context.watch<ProfileCubit>().state;
+              final loyaltyBalance = profileState is ProfileLoaded
+                  ? (profileState.profile.loyaltyPointsBalance ?? 0)
+                  : 0;
 
-            return Column(
-              children: [
-                _FormAppBar(),
-                Expanded(
-                  child: Form(
-                    key: _formKey,
-                    child: ListView(
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-                      children: [
-                        // ── Outbound Leg Passengers ──────────────────────
-                        _LegHeader(
-                          label: AppLocalizations.of(context)!.outbound,
-                          seatCount: _outboundCount,
-                          icon: Icons.flight_takeoff,
-                          color: ColorsManager.accentCyan,
-                          trip: state.selectedOutboundTrip,
+              return Column(
+                children: [
+                  _FormAppBar(),
+                  Expanded(
+                    child: Form(
+                      key: _formKey,
+                      child: ListView(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 16,
                         ),
-                        const SizedBox(height: 8),
-                        for (int i = 0; i < _outboundCount; i++)
-                          _PassengerCard(
-                            index: i + 1,
-                            seatLabel: AppLocalizations.of(context)!.seatLabel(state.selectedOutboundSeats[i]),
-                            controllers: _outboundControllers[i],
-                            isTrain: isTrain,
+                        children: [
+                          // ── Outbound Leg Passengers ──────────────────────
+                          _LegHeader(
+                            label: AppLocalizations.of(context)!.outbound,
+                            seatCount: _outboundCount,
+                            icon: Icons.flight_takeoff,
+                            color: ColorsManager.accentCyan,
+                            trip: state.selectedOutboundTrip,
                           ),
+                          const SizedBox(height: 8),
+                          for (int i = 0; i < _outboundCount; i++) ...[
+                            _PassengerCard(
+                              index: i + 1,
+                              seatLabel: AppLocalizations.of(
+                                context,
+                              )!.seatLabel(state.selectedOutboundSeats[i]),
+                              controllers: _outboundControllers[i],
+                              isTrain: outboundIsTrain,
+                            ),
+                            if (i == 0 &&
+                                !outboundIsTrain &&
+                                _outboundCount > 1)
+                              _AutofillBanner(
+                                autofilled: _outboundAutofilled,
+                                onAutofill: _autofillOutbound,
+                              ),
+                          ],
 
-                        const SizedBox(height: 16),
+                          const SizedBox(height: 16),
 
-                        // ── Return Leg Passengers ────────────────────────
-                        _LegHeader(
-                          label: AppLocalizations.of(context)!.returnTrip,
-                          seatCount: _returnCount,
-                          icon: Icons.flight_land,
-                          color: ColorsManager.turquoise,
-                          trip: state.selectedReturnTrip,
-                        ),
-                        const SizedBox(height: 8),
-                        for (int i = 0; i < _returnCount; i++)
-                          _PassengerCard(
-                            index: i + 1,
-                            seatLabel: AppLocalizations.of(context)!.seatLabel(state.selectedReturnSeats[i]),
-                            controllers: _returnControllers[i],
-                            isTrain: isTrain,
+                          // ── Return Leg Passengers ────────────────────────
+                          _LegHeader(
+                            label: AppLocalizations.of(context)!.returnTrip,
+                            seatCount: _returnCount,
+                            icon: Icons.flight_land,
+                            color: ColorsManager.turquoise,
+                            trip: state.selectedReturnTrip,
                           ),
-                        const SizedBox(height: 16),
-                        // ── Loyalty points section (for Book Now) ──────────
-                        PointsRedemptionWidget(
-                          cartTotal: cartTotal.toDouble(),
-                          walletPoints: loyaltyBalance,
-                          onPointsChanged: (pts) => setState(() => _selectedPoints = pts),
-                        ),
-                        const SizedBox(height: 8),
-                      ],
+                          const SizedBox(height: 8),
+                          for (int i = 0; i < _returnCount; i++) ...[
+                            _PassengerCard(
+                              index: i + 1,
+                              seatLabel: AppLocalizations.of(
+                                context,
+                              )!.seatLabel(state.selectedReturnSeats[i]),
+                              controllers: _returnControllers[i],
+                              isTrain: returnIsTrain,
+                            ),
+                            if (i == 0 && !returnIsTrain && _returnCount > 1)
+                              _AutofillBanner(
+                                autofilled: _returnAutofilled,
+                                onAutofill: _autofillReturn,
+                              ),
+                          ],
+                          const SizedBox(height: 16),
+                          // ── Loyalty points section (for Book Now) ──────────
+                          PointsRedemptionWidget(
+                            cartTotal: cartTotal.toDouble(),
+                            walletPoints: loyaltyBalance,
+                            onPointsChanged: (pts) =>
+                                setState(() => _selectedPoints = pts),
+                          ),
+                          const SizedBox(height: 8),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-                _FormBottomButtons(
-                  isAdding: state.isAddingToCart,
-                  isBookingNow: state.isBookingNow,
-                  onAddToCart: () => _submit(bookNow: false),
-                  onBookNow: () => _submit(bookNow: true),
-                ),
-              ],
-            );
-          },
+                  _FormBottomButtons(
+                    isAdding: state.isAddingToCart,
+                    isBookingNow: state.isBookingNow,
+                    onAddToCart: () => _submit(bookNow: false),
+                    onBookNow: () => _submit(bookNow: true),
+                  ),
+                ],
+              );
+            },
+          ),
         ),
       ),
-    ),
-  );
+    );
   }
 }
 
@@ -327,7 +532,9 @@ class _LegHeader extends StatelessWidget {
 
   List<Widget> _buildGovSubList(String gov, String sub) {
     if (sub.isEmpty || sub == gov) {
-      return [Text(gov, style: const TextStyle(color: Colors.white70, fontSize: 12))];
+      return [
+        Text(gov, style: const TextStyle(color: Colors.white70, fontSize: 12)),
+      ];
     }
     return [
       Text(gov, style: const TextStyle(color: Colors.white70, fontSize: 12)),
@@ -355,7 +562,11 @@ class _LegHeader extends StatelessWidget {
               children: [
                 Text(
                   '$label — ${AppLocalizations.of(context)!.passengersCount('$seatCount')}',
-                  style: TextStyle(color: color, fontSize: 14, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                    color: color,
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 if (trip != null) ...[
                   const SizedBox(height: 2),
@@ -367,10 +578,15 @@ class _LegHeader extends StatelessWidget {
                         trip!.originGovernorate.toLocalizedGov(context),
                         trip!.originStationName.toLocalizedStation(context),
                       ),
-                      const Text(' ➔ ', style: TextStyle(color: Colors.white70, fontSize: 12)),
+                      const Text(
+                        ' ➔ ',
+                        style: TextStyle(color: Colors.white70, fontSize: 12),
+                      ),
                       ..._buildGovSubList(
                         trip!.destinationGovernorate.toLocalizedGov(context),
-                        trip!.destinationStationName.toLocalizedStation(context),
+                        trip!.destinationStationName.toLocalizedStation(
+                          context,
+                        ),
                       ),
                     ],
                   ),
@@ -386,8 +602,8 @@ class _LegHeader extends StatelessWidget {
 
 // ── Per-passenger controllers ────────────────────────────────────────────────
 class _PassengerControllers {
-  final nameController  = TextEditingController();
-  final idController    = TextEditingController();
+  final nameController = TextEditingController();
+  final idController = TextEditingController();
   final phoneController = TextEditingController();
   final emailController = TextEditingController();
   // 'NationalId' | 'Passport'
@@ -418,13 +634,21 @@ class _FormAppBar extends StatelessWidget {
                 color: ColorsManager.seatContainerBg,
                 borderRadius: BorderRadius.circular(21),
               ),
-              child: const Icon(Icons.arrow_back, color: Colors.white, size: 20),
+              child: const Icon(
+                Icons.arrow_back,
+                color: Colors.white,
+                size: 20,
+              ),
             ),
           ),
           Expanded(
             child: Text(
               AppLocalizations.of(context)!.passengerDetails,
-              style: const TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.bold),
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 17,
+                fontWeight: FontWeight.bold,
+              ),
               textAlign: TextAlign.center,
             ),
           ),
@@ -490,7 +714,8 @@ class _PassengerCardState extends State<_PassengerCard> {
             controller: widget.controllers.nameController,
             label: loc.fullName,
             icon: Icons.person_outline,
-            validator: (v) => (v == null || v.trim().isEmpty) ? loc.requiredField : null,
+            validator: (v) =>
+                (v == null || v.trim().isEmpty) ? loc.requiredField : null,
           ),
           const SizedBox(height: 12),
           // ── ID Type Dropdown + ID Number — ONLY for train ──
@@ -499,8 +724,15 @@ class _PassengerCardState extends State<_PassengerCard> {
               value: widget.controllers.selectedIdType,
               decoration: InputDecoration(
                 labelText: loc.idTypeLabel,
-                labelStyle: const TextStyle(color: ColorsManager.textMuted, fontSize: 13),
-                prefixIcon: const Icon(Icons.badge_outlined, color: ColorsManager.textMuted, size: 20),
+                labelStyle: const TextStyle(
+                  color: ColorsManager.textMuted,
+                  fontSize: 13,
+                ),
+                prefixIcon: const Icon(
+                  Icons.badge_outlined,
+                  color: ColorsManager.textMuted,
+                  size: 20,
+                ),
                 filled: true,
                 fillColor: ColorsManager.seatContainerBg,
                 border: OutlineInputBorder(
@@ -511,13 +743,22 @@ class _PassengerCardState extends State<_PassengerCard> {
                   borderRadius: BorderRadius.circular(12),
                   borderSide: const BorderSide(color: ColorsManager.accentCyan),
                 ),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 14,
+                ),
               ),
               dropdownColor: ColorsManager.surfaceDark,
               style: const TextStyle(color: Colors.white, fontSize: 14),
               items: [
-                DropdownMenuItem(value: 'NationalId', child: Text(loc.idTypeNationalId)),
-                DropdownMenuItem(value: 'Passport', child: Text(loc.idTypePassport)),
+                DropdownMenuItem(
+                  value: 'NationalId',
+                  child: Text(loc.idTypeNationalId),
+                ),
+                DropdownMenuItem(
+                  value: 'Passport',
+                  child: Text(loc.idTypePassport),
+                ),
               ],
               onChanged: (val) {
                 if (val != null) {
@@ -538,7 +779,8 @@ class _PassengerCardState extends State<_PassengerCard> {
               keyboardType: widget.controllers.selectedIdType == 'NationalId'
                   ? TextInputType.number
                   : TextInputType.text,
-              validator: (v) => (v == null || v.trim().isEmpty) ? loc.requiredField : null,
+              validator: (v) =>
+                  (v == null || v.trim().isEmpty) ? loc.requiredField : null,
             ),
             const SizedBox(height: 12),
           ],
@@ -547,7 +789,8 @@ class _PassengerCardState extends State<_PassengerCard> {
             label: loc.phoneNumberLabel,
             icon: Icons.phone_outlined,
             keyboardType: TextInputType.phone,
-            validator: (v) => (v == null || v.trim().isEmpty) ? loc.requiredField : null,
+            validator: (v) =>
+                (v == null || v.trim().isEmpty) ? loc.requiredField : null,
           ),
           const SizedBox(height: 12),
           _buildTextField(
@@ -575,7 +818,10 @@ class _PassengerCardState extends State<_PassengerCard> {
       style: const TextStyle(color: Colors.white, fontSize: 14),
       decoration: InputDecoration(
         labelText: label,
-        labelStyle: const TextStyle(color: ColorsManager.textMuted, fontSize: 13),
+        labelStyle: const TextStyle(
+          color: ColorsManager.textMuted,
+          fontSize: 13,
+        ),
         prefixIcon: Icon(icon, color: ColorsManager.textMuted, size: 20),
         filled: true,
         fillColor: ColorsManager.seatContainerBg,
@@ -591,7 +837,10 @@ class _PassengerCardState extends State<_PassengerCard> {
           borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(color: Colors.redAccent),
         ),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 14,
+        ),
       ),
     );
   }
@@ -645,9 +894,7 @@ class _FormBottomButtonsState extends State<_FormBottomButtons> {
                             widget.onAddToCart();
                           },
                     style: OutlinedButton.styleFrom(
-                      side: const BorderSide(
-                        color: ColorsManager.accentCyan,
-                      ),
+                      side: const BorderSide(color: ColorsManager.accentCyan),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(25),
                       ),
@@ -712,6 +959,99 @@ class _FormBottomButtonsState extends State<_FormBottomButtons> {
                 ),
               ),
             ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _AutofillBanner extends StatelessWidget {
+  final bool autofilled;
+  final VoidCallback onAutofill;
+
+  const _AutofillBanner({required this.autofilled, required this.onAutofill});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      decoration: BoxDecoration(
+        color: ColorsManager.surfaceDark,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: ColorsManager.accentCyan.withAlpha(80),
+          width: 1.2,
+        ),
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: ColorsManager.accentCyan.withAlpha(25),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: const Icon(
+              Icons.family_restroom_rounded,
+              color: ColorsManager.accentCyan,
+              size: 22,
+            ),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  autofilled
+                      ? AppLocalizations.of(context)!.autoFilled
+                      : AppLocalizations.of(context)!.travellingWithFamily,
+                  style: TextStyle(
+                    color: autofilled
+                        ? ColorsManager.successGreen
+                        : Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 13,
+                  ),
+                ),
+                const SizedBox(height: 3),
+                Text(
+                  AppLocalizations.of(context)!.fillSeat1Info,
+                  style: const TextStyle(color: Colors.white54, fontSize: 11),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 8),
+          OutlinedButton(
+            onPressed: onAutofill,
+            style: OutlinedButton.styleFrom(
+              side: BorderSide(
+                color: autofilled
+                    ? ColorsManager.successGreen
+                    : ColorsManager.accentCyan,
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              minimumSize: Size.zero,
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            ),
+            child: Text(
+              autofilled
+                  ? AppLocalizations.of(context)!.reFill
+                  : AppLocalizations.of(context)!.autoFill,
+              style: TextStyle(
+                color: autofilled
+                    ? ColorsManager.successGreen
+                    : ColorsManager.accentCyan,
+                fontWeight: FontWeight.bold,
+                fontSize: 12,
+              ),
+            ),
           ),
         ],
       ),

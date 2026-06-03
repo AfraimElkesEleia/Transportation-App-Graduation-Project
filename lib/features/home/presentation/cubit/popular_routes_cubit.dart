@@ -10,6 +10,7 @@ class PopularRoutesCubit extends Cubit<PopularRoutesState> {
   Future<void> load() async {
     emit(PopularRoutesLoading());
     final result = await _usecase();
+    if (isClosed) return;
     result.fold(
       (f) => emit(PopularRoutesError(f.message)),
       (routes) => emit(PopularRoutesLoaded(routes)),

@@ -29,6 +29,7 @@ class _MultiDestinationPassengerFormScreenState
   late final List<int> _seatCounts;
   late final int _legCount;
   late final List<bool> _isTrainPerLeg;
+  late final List<bool> _autofilledPerLeg;
 
   @override
   void initState() {
@@ -52,6 +53,24 @@ class _MultiDestinationPassengerFormScreenState
       (i) => List.generate(_seatCounts[i], (_) => _PassengerControllers()),
     );
 
+    _autofilledPerLeg = List.generate(_legCount, (_) => false);
+
+    for (int legIndex = 0; legIndex < _legCount; legIndex++) {
+      if (_controllers[legIndex].isNotEmpty) {
+        final legIdx = legIndex;
+        _controllers[legIdx].first.nameController.addListener(() {
+          if (_autofilledPerLeg[legIdx]) {
+            setState(() => _autofilledPerLeg[legIdx] = false);
+          }
+        });
+        _controllers[legIdx].first.phoneController.addListener(() {
+          if (_autofilledPerLeg[legIdx]) {
+            setState(() => _autofilledPerLeg[legIdx] = false);
+          }
+        });
+      }
+    }
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
         final profileState = context.read<ProfileCubit>().state;
@@ -63,31 +82,84 @@ class _MultiDestinationPassengerFormScreenState
   }
 
   void _prefillFromProfile(ProfileEntity profile) {
-    if (_controllers.isNotEmpty && _controllers.first.isNotEmpty) {
-      final first = _controllers.first.first;
-      if (first.nameController.text.trim().isEmpty) {
-        first.nameController.text = profile.fullName;
-      }
-      if (first.phoneController.text.trim().isEmpty) {
-        first.phoneController.text = profile.phoneNumber;
-      }
-      if (first.emailController.text.trim().isEmpty) {
-        first.emailController.text = profile.email;
-      }
-      final firstLegIsTrain = _isTrainPerLeg.isNotEmpty && _isTrainPerLeg.first;
-      if (firstLegIsTrain) {
-        if (profile.idNumber != null && profile.idNumber!.isNotEmpty) {
-          if (first.nationalIdController.text.trim().isEmpty) {
-            first.nationalIdController.text = profile.idNumber!;
-          }
-          if (profile.idType != null) {
-            setState(() {
-              first.selectedIdType = profile.idType == 2 ? 'Passport' : 'NationalId';
-            });
+    for (int legIndex = 0; legIndex < _legCount; legIndex++) {
+      if (_controllers[legIndex].isNotEmpty) {
+        final first = _controllers[legIndex].first;
+        if (first.nameController.text.trim().isEmpty) {
+          first.nameController.text = profile.fullName;
+        }
+        if (first.phoneController.text.trim().isEmpty) {
+          first.phoneController.text = profile.phoneNumber;
+        }
+        if (first.emailController.text.trim().isEmpty) {
+          first.emailController.text = profile.email;
+        }
+        final legIsTrain = _isTrainPerLeg[legIndex];
+        if (legIsTrain) {
+          if (profile.idNumber != null && profile.idNumber!.isNotEmpty) {
+            if (first.nationalIdController.text.trim().isEmpty) {
+              first.nationalIdController.text = profile.idNumber!;
+            }
+            if (profile.idType != null) {
+              setState(() {
+                first.selectedIdType = profile.idType == 2 ? 'Passport' : 'NationalId';
+              });
+            }
           }
         }
       }
     }
+  }
+
+  void _autofillLeg(int legIndex) {
+    final legControllers = _controllers[legIndex];
+    if (legControllers.isEmpty) return;
+
+    final srcName = legControllers.first.nameController.text.trim();
+    final srcPhone = legControllers.first.phoneController.text.trim();
+
+    if (srcName.isEmpty || srcPhone.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Row(
+            children: [
+              const Icon(Icons.warning_amber_rounded, color: Colors.white, size: 18),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(AppLocalizations.of(context)!.fillNamePhoneFirst),
+              ),
+            ],
+          ),
+          backgroundColor: Colors.orange.shade700,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      return;
+    }
+
+    for (int i = 1; i < legControllers.length; i++) {
+      legControllers[i].nameController.text = srcName;
+      legControllers[i].phoneController.text = srcPhone;
+    }
+    setState(() => _autofilledPerLeg[legIndex] = true);
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            const Icon(Icons.check_circle, color: Colors.white, size: 18),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                AppLocalizations.of(context)!.filledNSeats('${legControllers.length - 1}', srcName),
+              ),
+            ),
+          ],
+        ),
+        backgroundColor: Colors.green.shade700,
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
   }
 
   bool _isTrain(TripResultEntity? trip) {
@@ -228,7 +300,7 @@ class _MultiDestinationPassengerFormScreenState
                               int pIndex = 0;
                               pIndex < _seatCounts[legIndex];
                               pIndex++
-                            )
+                            ) ...[
                               _PassengerCard(
                                 index: pIndex + 1,
                                 seatNumber: state
@@ -237,6 +309,12 @@ class _MultiDestinationPassengerFormScreenState
                                 controllers: _controllers[legIndex][pIndex],
                                 isTrain: _isTrainPerLeg[legIndex],
                               ),
+                              if (pIndex == 0 && !_isTrainPerLeg[legIndex] && _seatCounts[legIndex] > 1)
+                                _AutofillBanner(
+                                  autofilled: _autofilledPerLeg[legIndex],
+                                  onAutofill: () => _autofillLeg(legIndex),
+                                ),
+                            ],
 
                             const SizedBox(height: 8),
                           ],
@@ -531,6 +609,99 @@ class _PassengerCardState extends State<_PassengerCard> {
         borderSide: const BorderSide(color: Colors.redAccent),
       ),
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+    );
+  }
+}
+
+class _AutofillBanner extends StatelessWidget {
+  final bool autofilled;
+  final VoidCallback onAutofill;
+
+  const _AutofillBanner({required this.autofilled, required this.onAutofill});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      decoration: BoxDecoration(
+        color: ColorsManager.surfaceDark,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: ColorsManager.accentCyan.withAlpha(80),
+          width: 1.2,
+        ),
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: ColorsManager.accentCyan.withAlpha(25),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: const Icon(
+              Icons.family_restroom_rounded,
+              color: ColorsManager.accentCyan,
+              size: 22,
+            ),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  autofilled
+                      ? AppLocalizations.of(context)!.autoFilled
+                      : AppLocalizations.of(context)!.travellingWithFamily,
+                  style: TextStyle(
+                    color: autofilled
+                        ? ColorsManager.successGreen
+                        : Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 13,
+                  ),
+                ),
+                const SizedBox(height: 3),
+                Text(
+                  AppLocalizations.of(context)!.fillSeat1Info,
+                  style: const TextStyle(color: Colors.white54, fontSize: 11),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 8),
+          OutlinedButton(
+            onPressed: onAutofill,
+            style: OutlinedButton.styleFrom(
+              side: BorderSide(
+                color: autofilled
+                    ? ColorsManager.successGreen
+                    : ColorsManager.accentCyan,
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              minimumSize: Size.zero,
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            ),
+            child: Text(
+              autofilled
+                  ? AppLocalizations.of(context)!.reFill
+                  : AppLocalizations.of(context)!.autoFill,
+              style: TextStyle(
+                color: autofilled
+                    ? ColorsManager.successGreen
+                    : ColorsManager.accentCyan,
+                fontWeight: FontWeight.bold,
+                fontSize: 12,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

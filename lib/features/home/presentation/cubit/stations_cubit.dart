@@ -12,6 +12,7 @@ class StationsCubit extends Cubit<StationsState> {
     if (state is StationsLoaded) return;
     emit(StationsLoading());
     final result = await getStationsUseCase(NoParams());
+    if (isClosed) return;
     result.fold(
       (failure) => emit(StationsError(failure.message)),
       (groups)  => emit(StationsLoaded(groups)),

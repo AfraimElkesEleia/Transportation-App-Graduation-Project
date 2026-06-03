@@ -202,9 +202,11 @@ class MultiDestinationBookingCubit extends Cubit<MultiDestinationBookingState> {
         };
 
         await bookingRemoteDatasource.addToCart(payload);
+        if (isClosed) return;
       }
       emit(state.copyWith(isAddingToCart: false, cartSuccess: true));
     } catch (e) {
+      if (isClosed) return;
       emit(state.copyWith(isAddingToCart: false, cartError: e.toString()));
     }
   }

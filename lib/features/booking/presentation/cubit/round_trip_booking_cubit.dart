@@ -266,12 +266,15 @@ class RoundTripBookingCubit extends Cubit<RoundTripBookingState> {
 
       // 1. Add Outbound
       await bookingRemoteDatasource.addToCart(outboundPayload);
+      if (isClosed) return;
 
       try {
         // 2. Add Return
         await bookingRemoteDatasource.addToCart(returnPayload);
+        if (isClosed) return;
         emit(state.copyWith(isAddingToCart: false, cartSuccess: true));
       } catch (e) {
+        if (isClosed) return;
         // Leg 2 failed -> Rollback attempt
         // Currently API might not support an explicit rollback for a specific item easily
         // We will do a generic clear cart or just instruct the user.
@@ -282,6 +285,7 @@ class RoundTripBookingCubit extends Cubit<RoundTripBookingState> {
       }
 
     } catch (e) {
+      if (isClosed) return;
       // Outbound failed
       emit(state.copyWith(
         isAddingToCart: false,
@@ -326,15 +330,19 @@ class RoundTripBookingCubit extends Cubit<RoundTripBookingState> {
 
       // 1. Add Outbound to Cart
       await bookingRemoteDatasource.addToCart(outboundPayload);
+      if (isClosed) return;
 
       try {
         // 2. Add Return to Cart
         await bookingRemoteDatasource.addToCart(returnPayload);
+        if (isClosed) return;
         
         // 3. Checkout
         await bookingRemoteDatasource.checkout(pointsToRedeem: pointsToRedeem);
+        if (isClosed) return;
         emit(state.copyWith(isBookingNow: false, checkoutSuccess: true));
       } catch (e) {
+        if (isClosed) return;
         // Leg 2 or Checkout failed
         emit(state.copyWith(
           isBookingNow: false,
@@ -343,6 +351,7 @@ class RoundTripBookingCubit extends Cubit<RoundTripBookingState> {
       }
 
     } catch (e) {
+      if (isClosed) return;
       // Outbound failed
       emit(state.copyWith(
         isBookingNow: false,

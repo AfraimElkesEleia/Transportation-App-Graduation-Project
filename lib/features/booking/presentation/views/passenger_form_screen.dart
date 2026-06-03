@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:transportation_app/core/l10n/app_localizations.dart';
 import 'package:transportation_app/core/routing/routes.dart';
 import 'package:transportation_app/core/theming/colors.dart';
+import 'package:transportation_app/core/utils/error_localizer.dart';
 import 'package:transportation_app/features/booking/presentation/cubit/seat_map_cubit.dart';
 import 'package:transportation_app/features/booking/presentation/cubit/seat_map_state.dart';
 import 'package:transportation_app/features/profile/domain/entities/profile_entity.dart';
@@ -234,6 +235,7 @@ class _PassengerFormScreenState extends State<PassengerFormScreen> {
           listeners: [
             BlocListener<SeatMapCubit, SeatMapState>(
               listener: (context, state) {
+                final l10n = AppLocalizations.of(context)!;
                 if (state is CartSuccess) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
@@ -250,7 +252,7 @@ class _PassengerFormScreenState extends State<PassengerFormScreen> {
                 if (state is CartError) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text(state.message),
+                      content: Text(ErrorLocalizer.localize(context, state.message)),
                       backgroundColor: Colors.red,
                     ),
                   );
@@ -259,7 +261,9 @@ class _PassengerFormScreenState extends State<PassengerFormScreen> {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text(
-                        'Ticket added to cart, but checkout failed: ${state.message}',
+                        l10n.ticketAddedButCheckoutFailed(
+                          ErrorLocalizer.localize(context, state.message),
+                        ),
                       ),
                       backgroundColor: Colors.orange,
                       duration: const Duration(seconds: 4),

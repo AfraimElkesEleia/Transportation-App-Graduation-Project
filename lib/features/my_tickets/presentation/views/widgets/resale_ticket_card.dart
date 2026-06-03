@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:transportation_app/core/l10n/app_localizations.dart';
 import 'package:transportation_app/core/theming/colors.dart';
 import 'package:transportation_app/features/profile/domain/entities/ticket_entity.dart';
 
@@ -25,6 +26,7 @@ class ResaleTicketCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final dt = ticket.boardingTime;
     final daysLeft = dt.difference(DateTime.now()).inDays;
     final timeStr =
@@ -90,7 +92,7 @@ class ResaleTicketCard extends StatelessWidget {
                   ),
                 ),
                 child: Text(
-                  '$daysLeft day${daysLeft != 1 ? 's' : ''} left',
+                  l10n.daysLeft(daysLeft.toString()),
                   style: TextStyle(
                     color: daysLeft < 3
                         ? Colors.redAccent
@@ -147,13 +149,13 @@ class ResaleTicketCard extends StatelessWidget {
                 border:
                     Border.all(color: Colors.orange.withValues(alpha: 0.3)),
               ),
-              child: const Row(
+              child: Row(
                 children: [
-                  Icon(Icons.storefront, color: Colors.amber, size: 14),
-                  SizedBox(width: 6),
+                  const Icon(Icons.storefront, color: Colors.amber, size: 14),
+                  const SizedBox(width: 6),
                   Text(
-                    'This booking is listed on the Marketplace',
-                    style: TextStyle(color: Colors.amber, fontSize: 12),
+                    l10n.listedOnMarketplace,
+                    style: const TextStyle(color: Colors.amber, fontSize: 12),
                   ),
                 ],
               ),
@@ -179,7 +181,7 @@ class ResaleTicketCard extends StatelessWidget {
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      'Seat: ${p.seatNumber}  ·  ${p.name}',
+                      '${l10n.seat} ${p.seatNumber}  ·  ${p.name}',
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 13,
@@ -202,7 +204,7 @@ class ResaleTicketCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Total: ${totalPrice.round()} EGP',
+                      '${l10n.totalPrice} ${totalPrice.round()} ${l10n.egp}',
                       style: const TextStyle(
                         color: Colors.white38,
                         fontSize: 12,
@@ -231,9 +233,9 @@ class ResaleTicketCard extends StatelessWidget {
                                 .withValues(alpha: 0.12),
                             borderRadius: BorderRadius.circular(6),
                           ),
-                          child: const Text(
-                            'Est. Value',
-                            style: TextStyle(
+                          child: Text(
+                            l10n.estValue,
+                            style: const TextStyle(
                               color: ColorsManager.successGreen,
                               fontSize: 10,
                               fontWeight: FontWeight.w600,
@@ -260,9 +262,9 @@ class ResaleTicketCard extends StatelessWidget {
                 ElevatedButton.icon(
                   onPressed: onCancel,
                   icon: const Icon(Icons.cancel_outlined, size: 15),
-                  label: const Text(
-                    'Cancel',
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                  label: Text(
+                    l10n.cancel,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.redAccent,
@@ -281,9 +283,9 @@ class ResaleTicketCard extends StatelessWidget {
                 ElevatedButton.icon(
                   onPressed: onSell,
                   icon: const Icon(Icons.sell_outlined, size: 15),
-                  label: const Text(
-                    'Sell',
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                  label: Text(
+                    l10n.sell,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: onSell != null

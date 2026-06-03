@@ -13,6 +13,7 @@ class CartCubit extends Cubit<CartState> {
     emit(CartLoading());
     try {
       final cart = await datasource.getCart();
+      if (isClosed) return;
       if (cart == null || cart.items.isEmpty) {
         emit(CartEmpty());
       } else {
@@ -21,13 +22,16 @@ class CartCubit extends Cubit<CartState> {
             await LocalAlarmScheduler.scheduleCartExpiry(
               holdExpiresAt: item.holdExpiresAt!,
             );
+            if (isClosed) return;
           }
         }
         emit(CartLoaded(cart));
       }
     } on ServerException catch (e) {
+      if (isClosed) return;
       emit(CartError(e.message));
     } catch (_) {
+      if (isClosed) return;
       emit(
         const CartError('An unexpected error occurred while fetching cart.'),
       );
@@ -39,11 +43,15 @@ class CartCubit extends Cubit<CartState> {
     emit(CheckoutLoading());
     try {
       await datasource.checkout(pointsToRedeem: pointsToRedeem);
+      if (isClosed) return;
       await LocalAlarmScheduler.cancelCartExpiry();
+      if (isClosed) return;
       emit(CheckoutSuccess());
     } on ServerException catch (e) {
+      if (isClosed) return;
       emit(CheckoutError(e.message));
     } catch (_) {
+      if (isClosed) return;
       emit(
         const CheckoutError('An unexpected error occurred during checkout.'),
       );
@@ -54,11 +62,14 @@ class CartCubit extends Cubit<CartState> {
     emit(CartItemCancelling(bookingId));
     try {
       await datasource.cancelCartItem(bookingId);
+      if (isClosed) return;
       await fetchCart();
     } on ServerException catch (e) {
+      if (isClosed) return;
       emit(CartItemCancelError(e.message));
       await fetchCart();
     } catch (_) {
+      if (isClosed) return;
       emit(
         const CartItemCancelError(
           'An unexpected error occurred while cancelling.',

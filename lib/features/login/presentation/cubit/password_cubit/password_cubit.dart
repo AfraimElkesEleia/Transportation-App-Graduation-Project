@@ -17,6 +17,7 @@ class PasswordCubit extends Cubit<PasswordStates> {
   Future<void> forgotPassword({required String email}) async {
     emit(PasswordLoading());
     final result = await forgotPasswordUseCase(ForgetPasswordParams(email: email));
+    if (isClosed) return;
     result.fold(
       (failure) => emit(PasswordFailure(message: failure.message)),
       (_) => emit(const PasswordSuccess(
@@ -36,6 +37,7 @@ class PasswordCubit extends Cubit<PasswordStates> {
       email: email, token: token,
       newPassword: newPassword, confirmPassword: confirmPassword,
     ));
+    if (isClosed) return;
     result.fold(
       (failure) => emit(PasswordFailure(message: failure.message, errors: failure.errors)),
       (_) => emit(const PasswordSuccess('Password reset successfully')),
@@ -53,6 +55,7 @@ class PasswordCubit extends Cubit<PasswordStates> {
       newPassword:     newPassword,
       confirmPassword: confirmPassword,
     ));
+    if (isClosed) return;
     result.fold(
       (failure) => emit(PasswordFailure(message: failure.message)),
       (_) => emit(const PasswordSuccess('Password changed successfully')),

@@ -14,8 +14,10 @@ class NotificationCubit extends Cubit<NotificationState> {
     emit(const NotificationLoading());
     try {
       final items = await _datasource.getNotifications();
+      if (isClosed) return;
       emit(NotificationLoaded(notifications: items));
     } catch (_) {
+      if (isClosed) return;
       emit(const NotificationError('Failed to load notifications'));
     }
   }

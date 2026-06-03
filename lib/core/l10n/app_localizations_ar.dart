@@ -1486,4 +1486,48 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get refundRejected => 'تم رفض الاسترداد';
+
+  @override
+  String get expires => 'ينتهي خلال';
+
+  @override
+  String get expired => 'منتهية';
+
+  @override
+  String get cancelTripTitle => 'إلغاء هذه الرحلة؟';
+
+  @override
+  String get cancelTripMsg =>
+      'سيتم إلغاء حجز المقعد واستعادة المخزون. لا يمكن التراجع عن هذا الإجراء.';
+
+  @override
+  String get keepIt => 'الاحتفاظ بها';
+
+  @override
+  String get cancelTripBtn => 'إلغاء الرحلة';
+
+  @override
+  String get insufficientFunds => 'رصيد غير كافٍ.';
+
+  @override
+  String insufficientFundsDetail(String balance, String total) {
+    return 'رصيد غير كافٍ. رصيد محفظتك هو $balance جنيه، ولكن إجمالي الدفع هو $total جنيه.';
+  }
+
+  @override
+  String get checkoutFailed => 'فشل إتمام الدفع';
+
+  @override
+  String ticketAddedButCheckoutFailed(String error) {
+    return 'تمت إضافة التذكرة إلى السلة، ولكن فشل إتمام الدفع: $error';
+  }
+
+  @override
+  String originalPrice(String price, String currency) {
+    return 'السعر الأصلي: $price $currency';
+  }
+
+  @override
+  String get seatsTakenError =>
+      'تم حجز واحد أو أكثر من المقاعد المختارة للتو. يرجى تحديث خريطة المقاعد.';
 }

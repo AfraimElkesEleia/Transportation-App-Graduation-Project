@@ -28,6 +28,7 @@ class PassengerBoardingPassCubit extends Cubit<PassengerBoardingPassState> {
       bookingId: bookingId,
       passengerId: passengerId,
     );
+    if (isClosed) return;
     result.fold(
       (failure) => emit(PassengerBoardingPassError(failure.message)),
       (payload) => emit(PassengerBoardingPassLoaded(payload)),

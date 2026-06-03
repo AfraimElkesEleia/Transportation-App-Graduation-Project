@@ -199,6 +199,7 @@ class _ResellTicketsScreenState extends State<ResellTicketsScreen> {
     TicketEntity ticket,
     String ticketKey,
   ) {
+    final l10n = AppLocalizations.of(context)!;
     final priceCtrl = TextEditingController(
       text: ticket.totalPrice.round().toString(),
     );
@@ -276,14 +277,14 @@ class _ResellTicketsScreenState extends State<ResellTicketsScreen> {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      '${ticket.seatsBooked} seat${ticket.seatsBooked > 1 ? 's' : ''} · ${ticket.agencyName}',
+                      '${l10n.seatsCount(ticket.seatsBooked.toString())} · ${ticket.agencyName}',
                       style: const TextStyle(
                         color: Colors.white54,
                         fontSize: 12,
                       ),
                     ),
                     Text(
-                      'Original price: ${ticket.totalPrice.round()} EGP',
+                      l10n.originalPrice(ticket.totalPrice.round().toString(), l10n.egp),
                       style: const TextStyle(
                         color: ColorsManager.accentCyan,
                         fontSize: 12,
@@ -307,7 +308,7 @@ class _ResellTicketsScreenState extends State<ResellTicketsScreen> {
                 decoration: InputDecoration(
                   filled: true,
                   fillColor: Colors.white10,
-                  suffixText: 'EGP',
+                  suffixText: l10n.egp,
                   suffixStyle: const TextStyle(color: Colors.white54),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
@@ -446,7 +447,7 @@ class _StatsRow extends StatelessWidget {
           child: _StatCard(
             icon: Icons.trending_up,
             label: AppLocalizations.of(context)!.estValue,
-            value: '${totalValue.round()} EGP',
+            value: '${totalValue.round()} ${AppLocalizations.of(context)!.egp}',
             color: ColorsManager.successGreen,
           ),
         ),
@@ -514,6 +515,7 @@ class _ResellTicketCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final isListed = ticket.isOfferedForResale;
     final date = DateFormat('EEE, dd MMM yyyy').format(ticket.boardingTime);
     final time = DateFormat('HH:mm').format(ticket.boardingTime);
@@ -578,7 +580,7 @@ class _ResellTicketCard extends StatelessWidget {
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
-                    '$daysLeft day${daysLeft != 1 ? 's' : ''} left',
+                    l10n.daysLeft(daysLeft.toString()),
                     style: TextStyle(
                       color: daysLeft < 3 ? Colors.redAccent : Colors.white54,
                       fontSize: 11,
@@ -701,8 +703,7 @@ class _ResellTicketCard extends StatelessWidget {
                     _MetaChip(icon: Icons.access_time, label: time),
                     _MetaChip(
                       icon: Icons.event_seat,
-                      label:
-                          '${ticket.seatsBooked} seat${ticket.seatsBooked > 1 ? 's' : ''}',
+                      label: l10n.seatsCount(ticket.seatsBooked.toString()),
                     ),
                     _MetaChip(
                       icon: Icons.directions_bus,
@@ -720,7 +721,7 @@ class _ResellTicketCard extends StatelessWidget {
                       style: const TextStyle(color: Colors.white54, fontSize: 13),
                     ),
                     Text(
-                      '${ticket.totalPrice.round()} EGP',
+                      '${ticket.totalPrice.round()} ${l10n.egp}',
                       style: const TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
@@ -813,15 +814,15 @@ class _EmptyState extends StatelessWidget {
               color: Colors.white.withValues(alpha: 0.1),
             ),
             const SizedBox(height: 16),
-            const Text(
-              'No upcoming tickets available for resale.',
-              style: TextStyle(color: Colors.white54, fontSize: 14),
+            Text(
+              AppLocalizations.of(context)!.noResellable,
+              style: const TextStyle(color: Colors.white54, fontSize: 14),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 8),
-            const Text(
-              'Only confirmed, upcoming tickets that weren\'t\npurchased from the marketplace can be resold.',
-              style: TextStyle(color: Colors.white30, fontSize: 12),
+            Text(
+              AppLocalizations.of(context)!.resellRules,
+              style: const TextStyle(color: Colors.white30, fontSize: 12),
               textAlign: TextAlign.center,
             ),
           ],
@@ -863,9 +864,9 @@ class _ErrorBanner extends StatelessWidget {
           ),
           TextButton(
             onPressed: onRetry,
-            child: const Text(
-              'Retry',
-              style: TextStyle(color: ColorsManager.accentCyan),
+            child: Text(
+              AppLocalizations.of(context)!.retry,
+              style: const TextStyle(color: ColorsManager.accentCyan),
             ),
           ),
         ],

@@ -41,6 +41,7 @@ class SignupCubit extends Cubit<SignupState> {
         idNumber: idNumber,
       ),
     );
+    if (isClosed) return;
 
     result.fold(
       (failure) {
@@ -53,6 +54,7 @@ class SignupCubit extends Cubit<SignupState> {
           final uploadResult = await uploadPictureUseCase(
             UploadPictureParams(imagePath),
           );
+          if (isClosed) return;
           uploadResult.fold(
             (failure) => null,   
             (url)     => null,  

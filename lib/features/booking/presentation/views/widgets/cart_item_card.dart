@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:transportation_app/core/l10n/app_localizations.dart';
 import 'package:transportation_app/core/theming/colors.dart';
 import 'package:transportation_app/features/booking/domain/entities/cart_entity.dart';
 import 'package:transportation_app/features/booking/presentation/cubit/cart_cubit.dart';
@@ -22,6 +23,7 @@ class CartItemCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
@@ -120,7 +122,7 @@ class CartItemCard extends StatelessWidget {
                     border: Border.all(color: ColorsManager.accentCyan.withAlpha(76)),
                   ),
                   child: Text(
-                    '${item.totalPrice} EGP',
+                    '${item.totalPrice} ${l10n.egp}',
                     style: const TextStyle(
                       color: ColorsManager.accentCyan,
                       fontWeight: FontWeight.bold,
@@ -138,18 +140,21 @@ class CartItemCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 _buildTimeInfo(
+                  context,
                   icon: Icons.departure_board,
-                  label: 'Departure',
+                  label: l10n.departure,
                   time: item.boardingTime,
                 ),
                 _buildTimeInfo(
+                  context,
                   icon: Icons.event_seat,
-                  label: 'Class',
+                  label: l10n.classLabel,
                   text: item.className,
                 ),
                 _buildTimeInfo(
+                  context,
                   icon: Icons.timer,
-                  label: 'Expires',
+                  label: l10n.expires,
                   time: item.holdExpiresAt,
                   isWarning: true,
                 ),
@@ -167,7 +172,7 @@ class CartItemCard extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    '${item.seatsBooked} Passenger(s)',
+                    l10n.passengersCount(item.seatsBooked.toString()),
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 14,
@@ -206,19 +211,21 @@ class CartItemCard extends StatelessWidget {
     );
   }
 
-  Widget _buildTimeInfo({
+  Widget _buildTimeInfo(
+    BuildContext context, {
     required IconData icon,
     required String label,
     DateTime? time,
     String? text,
     bool isWarning = false,
   }) {
+    final l10n = AppLocalizations.of(context)!;
     String display = text ?? 'N/A';
     if (time != null) {
       if (isWarning) {
         final diff = time.difference(DateTime.now());
         if (diff.isNegative) {
-          display = 'Expired';
+          display = l10n.expired;
         } else {
           display = '${diff.inMinutes}m';
         }
@@ -298,30 +305,30 @@ class CartItemCard extends StatelessWidget {
   }
 
   void _confirmCancel(BuildContext context, int bookingId) {
+    final l10n = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: ColorsManager.cardBg,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text('Cancel this trip?',
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-        content: const Text(
-          'Your seat hold will be released and inventory restored. '
-          'This cannot be undone.',
-          style: TextStyle(color: Colors.white60),
+        title: Text(l10n.cancelTripTitle,
+            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        content: Text(
+          l10n.cancelTripMsg,
+          style: const TextStyle(color: Colors.white60),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Keep It', style: TextStyle(color: Colors.white54)),
+            child: Text(l10n.keepIt, style: const TextStyle(color: Colors.white54)),
           ),
           TextButton(
             onPressed: () {
               Navigator.pop(context);
               context.read<CartCubit>().cancelItem(bookingId);
             },
-            child: const Text('Cancel Trip',
-                style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+            child: Text(l10n.cancelTripBtn,
+                style: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
           ),
         ],
       ),

@@ -1491,4 +1491,48 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get refundRejected => 'Refund Rejected';
+
+  @override
+  String get expires => 'Expires';
+
+  @override
+  String get expired => 'Expired';
+
+  @override
+  String get cancelTripTitle => 'Cancel this trip?';
+
+  @override
+  String get cancelTripMsg =>
+      'Your seat hold will be released and inventory restored. This cannot be undone.';
+
+  @override
+  String get keepIt => 'Keep It';
+
+  @override
+  String get cancelTripBtn => 'Cancel Trip';
+
+  @override
+  String get insufficientFunds => 'Insufficient funds.';
+
+  @override
+  String insufficientFundsDetail(String balance, String total) {
+    return 'Insufficient funds. Your wallet balance is $balance EGP, but checkout total is $total EGP.';
+  }
+
+  @override
+  String get checkoutFailed => 'Checkout failed';
+
+  @override
+  String ticketAddedButCheckoutFailed(String error) {
+    return 'Ticket added to cart, but checkout failed: $error';
+  }
+
+  @override
+  String originalPrice(String price, String currency) {
+    return 'Original price: $price $currency';
+  }
+
+  @override
+  String get seatsTakenError =>
+      'One or more selected seats were just taken. Please refresh the seat map.';
 }

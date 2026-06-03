@@ -49,10 +49,13 @@ class SeatMapCubit extends Cubit<SeatMapState> {
         'contactEmail': contactEmail,
         'passengers': passengers,
       });
+      if (isClosed) return;
       emit(CartSuccess());
     } on ServerException catch (e) {
+      if (isClosed) return;
       emit(CartError(e.message));
     } catch (_) {
+      if (isClosed) return;
       emit(const CartError('Unexpected error occurred'));
     }
   }
@@ -64,11 +67,14 @@ class SeatMapCubit extends Cubit<SeatMapState> {
     try {
       for (final p in payloads) {
         await datasource.addToCart(p);
+        if (isClosed) return;
       }
       emit(CartSuccess());
     } on ServerException catch (e) {
+      if (isClosed) return;
       emit(CartError(e.message));
     } catch (_) {
+      if (isClosed) return;
       emit(const CartError('Unexpected error occurred'));
     }
   }
@@ -97,20 +103,27 @@ class SeatMapCubit extends Cubit<SeatMapState> {
         'contactEmail':        contactEmail,
         'passengers':          passengers,
       });
+      if (isClosed) return;
       try {
         final cart = await datasource.getCart();
+        if (isClosed) return;
         await datasource.checkout(pointsToRedeem: pointsToRedeem);
+        if (isClosed) return;
         
         await LocalAlarmScheduler.cancelCartExpiry();
+        if (isClosed) return;
         
-        if (!isClosed) emit(CartSuccess());
+        emit(CartSuccess());
       } on ServerException catch (e) {
-        if (!isClosed) emit(CartAddedButCheckoutFailed(e.message));
+        if (isClosed) return;
+        emit(CartAddedButCheckoutFailed(e.message));
       }
     } on ServerException catch (e) {
-      if (!isClosed) emit(CartError(e.message));
+      if (isClosed) return;
+      emit(CartError(e.message));
     } on NetworkException {
-      if (!isClosed) emit(const CartError('No internet connection.'));
+      if (isClosed) return;
+      emit(const CartError('No internet connection.'));
     }
   }
 }
