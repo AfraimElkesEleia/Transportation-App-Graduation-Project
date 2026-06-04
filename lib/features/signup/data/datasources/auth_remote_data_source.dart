@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:transportation_app/core/constants/api_constants.dart';
 import 'package:transportation_app/core/error/exceptions.dart';
 import 'package:transportation_app/features/signup/data/models/auth_response.dart';
@@ -77,9 +78,9 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       final data = _validateAndExtract(response);
       return AuthResponseModel.fromJson(data);
     } on DioException catch (e) {
-      print('🔴 [DataSource] DioException type: ${e.type}');
-      print('🔴 [DataSource] statusCode: ${e.response?.statusCode}');
-      print('🔴 [DataSource] body: ${e.response?.data}');
+      debugPrint('🔴 [DataSource] DioException type: ${e.type}');
+      debugPrint('🔴 [DataSource] statusCode: ${e.response?.statusCode}');
+      debugPrint('🔴 [DataSource] body: ${e.response?.data}');
       if (e.type == DioExceptionType.connectionError ||
           e.type == DioExceptionType.receiveTimeout ||
           e.type == DioExceptionType.connectionTimeout) {

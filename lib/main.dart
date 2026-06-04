@@ -32,7 +32,7 @@ void main() async {
   final tokenManager = sl<TokenManager>();
   final startup = AppStartup(tokenManager);
   final isLoggedIn = await startup.isUserLoggedIn();
-  print(isLoggedIn);
+  debugPrint('$isLoggedIn');
   runApp(
     DevicePreview(
       enabled: false,

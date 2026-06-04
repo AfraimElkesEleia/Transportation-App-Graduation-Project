@@ -125,10 +125,12 @@ class _RouteCard extends StatelessWidget {
         '${picked.day.toString().padLeft(2, '0')}';
 
     final searchParams = SearchParams(
-      fromDisplayName: route.originGov,
-      toDisplayName: route.destinationGov,
-      fromGovernorate: route.originGov,
-      toGovernorate: route.destinationGov,
+      fromDisplayName: route.originGovEn,
+      toDisplayName: route.destinationGovEn,
+      fromDisplayNameAr: route.originGovAr,
+      toDisplayNameAr: route.destinationGovAr,
+      fromGovernorate: route.originGovEn,
+      toGovernorate: route.destinationGovEn,
       travelDate: travelDate,
       passengers: 1,
     );
@@ -142,6 +144,7 @@ class _RouteCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isAr = Localizations.localeOf(context).languageCode == 'ar';
     return GestureDetector(
       onTap: () => _onTap(context),
       child: Container(
@@ -164,7 +167,7 @@ class _RouteCard extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    route.originGov,
+                    isAr ? route.originGovAr : route.originGovEn,
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 14,
@@ -184,7 +187,7 @@ class _RouteCard extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    route.destinationGov,
+                    isAr ? route.destinationGovAr : route.destinationGovEn,
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 14,

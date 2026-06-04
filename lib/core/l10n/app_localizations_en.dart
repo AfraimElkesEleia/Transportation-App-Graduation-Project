@@ -1553,4 +1553,17 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get arrivalTime => 'Arrival Time';
+
+  @override
+  String get identityDetails => 'Identity Details';
+
+  @override
+  String get identityDetailsWarning =>
+      'Once set, identity details cannot be changed. Please make sure the entered details are correct.';
+
+  @override
+  String get nationalIdRequired => 'National ID is required.';
+
+  @override
+  String get passportNumberRequired => 'Passport number is required.';
 }

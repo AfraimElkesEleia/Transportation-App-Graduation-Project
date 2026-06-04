@@ -10,7 +10,7 @@ class PlanYourJourneyHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        const Icon(FontAwesomeIcons.train, color: Colors.white, size: 20),
+        const FaIcon(FontAwesomeIcons.train, color: Colors.white, size: 20),
         const SizedBox(width: 12),
         Text(
           AppLocalizations.of(context)!.planYourJourney,

@@ -90,7 +90,10 @@ class WalletSection extends StatelessWidget {
                     const SizedBox(width: 4),
                     Text(
                       l10n.walletActive,
-                      style: const TextStyle(color: Color(0xFF00E5FF), fontSize: 11),
+                      style: const TextStyle(
+                        color: Color(0xFF00E5FF),
+                        fontSize: 11,
+                      ),
                     ),
                   ],
                 ),
@@ -128,7 +131,10 @@ class WalletSection extends StatelessWidget {
                         padding: const EdgeInsets.only(bottom: 6, left: 6),
                         child: Text(
                           l10n.egp,
-                          style: const TextStyle(color: Colors.white60, fontSize: 14),
+                          style: const TextStyle(
+                            color: Colors.white60,
+                            fontSize: 14,
+                          ),
                         ),
                       ),
                     ],
@@ -279,8 +285,11 @@ class _ChargeWalletSheetState extends State<_ChargeWalletSheet> {
               SnackBar(
                 content: Row(
                   children: [
-                    const Icon(Icons.error_outline,
-                        color: Colors.white, size: 18),
+                    const Icon(
+                      Icons.error_outline,
+                      color: Colors.white,
+                      size: 18,
+                    ),
                     const SizedBox(width: 10),
                     Expanded(
                       child: Text(
@@ -465,7 +474,8 @@ class _CardTab extends StatelessWidget {
                   FilteringTextInputFormatter.digitsOnly,
                   LengthLimitingTextInputFormatter(3),
                 ],
-                validator: (v) => (v?.length == 3) ? null : l10n.threeDigitsRequired,
+                validator: (v) =>
+                    (v?.length == 3) ? null : l10n.threeDigitsRequired,
               ),
             ),
           ],
@@ -629,8 +639,10 @@ class _WalletHistorySheet extends StatelessWidget {
                             padding: const EdgeInsets.all(10),
                             decoration: BoxDecoration(
                               color: t.isCredit
-                                  ? const Color(0xFF00C853).withValues(alpha: 0.15)
-                                  : Colors.red.withOpacity(0.15),
+                                  ? const Color(
+                                      0xFF00C853,
+                                    ).withValues(alpha: 0.15)
+                                  : Colors.red.withValues(alpha: 0.15),
                               shape: BoxShape.circle,
                             ),
                             child: Icon(
@@ -689,7 +701,9 @@ class _WalletHistorySheet extends StatelessWidget {
 class _ExpiryDateFormatter extends TextInputFormatter {
   @override
   TextEditingValue formatEditUpdate(
-      TextEditingValue oldValue, TextEditingValue newValue) {
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
     final newText = newValue.text;
 
     if (oldValue.text.length >= newText.length) {

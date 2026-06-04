@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:transportation_app/core/helper/spacing.dart';
 import 'package:transportation_app/core/theming/font_weight_helper.dart';
 
 class CustomBottomNavBarItem extends StatefulWidget {
   final bool isActive;
-  final IconData icon;
+  final FaIconData icon;
   final String label;
   final VoidCallback onTap;
   const CustomBottomNavBarItem({
@@ -77,7 +78,7 @@ class _CustomBottomNavBarItemState extends State<CustomBottomNavBarItem>
               mainAxisSize: MainAxisSize.min,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(
+                FaIcon(
                   widget.icon,
                   color: widget.isActive
                       ? const Color(0xFF40e0d0)

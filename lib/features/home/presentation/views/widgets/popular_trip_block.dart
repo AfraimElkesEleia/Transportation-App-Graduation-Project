@@ -17,12 +17,15 @@ class PopularTripBlock extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(
+              FaIcon(
                 FontAwesomeIcons.arrowTrendUp,
                 color: ColorsManager.cyanBlue,
               ),
               horizontalSpace(space: 10),
-              Text(AppLocalizations.of(context)!.popularRoutes, style: AppStyles.semiBold18White(context)),
+              Text(
+                AppLocalizations.of(context)!.popularRoutes,
+                style: AppStyles.semiBold18White(context),
+              ),
             ],
           ),
           verticalSpace(space: 12),

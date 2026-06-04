@@ -9,10 +9,13 @@ import 'package:transportation_app/features/profile/domain/entities/ticket_entit
 /// Sell / Cancel action button driven by [ticket.isOfferedForResale].
 class ResaleTicketCard extends StatelessWidget {
   final TicketEntity ticket;
+
   /// Called when the user taps "Sell" (ticket is not yet listed).
   final VoidCallback? onSell;
+
   /// Called when the user taps "Cancel" (ticket is already listed).
   final VoidCallback? onCancel;
+
   /// When true, replaces the action button with a small spinner.
   final bool isPending;
 
@@ -78,8 +81,7 @@ class ResaleTicketCard extends StatelessWidget {
               ),
               const SizedBox(width: 8),
               Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
                   color: daysLeft < 3
                       ? Colors.redAccent.withValues(alpha: 0.15)
@@ -141,13 +143,11 @@ class ResaleTicketCard extends StatelessWidget {
           if (isListed)
             Container(
               margin: const EdgeInsets.only(bottom: 10),
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
               decoration: BoxDecoration(
                 color: Colors.orange.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(10),
-                border:
-                    Border.all(color: Colors.orange.withValues(alpha: 0.3)),
+                border: Border.all(color: Colors.orange.withValues(alpha: 0.3)),
               ),
               child: Row(
                 children: [
@@ -165,8 +165,7 @@ class ResaleTicketCard extends StatelessWidget {
           ...ticket.passengers.map((p) {
             return Container(
               margin: const EdgeInsets.only(bottom: 8),
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
               decoration: BoxDecoration(
                 color: Colors.white.withValues(alpha: 0.05),
                 borderRadius: BorderRadius.circular(10),
@@ -182,10 +181,7 @@ class ResaleTicketCard extends StatelessWidget {
                   Expanded(
                     child: Text(
                       '${l10n.seat} ${p.seatNumber}  ·  ${p.name}',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 13,
-                      ),
+                      style: const TextStyle(color: Colors.white, fontSize: 13),
                     ),
                   ),
                 ],
@@ -229,8 +225,9 @@ class ResaleTicketCard extends StatelessWidget {
                             vertical: 2,
                           ),
                           decoration: BoxDecoration(
-                            color: ColorsManager.successGreen
-                                .withValues(alpha: 0.12),
+                            color: ColorsManager.successGreen.withValues(
+                              alpha: 0.12,
+                            ),
                             borderRadius: BorderRadius.circular(6),
                           ),
                           child: Text(

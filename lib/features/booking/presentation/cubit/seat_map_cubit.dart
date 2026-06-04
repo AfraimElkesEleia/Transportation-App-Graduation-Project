@@ -13,7 +13,7 @@ class SeatMapCubit extends Cubit<SeatMapState> {
     if (isClosed) return;
     emit(SeatMapLoading());
     try {
-      final map      = await datasource.getSeatMap(occurrenceId);
+      final map = await datasource.getSeatMap(occurrenceId);
       final classMap = map.classById(coachClassId);
       if (classMap == null) {
         emit(const SeatMapError('Class not found in seat map.'));
@@ -80,10 +80,10 @@ class SeatMapCubit extends Cubit<SeatMapState> {
   }
 
   Future<void> bookNow({
-    required int    tripOccurrenceId,
-    required int    coachClassId,
-    required int    originStationId,
-    required int    destinationStationId,
+    required int tripOccurrenceId,
+    required int coachClassId,
+    required int originStationId,
+    required int destinationStationId,
     required String contactName,
     required String contactPhone,
     required String contactEmail,
@@ -94,25 +94,25 @@ class SeatMapCubit extends Cubit<SeatMapState> {
     emit(CartAdding());
     try {
       await datasource.addToCart({
-        'tripOccurrenceId':    tripOccurrenceId,
-        'coachClassId':        coachClassId,
-        'originStationId':     originStationId,
+        'tripOccurrenceId': tripOccurrenceId,
+        'coachClassId': coachClassId,
+        'originStationId': originStationId,
         'destinationStationId': destinationStationId,
-        'contactName':         contactName,
-        'contactPhone':        contactPhone,
-        'contactEmail':        contactEmail,
-        'passengers':          passengers,
+        'contactName': contactName,
+        'contactPhone': contactPhone,
+        'contactEmail': contactEmail,
+        'passengers': passengers,
       });
       if (isClosed) return;
       try {
-        final cart = await datasource.getCart();
+        await datasource.getCart();
         if (isClosed) return;
         await datasource.checkout(pointsToRedeem: pointsToRedeem);
         if (isClosed) return;
-        
+
         await LocalAlarmScheduler.cancelCartExpiry();
         if (isClosed) return;
-        
+
         emit(CartSuccess());
       } on ServerException catch (e) {
         if (isClosed) return;

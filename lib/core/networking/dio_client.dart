@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:transportation_app/core/constants/api_constants.dart';
 import 'package:transportation_app/core/networking/auth_interceptors/auth_interceptor.dart';
 
@@ -25,7 +26,7 @@ class DioClient {
       LogInterceptor(
         requestBody: true,
         responseBody: true,
-        logPrint: (log) => print(log),
+        logPrint: (log) => debugPrint(log.toString()),
       ),
     ]);
     return dio;

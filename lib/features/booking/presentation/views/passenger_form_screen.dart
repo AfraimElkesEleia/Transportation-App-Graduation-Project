@@ -12,6 +12,10 @@ import 'package:transportation_app/features/profile/presentation/cubit/profile_c
 import 'package:transportation_app/features/search/domain/entities/coach_class_entity.dart';
 import 'package:transportation_app/features/search/domain/entities/trip_result_entity.dart';
 import 'package:transportation_app/features/booking/presentation/views/widgets/points_redemption_widget.dart';
+import 'package:transportation_app/features/booking/presentation/views/widgets/passenger_form/passenger_autofill_banner.dart';
+import 'package:transportation_app/features/booking/presentation/views/widgets/passenger_form/passenger_card.dart';
+import 'package:transportation_app/features/booking/presentation/views/widgets/passenger_form/passenger_form_app_bar.dart';
+import 'package:transportation_app/features/booking/presentation/views/widgets/passenger_form/passenger_form_controllers.dart';
 
 class PassengerFormScreen extends StatefulWidget {
   final TripResultEntity trip;
@@ -35,7 +39,7 @@ class _PassengerFormScreenState extends State<PassengerFormScreen> {
   final _formKey = GlobalKey<FormState>();
 
   // One controller set per passenger
-  late final List<_PassengerControllers> _controllers;
+  late final List<PassengerFormControllers> _controllers;
 
   // Loyalty points for "Book Now"
   int _selectedPoints = 0;
@@ -48,7 +52,7 @@ class _PassengerFormScreenState extends State<PassengerFormScreen> {
     super.initState();
     _controllers = List.generate(
       widget.selectedSeats.length,
-      (_) => _PassengerControllers(),
+      (_) => PassengerFormControllers(),
     );
     // Listen on first passenger fields to reset _autofilled badge when user edits
     _controllers.first.nameController.addListener(_onFirstChanged);
@@ -83,7 +87,9 @@ class _PassengerFormScreenState extends State<PassengerFormScreen> {
           }
           if (profile.idType != null) {
             setState(() {
-              first.selectedIdType = profile.idType == 2 ? 'Passport' : 'NationalId';
+              first.selectedIdType = profile.idType == 2
+                  ? 'Passport'
+                  : 'NationalId';
             });
           }
         }
@@ -252,7 +258,9 @@ class _PassengerFormScreenState extends State<PassengerFormScreen> {
                 if (state is CartError) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text(ErrorLocalizer.localize(context, state.message)),
+                      content: Text(
+                        ErrorLocalizer.localize(context, state.message),
+                      ),
                       backgroundColor: Colors.red,
                     ),
                   );
@@ -288,7 +296,7 @@ class _PassengerFormScreenState extends State<PassengerFormScreen> {
           child: Column(
             children: [
               // ── App bar ──
-              _FormAppBar(trip: widget.trip),
+              const PassengerFormAppBar(),
 
               // ── Form ──
               Expanded(
@@ -316,7 +324,7 @@ class _PassengerFormScreenState extends State<PassengerFormScreen> {
                                   context,
                                 )!.seatLabel(widget.selectedSeats[index]);
                           widgets.add(
-                            _PassengerCard(
+                            PassengerCard(
                               label: seatLabel,
                               controllers: _controllers[index],
                               isTrain: widget.isTrain,
@@ -329,7 +337,7 @@ class _PassengerFormScreenState extends State<PassengerFormScreen> {
                               !widget.isTrain &&
                               widget.selectedSeats.length > 1) {
                             widgets.add(
-                              _AutofillBanner(
+                              PassengerAutofillBanner(
                                 autofilled: _autofilled,
                                 onAutofill: _autofill,
                               ),
@@ -361,265 +369,6 @@ class _PassengerFormScreenState extends State<PassengerFormScreen> {
               ),
             ],
           ),
-        ),
-      ),
-    );
-  }
-}
-
-// ─────────────────────────────────────────────────────────────────
-// _PassengerControllers — holds text controllers per passenger
-// ─────────────────────────────────────────────────────────────────
-class _PassengerControllers {
-  final nameController = TextEditingController();
-  final idController = TextEditingController();
-  final phoneController = TextEditingController();
-  final emailController = TextEditingController();
-  // 'NationalId' | 'Passport'
-  String selectedIdType = 'NationalId';
-
-  void dispose() {
-    nameController.dispose();
-    idController.dispose();
-    phoneController.dispose();
-    emailController.dispose();
-  }
-}
-
-// ─────────────────────────────────────────────────────────────────
-// _FormAppBar
-// ─────────────────────────────────────────────────────────────────
-class _FormAppBar extends StatelessWidget {
-  final TripResultEntity trip;
-
-  const _FormAppBar({required this.trip});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      child: Row(
-        children: [
-          GestureDetector(
-            onTap: () => Navigator.pop(context),
-            child: Container(
-              width: 42,
-              height: 42,
-              decoration: BoxDecoration(
-                color: ColorsManager.seatContainerBg,
-                borderRadius: BorderRadius.circular(21),
-              ),
-              child: const Icon(
-                Icons.arrow_back,
-                color: Colors.white,
-                size: 20,
-              ),
-            ),
-          ),
-          Expanded(
-            child: Text(
-              AppLocalizations.of(context)!.passengerDetails,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 17,
-                fontWeight: FontWeight.bold,
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ),
-          const SizedBox(width: 42),
-        ],
-      ),
-    );
-  }
-}
-
-// ─────────────────────────────────────────────────────────────────
-// _PassengerCard — one card per passenger
-//   - Bus: Name + Phone + Email (no National ID)
-//   - Train (ENR): Name + National ID + Phone + Email
-// ─────────────────────────────────────────────────────────────────
-class _PassengerCard extends StatefulWidget {
-  final String label;
-  final _PassengerControllers controllers;
-  final bool isTrain;
-
-  const _PassengerCard({
-    required this.label,
-    required this.controllers,
-    required this.isTrain,
-  });
-
-  @override
-  State<_PassengerCard> createState() => _PassengerCardState();
-}
-
-class _PassengerCardState extends State<_PassengerCard> {
-  @override
-  Widget build(BuildContext context) {
-    final loc = AppLocalizations.of(context)!;
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: ColorsManager.surfaceDark,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: ColorsManager.borderDim, width: 1),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // ── Seat / passenger label ──
-          Text(
-            widget.label,
-            style: const TextStyle(
-              color: ColorsManager.accentCyan,
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 12),
-
-          // ── Full Name (required for all) ──
-          _buildTextField(
-            controller: widget.controllers.nameController,
-            label: loc.fullName,
-            icon: Icons.person_outline,
-            validator: (v) =>
-                (v == null || v.trim().isEmpty) ? loc.requiredField : null,
-          ),
-          const SizedBox(height: 12),
-
-          // ── ID Type Dropdown + ID Number — ONLY for train (ENR) ──
-          if (widget.isTrain) ...[
-            // ID Type Dropdown
-            DropdownButtonFormField<String>(
-              initialValue: widget.controllers.selectedIdType,
-              decoration: InputDecoration(
-                labelText: loc.idTypeLabel,
-                labelStyle: const TextStyle(
-                  color: ColorsManager.textMuted,
-                  fontSize: 13,
-                ),
-                prefixIcon: const Icon(
-                  Icons.badge_outlined,
-                  color: ColorsManager.textMuted,
-                  size: 20,
-                ),
-                filled: true,
-                fillColor: ColorsManager.seatContainerBg,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide.none,
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide:
-                      const BorderSide(color: ColorsManager.accentCyan),
-                ),
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 14,
-                ),
-              ),
-              dropdownColor: ColorsManager.surfaceDark,
-              style: const TextStyle(color: Colors.white, fontSize: 14),
-              items: [
-                DropdownMenuItem(
-                  value: 'NationalId',
-                  child: Text(loc.idTypeNationalId),
-                ),
-                DropdownMenuItem(
-                  value: 'Passport',
-                  child: Text(loc.idTypePassport),
-                ),
-              ],
-              onChanged: (val) {
-                if (val != null) {
-                  setState(() {
-                    widget.controllers.selectedIdType = val;
-                    widget.controllers.idController.clear();
-                  });
-                }
-              },
-            ),
-            const SizedBox(height: 12),
-            // ID Number field (label adapts to type)
-            _buildTextField(
-              controller: widget.controllers.idController,
-              label: widget.controllers.selectedIdType == 'NationalId'
-                  ? loc.idNumberLabel
-                  : loc.passportNumberLabel,
-              icon: Icons.credit_card_outlined,
-              keyboardType: widget.controllers.selectedIdType == 'NationalId'
-                  ? TextInputType.number
-                  : TextInputType.text,
-              validator: (v) =>
-                  (v == null || v.trim().isEmpty) ? loc.requiredField : null,
-            ),
-            const SizedBox(height: 12),
-          ],
-
-          // ── Phone ──
-          _buildTextField(
-            controller: widget.controllers.phoneController,
-            label: loc.phoneNumberLabel,
-            icon: Icons.phone_outlined,
-            keyboardType: TextInputType.phone,
-            validator: (v) =>
-                (v == null || v.trim().isEmpty) ? loc.requiredField : null,
-          ),
-          const SizedBox(height: 12),
-
-          // ── Email ──
-          _buildTextField(
-            controller: widget.controllers.emailController,
-            label: loc.emailOptional,
-            icon: Icons.email_outlined,
-            keyboardType: TextInputType.emailAddress,
-          ),
-          const SizedBox(height: 12),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildTextField({
-    required TextEditingController controller,
-    required String label,
-    required IconData icon,
-    TextInputType keyboardType = TextInputType.text,
-    String? Function(String?)? validator,
-  }) {
-    return TextFormField(
-      controller: controller,
-      keyboardType: keyboardType,
-      validator: validator,
-      style: const TextStyle(color: Colors.white, fontSize: 14),
-      decoration: InputDecoration(
-        labelText: label,
-        labelStyle: const TextStyle(
-          color: ColorsManager.textMuted,
-          fontSize: 13,
-        ),
-        prefixIcon: Icon(icon, color: ColorsManager.textMuted, size: 20),
-        filled: true,
-        fillColor: ColorsManager.seatContainerBg,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide.none,
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: ColorsManager.accentCyan),
-        ),
-        errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Colors.redAccent),
-        ),
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 16,
-          vertical: 14,
         ),
       ),
     );
@@ -752,102 +501,6 @@ class _FormBottomButtonsState extends State<_FormBottomButtons> {
           ],
         );
       },
-    );
-  }
-}
-
-// -----------------------------------------------------------------
-// _AutofillBanner - shown between seat 0 and seat 1 for bus legs
-// -----------------------------------------------------------------
-class _AutofillBanner extends StatelessWidget {
-  final bool autofilled;
-  final VoidCallback onAutofill;
-
-  const _AutofillBanner({required this.autofilled, required this.onAutofill});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-      decoration: BoxDecoration(
-        color: ColorsManager.surfaceDark,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: ColorsManager.accentCyan.withAlpha(80),
-          width: 1.2,
-        ),
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: ColorsManager.accentCyan.withAlpha(25),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: const Icon(
-              Icons.family_restroom_rounded,
-              color: ColorsManager.accentCyan,
-              size: 22,
-            ),
-          ),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  autofilled
-                      ? AppLocalizations.of(context)!.autoFilled
-                      : AppLocalizations.of(context)!.travellingWithFamily,
-                  style: TextStyle(
-                    color: autofilled
-                        ? ColorsManager.successGreen
-                        : Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 13,
-                  ),
-                ),
-                const SizedBox(height: 3),
-                Text(
-                  AppLocalizations.of(context)!.fillSeat1Info,
-                  style: const TextStyle(color: Colors.white54, fontSize: 11),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(width: 8),
-          OutlinedButton(
-            onPressed: onAutofill,
-            style: OutlinedButton.styleFrom(
-              side: BorderSide(
-                color: autofilled
-                    ? ColorsManager.successGreen
-                    : ColorsManager.accentCyan,
-              ),
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              minimumSize: Size.zero,
-              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-            ),
-            child: Text(
-              autofilled
-                  ? AppLocalizations.of(context)!.reFill
-                  : AppLocalizations.of(context)!.autoFill,
-              style: TextStyle(
-                color: autofilled
-                    ? ColorsManager.successGreen
-                    : ColorsManager.accentCyan,
-                fontWeight: FontWeight.bold,
-                fontSize: 12,
-              ),
-            ),
-          ),
-        ],
-      ),
     );
   }
 }

@@ -806,5 +806,9 @@
   "allCompanies": "All companies",
   "from": "From",
   "to": "To",
-  "arrivalTime": "Arrival Time"
+  "arrivalTime": "Arrival Time",
+  "identityDetails": "Identity Details",
+  "identityDetailsWarning": "Once set, identity details cannot be changed. Please make sure the entered details are correct.",
+  "nationalIdRequired": "National ID is required.",
+  "passportNumberRequired": "Passport number is required."
 }

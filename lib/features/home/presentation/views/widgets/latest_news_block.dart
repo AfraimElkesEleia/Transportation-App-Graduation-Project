@@ -16,7 +16,8 @@ class LatestNewsBlock extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final state = context.watch<NotificationCubit>().state;
-    final latestNotif = (state is NotificationLoaded && state.notifications.isNotEmpty)
+    final latestNotif =
+        (state is NotificationLoaded && state.notifications.isNotEmpty)
         ? state.notifications.first
         : null;
 
@@ -26,9 +27,12 @@ class LatestNewsBlock extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(FontAwesomeIcons.newspaper, color: ColorsManager.cyanBlue),
+              FaIcon(FontAwesomeIcons.newspaper, color: ColorsManager.cyanBlue),
               horizontalSpace(space: 8),
-              Text(AppLocalizations.of(context)!.latestNews, style: AppStyles.semiBold18White(context)),
+              Text(
+                AppLocalizations.of(context)!.latestNews,
+                style: AppStyles.semiBold18White(context),
+              ),
             ],
           ),
           verticalSpace(space: 8),

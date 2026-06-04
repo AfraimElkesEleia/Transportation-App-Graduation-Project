@@ -57,6 +57,7 @@ class ProfileEntity extends Equatable {
   final List<ChallengeEntity>? activeChallenges;
   final int? idType;      // 1 = National ID, 2 = Passport
   final String? idNumber;
+  final bool hasSetIdentityDetails;
   const ProfileEntity({
     required this.userId,
     required this.firstName,
@@ -77,6 +78,7 @@ class ProfileEntity extends Equatable {
     this.activeChallenges,
     this.idType,
     this.idNumber,
+    this.hasSetIdentityDetails = false,
   });
 
   ProfileEntity copyWith({
@@ -95,6 +97,7 @@ class ProfileEntity extends Equatable {
     List<ChallengeEntity>? activeChallenges,
     int? idType,
     String? idNumber,
+    bool? hasSetIdentityDetails,
   }) {
     return ProfileEntity(
       userId: userId,
@@ -116,6 +119,7 @@ class ProfileEntity extends Equatable {
       activeChallenges: activeChallenges ?? this.activeChallenges,
       idType: idType ?? this.idType,
       idNumber: idNumber ?? this.idNumber,
+      hasSetIdentityDetails: hasSetIdentityDetails ?? this.hasSetIdentityDetails,
     );
   }
 

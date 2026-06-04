@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:transportation_app/core/constants/api_constants.dart';
 import 'package:transportation_app/core/error/exceptions.dart';
 import 'package:transportation_app/features/profile/data/models/profile_model.dart';
@@ -13,6 +14,8 @@ abstract class ProfileRemoteDatasource {
     required String familyName,
     required String email,
     required String phoneNumber,
+    int? idType,
+    String? idNumber,
   });
   Future<String> uploadProfilePicture({required String filePath});
   Future<void> revokeToken({required String refreshToken});
@@ -35,7 +38,7 @@ class ProfileRemoteDatasourceImpl implements ProfileRemoteDatasource {
     try {
       final res = await dio.get(ApiConstants.userMe);
       final body = res.data as Map<String, dynamic>;
-      print('📦 [Profile] raw data: ${body['data']}');
+      debugPrint('📦 [Profile] raw data: ${body['data']}');
       if (body['success'] != true) {
         throw ServerException(
           message: body['message'] ?? 'Failed to load profile',
@@ -54,27 +57,29 @@ class ProfileRemoteDatasourceImpl implements ProfileRemoteDatasource {
     required String familyName,
     required String email,
     required String phoneNumber,
+    int? idType,
+    String? idNumber,
   }) async {
     try {
-      final res = await dio.put(
-        ApiConstants.userMe,
-        data: {
-          'firstName': firstName,
-          'lastName': lastName,
-          'familyName': familyName,
-          'email': email,
-          'phoneNumber': phoneNumber,
-        },
-      );
-      final body = res.data as Map<String, dynamic>;
-      if (body['success'] != true) {
+      final body = <String, dynamic>{
+        'firstName': firstName,
+        'lastName': lastName,
+        'familyName': familyName,
+        'email': email,
+        'phoneNumber': phoneNumber,
+      };
+      if (idType != null) body['idType'] = idType;
+      if (idNumber != null && idNumber.isNotEmpty) body['idNumber'] = idNumber;
+      final res = await dio.put(ApiConstants.userMe, data: body);
+      final bodyRes = res.data as Map<String, dynamic>;
+      if (bodyRes['success'] != true) {
         final errors =
-            (body['errors'] as List<dynamic>?)
+            (bodyRes['errors'] as List<dynamic>?)
                 ?.map((e) => e.toString())
                 .toList() ??
             [];
         throw ServerException(
-          message: body['message'] ?? 'Update failed',
+          message: bodyRes['message'] ?? 'Update failed',
           errors: errors,
         );
       }

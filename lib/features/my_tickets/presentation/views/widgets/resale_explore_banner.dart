@@ -15,7 +15,7 @@ class ResaleExploreBanner extends StatelessWidget {
       decoration: BoxDecoration(
         color: ColorsManager.resellSurfaceTeal.withValues(alpha: 0.4),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.teal.withOpacity(0.3)),
+        border: Border.all(color: Colors.teal.withValues(alpha: 0.3)),
       ),
       child: Row(
         children: [

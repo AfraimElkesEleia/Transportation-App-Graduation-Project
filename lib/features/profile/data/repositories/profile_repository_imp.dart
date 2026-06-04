@@ -56,6 +56,8 @@ class ProfileRepositoryImp extends ProfileRepository {
     required String familyName,
     required String email,
     required String phoneNumber,
+    int? idType,
+    String? idNumber,
   }) async {
     try {
       final model = await remoteDataSource.updateProfile(
@@ -64,6 +66,8 @@ class ProfileRepositoryImp extends ProfileRepository {
         familyName:  familyName,
         email:       email,
         phoneNumber: phoneNumber,
+        idType:      idType,
+        idNumber:    idNumber,
       );
       await tokenManager.saveUser(model);
       return Right(model);

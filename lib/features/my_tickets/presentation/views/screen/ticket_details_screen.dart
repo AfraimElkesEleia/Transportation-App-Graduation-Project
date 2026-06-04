@@ -22,7 +22,9 @@ class _TicketDetailsScreenState extends State<TicketDetailsScreen> {
   late TicketEntity _ticket;
 
   Color get _statusColor {
-    if (_ticket.refundStatus == 'Accepted' || _ticket.refundStatus == 'Approved' || _ticket.status.toLowerCase() == 'cancelled') {
+    if (_ticket.refundStatus == 'Accepted' ||
+        _ticket.refundStatus == 'Approved' ||
+        _ticket.status.toLowerCase() == 'cancelled') {
       return Colors.red;
     }
     if (_ticket.status.toLowerCase() == 'completed') {
@@ -32,7 +34,8 @@ class _TicketDetailsScreenState extends State<TicketDetailsScreen> {
   }
 
   String _getLocalizedStatus(AppLocalizations l10n, String status) {
-    if (_ticket.refundStatus == 'Accepted' || _ticket.refundStatus == 'Approved') {
+    if (_ticket.refundStatus == 'Accepted' ||
+        _ticket.refundStatus == 'Approved') {
       return l10n.statusCancelled;
     }
     switch (status.toLowerCase()) {
@@ -68,7 +71,7 @@ class _TicketDetailsScreenState extends State<TicketDetailsScreen> {
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: Colors.orange.withOpacity(0.15),
+                color: Colors.orange.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: const Icon(
@@ -236,7 +239,9 @@ class _TicketDetailsScreenState extends State<TicketDetailsScreen> {
                   decoration: BoxDecoration(
                     color: ColorsManager.cardBg,
                     borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: Colors.white.withValues(alpha: 0.07)),
+                    border: Border.all(
+                      color: Colors.white.withValues(alpha: 0.07),
+                    ),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -260,14 +265,10 @@ class _TicketDetailsScreenState extends State<TicketDetailsScreen> {
                               vertical: 4,
                             ),
                             decoration: BoxDecoration(
-                              color: _statusColor.withValues(
-                                alpha: 0.15,
-                              ),
+                              color: _statusColor.withValues(alpha: 0.15),
                               borderRadius: BorderRadius.circular(8),
                               border: Border.all(
-                                color: _statusColor.withValues(
-                                  alpha: 0.4,
-                                ),
+                                color: _statusColor.withValues(alpha: 0.4),
                               ),
                             ),
                             child: Text(
@@ -527,7 +528,9 @@ class _TicketDetailsScreenState extends State<TicketDetailsScreen> {
                             width: 36,
                             height: 36,
                             decoration: BoxDecoration(
-                              color: ColorsManager.accentCyan.withValues(alpha: 0.1),
+                              color: ColorsManager.accentCyan.withValues(
+                                alpha: 0.1,
+                              ),
                               shape: BoxShape.circle,
                               border: Border.all(
                                 color: ColorsManager.accentCyan.withValues(
@@ -628,6 +631,7 @@ class _RefundButton extends StatelessWidget {
   final AppLocalizations l10n;
   final bool isRequesting;
   final String? refundStatus;
+
   /// True when the ticket is currently listed on the resale marketplace.
   final bool isLockedByResale;
   final VoidCallback onPressed;
@@ -642,7 +646,11 @@ class _RefundButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final hasStatus = refundStatus == 'Requested' || refundStatus == 'Accepted' || refundStatus == 'Approved' || refundStatus == 'Rejected';
+    final hasStatus =
+        refundStatus == 'Requested' ||
+        refundStatus == 'Accepted' ||
+        refundStatus == 'Approved' ||
+        refundStatus == 'Rejected';
     final isDisabled = hasStatus || isRequesting || isLockedByResale;
 
     return AnimatedContainer(
@@ -661,7 +669,7 @@ class _RefundButton extends StatelessWidget {
             ? null
             : [
                 BoxShadow(
-                  color: Colors.orange.withOpacity(0.35),
+                  color: Colors.orange.withValues(alpha: 0.35),
                   blurRadius: 12,
                   offset: const Offset(0, 4),
                 ),
@@ -695,7 +703,8 @@ class _RefundButton extends StatelessWidget {
                       fontSize: 15,
                     ),
                   ),
-                ] else if (refundStatus == 'Accepted' || refundStatus == 'Approved') ...[
+                ] else if (refundStatus == 'Accepted' ||
+                    refundStatus == 'Approved') ...[
                   const Icon(
                     Icons.check_circle,
                     color: ColorsManager.successGreen,
@@ -711,11 +720,7 @@ class _RefundButton extends StatelessWidget {
                     ),
                   ),
                 ] else if (refundStatus == 'Rejected') ...[
-                  const Icon(
-                    Icons.cancel,
-                    color: Colors.red,
-                    size: 20,
-                  ),
+                  const Icon(Icons.cancel, color: Colors.red, size: 20),
                   const SizedBox(width: 8),
                   Text(
                     l10n.refundRejected,
@@ -741,11 +746,7 @@ class _RefundButton extends StatelessWidget {
                     ),
                   ),
                 ] else if (isLockedByResale) ...[
-                  const Icon(
-                    Icons.storefront,
-                    color: Colors.orange,
-                    size: 20,
-                  ),
+                  const Icon(Icons.storefront, color: Colors.orange, size: 20),
                   const SizedBox(width: 8),
                   Text(
                     l10n.listedOnMarketplace,

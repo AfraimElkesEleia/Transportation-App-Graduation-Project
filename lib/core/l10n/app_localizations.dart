@@ -2959,6 +2959,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Arrival Time'**
   String get arrivalTime;
+
+  /// No description provided for @identityDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Identity Details'**
+  String get identityDetails;
+
+  /// No description provided for @identityDetailsWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'Once set, identity details cannot be changed. Please make sure the entered details are correct.'**
+  String get identityDetailsWarning;
+
+  /// No description provided for @nationalIdRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'National ID is required.'**
+  String get nationalIdRequired;
+
+  /// No description provided for @passportNumberRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Passport number is required.'**
+  String get passportNumberRequired;
 }
 
 class _AppLocalizationsDelegate

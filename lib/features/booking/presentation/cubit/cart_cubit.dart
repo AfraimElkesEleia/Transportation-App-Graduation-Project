@@ -39,7 +39,6 @@ class CartCubit extends Cubit<CartState> {
   }
 
   Future<void> checkout({int pointsToRedeem = 0}) async {
-    final currentState = state;
     emit(CheckoutLoading());
     try {
       await datasource.checkout(pointsToRedeem: pointsToRedeem);

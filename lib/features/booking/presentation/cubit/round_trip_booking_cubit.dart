@@ -21,62 +21,82 @@ class RoundTripBookingCubit extends Cubit<RoundTripBookingState> {
 
   // ── Outbound ──
   Future<void> searchOutbound(SearchParams params) async {
-    emit(state.copyWith(
-      activeParams: params,
-      isLoadingOutbound: true,
-      clearOutboundError: true,
-      outboundResults: [],
-    ));
+    emit(
+      state.copyWith(
+        activeParams: params,
+        isLoadingOutbound: true,
+        clearOutboundError: true,
+        outboundResults: [],
+      ),
+    );
 
     final result = await searchTripsUseCase(params);
     if (isClosed) return;
 
     result.fold(
-      (failure) => emit(state.copyWith(
-        isLoadingOutbound: false,
-        outboundError: failure.message,
-      )),
-      (paged) => emit(state.copyWith(
-        isLoadingOutbound: false,
-        outboundResults: paged.items,
-        outboundCurrentPage: paged.currentPage,
-        outboundTotalPages: paged.totalPages,
-      )),
+      (failure) => emit(
+        state.copyWith(
+          isLoadingOutbound: false,
+          outboundError: failure.message,
+        ),
+      ),
+      (paged) => emit(
+        state.copyWith(
+          isLoadingOutbound: false,
+          outboundResults: paged.items,
+          outboundCurrentPage: paged.currentPage,
+          outboundTotalPages: paged.totalPages,
+        ),
+      ),
     );
   }
 
   Future<void> loadMoreOutbound() async {
-    if (isClosed || state.isFetchingMoreOutbound || !state.hasMoreOutboundPages) return;
+    if (isClosed ||
+        state.isFetchingMoreOutbound ||
+        !state.hasMoreOutboundPages) {
+      return;
+    }
 
     emit(state.copyWith(isFetchingMoreOutbound: true));
 
-    final newParams = state.activeParams!.copyWith(newPage: state.outboundCurrentPage + 1);
+    final newParams = state.activeParams!.copyWith(
+      newPage: state.outboundCurrentPage + 1,
+    );
     final result = await searchTripsUseCase(newParams);
-    
+
     if (isClosed) return;
 
     result.fold(
       (failure) => emit(state.copyWith(isFetchingMoreOutbound: false)),
       (paged) {
-        final existingIds = state.outboundResults!.map((t) => t.tripOccurrenceId).toSet();
-        final newItems = paged.items.where((t) => !existingIds.contains(t.tripOccurrenceId)).toList();
-        
-        emit(state.copyWith(
-          isFetchingMoreOutbound: false,
-          outboundResults: [...state.outboundResults!, ...newItems],
-          outboundCurrentPage: paged.currentPage,
-          outboundTotalPages: paged.totalPages,
-        ));
+        final existingIds = state.outboundResults!
+            .map((t) => t.tripOccurrenceId)
+            .toSet();
+        final newItems = paged.items
+            .where((t) => !existingIds.contains(t.tripOccurrenceId))
+            .toList();
+
+        emit(
+          state.copyWith(
+            isFetchingMoreOutbound: false,
+            outboundResults: [...state.outboundResults!, ...newItems],
+            outboundCurrentPage: paged.currentPage,
+            outboundTotalPages: paged.totalPages,
+          ),
+        );
       },
     );
   }
 
   void selectOutboundTrip(TripResultEntity trip, CoachClassEntity coachClass) {
-    emit(state.copyWith(
-      selectedOutboundTrip: trip,
-      selectedOutboundClass: coachClass,
-      currentStep: RoundTripBookingStep.searchReturn,
-    ));
+    emit(
+      state.copyWith(
+        selectedOutboundTrip: trip,
+        selectedOutboundClass: coachClass,
+        currentStep: RoundTripBookingStep.searchReturn,
+      ),
+    );
     _searchReturnForSelectedOutbound();
   }
 
@@ -85,36 +105,41 @@ class RoundTripBookingCubit extends Cubit<RoundTripBookingState> {
   }
 
   void applyReturnFilters(SearchParams newParams) {
-    emit(state.copyWith(
-      activeParams: state.activeParams!.copyWith(
-        transport: newParams.transport,
-        sortBy: newParams.sortBy,
-        maxPrice: newParams.maxPrice,
-        clearMaxPrice: newParams.maxPrice == null,
-        departureFrom: newParams.departureFrom,
-        departureTo: newParams.departureTo,
-        arrivalFrom: newParams.arrivalFrom,
-        arrivalTo: newParams.arrivalTo,
-        clearTimeFilters: !newParams.hasTimeFilters,
+    emit(
+      state.copyWith(
+        activeParams: state.activeParams!.copyWith(
+          transport: newParams.transport,
+          sortBy: newParams.sortBy,
+          maxPrice: newParams.maxPrice,
+          clearMaxPrice: newParams.maxPrice == null,
+          departureFrom: newParams.departureFrom,
+          departureTo: newParams.departureTo,
+          arrivalFrom: newParams.arrivalFrom,
+          arrivalTo: newParams.arrivalTo,
+          clearTimeFilters: !newParams.hasTimeFilters,
+        ),
       ),
-    ));
+    );
     _searchReturnForSelectedOutbound();
   }
 
   // ── Return ──
   Future<void> _searchReturnForSelectedOutbound() async {
-    if (state.activeParams?.returnDate == null || state.selectedOutboundTrip == null) {
-      emit(state.copyWith(returnError: 'Return date or outbound trip missing.'));
+    if (state.activeParams?.returnDate == null ||
+        state.selectedOutboundTrip == null) {
+      emit(
+        state.copyWith(returnError: 'Return date or outbound trip missing.'),
+      );
       return;
     }
 
-    emit(state.copyWith(
-      isLoadingReturn: true,
-      clearReturnError: true,
-      returnResults: [],
-    ));
-
-    final outboundTrip = state.selectedOutboundTrip!;
+    emit(
+      state.copyWith(
+        isLoadingReturn: true,
+        clearReturnError: true,
+        returnResults: [],
+      ),
+    );
 
     final returnParams = state.activeParams!.copyWith(
       travelDate: state.activeParams!.returnDate, // use return date
@@ -144,27 +169,32 @@ class RoundTripBookingCubit extends Cubit<RoundTripBookingState> {
     if (isClosed) return;
 
     result.fold(
-      (failure) => emit(state.copyWith(
-        isLoadingReturn: false,
-        returnError: failure.message,
-      )),
+      (failure) => emit(
+        state.copyWith(isLoadingReturn: false, returnError: failure.message),
+      ),
       (paged) {
-        emit(state.copyWith(
-          isLoadingReturn: false,
-          returnResults: paged.items,
-          returnCurrentPage: paged.currentPage,
-          returnTotalPages: paged.totalPages,
-        ));
+        emit(
+          state.copyWith(
+            isLoadingReturn: false,
+            returnResults: paged.items,
+            returnCurrentPage: paged.currentPage,
+            returnTotalPages: paged.totalPages,
+          ),
+        );
       },
     );
   }
 
   Future<void> loadMoreReturn() async {
-    if (isClosed || state.isFetchingMoreReturn || !state.hasMoreReturnPages || state.selectedOutboundTrip == null) return;
+    if (isClosed ||
+        state.isFetchingMoreReturn ||
+        !state.hasMoreReturnPages ||
+        state.selectedOutboundTrip == null) {
+      return;
+    }
 
     emit(state.copyWith(isFetchingMoreReturn: true));
 
-    final outboundTrip = state.selectedOutboundTrip!;
     final returnParams = state.activeParams!.copyWith(
       travelDate: state.activeParams!.returnDate,
       newPage: state.returnCurrentPage + 1,
@@ -196,38 +226,46 @@ class RoundTripBookingCubit extends Cubit<RoundTripBookingState> {
     result.fold(
       (failure) => emit(state.copyWith(isFetchingMoreReturn: false)),
       (paged) {
-        final existingIds = state.returnResults!.map((t) => t.tripOccurrenceId).toSet();
+        final existingIds = state.returnResults!
+            .map((t) => t.tripOccurrenceId)
+            .toSet();
         final newItems = paged.items.where((t) {
           if (existingIds.contains(t.tripOccurrenceId)) return false;
           return true;
         }).toList();
-        
-        emit(state.copyWith(
-          isFetchingMoreReturn: false,
-          returnResults: [...state.returnResults!, ...newItems],
-          returnCurrentPage: paged.currentPage,
-          returnTotalPages: paged.totalPages,
-        ));
+
+        emit(
+          state.copyWith(
+            isFetchingMoreReturn: false,
+            returnResults: [...state.returnResults!, ...newItems],
+            returnCurrentPage: paged.currentPage,
+            returnTotalPages: paged.totalPages,
+          ),
+        );
       },
     );
   }
 
   void selectReturnTrip(TripResultEntity trip, CoachClassEntity coachClass) {
-    emit(state.copyWith(
-      selectedReturnTrip: trip,
-      selectedReturnClass: coachClass,
-      currentStep: RoundTripBookingStep.selectSeats,
-    ));
+    emit(
+      state.copyWith(
+        selectedReturnTrip: trip,
+        selectedReturnClass: coachClass,
+        currentStep: RoundTripBookingStep.selectSeats,
+      ),
+    );
   }
 
   void saveUnifiedSeats(List<String> outboundSeats, List<String> returnSeats) {
     // Each leg only needs at least one seat — counts can differ.
     if (outboundSeats.isEmpty || returnSeats.isEmpty) return;
-    emit(state.copyWith(
-      selectedOutboundSeats: outboundSeats,
-      selectedReturnSeats: returnSeats,
-      currentStep: RoundTripBookingStep.summary,
-    ));
+    emit(
+      state.copyWith(
+        selectedOutboundSeats: outboundSeats,
+        selectedReturnSeats: returnSeats,
+        currentStep: RoundTripBookingStep.summary,
+      ),
+    );
   }
 
   // ── Cart / Bundle Submission ──
@@ -246,7 +284,8 @@ class RoundTripBookingCubit extends Cubit<RoundTripBookingState> {
         'tripOccurrenceId': state.selectedOutboundTrip!.tripOccurrenceId,
         'coachClassId': state.selectedOutboundClass!.coachClassId,
         'originStationId': state.selectedOutboundTrip!.originStationId,
-        'destinationStationId': state.selectedOutboundTrip!.destinationStationId,
+        'destinationStationId':
+            state.selectedOutboundTrip!.destinationStationId,
         'contactName': contactName,
         'contactPhone': contactPhone,
         'contactEmail': contactEmail,
@@ -278,19 +317,18 @@ class RoundTripBookingCubit extends Cubit<RoundTripBookingState> {
         // Leg 2 failed -> Rollback attempt
         // Currently API might not support an explicit rollback for a specific item easily
         // We will do a generic clear cart or just instruct the user.
-        emit(state.copyWith(
-          isAddingToCart: false,
-          cartError: 'Sorry, the return trip seats are no longer available. Please select a different return trip. (Note: Outbound trip was added to cart)',
-        ));
+        emit(
+          state.copyWith(
+            isAddingToCart: false,
+            cartError:
+                'Sorry, the return trip seats are no longer available. Please select a different return trip. (Note: Outbound trip was added to cart)',
+          ),
+        );
       }
-
     } catch (e) {
       if (isClosed) return;
       // Outbound failed
-      emit(state.copyWith(
-        isAddingToCart: false,
-        cartError: e.toString(),
-      ));
+      emit(state.copyWith(isAddingToCart: false, cartError: e.toString()));
     }
   }
 
@@ -310,7 +348,8 @@ class RoundTripBookingCubit extends Cubit<RoundTripBookingState> {
         'tripOccurrenceId': state.selectedOutboundTrip!.tripOccurrenceId,
         'coachClassId': state.selectedOutboundClass!.coachClassId,
         'originStationId': state.selectedOutboundTrip!.originStationId,
-        'destinationStationId': state.selectedOutboundTrip!.destinationStationId,
+        'destinationStationId':
+            state.selectedOutboundTrip!.destinationStationId,
         'contactName': contactName,
         'contactPhone': contactPhone,
         'contactEmail': contactEmail,
@@ -336,7 +375,7 @@ class RoundTripBookingCubit extends Cubit<RoundTripBookingState> {
         // 2. Add Return to Cart
         await bookingRemoteDatasource.addToCart(returnPayload);
         if (isClosed) return;
-        
+
         // 3. Checkout
         await bookingRemoteDatasource.checkout(pointsToRedeem: pointsToRedeem);
         if (isClosed) return;
@@ -344,48 +383,48 @@ class RoundTripBookingCubit extends Cubit<RoundTripBookingState> {
       } catch (e) {
         if (isClosed) return;
         // Leg 2 or Checkout failed
-        emit(state.copyWith(
-          isBookingNow: false,
-          cartError: 'Failed to complete booking: ${e.toString()}',
-        ));
+        emit(
+          state.copyWith(
+            isBookingNow: false,
+            cartError: 'Failed to complete booking: ${e.toString()}',
+          ),
+        );
       }
-
     } catch (e) {
       if (isClosed) return;
       // Outbound failed
-      emit(state.copyWith(
-        isBookingNow: false,
-        cartError: e.toString(),
-      ));
+      emit(state.copyWith(isBookingNow: false, cartError: e.toString()));
     }
   }
 
   // ── Navigation ──
   void goBackToOutbound() {
-    emit(state.copyWith(
-      currentStep: RoundTripBookingStep.searchOutbound,
-      selectedOutboundTrip: null,
-      selectedOutboundClass: null,
-      selectedReturnTrip: null,
-      selectedReturnClass: null,
-      selectedOutboundSeats: const [],
-      selectedReturnSeats: const [],
-    ));
+    emit(
+      state.copyWith(
+        currentStep: RoundTripBookingStep.searchOutbound,
+        selectedOutboundTrip: null,
+        selectedOutboundClass: null,
+        selectedReturnTrip: null,
+        selectedReturnClass: null,
+        selectedOutboundSeats: const [],
+        selectedReturnSeats: const [],
+      ),
+    );
   }
 
   void goBackToReturn() {
-    emit(state.copyWith(
-      currentStep: RoundTripBookingStep.searchReturn,
-      selectedReturnTrip: null,
-      selectedReturnClass: null,
-      selectedOutboundSeats: const [],
-      selectedReturnSeats: const [],
-    ));
+    emit(
+      state.copyWith(
+        currentStep: RoundTripBookingStep.searchReturn,
+        selectedReturnTrip: null,
+        selectedReturnClass: null,
+        selectedOutboundSeats: const [],
+        selectedReturnSeats: const [],
+      ),
+    );
   }
 
   void goBackToSeats() {
-    emit(state.copyWith(
-      currentStep: RoundTripBookingStep.selectSeats,
-    ));
+    emit(state.copyWith(currentStep: RoundTripBookingStep.selectSeats));
   }
 }

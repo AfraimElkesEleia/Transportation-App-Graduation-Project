@@ -28,7 +28,7 @@ class FilterSelection extends StatelessWidget {
         ),
         width: constraints.maxWidth,
         initialSelection: items[0],
-        trailingIcon: Icon(
+        trailingIcon: FaIcon(
           FontAwesomeIcons.caretDown,
           size: 14,
           color: ColorsManager.cyanBlue,

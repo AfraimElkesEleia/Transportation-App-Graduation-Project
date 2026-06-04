@@ -11,6 +11,8 @@ class UpdateProfileParams extends Equatable {
   final String familyName;
   final String email;
   final String phoneNumber;
+  final int? idType;
+  final String? idNumber;
 
   const UpdateProfileParams({
     required this.firstName,
@@ -18,10 +20,12 @@ class UpdateProfileParams extends Equatable {
     required this.familyName,
     required this.email,
     required this.phoneNumber,
+    this.idType,
+    this.idNumber,
   });
 
   @override
-  List<Object> get props => [firstName, lastName, familyName, email, phoneNumber];
+  List<Object?> get props => [firstName, lastName, familyName, email, phoneNumber, idType, idNumber];
 }
 
 class UpdateProfileUseCase extends Usecase<ProfileEntity, UpdateProfileParams> {
@@ -36,6 +40,8 @@ class UpdateProfileUseCase extends Usecase<ProfileEntity, UpdateProfileParams> {
       familyName:  params.familyName,
       email:       params.email,
       phoneNumber: params.phoneNumber,
+      idType:      params.idType,
+      idNumber:    params.idNumber,
     );
   }
 }

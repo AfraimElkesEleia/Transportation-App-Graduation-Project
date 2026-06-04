@@ -1,4 +1,5 @@
 import 'package:dartz/dartz.dart';
+import 'package:flutter/foundation.dart';
 import 'package:transportation_app/core/error/exceptions.dart';
 import 'package:transportation_app/core/error/failures.dart';
 import 'package:transportation_app/core/utils/token_manager.dart';
@@ -52,10 +53,10 @@ class SignupRepositoryImpl implements RegisterRepository {
       );
       return Right(result);
     } on ServerException catch (e) {
-      print('🟠 [Repository] ServerException caught: ${e.message}');
+      debugPrint('🟠 [Repository] ServerException caught: ${e.message}');
       return Left(ServerFailure(message: e.message, errors: e.errors));
     } on NetworkException {
-      print('🟠 [Repository] NetworkException caught');
+      debugPrint('🟠 [Repository] NetworkException caught');
       return Left(const NetworkFailure());
     }
   }

@@ -89,7 +89,7 @@ class _FilterSectionState extends State<FilterSection>
             children: [
               RotationTransition(
                 turns: animation,
-                child: const Icon(FontAwesomeIcons.filter),
+                child: const FaIcon(FontAwesomeIcons.filter),
               ),
               horizontalSpace(space: 8),
               Text(

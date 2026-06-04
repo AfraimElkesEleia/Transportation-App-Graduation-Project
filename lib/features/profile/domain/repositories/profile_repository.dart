@@ -11,6 +11,8 @@ abstract class ProfileRepository {
     required String familyName,
     required String email,
     required String phoneNumber,
+    int? idType,
+    String? idNumber,
   });
   ResultFuture<String> uploadProfilePicture({required String filePath});
   ResultVoid depositToWallet({

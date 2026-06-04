@@ -11,15 +11,14 @@ import 'package:transportation_app/features/notfication/presentation/widgets/not
 import 'package:transportation_app/features/notfication/presentation/widgets/notfication_empty_state.dart';
 import 'package:transportation_app/features/notfication/presentation/widgets/notfication_filter_bar.dart';
 import 'package:transportation_app/features/notfication/presentation/widgets/notfication_section_header.dart';
-import 'package:transportation_app/features/notfication/presentation/widgets/notfication_type_config.dart';
-import 'package:transportation_app/core/routing/routes.dart';
 
 /// Notification Inbox Screen.
 class NotificationInboxScreen extends StatefulWidget {
   const NotificationInboxScreen({super.key});
 
   @override
-  State<NotificationInboxScreen> createState() => _NotificationInboxScreenState();
+  State<NotificationInboxScreen> createState() =>
+      _NotificationInboxScreenState();
 }
 
 class _NotificationInboxScreenState extends State<NotificationInboxScreen> {
@@ -115,18 +114,16 @@ class _NotificationList extends StatelessWidget {
                   SliverPadding(
                     padding: const EdgeInsets.symmetric(horizontal: 12),
                     sliver: SliverList(
-                      delegate: SliverChildBuilderDelegate(
-                        (context, i) {
-                          final notif = entry.value[i];
-                          return NotificationCard(
-                            notification: notif,
-                            onTap: () => _onTap(context, notif),
-                            onDismiss: () =>
-                                context.read<NotificationCubit>().dismiss(notif.id),
-                          );
-                        },
-                        childCount: entry.value.length,
-                      ),
+                      delegate: SliverChildBuilderDelegate((context, i) {
+                        final notif = entry.value[i];
+                        return NotificationCard(
+                          notification: notif,
+                          onTap: () => _onTap(context, notif),
+                          onDismiss: () => context
+                              .read<NotificationCubit>()
+                              .dismiss(notif.id),
+                        );
+                      }, childCount: entry.value.length),
                     ),
                   ),
                   const SliverToBoxAdapter(child: SizedBox(height: 6)),
@@ -172,8 +169,11 @@ class _SwipeHint extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.swipe_left_rounded,
-              size: 13, color: ColorsManager.textMuted.withValues(alpha: 0.3)),
+          Icon(
+            Icons.swipe_left_rounded,
+            size: 13,
+            color: ColorsManager.textMuted.withValues(alpha: 0.3),
+          ),
           const SizedBox(width: 6),
           Text(
             'Swipe left to dismiss',
@@ -209,9 +209,10 @@ class _LoadingShimmerState extends State<_LoadingShimmer>
       vsync: this,
       duration: const Duration(milliseconds: 1200),
     )..repeat(reverse: true);
-    _anim = Tween<double>(begin: 0.3, end: 0.7).animate(
-      CurvedAnimation(parent: _ctrl, curve: Curves.easeInOut),
-    );
+    _anim = Tween<double>(
+      begin: 0.3,
+      end: 0.7,
+    ).animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeInOut));
   }
 
   @override
@@ -260,8 +261,11 @@ class _ErrorState extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(Icons.wifi_off_rounded,
-              size: 40, color: ColorsManager.textMuted.withValues(alpha: 0.4)),
+          Icon(
+            Icons.wifi_off_rounded,
+            size: 40,
+            color: ColorsManager.textMuted.withValues(alpha: 0.4),
+          ),
           const SizedBox(height: 16),
           Text(
             message,

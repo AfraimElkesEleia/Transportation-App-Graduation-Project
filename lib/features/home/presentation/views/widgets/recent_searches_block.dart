@@ -100,11 +100,13 @@ class RecentSearchItem extends StatelessWidget {
   }
 
   ListTile recentSearchesItem(BuildContext context) {
-    final from = search.fromDisplayName.toLocalizedGov(context).toLocalizedStation(context);
-    final to = search.toDisplayName.toLocalizedGov(context).toLocalizedStation(context);
-    final routeText = search.isRoundTrip
-        ? "$from <-> $to"
-        : "$from -> $to";
+    final from = search.fromDisplayName
+        .toLocalizedGov(context)
+        .toLocalizedStation(context);
+    final to = search.toDisplayName
+        .toLocalizedGov(context)
+        .toLocalizedStation(context);
+    final routeText = search.isRoundTrip ? "$from <-> $to" : "$from -> $to";
 
     final isAr = context.isArabic;
     final toWord = isAr ? "إلى" : "to";
@@ -113,7 +115,7 @@ class RecentSearchItem extends StatelessWidget {
         : search.travelDate;
 
     return ListTile(
-      leading: Icon(
+      leading: FaIcon(
         FontAwesomeIcons.clockRotateLeft,
         color: ColorsManager.cyanBlue,
       ),
@@ -131,7 +133,7 @@ class RecentSearchItem extends StatelessWidget {
           ),
         ],
       ),
-      trailing: Icon(
+      trailing: FaIcon(
         FontAwesomeIcons.chevronRight,
         color: ColorsManager.cyanBlue,
         size: 16,

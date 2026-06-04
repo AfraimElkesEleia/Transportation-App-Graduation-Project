@@ -39,6 +39,8 @@ class ProfileCubit extends Cubit<ProfileState> {
     required String familyName,
     required String email,
     required String phoneNumber,
+    int? idType,
+    String? idNumber,
   }) async {
     if (isClosed) return;
     emit(ProfileUpdating());
@@ -49,6 +51,8 @@ class ProfileCubit extends Cubit<ProfileState> {
         familyName: familyName,
         email: email,
         phoneNumber: phoneNumber,
+        idType: idType,
+        idNumber: idNumber,
       ),
     );
     if (isClosed) return;

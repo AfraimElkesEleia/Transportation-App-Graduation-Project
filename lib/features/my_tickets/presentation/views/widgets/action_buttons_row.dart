@@ -62,7 +62,10 @@ class ActionButtonsRow extends StatelessWidget {
           border: isOutlined ? Border.all(color: Colors.white30) : null,
           gradient: isOutlined
               ? LinearGradient(
-                  colors: [color.withValues(alpha: 0.4), color.withValues(alpha: 0.1)],
+                  colors: [
+                    color.withValues(alpha: 0.4),
+                    color.withValues(alpha: 0.1),
+                  ],
                 )
               : null,
         ),

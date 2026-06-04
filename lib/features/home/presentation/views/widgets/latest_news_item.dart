@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:transportation_app/core/helper/spacing.dart';
@@ -8,10 +7,7 @@ import 'package:transportation_app/features/notfication/domain/entities/app_notf
 
 class LatestNewsItem extends StatelessWidget {
   final AppNotification? notification;
-  const LatestNewsItem({
-    super.key,
-    this.notification,
-  });
+  const LatestNewsItem({super.key, this.notification});
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +24,7 @@ class LatestNewsItem extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(FontAwesomeIcons.pooStorm, color: Colors.yellow),
+          FaIcon(FontAwesomeIcons.pooStorm, color: Colors.yellow),
           horizontalSpace(space: 16),
           Expanded(
             child: Column(
@@ -43,7 +39,7 @@ class LatestNewsItem extends StatelessWidget {
                 ),
                 Text(
                   notification?.body ??
-                  "Cairo-Alex route now is 40% faster with new trains",
+                      "Cairo-Alex route now is 40% faster with new trains",
                   maxLines: 4,
                   overflow: TextOverflow.fade,
                   style: AppStyles.regular16CyanBlue(
@@ -51,7 +47,9 @@ class LatestNewsItem extends StatelessWidget {
                   ).copyWith(color: Colors.white),
                 ),
                 Text(
-                  notification != null ? _timeAgo(notification!.receivedAt) : "2 hours ago",
+                  notification != null
+                      ? _timeAgo(notification!.receivedAt)
+                      : "2 hours ago",
                   style: const TextStyle(fontSize: 14, color: Colors.grey),
                 ),
               ],

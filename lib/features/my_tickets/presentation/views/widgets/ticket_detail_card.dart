@@ -30,7 +30,8 @@ class TicketDetailCard extends StatelessWidget {
   }
 
   Color get _statusColor {
-    if (ticket.refundStatus == 'Accepted' || ticket.refundStatus == 'Approved') {
+    if (ticket.refundStatus == 'Accepted' ||
+        ticket.refundStatus == 'Approved') {
       return Colors.red;
     }
     switch (ticket.status.toLowerCase()) {
@@ -48,7 +49,8 @@ class TicketDetailCard extends StatelessWidget {
   String _getLocalizedStatus(BuildContext context, String status) {
     final l10n = AppLocalizations.of(context);
     if (l10n == null) return status;
-    if (ticket.refundStatus == 'Accepted' || ticket.refundStatus == 'Approved') {
+    if (ticket.refundStatus == 'Accepted' ||
+        ticket.refundStatus == 'Approved') {
       return l10n.statusCancelled;
     }
     switch (status.toLowerCase()) {
@@ -154,7 +156,9 @@ class TicketDetailCard extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: _statusColor.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: _statusColor.withValues(alpha: 0.4)),
+                      border: Border.all(
+                        color: _statusColor.withValues(alpha: 0.4),
+                      ),
                     ),
                     child: Text(
                       _getLocalizedStatus(context, ticket.status),
@@ -446,7 +450,7 @@ class _UrgencyBannerState extends State<_UrgencyBanner> {
           width: double.infinity,
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
           decoration: BoxDecoration(
-            color: color.withOpacity(0.12),
+            color: color.withValues(alpha: 0.12),
             borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
           ),
           child: Row(

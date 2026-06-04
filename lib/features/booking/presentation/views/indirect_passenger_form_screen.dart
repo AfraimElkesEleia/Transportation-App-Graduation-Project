@@ -10,6 +10,9 @@ import 'package:transportation_app/features/profile/domain/entities/profile_enti
 import 'package:transportation_app/features/profile/presentation/cubit/profile_cubit/profile_cubit.dart';
 import 'package:transportation_app/features/profile/presentation/cubit/profile_cubit/profile_states.dart';
 import 'package:transportation_app/features/search/domain/entities/trip_result_entity.dart';
+import 'package:transportation_app/features/booking/presentation/views/widgets/passenger_form/passenger_autofill_banner.dart';
+import 'package:transportation_app/features/booking/presentation/views/widgets/passenger_form/passenger_card.dart';
+import 'package:transportation_app/features/booking/presentation/views/widgets/passenger_form/passenger_form_controllers.dart';
 
 class IndirectPassengerFormScreen extends StatefulWidget {
   final IndirectBookingState bookingState;
@@ -24,7 +27,7 @@ class IndirectPassengerFormScreen extends StatefulWidget {
 class _IndirectPassengerFormScreenState
     extends State<IndirectPassengerFormScreen> {
   final _formKey = GlobalKey<FormState>();
-  late final List<_PassengerControllers> _controllers;
+  late final List<PassengerFormControllers> _controllers;
   bool _autofilled = false;
 
   @override
@@ -32,7 +35,7 @@ class _IndirectPassengerFormScreenState
     super.initState();
     _controllers = List.generate(
       widget.bookingState.requiredSeatCount,
-      (_) => _PassengerControllers(),
+      (_) => PassengerFormControllers(),
     );
 
     if (_controllers.isNotEmpty) {
@@ -62,8 +65,9 @@ class _IndirectPassengerFormScreenState
       if (first.emailController.text.trim().isEmpty) {
         first.emailController.text = profile.email;
       }
-      final hasTrain = _isTrain(widget.bookingState.selectedTripLeg1!) ||
-                       _isTrain(widget.bookingState.selectedTripLeg2!);
+      final hasTrain =
+          _isTrain(widget.bookingState.selectedTripLeg1!) ||
+          _isTrain(widget.bookingState.selectedTripLeg2!);
       if (hasTrain) {
         if (profile.idNumber != null && profile.idNumber!.isNotEmpty) {
           if (first.idController.text.trim().isEmpty) {
@@ -71,7 +75,9 @@ class _IndirectPassengerFormScreenState
           }
           if (profile.idType != null) {
             setState(() {
-              first.selectedIdType = profile.idType == 2 ? 'Passport' : 'NationalId';
+              first.selectedIdType = profile.idType == 2
+                  ? 'Passport'
+                  : 'NationalId';
             });
           }
         }
@@ -243,7 +249,9 @@ class _IndirectPassengerFormScreenState
               if (state is CartSuccess) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text(AppLocalizations.of(context)!.indirectTripAddedToCart),
+                    content: Text(
+                      AppLocalizations.of(context)!.indirectTripAddedToCart,
+                    ),
                     backgroundColor: Colors.green,
                   ),
                 );
@@ -281,12 +289,16 @@ class _IndirectPassengerFormScreenState
                   children: [
                     ...() {
                       final widgets = <Widget>[];
-                      for (int index = 0; index < widget.bookingState.requiredSeatCount; index++) {
+                      for (
+                        int index = 0;
+                        index < widget.bookingState.requiredSeatCount;
+                        index++
+                      ) {
                         widgets.add(
-                          _PassengerCard(
-                            label: 'Passenger ${index + 1}',
+                          PassengerCard(
+                            index: index + 1,
                             controllers: _controllers[index],
-                            hasTrainAnywhere: hasTrain,
+                            isTrain: hasTrain,
                           ),
                         );
 
@@ -295,7 +307,7 @@ class _IndirectPassengerFormScreenState
                             !hasTrain &&
                             widget.bookingState.requiredSeatCount > 1) {
                           widgets.add(
-                            _AutofillBanner(
+                            PassengerAutofillBanner(
                               autofilled: _autofilled,
                               onAutofill: _autofill,
                             ),
@@ -354,246 +366,6 @@ class _IndirectPassengerFormScreenState
             ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class _PassengerControllers {
-  final nameController = TextEditingController();
-  final idController = TextEditingController();
-  final phoneController = TextEditingController();
-  final emailController = TextEditingController();
-  // 'NationalId' | 'Passport'
-  String selectedIdType = 'NationalId';
-
-  void dispose() {
-    nameController.dispose();
-    idController.dispose();
-    phoneController.dispose();
-    emailController.dispose();
-  }
-}
-
-class _PassengerCard extends StatefulWidget {
-  final String label;
-  final _PassengerControllers controllers;
-  final bool hasTrainAnywhere;
-
-  const _PassengerCard({
-    required this.label,
-    required this.controllers,
-    required this.hasTrainAnywhere,
-  });
-
-  @override
-  State<_PassengerCard> createState() => _PassengerCardState();
-}
-
-class _PassengerCardState extends State<_PassengerCard> {
-  @override
-  Widget build(BuildContext context) {
-    final loc = AppLocalizations.of(context)!;
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: ColorsManager.surfaceDark,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: ColorsManager.borderDim),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            loc.passengerN(widget.label.replaceAll('Passenger ', '')),
-            style: const TextStyle(
-              color: ColorsManager.accentCyan,
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 12),
-          TextFormField(
-            controller: widget.controllers.nameController,
-            style: const TextStyle(color: Colors.white),
-            decoration: InputDecoration(
-              labelText: loc.fullName,
-              labelStyle: const TextStyle(color: ColorsManager.textMuted),
-            ),
-            validator: (v) =>
-                (v == null || v.trim().isEmpty) ? loc.requiredField : null,
-          ),
-          const SizedBox(height: 12),
-          // ID Type Dropdown + ID Number — ONLY when trip has a train
-          if (widget.hasTrainAnywhere) ...[
-            DropdownButtonFormField<String>(
-              initialValue: widget.controllers.selectedIdType,
-              decoration: InputDecoration(
-                labelText: loc.idTypeLabel,
-                labelStyle: const TextStyle(color: ColorsManager.textMuted, fontSize: 13),
-                prefixIcon: const Icon(Icons.badge_outlined, color: ColorsManager.textMuted, size: 20),
-                filled: true,
-                fillColor: ColorsManager.seatContainerBg,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide.none,
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(color: ColorsManager.accentCyan),
-                ),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-              ),
-              dropdownColor: ColorsManager.surfaceDark,
-              style: const TextStyle(color: Colors.white, fontSize: 14),
-              items: [
-                DropdownMenuItem(value: 'NationalId', child: Text(loc.idTypeNationalId)),
-                DropdownMenuItem(value: 'Passport', child: Text(loc.idTypePassport)),
-              ],
-              onChanged: (val) {
-                if (val != null) {
-                  setState(() {
-                    widget.controllers.selectedIdType = val;
-                    widget.controllers.idController.clear();
-                  });
-                }
-              },
-            ),
-            const SizedBox(height: 12),
-            TextFormField(
-              controller: widget.controllers.idController,
-              keyboardType: widget.controllers.selectedIdType == 'NationalId'
-                  ? TextInputType.number
-                  : TextInputType.text,
-              style: const TextStyle(color: Colors.white),
-              decoration: InputDecoration(
-                labelText: widget.controllers.selectedIdType == 'NationalId'
-                    ? loc.idNumberLabel
-                    : loc.passportNumberLabel,
-                labelStyle: const TextStyle(color: ColorsManager.textMuted),
-              ),
-              validator: (v) =>
-                  (v == null || v.trim().isEmpty) ? loc.requiredField : null,
-            ),
-            const SizedBox(height: 12),
-          ],
-          TextFormField(
-            controller: widget.controllers.phoneController,
-            keyboardType: TextInputType.phone,
-            style: const TextStyle(color: Colors.white),
-            decoration: InputDecoration(
-              labelText: loc.phoneNumberLabel,
-              labelStyle: const TextStyle(color: ColorsManager.textMuted),
-            ),
-            validator: (v) =>
-                (v == null || v.trim().isEmpty) ? loc.requiredField : null,
-          ),
-          const SizedBox(height: 12),
-          TextFormField(
-            controller: widget.controllers.emailController,
-            keyboardType: TextInputType.emailAddress,
-            style: const TextStyle(color: Colors.white),
-            decoration: InputDecoration(
-              labelText: loc.emailOptional,
-              labelStyle: const TextStyle(color: ColorsManager.textMuted),
-            ),
-          ),
-          const SizedBox(height: 12),
-        ],
-      ),
-    );
-  }
-}
-
-class _AutofillBanner extends StatelessWidget {
-  final bool autofilled;
-  final VoidCallback onAutofill;
-
-  const _AutofillBanner({required this.autofilled, required this.onAutofill});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-      decoration: BoxDecoration(
-        color: ColorsManager.surfaceDark,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: ColorsManager.accentCyan.withAlpha(80),
-          width: 1.2,
-        ),
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: ColorsManager.accentCyan.withAlpha(25),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: const Icon(
-              Icons.family_restroom_rounded,
-              color: ColorsManager.accentCyan,
-              size: 22,
-            ),
-          ),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  autofilled
-                      ? AppLocalizations.of(context)!.autoFilled
-                      : AppLocalizations.of(context)!.travellingWithFamily,
-                  style: TextStyle(
-                    color: autofilled
-                        ? ColorsManager.successGreen
-                        : Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 13,
-                  ),
-                ),
-                const SizedBox(height: 3),
-                Text(
-                  AppLocalizations.of(context)!.fillSeat1Info,
-                  style: const TextStyle(color: Colors.white54, fontSize: 11),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(width: 8),
-          OutlinedButton(
-            onPressed: onAutofill,
-            style: OutlinedButton.styleFrom(
-              side: BorderSide(
-                color: autofilled
-                    ? ColorsManager.successGreen
-                    : ColorsManager.accentCyan,
-              ),
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              minimumSize: Size.zero,
-              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-            ),
-            child: Text(
-              autofilled
-                  ? AppLocalizations.of(context)!.reFill
-                  : AppLocalizations.of(context)!.autoFill,
-              style: TextStyle(
-                color: autofilled
-                    ? ColorsManager.successGreen
-                    : ColorsManager.accentCyan,
-                fontWeight: FontWeight.bold,
-                fontSize: 12,
-              ),
-            ),
-          ),
-        ],
       ),
     );
   }

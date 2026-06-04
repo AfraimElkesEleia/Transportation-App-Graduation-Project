@@ -17,7 +17,7 @@ class ToggleAppBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final labels = [l10n.all, l10n.train, l10n.bus];
-    final icons = [
+    final List<FaIconData?> icons = [
       null,
       FontAwesomeIcons.train,
       FontAwesomeIcons.bus,
@@ -42,7 +42,7 @@ class ToggleAppBar extends StatelessWidget {
             if (icons[i] != null)
               FittedBox(
                 fit: BoxFit.scaleDown,
-                child: Icon(icons[i], color: Colors.white),
+                child: FaIcon(icons[i], color: Colors.white),
               ),
             horizontalSpace(space: 6),
             Text(labels[i], style: const TextStyle(color: Colors.white)),

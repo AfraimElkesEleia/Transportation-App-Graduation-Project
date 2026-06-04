@@ -32,36 +32,53 @@ class AppBarInHomeScreen extends StatelessWidget {
               children: [
                 BlocBuilder<NotificationCubit, NotificationState>(
                   builder: (context, state) {
-                    final unread = state is NotificationLoaded ? state.unreadCount : 0;
-                    return Stack(children: [
-                      IconButton(
-                        icon: Icon(Icons.notifications_outlined, color: Colors.white),
-                        onPressed: () => context.pushNamed(AppRoutes.notificationsScreen),
-                      ),
-                      if (unread > 0)
-                        Positioned(
-                          right: 6, top: 6,
-                          child: Container(
-                            width: 16, height: 16,
-                            decoration: BoxDecoration(
-                              color: ColorsManager.accentCyan,
-                              shape: BoxShape.circle,
-                            ),
-                            child: Text(
-                              unread > 9 ? '9+' : '$unread',
-                              style: TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.bold),
-                              textAlign: TextAlign.center,
+                    final unread = state is NotificationLoaded
+                        ? state.unreadCount
+                        : 0;
+                    return Stack(
+                      children: [
+                        IconButton(
+                          icon: Icon(
+                            Icons.notifications_outlined,
+                            color: Colors.white,
+                          ),
+                          onPressed: () =>
+                              context.pushNamed(AppRoutes.notificationsScreen),
+                        ),
+                        if (unread > 0)
+                          Positioned(
+                            right: 6,
+                            top: 6,
+                            child: Container(
+                              width: 16,
+                              height: 16,
+                              decoration: BoxDecoration(
+                                color: ColorsManager.accentCyan,
+                                shape: BoxShape.circle,
+                              ),
+                              child: Text(
+                                unread > 9 ? '9+' : '$unread',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 9,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
                             ),
                           ),
-                        ),
-                    ]);
+                      ],
+                    );
                   },
                 ),
                 IconButton(
                   onPressed: () {
                     context.pushNamed(AppRoutes.cartScreen);
                   },
-                  icon: Icon(FontAwesomeIcons.cartShopping, color: Colors.white),
+                  icon: FaIcon(
+                    FontAwesomeIcons.cartShopping,
+                    color: Colors.white,
+                  ),
                 ),
               ],
             ),

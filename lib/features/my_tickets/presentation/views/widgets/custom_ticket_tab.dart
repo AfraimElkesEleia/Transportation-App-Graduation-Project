@@ -72,7 +72,9 @@ class _CustomTicketTabsState extends State<CustomTicketTabs> {
         margin: const EdgeInsets.symmetric(horizontal: 2),
         padding: const EdgeInsets.symmetric(vertical: 12),
         decoration: BoxDecoration(
-          color: isActive ? Colors.white.withValues(alpha: 0.15) : Colors.transparent,
+          color: isActive
+              ? Colors.white.withValues(alpha: 0.15)
+              : Colors.transparent,
           borderRadius: BorderRadius.circular(20),
           border: isActive
               ? Border.all(color: Colors.white24)

@@ -11,6 +11,10 @@ import 'package:transportation_app/features/profile/domain/entities/profile_enti
 import 'package:transportation_app/features/profile/presentation/cubit/profile_cubit/profile_cubit.dart';
 import 'package:transportation_app/features/profile/presentation/cubit/profile_cubit/profile_states.dart';
 import 'package:transportation_app/features/search/domain/entities/trip_result_entity.dart';
+import 'package:transportation_app/features/booking/presentation/views/widgets/passenger_form/passenger_autofill_banner.dart';
+import 'package:transportation_app/features/booking/presentation/views/widgets/passenger_form/passenger_card.dart';
+import 'package:transportation_app/features/booking/presentation/views/widgets/passenger_form/passenger_form_app_bar.dart';
+import 'package:transportation_app/features/booking/presentation/views/widgets/passenger_form/passenger_form_controllers.dart';
 
 class RoundTripPassengerFormScreen extends StatefulWidget {
   const RoundTripPassengerFormScreen({super.key});
@@ -25,8 +29,8 @@ class _RoundTripPassengerFormScreenState
   final _formKey = GlobalKey<FormState>();
 
   // Separate passenger controller lists per leg
-  late final List<_PassengerControllers> _outboundControllers;
-  late final List<_PassengerControllers> _returnControllers;
+  late final List<PassengerFormControllers> _outboundControllers;
+  late final List<PassengerFormControllers> _returnControllers;
 
   late final int _outboundCount;
   late final int _returnCount;
@@ -45,11 +49,11 @@ class _RoundTripPassengerFormScreenState
 
     _outboundControllers = List.generate(
       _outboundCount,
-      (_) => _PassengerControllers(),
+      (_) => PassengerFormControllers(),
     );
     _returnControllers = List.generate(
       _returnCount,
-      (_) => _PassengerControllers(),
+      (_) => PassengerFormControllers(),
     );
 
     if (_outboundControllers.isNotEmpty) {
@@ -422,7 +426,7 @@ class _RoundTripPassengerFormScreenState
 
               return Column(
                 children: [
-                  _FormAppBar(),
+                  const PassengerFormAppBar(),
                   Expanded(
                     child: Form(
                       key: _formKey,
@@ -442,7 +446,7 @@ class _RoundTripPassengerFormScreenState
                           ),
                           const SizedBox(height: 8),
                           for (int i = 0; i < _outboundCount; i++) ...[
-                            _PassengerCard(
+                            PassengerCard(
                               index: i + 1,
                               seatLabel: AppLocalizations.of(
                                 context,
@@ -453,7 +457,7 @@ class _RoundTripPassengerFormScreenState
                             if (i == 0 &&
                                 !outboundIsTrain &&
                                 _outboundCount > 1)
-                              _AutofillBanner(
+                              PassengerAutofillBanner(
                                 autofilled: _outboundAutofilled,
                                 onAutofill: _autofillOutbound,
                               ),
@@ -471,7 +475,7 @@ class _RoundTripPassengerFormScreenState
                           ),
                           const SizedBox(height: 8),
                           for (int i = 0; i < _returnCount; i++) ...[
-                            _PassengerCard(
+                            PassengerCard(
                               index: i + 1,
                               seatLabel: AppLocalizations.of(
                                 context,
@@ -480,7 +484,7 @@ class _RoundTripPassengerFormScreenState
                               isTrain: returnIsTrain,
                             ),
                             if (i == 0 && !returnIsTrain && _returnCount > 1)
-                              _AutofillBanner(
+                              PassengerAutofillBanner(
                                 autofilled: _returnAutofilled,
                                 onAutofill: _autofillReturn,
                               ),
@@ -600,252 +604,6 @@ class _LegHeader extends StatelessWidget {
   }
 }
 
-// ── Per-passenger controllers ────────────────────────────────────────────────
-class _PassengerControllers {
-  final nameController = TextEditingController();
-  final idController = TextEditingController();
-  final phoneController = TextEditingController();
-  final emailController = TextEditingController();
-  // 'NationalId' | 'Passport'
-  String selectedIdType = 'NationalId';
-
-  void dispose() {
-    nameController.dispose();
-    idController.dispose();
-    phoneController.dispose();
-    emailController.dispose();
-  }
-}
-
-// ── App bar ───────────────────────────────────────────────────────────────────
-class _FormAppBar extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      child: Row(
-        children: [
-          GestureDetector(
-            onTap: () => Navigator.pop(context),
-            child: Container(
-              width: 42,
-              height: 42,
-              decoration: BoxDecoration(
-                color: ColorsManager.seatContainerBg,
-                borderRadius: BorderRadius.circular(21),
-              ),
-              child: const Icon(
-                Icons.arrow_back,
-                color: Colors.white,
-                size: 20,
-              ),
-            ),
-          ),
-          Expanded(
-            child: Text(
-              AppLocalizations.of(context)!.passengerDetails,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 17,
-                fontWeight: FontWeight.bold,
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ),
-          const SizedBox(width: 42),
-        ],
-      ),
-    );
-  }
-}
-
-// ── Single passenger card ─────────────────────────────────────────────────────
-class _PassengerCard extends StatefulWidget {
-  final int index;
-  final String seatLabel;
-  final _PassengerControllers controllers;
-  final bool isTrain;
-
-  const _PassengerCard({
-    required this.index,
-    required this.seatLabel,
-    required this.controllers,
-    required this.isTrain,
-  });
-
-  @override
-  State<_PassengerCard> createState() => _PassengerCardState();
-}
-
-class _PassengerCardState extends State<_PassengerCard> {
-  @override
-  Widget build(BuildContext context) {
-    final loc = AppLocalizations.of(context)!;
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: ColorsManager.surfaceDark,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: ColorsManager.borderDim, width: 1),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                loc.passengerN('${widget.index}'),
-                style: const TextStyle(
-                  color: ColorsManager.accentCyan,
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              Text(
-                widget.seatLabel,
-                style: const TextStyle(color: Colors.white70, fontSize: 12),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          _buildTextField(
-            controller: widget.controllers.nameController,
-            label: loc.fullName,
-            icon: Icons.person_outline,
-            validator: (v) =>
-                (v == null || v.trim().isEmpty) ? loc.requiredField : null,
-          ),
-          const SizedBox(height: 12),
-          // ── ID Type Dropdown + ID Number — ONLY for train ──
-          if (widget.isTrain) ...[
-            DropdownButtonFormField<String>(
-              initialValue: widget.controllers.selectedIdType,
-              decoration: InputDecoration(
-                labelText: loc.idTypeLabel,
-                labelStyle: const TextStyle(
-                  color: ColorsManager.textMuted,
-                  fontSize: 13,
-                ),
-                prefixIcon: const Icon(
-                  Icons.badge_outlined,
-                  color: ColorsManager.textMuted,
-                  size: 20,
-                ),
-                filled: true,
-                fillColor: ColorsManager.seatContainerBg,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide.none,
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(color: ColorsManager.accentCyan),
-                ),
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 14,
-                ),
-              ),
-              dropdownColor: ColorsManager.surfaceDark,
-              style: const TextStyle(color: Colors.white, fontSize: 14),
-              items: [
-                DropdownMenuItem(
-                  value: 'NationalId',
-                  child: Text(loc.idTypeNationalId),
-                ),
-                DropdownMenuItem(
-                  value: 'Passport',
-                  child: Text(loc.idTypePassport),
-                ),
-              ],
-              onChanged: (val) {
-                if (val != null) {
-                  setState(() {
-                    widget.controllers.selectedIdType = val;
-                    widget.controllers.idController.clear();
-                  });
-                }
-              },
-            ),
-            const SizedBox(height: 12),
-            _buildTextField(
-              controller: widget.controllers.idController,
-              label: widget.controllers.selectedIdType == 'NationalId'
-                  ? loc.idNumberLabel
-                  : loc.passportNumberLabel,
-              icon: Icons.credit_card_outlined,
-              keyboardType: widget.controllers.selectedIdType == 'NationalId'
-                  ? TextInputType.number
-                  : TextInputType.text,
-              validator: (v) =>
-                  (v == null || v.trim().isEmpty) ? loc.requiredField : null,
-            ),
-            const SizedBox(height: 12),
-          ],
-          _buildTextField(
-            controller: widget.controllers.phoneController,
-            label: loc.phoneNumberLabel,
-            icon: Icons.phone_outlined,
-            keyboardType: TextInputType.phone,
-            validator: (v) =>
-                (v == null || v.trim().isEmpty) ? loc.requiredField : null,
-          ),
-          const SizedBox(height: 12),
-          _buildTextField(
-            controller: widget.controllers.emailController,
-            label: loc.emailOptional,
-            icon: Icons.email_outlined,
-            keyboardType: TextInputType.emailAddress,
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildTextField({
-    required TextEditingController controller,
-    required String label,
-    required IconData icon,
-    TextInputType keyboardType = TextInputType.text,
-    String? Function(String?)? validator,
-  }) {
-    return TextFormField(
-      controller: controller,
-      keyboardType: keyboardType,
-      validator: validator,
-      style: const TextStyle(color: Colors.white, fontSize: 14),
-      decoration: InputDecoration(
-        labelText: label,
-        labelStyle: const TextStyle(
-          color: ColorsManager.textMuted,
-          fontSize: 13,
-        ),
-        prefixIcon: Icon(icon, color: ColorsManager.textMuted, size: 20),
-        filled: true,
-        fillColor: ColorsManager.seatContainerBg,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide.none,
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: ColorsManager.accentCyan),
-        ),
-        errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Colors.redAccent),
-        ),
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 16,
-          vertical: 14,
-        ),
-      ),
-    );
-  }
-}
-
 // ── Bottom submit bar ─────────────────────────────────────────────────────────
 class _FormBottomButtons extends StatefulWidget {
   final bool isAdding;
@@ -959,99 +717,6 @@ class _FormBottomButtonsState extends State<_FormBottomButtons> {
                 ),
               ),
             ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _AutofillBanner extends StatelessWidget {
-  final bool autofilled;
-  final VoidCallback onAutofill;
-
-  const _AutofillBanner({required this.autofilled, required this.onAutofill});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-      decoration: BoxDecoration(
-        color: ColorsManager.surfaceDark,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: ColorsManager.accentCyan.withAlpha(80),
-          width: 1.2,
-        ),
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: ColorsManager.accentCyan.withAlpha(25),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: const Icon(
-              Icons.family_restroom_rounded,
-              color: ColorsManager.accentCyan,
-              size: 22,
-            ),
-          ),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  autofilled
-                      ? AppLocalizations.of(context)!.autoFilled
-                      : AppLocalizations.of(context)!.travellingWithFamily,
-                  style: TextStyle(
-                    color: autofilled
-                        ? ColorsManager.successGreen
-                        : Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 13,
-                  ),
-                ),
-                const SizedBox(height: 3),
-                Text(
-                  AppLocalizations.of(context)!.fillSeat1Info,
-                  style: const TextStyle(color: Colors.white54, fontSize: 11),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(width: 8),
-          OutlinedButton(
-            onPressed: onAutofill,
-            style: OutlinedButton.styleFrom(
-              side: BorderSide(
-                color: autofilled
-                    ? ColorsManager.successGreen
-                    : ColorsManager.accentCyan,
-              ),
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              minimumSize: Size.zero,
-              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-            ),
-            child: Text(
-              autofilled
-                  ? AppLocalizations.of(context)!.reFill
-                  : AppLocalizations.of(context)!.autoFill,
-              style: TextStyle(
-                color: autofilled
-                    ? ColorsManager.successGreen
-                    : ColorsManager.accentCyan,
-                fontWeight: FontWeight.bold,
-                fontSize: 12,
-              ),
-            ),
           ),
         ],
       ),

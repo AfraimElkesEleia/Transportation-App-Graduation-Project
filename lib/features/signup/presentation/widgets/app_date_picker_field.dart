@@ -22,7 +22,6 @@ class AppDatePickerField extends StatelessWidget {
   final DateTime? lastDate;
   final String dateFormat;
 
-  static const _cyan    = Color(0xff1AC8E8);
   static const _white20 = Color(0x33FFFFFF);
 
   @override
@@ -55,9 +54,7 @@ class AppDatePickerField extends StatelessWidget {
               color: Colors.white.withValues(alpha: 0.04),
               borderRadius: BorderRadius.circular(20),
               border: Border.all(
-                color: errorText != null
-                    ? Colors.redAccent
-                    : _white20,
+                color: errorText != null ? Colors.redAccent : _white20,
                 width: 1,
               ),
             ),
@@ -113,7 +110,10 @@ class AppDatePickerField extends StatelessWidget {
               onPrimary: Colors.white,
               surface: Color(0xff0B1F3A),
               onSurface: Colors.white,
-            ), dialogTheme: DialogThemeData(backgroundColor: const Color(0xff081A33)),
+            ),
+            dialogTheme: DialogThemeData(
+              backgroundColor: const Color(0xff081A33),
+            ),
           ),
           child: child!,
         );

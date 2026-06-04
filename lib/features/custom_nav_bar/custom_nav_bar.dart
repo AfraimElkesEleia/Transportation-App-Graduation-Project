@@ -18,7 +18,7 @@ import 'package:transportation_app/features/profile/presentation/cubit/profile_c
 import 'package:transportation_app/features/profile/presentation/views/screen/profile_screen.dart';
 
 class NavItem {
-  final IconData icon;
+  final FaIconData icon;
   final String label;
 
   NavItem({required this.icon, required this.label});

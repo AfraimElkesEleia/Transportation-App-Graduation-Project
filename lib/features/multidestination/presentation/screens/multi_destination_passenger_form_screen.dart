@@ -11,6 +11,9 @@ import 'package:transportation_app/features/profile/domain/entities/profile_enti
 import 'package:transportation_app/features/profile/presentation/cubit/profile_cubit/profile_cubit.dart';
 import 'package:transportation_app/features/profile/presentation/cubit/profile_cubit/profile_states.dart';
 import 'package:transportation_app/features/search/domain/entities/trip_result_entity.dart';
+import 'package:transportation_app/features/booking/presentation/views/widgets/passenger_form/passenger_autofill_banner.dart';
+import 'package:transportation_app/features/booking/presentation/views/widgets/passenger_form/passenger_card.dart';
+import 'package:transportation_app/features/booking/presentation/views/widgets/passenger_form/passenger_form_controllers.dart';
 
 class MultiDestinationPassengerFormScreen extends StatefulWidget {
   const MultiDestinationPassengerFormScreen({super.key});
@@ -25,7 +28,7 @@ class _MultiDestinationPassengerFormScreenState
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   /// _controllers[legIndex][passengerIndex]
-  late final List<List<_PassengerControllers>> _controllers;
+  late final List<List<PassengerFormControllers>> _controllers;
   late final List<int> _seatCounts;
   late final int _legCount;
   late final List<bool> _isTrainPerLeg;
@@ -50,7 +53,7 @@ class _MultiDestinationPassengerFormScreenState
 
     _controllers = List.generate(
       _legCount,
-      (i) => List.generate(_seatCounts[i], (_) => _PassengerControllers()),
+      (i) => List.generate(_seatCounts[i], (_) => PassengerFormControllers()),
     );
 
     _autofilledPerLeg = List.generate(_legCount, (_) => false);
@@ -97,12 +100,14 @@ class _MultiDestinationPassengerFormScreenState
         final legIsTrain = _isTrainPerLeg[legIndex];
         if (legIsTrain) {
           if (profile.idNumber != null && profile.idNumber!.isNotEmpty) {
-            if (first.nationalIdController.text.trim().isEmpty) {
-              first.nationalIdController.text = profile.idNumber!;
+            if (first.idController.text.trim().isEmpty) {
+              first.idController.text = profile.idNumber!;
             }
             if (profile.idType != null) {
               setState(() {
-                first.selectedIdType = profile.idType == 2 ? 'Passport' : 'NationalId';
+                first.selectedIdType = profile.idType == 2
+                    ? 'Passport'
+                    : 'NationalId';
               });
             }
           }
@@ -123,7 +128,11 @@ class _MultiDestinationPassengerFormScreenState
         SnackBar(
           content: Row(
             children: [
-              const Icon(Icons.warning_amber_rounded, color: Colors.white, size: 18),
+              const Icon(
+                Icons.warning_amber_rounded,
+                color: Colors.white,
+                size: 18,
+              ),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(AppLocalizations.of(context)!.fillNamePhoneFirst),
@@ -151,7 +160,9 @@ class _MultiDestinationPassengerFormScreenState
             const SizedBox(width: 8),
             Expanded(
               child: Text(
-                AppLocalizations.of(context)!.filledNSeats('${legControllers.length - 1}', srcName),
+                AppLocalizations.of(
+                  context,
+                )!.filledNSeats('${legControllers.length - 1}', srcName),
               ),
             ),
           ],
@@ -201,7 +212,7 @@ class _MultiDestinationPassengerFormScreenState
 
         if (_isTrainPerLeg[legIndex]) {
           pass['idType'] = c.selectedIdType;
-          pass['idNumber'] = c.nationalIdController.text.trim();
+          pass['idNumber'] = c.idController.text.trim();
         }
 
         legPass.add(pass);
@@ -245,119 +256,124 @@ class _MultiDestinationPassengerFormScreenState
             _prefillFromProfile(profileState.profile);
           }
         },
-        child: BlocConsumer<
-          MultiDestinationBookingCubit,
-          MultiDestinationBookingState
-        >(
-          listenWhen: (prev, current) =>
-              prev.isAddingToCart != current.isAddingToCart ||
-              current.cartSuccess ||
-              current.cartError != null,
-          listener: (context, state) {
-            if (state.cartSuccess) {
-              Navigator.pushNamedAndRemoveUntil(
-                context,
-                AppRoutes.cartScreen,
-                (route) => route.settings.name == AppRoutes.homeScreen,
-              );
-            } else if (state.cartError != null) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(state.cartError!),
-                  backgroundColor: Colors.red,
-                ),
-              );
-            }
-          },
-          builder: (context, state) {
-            return SafeArea(
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  children: [
-                    Expanded(
-                      child: ListView(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                          vertical: 16,
-                        ),
-                        children: [
-                          for (
-                            int legIndex = 0;
-                            legIndex < _legCount;
-                            legIndex++
-                          ) ...[
-                            // ── Leg header ──────────────────────────────
-                            _LegHeader(
-                              legIndex: legIndex,
-                              seatCount: _seatCounts[legIndex],
-                              summary: state.legSummaries[legIndex],
-                            ),
-                            const SizedBox(height: 10),
-
-                            // ── Passenger cards for this leg ─────────────
-                            for (
-                              int pIndex = 0;
-                              pIndex < _seatCounts[legIndex];
-                              pIndex++
-                            ) ...[
-                              _PassengerCard(
-                                index: pIndex + 1,
-                                seatNumber: state
-                                    .selectedSeats[legIndex]![pIndex]
-                                    .toString(),
-                                controllers: _controllers[legIndex][pIndex],
-                                isTrain: _isTrainPerLeg[legIndex],
-                              ),
-                              if (pIndex == 0 && !_isTrainPerLeg[legIndex] && _seatCounts[legIndex] > 1)
-                                _AutofillBanner(
-                                  autofilled: _autofilledPerLeg[legIndex],
-                                  onAutofill: () => _autofillLeg(legIndex),
-                                ),
-                            ],
-
-                            const SizedBox(height: 8),
-                          ],
-                        ],
-                      ),
+        child:
+            BlocConsumer<
+              MultiDestinationBookingCubit,
+              MultiDestinationBookingState
+            >(
+              listenWhen: (prev, current) =>
+                  prev.isAddingToCart != current.isAddingToCart ||
+                  current.cartSuccess ||
+                  current.cartError != null,
+              listener: (context, state) {
+                if (state.cartSuccess) {
+                  Navigator.pushNamedAndRemoveUntil(
+                    context,
+                    AppRoutes.cartScreen,
+                    (route) => route.settings.name == AppRoutes.homeScreen,
+                  );
+                } else if (state.cartError != null) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(state.cartError!),
+                      backgroundColor: Colors.red,
                     ),
+                  );
+                }
+              },
+              builder: (context, state) {
+                return SafeArea(
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      children: [
+                        Expanded(
+                          child: ListView(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                              vertical: 16,
+                            ),
+                            children: [
+                              for (
+                                int legIndex = 0;
+                                legIndex < _legCount;
+                                legIndex++
+                              ) ...[
+                                // ── Leg header ──────────────────────────────
+                                _LegHeader(
+                                  legIndex: legIndex,
+                                  seatCount: _seatCounts[legIndex],
+                                  summary: state.legSummaries[legIndex],
+                                ),
+                                const SizedBox(height: 10),
 
-                    // ── Submit button ─────────────────────────────────────
-                    Container(
-                      padding: const EdgeInsets.all(16),
-                      color: ColorsManager.surfaceDark,
-                      child: SizedBox(
-                        width: double.infinity,
-                        height: 52,
-                        child: ElevatedButton(
-                          onPressed: state.isAddingToCart ? null : _submit,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: ColorsManager.buttonBlue,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(26),
+                                // ── Passenger cards for this leg ─────────────
+                                for (
+                                  int pIndex = 0;
+                                  pIndex < _seatCounts[legIndex];
+                                  pIndex++
+                                ) ...[
+                                  PassengerCard(
+                                    index: pIndex + 1,
+                                    seatLabel: AppLocalizations.of(context)!
+                                        .seatLabel(
+                                          state.selectedSeats[legIndex]![pIndex]
+                                              .toString(),
+                                        ),
+                                    controllers: _controllers[legIndex][pIndex],
+                                    isTrain: _isTrainPerLeg[legIndex],
+                                  ),
+                                  if (pIndex == 0 &&
+                                      !_isTrainPerLeg[legIndex] &&
+                                      _seatCounts[legIndex] > 1)
+                                    PassengerAutofillBanner(
+                                      autofilled: _autofilledPerLeg[legIndex],
+                                      onAutofill: () => _autofillLeg(legIndex),
+                                    ),
+                                ],
+
+                                const SizedBox(height: 8),
+                              ],
+                            ],
+                          ),
+                        ),
+
+                        // ── Submit button ─────────────────────────────────────
+                        Container(
+                          padding: const EdgeInsets.all(16),
+                          color: ColorsManager.surfaceDark,
+                          child: SizedBox(
+                            width: double.infinity,
+                            height: 52,
+                            child: ElevatedButton(
+                              onPressed: state.isAddingToCart ? null : _submit,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: ColorsManager.buttonBlue,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(26),
+                                ),
+                              ),
+                              child: state.isAddingToCart
+                                  ? const CircularProgressIndicator(
+                                      color: Colors.white,
+                                    )
+                                  : Text(
+                                      AppLocalizations.of(context)!.addToCart,
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
                             ),
                           ),
-                          child: state.isAddingToCart
-                              ? const CircularProgressIndicator(
-                                  color: Colors.white,
-                                )
-                              : Text(
-                                  AppLocalizations.of(context)!.addToCart,
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
                         ),
-                      ),
+                      ],
                     ),
-                  ],
-                ),
-              ),
-            );
-          },
-        ),
+                  ),
+                );
+              },
+            ),
       ),
     );
   }
@@ -395,7 +411,9 @@ class _LegHeader extends StatelessWidget {
       decoration: BoxDecoration(
         color: ColorsManager.accentCyan.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: ColorsManager.accentCyan.withValues(alpha: 0.4)),
+        border: Border.all(
+          color: ColorsManager.accentCyan.withValues(alpha: 0.4),
+        ),
       ),
       child: Row(
         children: [
@@ -432,272 +450,6 @@ class _LegHeader extends StatelessWidget {
                   ],
                 ),
               ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// ── Per-passenger controllers ────────────────────────────────────────────────────────────────
-class _PassengerControllers {
-  final nameController = TextEditingController();
-  final nationalIdController = TextEditingController();
-  final phoneController = TextEditingController();
-  final emailController = TextEditingController();
-  // 'NationalId' | 'Passport'
-  String selectedIdType = 'NationalId';
-
-  void dispose() {
-    nameController.dispose();
-    nationalIdController.dispose();
-    phoneController.dispose();
-    emailController.dispose();
-  }
-}
-
-// ── Single passenger card ────────────────────────────────────────────────────────────────
-class _PassengerCard extends StatefulWidget {
-  final int index;
-  final String seatNumber;
-  final _PassengerControllers controllers;
-  final bool isTrain;
-
-  const _PassengerCard({
-    required this.index,
-    required this.seatNumber,
-    required this.controllers,
-    required this.isTrain,
-  });
-
-  @override
-  State<_PassengerCard> createState() => _PassengerCardState();
-}
-
-class _PassengerCardState extends State<_PassengerCard> {
-  @override
-  Widget build(BuildContext context) {
-    final loc = AppLocalizations.of(context)!;
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: ColorsManager.surfaceDark,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: ColorsManager.borderDim, width: 1),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                loc.passengerN('${widget.index}'),
-                style: const TextStyle(
-                  color: ColorsManager.accentCyan,
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              Text(
-                loc.seatLabel(widget.seatNumber),
-                style: const TextStyle(color: Colors.white70, fontSize: 12),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          TextFormField(
-            controller: widget.controllers.nameController,
-            style: const TextStyle(color: Colors.white, fontSize: 14),
-            decoration: _inputDecoration(
-              label: loc.fullName,
-              icon: Icons.person_outline,
-            ),
-            validator: (v) =>
-                (v == null || v.trim().isEmpty) ? loc.requiredField : null,
-          ),
-          const SizedBox(height: 12),
-          // ── ID Type Dropdown + ID Number — ONLY for train legs ──
-          if (widget.isTrain) ...[
-            DropdownButtonFormField<String>(
-              initialValue: widget.controllers.selectedIdType,
-              decoration: _inputDecoration(
-                label: loc.idTypeLabel,
-                icon: Icons.badge_outlined,
-              ),
-              dropdownColor: ColorsManager.surfaceDark,
-              style: const TextStyle(color: Colors.white, fontSize: 14),
-              items: [
-                DropdownMenuItem(value: 'NationalId', child: Text(loc.idTypeNationalId)),
-                DropdownMenuItem(value: 'Passport', child: Text(loc.idTypePassport)),
-              ],
-              onChanged: (val) {
-                if (val != null) {
-                  setState(() {
-                    widget.controllers.selectedIdType = val;
-                    widget.controllers.nationalIdController.clear();
-                  });
-                }
-              },
-            ),
-            const SizedBox(height: 12),
-            TextFormField(
-              controller: widget.controllers.nationalIdController,
-              keyboardType: widget.controllers.selectedIdType == 'NationalId'
-                  ? TextInputType.number
-                  : TextInputType.text,
-              style: const TextStyle(color: Colors.white, fontSize: 14),
-              decoration: _inputDecoration(
-                label: widget.controllers.selectedIdType == 'NationalId'
-                    ? loc.idNumberLabel
-                    : loc.passportNumberLabel,
-                icon: Icons.credit_card_outlined,
-              ),
-              validator: (v) =>
-                  (v == null || v.trim().isEmpty) ? loc.requiredField : null,
-            ),
-            const SizedBox(height: 12),
-          ],
-          TextFormField(
-            controller: widget.controllers.phoneController,
-            keyboardType: TextInputType.phone,
-            style: const TextStyle(color: Colors.white, fontSize: 14),
-            decoration: _inputDecoration(
-              label: loc.phoneNumberLabel,
-              icon: Icons.phone_outlined,
-            ),
-            validator: (v) =>
-                (v == null || v.trim().isEmpty) ? loc.requiredField : null,
-          ),
-          const SizedBox(height: 12),
-          TextFormField(
-            controller: widget.controllers.emailController,
-            keyboardType: TextInputType.emailAddress,
-            style: const TextStyle(color: Colors.white, fontSize: 14),
-            decoration: _inputDecoration(
-              label: loc.emailOptional,
-              icon: Icons.email_outlined,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  InputDecoration _inputDecoration({
-    required String label,
-    required IconData icon,
-  }) {
-    return InputDecoration(
-      labelText: label,
-      labelStyle: const TextStyle(color: ColorsManager.textMuted, fontSize: 13),
-      prefixIcon: Icon(icon, color: ColorsManager.textMuted, size: 20),
-      filled: true,
-      fillColor: ColorsManager.seatContainerBg,
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide.none,
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: ColorsManager.accentCyan),
-      ),
-      errorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: Colors.redAccent),
-      ),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-    );
-  }
-}
-
-class _AutofillBanner extends StatelessWidget {
-  final bool autofilled;
-  final VoidCallback onAutofill;
-
-  const _AutofillBanner({required this.autofilled, required this.onAutofill});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-      decoration: BoxDecoration(
-        color: ColorsManager.surfaceDark,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: ColorsManager.accentCyan.withAlpha(80),
-          width: 1.2,
-        ),
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: ColorsManager.accentCyan.withAlpha(25),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: const Icon(
-              Icons.family_restroom_rounded,
-              color: ColorsManager.accentCyan,
-              size: 22,
-            ),
-          ),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  autofilled
-                      ? AppLocalizations.of(context)!.autoFilled
-                      : AppLocalizations.of(context)!.travellingWithFamily,
-                  style: TextStyle(
-                    color: autofilled
-                        ? ColorsManager.successGreen
-                        : Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 13,
-                  ),
-                ),
-                const SizedBox(height: 3),
-                Text(
-                  AppLocalizations.of(context)!.fillSeat1Info,
-                  style: const TextStyle(color: Colors.white54, fontSize: 11),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(width: 8),
-          OutlinedButton(
-            onPressed: onAutofill,
-            style: OutlinedButton.styleFrom(
-              side: BorderSide(
-                color: autofilled
-                    ? ColorsManager.successGreen
-                    : ColorsManager.accentCyan,
-              ),
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              minimumSize: Size.zero,
-              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-            ),
-            child: Text(
-              autofilled
-                  ? AppLocalizations.of(context)!.reFill
-                  : AppLocalizations.of(context)!.autoFill,
-              style: TextStyle(
-                color: autofilled
-                    ? ColorsManager.successGreen
-                    : ColorsManager.accentCyan,
-                fontWeight: FontWeight.bold,
-                fontSize: 12,
-              ),
             ),
           ),
         ],

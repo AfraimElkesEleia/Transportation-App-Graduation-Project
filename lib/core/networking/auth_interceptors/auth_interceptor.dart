@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:transportation_app/core/constants/api_constants.dart';
 import 'package:transportation_app/core/utils/token_manager.dart';
 import 'package:transportation_app/core/routing/routes.dart';
@@ -37,7 +38,7 @@ class AuthInterceptor extends Interceptor {
 
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) async {
-    print(
+    debugPrint(
       '🔵 [AuthInterceptor] onError called — status: ${err.response?.statusCode}',
     );
     final isPublic = _publicEndpoints.any(
@@ -45,7 +46,7 @@ class AuthInterceptor extends Interceptor {
     );
     final tokenExpired = err.response?.headers.value('Token-Expired') == 'true';
     if (tokenExpired) {
-      print('🔵 [AuthInterceptor] token expired — trying silent refresh');
+      debugPrint('🔵 [AuthInterceptor] token expired — trying silent refresh');
       final refreshed = await _tryRefreshToken();
       if (refreshed) {
         final newToken = await _tokenManager.getAccessToken();
@@ -62,7 +63,7 @@ class AuthInterceptor extends Interceptor {
     } else if (err.response?.statusCode == 401 && !isPublic) {
       _forceLogout();
     }
-    print('🔵 [AuthInterceptor] forwarding error to next handler');
+    debugPrint('🔵 [AuthInterceptor] forwarding error to next handler');
     handler.next(err);
   }
 

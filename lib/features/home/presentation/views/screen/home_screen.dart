@@ -78,7 +78,7 @@ class _HomeContent extends StatelessWidget {
                     children: [
                       Row(
                         children: [
-                          Icon(
+                          FaIcon(
                             FontAwesomeIcons.timeline,
                             color: ColorsManager.cyanBlue,
                           ),

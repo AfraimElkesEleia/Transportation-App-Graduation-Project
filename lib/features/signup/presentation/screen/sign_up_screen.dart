@@ -46,7 +46,6 @@ class _SignupScreenState extends State<SignupScreen> {
   String? _countryCode;
   String? _countryName;
   String? _dialCode = '+20';
-  String? _dialCountry = 'EG';
   int? _idType; // null = no ID, 1 = National ID, 2 = Passport
 
   // ── UI state ──────────────────────────────────────────
@@ -78,9 +77,7 @@ class _SignupScreenState extends State<SignupScreen> {
 
     final genderErr = _gender == null ? l10n.genderError : null;
     final dobErr = AppValidators.dateOfBirth(_dateOfBirth);
-    final countryErr = _countryCode == null
-        ? l10n.countryError
-        : null;
+    final countryErr = _countryCode == null ? l10n.countryError : null;
     setState(() {
       _genderError = genderErr;
       _dobError = dobErr;
@@ -132,14 +129,14 @@ class _SignupScreenState extends State<SignupScreen> {
     return AuthBackground(
       child: BlocConsumer<SignupCubit, SignupState>(
         listener: (context, state) {
-          print('👁 [Screen] state changed to: $state');
+          debugPrint('👁 [Screen] state changed to: $state');
           if (state is SignupSuccess) {
             context.read<LocaleCubit>().syncLanguageWithBackend();
             Navigator.of(
               context,
             ).pushNamedAndRemoveUntil(AppRoutes.homeScreen, (route) => false);
           } else if (state is SignupFailure) {
-            print('👁 [Screen] showing snackbar: ${state.message}');
+            debugPrint('👁 [Screen] showing snackbar: ${state.message}');
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(state.message),
@@ -210,7 +207,6 @@ class _SignupScreenState extends State<SignupScreen> {
                   }),
                   onDialCodeChanged: (dialCode, countryCode) => setState(() {
                     _dialCode = dialCode;
-                    _dialCountry = countryCode;
                   }),
                   emailController: _emailController,
                   phoneController: _phoneController,

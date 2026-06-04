@@ -1548,4 +1548,17 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get arrivalTime => 'وقت الوصول';
+
+  @override
+  String get identityDetails => 'تفاصيل الهوية';
+
+  @override
+  String get identityDetailsWarning =>
+      'بمجرد التعيين، لا يمكن تغيير تفاصيل الهوية. يرجى التأكد من صحة البيانات المدخلة.';
+
+  @override
+  String get nationalIdRequired => 'الرقم القومي مطلوب.';
+
+  @override
+  String get passportNumberRequired => 'رقم جواز السفر مطلوب.';
 }

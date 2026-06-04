@@ -10,6 +10,7 @@ import 'package:transportation_app/features/profile/domain/entities/profile_enti
 import 'package:transportation_app/features/profile/presentation/cubit/profile_cubit/profile_cubit.dart';
 import 'package:transportation_app/features/profile/presentation/cubit/profile_cubit/profile_states.dart';
 import 'package:transportation_app/features/profile/presentation/views/widgets/profile_section_container.dart';
+import 'package:transportation_app/core/validators/app_validators.dart';
 
 class EditProfileScreen extends StatefulWidget {
   final ProfileEntity profile;
@@ -31,6 +32,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   String? _newImagePath;
   String? _uploadedImageUrl;
 
+  int? _idType; // null = None, 1 = National ID, 2 = Passport
+  late final TextEditingController _idNumberController;
+
   @override
   void initState() {
     super.initState();
@@ -43,6 +47,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     );
     _emailController = TextEditingController(text: widget.profile.email);
     _phoneController = TextEditingController(text: widget.profile.phoneNumber);
+    _idType = widget.profile.idType;
+    _idNumberController = TextEditingController(text: widget.profile.idNumber);
   }
 
   @override
@@ -52,6 +58,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     _familyNameController.dispose();
     _emailController.dispose();
     _phoneController.dispose();
+    _idNumberController.dispose();
     super.dispose();
   }
 
@@ -75,6 +82,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       familyName: _familyNameController.text.trim(),
       email: _emailController.text.trim(),
       phoneNumber: _phoneController.text.trim(),
+      idType: widget.profile.hasSetIdentityDetails ? null : _idType,
+      idNumber: widget.profile.hasSetIdentityDetails
+          ? null
+          : (_idType == null ? null : _idNumberController.text.trim()),
     );
   }
 
@@ -281,6 +292,120 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                             const SizedBox(height: 20),
                             // ── Fixed Details Section ──────────
                             _FixedDetailsSection(profile: widget.profile),
+                            if (!widget.profile.hasSetIdentityDetails) ...[
+                              const SizedBox(height: 20),
+                              ProfileSectionContainer(
+                                title: l10n.identityDetails,
+                                icon: Icons.badge_outlined,
+                                children: [
+                                  Text(
+                                    l10n.idTypeLabel,
+                                    style: const TextStyle(
+                                      color: Colors.white70,
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 10),
+                                  Row(
+                                    children: [
+                                      _buildIdChip(
+                                        label: l10n.idTypeNone,
+                                        selected: _idType == null,
+                                        onTap: () {
+                                          setState(() {
+                                            _idType = null;
+                                            _idNumberController.clear();
+                                          });
+                                        },
+                                      ),
+                                      const SizedBox(width: 8),
+                                      _buildIdChip(
+                                        label: l10n.idTypeNationalId,
+                                        selected: _idType == 1,
+                                        onTap: () {
+                                          setState(() {
+                                            _idType = 1;
+                                          });
+                                        },
+                                      ),
+                                      const SizedBox(width: 8),
+                                      _buildIdChip(
+                                        label: l10n.idTypePassport,
+                                        selected: _idType == 2,
+                                        onTap: () {
+                                          setState(() {
+                                            _idType = 2;
+                                          });
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                  if (_idType != null) ...[
+                                    const SizedBox(height: 16),
+                                    TextFormField(
+                                      controller: _idNumberController,
+                                      style: const TextStyle(color: Colors.white),
+                                      keyboardType: TextInputType.text,
+                                      validator: (v) {
+                                        if (_idType != null) {
+                                          if (v == null || v.trim().isEmpty) {
+                                            return _idType == 1
+                                                ? l10n.nationalIdRequired
+                                                : l10n.passportNumberRequired;
+                                          }
+                                          return _idType == 1
+                                              ? AppValidators.nationalId(v)
+                                              : AppValidators.passportNumber(v);
+                                        }
+                                        return null;
+                                      },
+                                      decoration: AppDecorations.profileInput(
+                                        _idType == 1
+                                            ? l10n.idTypeNationalId
+                                            : l10n.idTypePassport,
+                                      ).copyWith(
+                                        filled: true,
+                                        fillColor: const Color(0xFF1A2A3A),
+                                        hintText: _idType == 1
+                                            ? l10n.nationalIdHint
+                                            : l10n.passportNumberHint,
+                                        hintStyle: const TextStyle(
+                                          color: Colors.white24,
+                                        ),
+                                        prefixIcon: Icon(
+                                          _idType == 1
+                                              ? Icons.badge_outlined
+                                              : Icons.airplane_ticket_outlined,
+                                          color: Colors.white54,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                  const SizedBox(height: 12),
+                                  Row(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      const Icon(
+                                        Icons.warning_amber_rounded,
+                                        color: Colors.orange,
+                                        size: 16,
+                                      ),
+                                      const SizedBox(width: 6),
+                                      Expanded(
+                                        child: Text(
+                                          l10n.identityDetailsWarning,
+                                          style: const TextStyle(
+                                            color: Colors.orange,
+                                            fontSize: 12,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ],
                             const SizedBox(height: 32),
 
                             // ── Save button ──────────────────
@@ -364,6 +489,38 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       ),
     );
   }
+
+  Widget _buildIdChip({
+    required String label,
+    required bool selected,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+        decoration: BoxDecoration(
+          color: selected
+              ? ColorsManager.accentCyan.withValues(alpha: 0.15)
+              : Colors.white.withValues(alpha: 0.05),
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(
+            color: selected ? ColorsManager.accentCyan : Colors.white24,
+            width: selected ? 1.5 : 1,
+          ),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            color: selected ? ColorsManager.accentCyan : Colors.white54,
+            fontSize: 13,
+            fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 class _FixedDetailsSection extends StatelessWidget {
@@ -377,10 +534,12 @@ class _FixedDetailsSection extends StatelessWidget {
 
     // Resolve id type label
     String? idTypeLabel;
-    if (profile.idType == 1) {
-      idTypeLabel = l10n.idTypeNationalId;
-    } else if (profile.idType == 2) {
-      idTypeLabel = l10n.idTypePassport;
+    if (profile.hasSetIdentityDetails) {
+      if (profile.idType == 1) {
+        idTypeLabel = l10n.idTypeNationalId;
+      } else if (profile.idType == 2) {
+        idTypeLabel = l10n.idTypePassport;
+      }
     }
 
     return ProfileSectionContainer(
@@ -392,7 +551,9 @@ class _FixedDetailsSection extends StatelessWidget {
           const SizedBox(height: 4),
           _buildReadOnly(l10n.idTypeLabel, idTypeLabel),
         ],
-        if (profile.idNumber != null && profile.idNumber!.isNotEmpty) ...[
+        if (profile.hasSetIdentityDetails &&
+            profile.idNumber != null &&
+            profile.idNumber!.isNotEmpty) ...[
           const SizedBox(height: 4),
           _buildReadOnly(
             profile.idType == 2 ? l10n.passportNumberLabel : l10n.idNumberLabel,

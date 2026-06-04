@@ -659,5 +659,9 @@
   "allCompanies": "كل الشركات",
   "from": "من",
   "to": "إلى",
-  "arrivalTime": "وقت الوصول"
+  "arrivalTime": "وقت الوصول",
+  "identityDetails": "تفاصيل الهوية",
+  "identityDetailsWarning": "بمجرد التعيين، لا يمكن تغيير تفاصيل الهوية. يرجى التأكد من صحة البيانات المدخلة.",
+  "nationalIdRequired": "الرقم القومي مطلوب.",
+  "passportNumberRequired": "رقم جواز السفر مطلوب."
 }

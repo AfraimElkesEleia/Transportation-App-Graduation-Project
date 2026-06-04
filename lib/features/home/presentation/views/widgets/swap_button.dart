@@ -24,7 +24,7 @@ class SwapButton extends StatelessWidget {
           ),
           child: RotationTransition(
             turns: animation,
-            child: Icon(
+            child: FaIcon(
               FontAwesomeIcons.arrowRightArrowLeft,
               color: ColorsManager.cyanBlue,
               size: 16,

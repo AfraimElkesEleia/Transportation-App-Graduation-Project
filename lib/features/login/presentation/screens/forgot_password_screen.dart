@@ -65,7 +65,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
         builder: (context, state) {
           final isLoading = state is PasswordLoading;
           final isSuccess = state is PasswordSuccess;
-          final isFailure = state is PasswordFailure;
 
           return SingleChildScrollView(
             child: Column(
@@ -278,7 +277,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
 
 // ── Feedback card widget ───────────────────────────────────────────────────────
 class _FeedbackCard extends StatelessWidget {
-  final IconData icon;
+  final FaIconData icon;
   final Color iconColor;
   final Color borderColor;
   final Color bgColor;

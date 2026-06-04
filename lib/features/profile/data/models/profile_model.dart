@@ -49,6 +49,7 @@ class ProfileModel extends ProfileEntity {
     super.activeChallenges,
     super.idType,
     super.idNumber,
+    super.hasSetIdentityDetails = false,
   });
 
   static int? _parseIdType(dynamic value) {
@@ -86,6 +87,7 @@ class ProfileModel extends ProfileEntity {
           .toList(),
       idType: _parseIdType(json['idType']),
       idNumber: json['idNumber'] as String?,
+      hasSetIdentityDetails: json['hasSetIdentityDetails'] as bool? ?? false,
     );
   }
 }

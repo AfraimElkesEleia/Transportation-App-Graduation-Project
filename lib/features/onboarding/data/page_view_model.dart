@@ -1,10 +1,8 @@
-import 'package:flutter/material.dart';
-
 class PageViewModel {
   final String subtitle;
   final String title;
   final String description;
-  final IconData icon;
+  final Object icon;
 
   const PageViewModel({
     required this.subtitle,
