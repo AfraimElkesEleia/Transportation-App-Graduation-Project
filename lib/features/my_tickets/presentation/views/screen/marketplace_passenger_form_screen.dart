@@ -275,13 +275,13 @@ class _TransportBadge extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       decoration: BoxDecoration(
         color: isTrain
-            ? const Color(0xFF1A3A6A).withOpacity(0.8)
-            : const Color(0xFF1A3A2A).withOpacity(0.8),
+            ? const Color(0xFF1A3A6A).withValues(alpha: 0.8)
+            : const Color(0xFF1A3A2A).withValues(alpha: 0.8),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: isTrain
-              ? ColorsManager.accentCyan.withOpacity(0.4)
-              : ColorsManager.successGreen.withOpacity(0.4),
+              ? ColorsManager.accentCyan.withValues(alpha: 0.4)
+              : ColorsManager.successGreen.withValues(alpha: 0.4),
         ),
       ),
       child: Row(
@@ -419,7 +419,7 @@ class _PassengerCardState extends State<_PassengerCard> {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: ColorsManager.accentCyan.withOpacity(0.1),
+                  color: ColorsManager.accentCyan.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: const Icon(
@@ -491,7 +491,7 @@ class _PassengerCardState extends State<_PassengerCard> {
 
   Widget _buildIdTypeDropdown() {
     return DropdownButtonFormField<String>(
-      value: widget.controllers.selectedIdType,
+      initialValue: widget.controllers.selectedIdType,
       dropdownColor: ColorsManager.seatContainerBg,
       style: const TextStyle(color: Colors.white, fontSize: 14),
       decoration: InputDecoration(

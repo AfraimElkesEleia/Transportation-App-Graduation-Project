@@ -180,8 +180,9 @@ class _MiniTicketCard extends StatelessWidget {
     final n = ticket.agencyName.toLowerCase();
     if (n.contains('gobus')) return ColorsManager.agencyGoBus;
     if (n.contains('blue')) return ColorsManager.agencyBlueBus;
-    if (n.contains('rail') || n.contains('train'))
+    if (n.contains('rail') || n.contains('train')) {
       return ColorsManager.agencyRailway;
+    }
     if (n.contains('horus')) return ColorsManager.agencyHorus;
     return ColorsManager.agencyDefault;
   }
@@ -214,7 +215,7 @@ class _MiniTicketCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: const Color(0xFF0F1B2D),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withOpacity(0.07)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.07)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -225,10 +226,10 @@ class _MiniTicketCard extends StatelessWidget {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
-                  color: _agencyColor.withOpacity(0.2),
+                  color: _agencyColor.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(6),
                   border:
-                      Border.all(color: _agencyColor.withOpacity(0.5)),
+                      Border.all(color: _agencyColor.withValues(alpha: 0.5)),
                 ),
                 child: Text(ticket.agencyName,
                     style: TextStyle(
@@ -245,7 +246,7 @@ class _MiniTicketCard extends StatelessWidget {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
-                  color: _statusColor.withOpacity(0.15),
+                  color: _statusColor.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Text(ticket.status,

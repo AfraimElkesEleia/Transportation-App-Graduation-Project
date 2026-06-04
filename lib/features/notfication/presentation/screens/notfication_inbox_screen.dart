@@ -173,13 +173,13 @@ class _SwipeHint extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(Icons.swipe_left_rounded,
-              size: 13, color: ColorsManager.textMuted.withOpacity(0.3)),
+              size: 13, color: ColorsManager.textMuted.withValues(alpha: 0.3)),
           const SizedBox(width: 6),
           Text(
             'Swipe left to dismiss',
             style: TextStyle(
               fontSize: 11,
-              color: ColorsManager.textMuted.withOpacity(0.3),
+              color: ColorsManager.textMuted.withValues(alpha: 0.3),
             ),
           ),
         ],
@@ -233,10 +233,10 @@ class _LoadingShimmerState extends State<_LoadingShimmer>
               margin: const EdgeInsets.only(bottom: 8),
               height: 88,
               decoration: BoxDecoration(
-                color: ColorsManager.cardUnread.withOpacity(_anim.value),
+                color: ColorsManager.cardUnread.withValues(alpha: _anim.value),
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
-                  color: ColorsManager.cardBorderUnread.withOpacity(0.3),
+                  color: ColorsManager.cardBorderUnread.withValues(alpha: 0.3),
                 ),
               ),
             ),
@@ -261,7 +261,7 @@ class _ErrorState extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(Icons.wifi_off_rounded,
-              size: 40, color: ColorsManager.textMuted.withOpacity(0.4)),
+              size: 40, color: ColorsManager.textMuted.withValues(alpha: 0.4)),
           const SizedBox(height: 16),
           Text(
             message,
@@ -277,10 +277,10 @@ class _ErrorState extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
               decoration: BoxDecoration(
-                color: ColorsManager.cyanBlue.withOpacity(0.12),
+                color: ColorsManager.cyanBlue.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                  color: ColorsManager.cyanBlue.withOpacity(0.25),
+                  color: ColorsManager.cyanBlue.withValues(alpha: 0.25),
                 ),
               ),
               child: const Text(

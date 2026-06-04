@@ -14,7 +14,6 @@ import 'package:transportation_app/features/home/presentation/cubit/stations_sta
 import 'package:transportation_app/features/home/presentation/cubit/popular_routes_cubit.dart';
 import 'package:transportation_app/features/notfication/presentation/cubit/notfication_cubit.dart';
 import 'package:transportation_app/features/home/presentation/views/widgets/app_bar_in_home_screen.dart';
-import 'package:transportation_app/features/home/presentation/views/widgets/latest_news_block.dart';
 import 'package:transportation_app/features/home/presentation/views/widgets/plan_your_journey_block.dart';
 import 'package:transportation_app/features/home/presentation/views/widgets/recent_searches_block.dart';
 import 'package:transportation_app/features/home/presentation/views/widgets/popular_routes_section.dart';

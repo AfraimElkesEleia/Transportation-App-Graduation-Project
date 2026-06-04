@@ -30,6 +30,7 @@ class _CartScreenState extends State<CartScreen> {
     context.read<CartCubit>().checkout(pointsToRedeem: pointsToRedeem);
   }
 
+  @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     return Scaffold(

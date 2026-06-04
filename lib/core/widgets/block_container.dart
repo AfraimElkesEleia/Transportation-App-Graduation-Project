@@ -21,14 +21,14 @@ class BlockContainer extends StatelessWidget {
         shadows: isVip != null
             ? [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.25),
+                  color: Colors.black.withValues(alpha: 0.25),
                   blurRadius: 12,
                   spreadRadius: 1,
                   offset: const Offset(0, 6),
                 ),
                 BoxShadow(
-                  color: Colors.white.withOpacity(
-                    0.08,
+                  color: Colors.white.withValues(
+                    alpha: 0.08,
                   ), // subtle top-glow effect
                   blurRadius: 6,
                   spreadRadius: -2,

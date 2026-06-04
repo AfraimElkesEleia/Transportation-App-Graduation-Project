@@ -224,7 +224,7 @@ class _PointsInfoBanner extends StatelessWidget {
       decoration: BoxDecoration(
         color: ColorsManager.surfaceDark,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withOpacity(0.5)),
+        border: Border.all(color: color.withValues(alpha: 0.5)),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,

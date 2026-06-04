@@ -45,10 +45,10 @@ class WalletCard extends StatelessWidget {
           colors: [Color(0xFF0D2B5E), Color(0xFF1A4A8A)],
         ),
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Colors.white.withOpacity(0.12)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.3),
+            color: Colors.black.withValues(alpha: 0.3),
             blurRadius: 20,
             offset: const Offset(0, 8),
           ),
@@ -63,7 +63,7 @@ class WalletCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.1),
+                  color: Colors.white.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: const Icon(Icons.account_balance_wallet_rounded,
@@ -157,9 +157,9 @@ class _ActiveBadge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: ColorsManager.accentCyan.withOpacity(0.15),
+        color: ColorsManager.accentCyan.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: ColorsManager.accentCyan.withOpacity(0.4)),
+        border: Border.all(color: ColorsManager.accentCyan.withValues(alpha: 0.4)),
       ),
       child: const Row(
         mainAxisSize: MainAxisSize.min,
@@ -192,9 +192,9 @@ class _WalletActionBtn extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 12),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.12),
+          color: color.withValues(alpha: 0.12),
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: color.withOpacity(0.35)),
+          border: Border.all(color: color.withValues(alpha: 0.35)),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -429,10 +429,10 @@ class _PointsTab extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: ColorsManager.successGreen.withOpacity(0.1),
+            color: ColorsManager.successGreen.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-                color: ColorsManager.successGreen.withOpacity(0.3)),
+                color: ColorsManager.successGreen.withValues(alpha: 0.3)),
           ),
           child: const Text('100 points = 10 EGP  •  Min redeem: 100 pts',
               style:
@@ -477,8 +477,9 @@ class _CardTab extends StatelessWidget {
           icon: Icons.credit_card,
           keyboardType: TextInputType.number,
           validator: (v) {
-            if ((v ?? '').replaceAll(' ', '').length != 16)
+            if ((v ?? '').replaceAll(' ', '').length != 16) {
               return 'Must be 16 digits';
+            }
             return null;
           },
         ),
@@ -513,7 +514,7 @@ class _CardTab extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.05),
+              color: Colors.white.withValues(alpha: 0.05),
               borderRadius: BorderRadius.circular(12)),
           child: const Row(children: [
             Icon(Icons.security, color: Colors.white38, size: 16),
@@ -563,12 +564,12 @@ class _InstapayTab extends StatelessWidget {
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
             gradient: LinearGradient(colors: [
-              ColorsManager.successGreen.withOpacity(0.1),
-              const Color(0xFF1B5E20).withOpacity(0.1),
+              ColorsManager.successGreen.withValues(alpha: 0.1),
+              const Color(0xFF1B5E20).withValues(alpha: 0.1),
             ]),
             borderRadius: BorderRadius.circular(14),
             border: Border.all(
-                color: ColorsManager.successGreen.withOpacity(0.3)),
+                color: ColorsManager.successGreen.withValues(alpha: 0.3)),
           ),
           child: const Column(children: [
             Icon(Icons.phone_android,
@@ -716,7 +717,7 @@ class _WalletHistorySheet extends StatelessWidget {
                             decoration: BoxDecoration(
                               color: t.isCredit
                                   ? ColorsManager.successGreen
-                                      .withOpacity(0.15)
+                                      .withValues(alpha: 0.15)
                                   : Colors.red.withOpacity(0.15),
                               shape: BoxShape.circle,
                             ),

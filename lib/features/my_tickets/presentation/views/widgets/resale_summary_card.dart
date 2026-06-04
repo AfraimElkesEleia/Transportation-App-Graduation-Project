@@ -26,14 +26,14 @@ class ResaleSummaryCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: ColorsManager.resellCardBg.withOpacity(0.5),
+        color: ColorsManager.resellCardBg.withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: Colors.white10),
       ),
       child: Row(
         children: [
           CircleAvatar(
-            backgroundColor: Colors.white.withOpacity(0.1),
+            backgroundColor: Colors.white.withValues(alpha: 0.1),
             child: Icon(icon, color: ColorsManager.accentCyan, size: 20),
           ),
           const SizedBox(width: 12),

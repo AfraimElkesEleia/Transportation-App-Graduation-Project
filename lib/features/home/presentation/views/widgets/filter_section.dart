@@ -48,7 +48,7 @@ class _FilterSectionState extends State<FilterSection>
         max: 1000,
         value: price.toDouble(),
         activeColor: ColorsManager.cyanBlue,
-        inactiveColor: ColorsManager.darkBlue.withOpacity(0.5),
+        inactiveColor: ColorsManager.darkBlue.withValues(alpha: 0.5),
         thumbColor: Colors.white,
         onChanged: (value) {
           setState(() {

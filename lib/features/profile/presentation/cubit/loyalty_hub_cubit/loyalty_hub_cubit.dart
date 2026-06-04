@@ -9,12 +9,12 @@ class LoyaltyHubCubit extends Cubit<LoyaltyHubState> {
   final GetPointHistoryUsecase _pointUsecase;
   final GetChallengeHistoryUsecase _challengeUsecase;
 
-  List<ChallengeHistory> _challenges = [];
+  final List<ChallengeHistory> _challenges = [];
   bool _showCompleted = false;
   int _challengePage = 1;
   bool _hasMoreChallenges = true;
 
-  List<PointTransaction> _points = [];
+  final List<PointTransaction> _points = [];
   int _pointsPage = 1;
   bool _hasMorePoints = true;
 

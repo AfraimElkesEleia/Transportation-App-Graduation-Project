@@ -40,8 +40,9 @@ class DropdownAppMenu<T> extends StatelessWidget {
   }
 
   String _nameAr(T item) {
-    if (item is StationGroupEntity)
+    if (item is StationGroupEntity) {
       return item.governorateAr ?? item.governorate;
+    }
     if (item is StationEntity) return item.arabicName;
     return '';
   }

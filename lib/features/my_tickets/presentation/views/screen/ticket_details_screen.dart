@@ -236,7 +236,7 @@ class _TicketDetailsScreenState extends State<TicketDetailsScreen> {
                   decoration: BoxDecoration(
                     color: ColorsManager.cardBg,
                     borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: Colors.white.withOpacity(0.07)),
+                    border: Border.all(color: Colors.white.withValues(alpha: 0.07)),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -260,13 +260,13 @@ class _TicketDetailsScreenState extends State<TicketDetailsScreen> {
                               vertical: 4,
                             ),
                             decoration: BoxDecoration(
-                              color: _statusColor.withOpacity(
-                                0.15,
+                              color: _statusColor.withValues(
+                                alpha: 0.15,
                               ),
                               borderRadius: BorderRadius.circular(8),
                               border: Border.all(
-                                color: _statusColor.withOpacity(
-                                  0.4,
+                                color: _statusColor.withValues(
+                                  alpha: 0.4,
                                 ),
                               ),
                             ),
@@ -517,7 +517,7 @@ class _TicketDetailsScreenState extends State<TicketDetailsScreen> {
                         color: ColorsManager.surfaceMid,
                         borderRadius: BorderRadius.circular(15),
                         border: Border.all(
-                          color: Colors.white.withOpacity(0.05),
+                          color: Colors.white.withValues(alpha: 0.05),
                         ),
                       ),
                       child: Row(
@@ -527,11 +527,11 @@ class _TicketDetailsScreenState extends State<TicketDetailsScreen> {
                             width: 36,
                             height: 36,
                             decoration: BoxDecoration(
-                              color: ColorsManager.accentCyan.withOpacity(0.1),
+                              color: ColorsManager.accentCyan.withValues(alpha: 0.1),
                               shape: BoxShape.circle,
                               border: Border.all(
-                                color: ColorsManager.accentCyan.withOpacity(
-                                  0.3,
+                                color: ColorsManager.accentCyan.withValues(
+                                  alpha: 0.3,
                                 ),
                               ),
                             ),
@@ -578,11 +578,11 @@ class _TicketDetailsScreenState extends State<TicketDetailsScreen> {
                                     ),
                                     decoration: BoxDecoration(
                                       color: ColorsManager.accentCyan
-                                          .withOpacity(0.1),
+                                          .withValues(alpha: 0.1),
                                       borderRadius: BorderRadius.circular(12),
                                       border: Border.all(
                                         color: ColorsManager.accentCyan
-                                            .withOpacity(0.3),
+                                            .withValues(alpha: 0.3),
                                       ),
                                     ),
                                     child: Text(

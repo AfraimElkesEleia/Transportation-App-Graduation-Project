@@ -1,6 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:transportation_app/features/notfication/data/datasources/notfication_remote_datasource.dart';
-import 'package:transportation_app/features/notfication/domain/entities/app_notfication.dart';
 import 'package:transportation_app/features/notfication/presentation/cubit/notfication_state.dart';
 
 class NotificationCubit extends Cubit<NotificationState> {

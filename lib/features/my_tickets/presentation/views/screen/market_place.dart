@@ -175,7 +175,7 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               backgroundColor: isFilterActive
-                                  ? ColorsManager.accentCyan.withOpacity(0.08)
+                                  ? ColorsManager.accentCyan.withValues(alpha: 0.08)
                                   : Colors.transparent,
                             ),
                           ),
@@ -647,9 +647,9 @@ class _ActiveFilterChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
-        color: ColorsManager.accentCyan.withOpacity(0.12),
+        color: ColorsManager.accentCyan.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: ColorsManager.accentCyan.withOpacity(0.4)),
+        border: Border.all(color: ColorsManager.accentCyan.withValues(alpha: 0.4)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,

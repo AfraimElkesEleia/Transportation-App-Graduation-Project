@@ -184,10 +184,12 @@ class _SearchSectionState extends State<SearchSection> {
       String? tErr;
       String? dErr;
 
-      if (leg.fromGroup == null)
+      if (leg.fromGroup == null) {
         fErr = AppLocalizations.of(context)!.selectDepartureGov;
-      if (leg.toGroup == null)
+      }
+      if (leg.toGroup == null) {
         tErr = AppLocalizations.of(context)!.selectDestinationGov;
+      }
 
       if (leg.fromGroup != null &&
           leg.toGroup != null &&

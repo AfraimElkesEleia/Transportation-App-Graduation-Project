@@ -113,8 +113,7 @@ class AppDatePickerField extends StatelessWidget {
               onPrimary: Colors.white,
               surface: Color(0xff0B1F3A),
               onSurface: Colors.white,
-            ),
-            dialogBackgroundColor: const Color(0xff081A33),
+            ), dialogTheme: DialogThemeData(backgroundColor: const Color(0xff081A33)),
           ),
           child: child!,
         );

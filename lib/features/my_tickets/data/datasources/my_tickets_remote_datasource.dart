@@ -159,12 +159,15 @@ class MyTicketsRemoteDatasourceImpl implements MyTicketsRemoteDatasource {
         'pageNumber': pageNumber,
         'pageSize': pageSize,
       };
-      if (originGovernorate != null && originGovernorate.isNotEmpty)
+      if (originGovernorate != null && originGovernorate.isNotEmpty) {
         queryParams['originGovernorate'] = originGovernorate;
-      if (destinationGovernorate != null && destinationGovernorate.isNotEmpty)
+      }
+      if (destinationGovernorate != null && destinationGovernorate.isNotEmpty) {
         queryParams['destinationGovernorate'] = destinationGovernorate;
-      if (travelDate != null && travelDate.isNotEmpty)
+      }
+      if (travelDate != null && travelDate.isNotEmpty) {
         queryParams['travelDate'] = travelDate;
+      }
 
       final res = await dio.get(
         ApiConstants.marketplaceActive,

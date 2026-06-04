@@ -428,7 +428,7 @@ class _PassengerCardState extends State<_PassengerCard> {
           // ID Type Dropdown + ID Number — ONLY when trip has a train
           if (widget.hasTrainAnywhere) ...[
             DropdownButtonFormField<String>(
-              value: widget.controllers.selectedIdType,
+              initialValue: widget.controllers.selectedIdType,
               decoration: InputDecoration(
                 labelText: loc.idTypeLabel,
                 labelStyle: const TextStyle(color: ColorsManager.textMuted, fontSize: 13),

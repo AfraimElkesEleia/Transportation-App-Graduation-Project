@@ -231,7 +231,7 @@ class _MarketplaceFilterSheetState extends State<MarketplaceFilterSheet> {
                 ),
                 decoration: BoxDecoration(
                   color: _travelDate != null
-                      ? ColorsManager.accentCyan.withOpacity(0.08)
+                      ? ColorsManager.accentCyan.withValues(alpha: 0.08)
                       : ColorsManager.surfaceMid,
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(

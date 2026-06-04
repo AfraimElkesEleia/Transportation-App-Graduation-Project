@@ -22,8 +22,9 @@ class TicketDetailCard extends StatelessWidget {
     final n = ticket.agencyName.toLowerCase();
     if (n.contains('gobus')) return ColorsManager.agencyGoBus;
     if (n.contains('blue')) return ColorsManager.agencyBlueBus;
-    if (n.contains('rail') || n.contains('train'))
+    if (n.contains('rail') || n.contains('train')) {
       return ColorsManager.agencyRailway;
+    }
     if (n.contains('horus')) return ColorsManager.agencyHorus;
     return ColorsManager.agencyDefault;
   }
@@ -88,10 +89,10 @@ class TicketDetailCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: ColorsManager.cardBg,
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: Colors.white.withOpacity(0.07)),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.07)),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.2),
+              color: Colors.black.withValues(alpha: 0.2),
               blurRadius: 12,
               offset: const Offset(0, 4),
             ),
@@ -104,7 +105,7 @@ class TicketDetailCard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               decoration: BoxDecoration(
-                color: _agencyColor.withOpacity(0.12),
+                color: _agencyColor.withValues(alpha: 0.12),
                 borderRadius: const BorderRadius.vertical(
                   top: Radius.circular(20),
                 ),
@@ -118,10 +119,10 @@ class TicketDetailCard extends StatelessWidget {
                         vertical: 4,
                       ),
                       decoration: BoxDecoration(
-                        color: _agencyColor.withOpacity(0.25),
+                        color: _agencyColor.withValues(alpha: 0.25),
                         borderRadius: BorderRadius.circular(8),
                         border: Border.all(
-                          color: _agencyColor.withOpacity(0.6),
+                          color: _agencyColor.withValues(alpha: 0.6),
                         ),
                       ),
                       child: Text(
@@ -151,9 +152,9 @@ class TicketDetailCard extends StatelessWidget {
                       vertical: 4,
                     ),
                     decoration: BoxDecoration(
-                      color: _statusColor.withOpacity(0.15),
+                      color: _statusColor.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: _statusColor.withOpacity(0.4)),
+                      border: Border.all(color: _statusColor.withValues(alpha: 0.4)),
                     ),
                     child: Text(
                       _getLocalizedStatus(context, ticket.status),
@@ -244,7 +245,7 @@ class TicketDetailCard extends StatelessWidget {
                         margin: const EdgeInsets.symmetric(vertical: 4),
                         height: 1.5,
                         width: 48,
-                        color: ColorsManager.accentCyan.withOpacity(0.4),
+                        color: ColorsManager.accentCyan.withValues(alpha: 0.4),
                       ),
                       const Icon(
                         Icons.flight_land,

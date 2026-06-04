@@ -494,7 +494,7 @@ class _PassengerCardState extends State<_PassengerCard> {
           if (widget.isTrain) ...[
             // ID Type Dropdown
             DropdownButtonFormField<String>(
-              value: widget.controllers.selectedIdType,
+              initialValue: widget.controllers.selectedIdType,
               decoration: InputDecoration(
                 labelText: loc.idTypeLabel,
                 labelStyle: const TextStyle(

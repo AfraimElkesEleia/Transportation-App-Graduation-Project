@@ -31,7 +31,7 @@ class NotficationPermissionManager {
         backgroundColor: const Color(0xFF112240),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
-          side: BorderSide(color: const Color(0xFF00B1DF).withOpacity(0.25)),
+          side: BorderSide(color: const Color(0xFF00B1DF).withValues(alpha: 0.25)),
         ),
         title: const Text(
           'Stay in the loop',

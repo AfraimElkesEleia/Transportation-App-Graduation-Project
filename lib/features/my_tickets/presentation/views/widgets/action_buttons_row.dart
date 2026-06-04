@@ -33,7 +33,7 @@ class ActionButtonsRow extends StatelessWidget {
                 onTap: marketPlaceButton,
                 icon: Icons.star_border,
                 label: l10n.marketplace,
-                color: const Color(0xFF5C6BC0).withOpacity(0.3),
+                color: const Color(0xFF5C6BC0).withValues(alpha: 0.3),
                 textColor: Colors.blue[100]!,
                 isOutlined: true,
               ),
@@ -62,7 +62,7 @@ class ActionButtonsRow extends StatelessWidget {
           border: isOutlined ? Border.all(color: Colors.white30) : null,
           gradient: isOutlined
               ? LinearGradient(
-                  colors: [color.withOpacity(0.4), color.withOpacity(0.1)],
+                  colors: [color.withValues(alpha: 0.4), color.withValues(alpha: 0.1)],
                 )
               : null,
         ),

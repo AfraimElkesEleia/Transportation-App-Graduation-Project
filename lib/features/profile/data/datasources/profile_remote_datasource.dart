@@ -117,8 +117,9 @@ class ProfileRemoteDatasourceImpl implements ProfileRemoteDatasource {
     try {
       await dio.post(ApiConstants.revoke, data: {'refreshToken': refreshToken});
     } on DioException catch (e) {
-      if (e.response?.statusCode == 400 || e.response?.statusCode == 401)
+      if (e.response?.statusCode == 400 || e.response?.statusCode == 401) {
         return;
+      }
       _handleDio(e);
     }
   }

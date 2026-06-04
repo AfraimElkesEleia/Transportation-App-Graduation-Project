@@ -548,9 +548,9 @@ class _LegHeader extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.12),
+        color: color.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withOpacity(0.4)),
+        border: Border.all(color: color.withValues(alpha: 0.4)),
       ),
       child: Row(
         children: [
@@ -721,7 +721,7 @@ class _PassengerCardState extends State<_PassengerCard> {
           // ── ID Type Dropdown + ID Number — ONLY for train ──
           if (widget.isTrain) ...[
             DropdownButtonFormField<String>(
-              value: widget.controllers.selectedIdType,
+              initialValue: widget.controllers.selectedIdType,
               decoration: InputDecoration(
                 labelText: loc.idTypeLabel,
                 labelStyle: const TextStyle(

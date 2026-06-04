@@ -1,5 +1,4 @@
 import 'package:equatable/equatable.dart';
-import 'package:transportation_app/features/home/domain/entities/page_result_entity.dart';
 import 'package:transportation_app/features/home/domain/entities/search_params.dart';
 import 'package:transportation_app/features/search/domain/entities/indirect_trips_enitity.dart';
 import 'package:transportation_app/features/search/domain/entities/trip_result_entity.dart';

@@ -13,7 +13,7 @@ class ResaleExploreBanner extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: ColorsManager.resellSurfaceTeal.withOpacity(0.4),
+        color: ColorsManager.resellSurfaceTeal.withValues(alpha: 0.4),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: Colors.teal.withOpacity(0.3)),
       ),

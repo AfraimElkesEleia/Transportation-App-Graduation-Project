@@ -215,20 +215,24 @@ class SearchCubit extends Cubit<SearchState> {
         final dep = TimeOfDay.fromDateTime(t.departureTime);
         final depMins = _mins(dep);
         if (params.departureFrom != null &&
-            depMins < _mins(params.departureFrom!))
+            depMins < _mins(params.departureFrom!)) {
           return false;
-        if (params.departureTo != null && depMins > _mins(params.departureTo!))
+        }
+        if (params.departureTo != null && depMins > _mins(params.departureTo!)) {
           return false;
+        }
       }
       // Arrival range
       if (params.arrivalFrom != null || params.arrivalTo != null) {
         if (t.arrivalTime == null) return false;
         final arr = TimeOfDay.fromDateTime(t.arrivalTime!);
         final arrMins = _mins(arr);
-        if (params.arrivalFrom != null && arrMins < _mins(params.arrivalFrom!))
+        if (params.arrivalFrom != null && arrMins < _mins(params.arrivalFrom!)) {
           return false;
-        if (params.arrivalTo != null && arrMins > _mins(params.arrivalTo!))
+        }
+        if (params.arrivalTo != null && arrMins > _mins(params.arrivalTo!)) {
           return false;
+        }
       }
       return true;
     }).toList();

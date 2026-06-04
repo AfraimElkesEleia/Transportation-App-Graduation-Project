@@ -22,9 +22,9 @@ class NotficationAppBar extends StatelessWidget {
               width: 40,
               height: 40,
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.09),
+                color: Colors.white.withValues(alpha: 0.09),
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.white.withOpacity(0.1)),
+                border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
               ),
               child: const Icon(
                 Icons.arrow_back_ios_new_rounded,

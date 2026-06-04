@@ -18,7 +18,7 @@ class IconContainerWidget extends StatelessWidget {
           decoration: ShapeDecoration(
             shadows: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.30),
+                color: Colors.black.withValues(alpha: 0.30),
                 blurRadius: 10,
                 spreadRadius: 3,
                 offset: Offset(0, 8),

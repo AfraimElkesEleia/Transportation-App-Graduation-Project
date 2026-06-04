@@ -65,8 +65,8 @@ class _Chip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final activeColor = ColorsManager.accentCyan;
-    final bg = isActive ? activeColor.withOpacity(0.15) : ColorsManager.surfaceMid;
-    final border = isActive ? activeColor.withOpacity(0.5) : ColorsManager.borderSubtle;
+    final bg = isActive ? activeColor.withValues(alpha: 0.15) : ColorsManager.surfaceMid;
+    final border = isActive ? activeColor.withValues(alpha: 0.5) : ColorsManager.borderSubtle;
     final textColor = isActive ? activeColor : ColorsManager.textMuted;
 
     return GestureDetector(

@@ -203,8 +203,8 @@ class _IdChip extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
         decoration: BoxDecoration(
           color: selected
-              ? ColorsManager.accentCyan.withOpacity(0.15)
-              : Colors.white.withOpacity(0.05),
+              ? ColorsManager.accentCyan.withValues(alpha: 0.15)
+              : Colors.white.withValues(alpha: 0.05),
           borderRadius: BorderRadius.circular(10),
           border: Border.all(
             color: selected
