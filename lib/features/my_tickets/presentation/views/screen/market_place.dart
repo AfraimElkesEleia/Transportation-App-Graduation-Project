@@ -249,19 +249,19 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
                   padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
                   child: Builder(
                     builder: (ctx) {
-                      final count = (state is MarketplaceLoadedState)
+                      final visibleListings = (state is MarketplaceLoadedState)
                           ? state.listings.where((l) {
                               return (l['sellerId'] as int?) != currentUserId;
-                            }).length
-                          : 0;
+                            }).toList()
+                          : <dynamic>[];
+                      final count = visibleListings.length;
                       return Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           MarketplaceStatBox(
                             icon: Icons.bolt,
-                            value:
-                                (state is MarketplaceLoadedState && count > 0)
-                                ? _avgDiscount(state.listings)
+                            value: count > 0
+                                ? _avgDiscount(visibleListings)
                                 : '—',
                             label: l10n.avgDiscount,
                             color: Colors.amber,
@@ -415,8 +415,11 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
                         final newPrice = (item['askingPrice'] as num? ?? 0)
                             .toDouble();
                         final discountVal = oldPrice > 0
-                            ? ((oldPrice - newPrice) / oldPrice * 100).round()
+                            ? ((newPrice - oldPrice) / oldPrice * 100).round()
                             : 0;
+                        final percentageLabel = discountVal > 0
+                            ? '+$discountVal%'
+                            : '$discountVal%';
 
                         return Padding(
                           padding: const EdgeInsets.only(bottom: 16),
@@ -441,7 +444,7 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
                                 item['agency'] as String?,
                             oldPrice: '$oldPrice EGP',
                             newPrice: '$newPrice EGP',
-                            discount: '-$discountVal%',
+                            discount: percentageLabel,
                             onBuy: () => _showBuyDialog(context, item, cubit),
                           ),
                         );
@@ -463,13 +466,19 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
   String _avgDiscount(List<dynamic> listings) {
     if (listings.isEmpty) return '—';
     double sum = 0;
+    int validCount = 0;
     for (final l in listings) {
       final item = l as Map<String, dynamic>;
       final old = (item['originalPrice'] as num? ?? 0).toDouble();
       final ask = (item['askingPrice'] as num? ?? 0).toDouble();
-      if (old > 0) sum += (old - ask) / old * 100;
+      if (old > 0) {
+        sum += (ask - old) / old * 100;
+        validCount++;
+      }
     }
-    return '${(sum / listings.length).round()}%';
+    if (validCount == 0) return '—';
+    final avg = (sum / validCount).round();
+    return avg > 0 ? '+$avg%' : '$avg%';
   }
 
   /// Removes duplicate agency prefix from class names.

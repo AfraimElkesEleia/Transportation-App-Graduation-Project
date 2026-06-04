@@ -295,37 +295,42 @@ class _RoundTripPassengerFormScreenState
         name.contains('talgo');
   }
 
+  List<Map<String, dynamic>> _buildPassengersPayload({
+    required List<PassengerFormControllers> controllers,
+    required List<String> seats,
+    required bool isTrain,
+  }) {
+    return List.generate(controllers.length, (i) {
+      final c = controllers[i];
+      final payload = <String, dynamic>{
+        'passengerName': c.nameController.text.trim(),
+        'seatNumber': seats[i],
+      };
+
+      if (isTrain) {
+        payload['idType'] = c.selectedIdType;
+        payload['idNumber'] = c.idController.text.trim();
+      }
+
+      return payload;
+    });
+  }
+
   void _submit({required bool bookNow}) {
     if (!_formKey.currentState!.validate()) return;
 
     final cubit = context.read<RoundTripBookingCubit>();
     final state = cubit.state;
-
-    final List<Map<String, dynamic>> outboundPassengers = [];
-    for (int i = 0; i < _outboundCount; i++) {
-      final c = _outboundControllers[i];
-      outboundPassengers.add({
-        'passengerName': c.nameController.text.trim(),
-        'idNumber': c.idController.text.trim().isEmpty
-            ? 'N/A'
-            : c.idController.text.trim(),
-        'idType': c.selectedIdType,
-        'seatNumber': state.selectedOutboundSeats[i],
-      });
-    }
-
-    final List<Map<String, dynamic>> returnPassengers = [];
-    for (int i = 0; i < _returnCount; i++) {
-      final c = _returnControllers[i];
-      returnPassengers.add({
-        'passengerName': c.nameController.text.trim(),
-        'idNumber': c.idController.text.trim().isEmpty
-            ? 'N/A'
-            : c.idController.text.trim(),
-        'idType': c.selectedIdType,
-        'seatNumber': state.selectedReturnSeats[i],
-      });
-    }
+    final outboundPassengers = _buildPassengersPayload(
+      controllers: _outboundControllers,
+      seats: state.selectedOutboundSeats,
+      isTrain: _isTrain(state.selectedOutboundTrip),
+    );
+    final returnPassengers = _buildPassengersPayload(
+      controllers: _returnControllers,
+      seats: state.selectedReturnSeats,
+      isTrain: _isTrain(state.selectedReturnTrip),
+    );
 
     final contactName = _outboundControllers.isNotEmpty
         ? _outboundControllers.first.nameController.text.trim()
@@ -371,13 +376,14 @@ class _RoundTripPassengerFormScreenState
           child: BlocConsumer<RoundTripBookingCubit, RoundTripBookingState>(
             listenWhen: (prev, current) =>
                 prev.cartError != current.cartError ||
-                prev.cartSuccess != current.cartSuccess,
+                prev.cartSuccess != current.cartSuccess ||
+                prev.checkoutSuccess != current.checkoutSuccess,
             listener: (context, state) {
-              if (state.cartSuccess) {
+              if (state.checkoutSuccess) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text(
-                      AppLocalizations.of(context)!.journeyAddedToCart,
+                      AppLocalizations.of(context)!.bookingSuccessful,
                     ),
                     backgroundColor: Colors.green,
                   ),
@@ -387,11 +393,11 @@ class _RoundTripPassengerFormScreenState
                   AppRoutes.cartScreen,
                   (route) => route.isFirst,
                 );
-              } else if (state.checkoutSuccess) {
+              } else if (state.cartSuccess) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text(
-                      AppLocalizations.of(context)!.bookingSuccessful,
+                      AppLocalizations.of(context)!.journeyAddedToCart,
                     ),
                     backgroundColor: Colors.green,
                   ),

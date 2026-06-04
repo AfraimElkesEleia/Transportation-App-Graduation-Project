@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:transportation_app/core/l10n/app_localizations.dart';
 import 'package:transportation_app/core/routing/routes.dart';
 import 'package:transportation_app/core/theming/colors.dart';
+import 'package:transportation_app/core/utils/error_localizer.dart';
 import 'package:transportation_app/features/booking/presentation/cubit/indirect_booking_state.dart';
 import 'package:transportation_app/features/booking/presentation/cubit/seat_map_cubit.dart';
 import 'package:transportation_app/features/booking/presentation/cubit/seat_map_state.dart';
@@ -10,6 +11,7 @@ import 'package:transportation_app/features/profile/domain/entities/profile_enti
 import 'package:transportation_app/features/profile/presentation/cubit/profile_cubit/profile_cubit.dart';
 import 'package:transportation_app/features/profile/presentation/cubit/profile_cubit/profile_states.dart';
 import 'package:transportation_app/features/search/domain/entities/trip_result_entity.dart';
+import 'package:transportation_app/features/booking/presentation/views/widgets/points_redemption_widget.dart';
 import 'package:transportation_app/features/booking/presentation/views/widgets/passenger_form/passenger_autofill_banner.dart';
 import 'package:transportation_app/features/booking/presentation/views/widgets/passenger_form/passenger_card.dart';
 import 'package:transportation_app/features/booking/presentation/views/widgets/passenger_form/passenger_form_controllers.dart';
@@ -29,12 +31,24 @@ class _IndirectPassengerFormScreenState
   final _formKey = GlobalKey<FormState>();
   late final List<PassengerFormControllers> _controllers;
   bool _autofilled = false;
+  int _selectedPoints = 0;
+
+  int get _passengerCount => widget.bookingState.selectedSeatsLeg1.length;
+  double get _journeyTotal {
+    final leg1Total =
+        widget.bookingState.selectedSeatsLeg1.length *
+        widget.bookingState.selectedClassLeg1!.price;
+    final leg2Total =
+        widget.bookingState.selectedSeatsLeg2.length *
+        widget.bookingState.selectedClassLeg2!.price;
+    return leg1Total + leg2Total;
+  }
 
   @override
   void initState() {
     super.initState();
     _controllers = List.generate(
-      widget.bookingState.requiredSeatCount,
+      _passengerCount,
       (_) => PassengerFormControllers(),
     );
 
@@ -170,19 +184,15 @@ class _IndirectPassengerFormScreenState
   ) {
     final isTrain = _isTrain(trip);
 
-    final passengers = List.generate(widget.bookingState.requiredSeatCount, (
-      i,
-    ) {
+    final passengers = List.generate(_passengerCount, (i) {
       final c = _controllers[i];
       final Map<String, dynamic> p = {
         'passengerName': c.nameController.text.trim(),
-        'idNumber': c.idController.text.trim().isEmpty
-            ? 'N/A'
-            : c.idController.text.trim(),
-        'idType': isTrain ? c.selectedIdType : 'NationalId',
       };
 
       if (isTrain) {
+        p['idType'] = c.selectedIdType;
+        p['idNumber'] = c.idController.text.trim();
         p['seatNumber'] = '${i + 1}';
       } else {
         p['seatNumber'] = selectedSeats[i];
@@ -206,7 +216,7 @@ class _IndirectPassengerFormScreenState
     };
   }
 
-  void _submit() {
+  void _submit({required bool bookNow}) {
     if (!_formKey.currentState!.validate()) return;
 
     final leg1Payload = _buildPayloadForLeg(
@@ -221,9 +231,16 @@ class _IndirectPassengerFormScreenState
       widget.bookingState.selectedSeatsLeg2,
     );
 
-    context.read<SeatMapCubit>().addMultipleToCart(
-      payloads: [leg1Payload, leg2Payload],
-    );
+    final cubit = context.read<SeatMapCubit>();
+    final payloads = [leg1Payload, leg2Payload];
+    if (bookNow) {
+      cubit.bookMultipleNow(
+        payloads: payloads,
+        pointsToRedeem: _selectedPoints,
+      );
+    } else {
+      cubit.addMultipleToCart(payloads: payloads);
+    }
   }
 
   @override
@@ -231,6 +248,11 @@ class _IndirectPassengerFormScreenState
     final hasTrain =
         _isTrain(widget.bookingState.selectedTripLeg1!) ||
         _isTrain(widget.bookingState.selectedTripLeg2!);
+    int loyaltyBalance = 0;
+    final profileState = context.watch<ProfileCubit>().state;
+    if (profileState is ProfileLoaded) {
+      loyaltyBalance = profileState.profile.loyaltyPointsBalance ?? 0;
+    }
 
     return Scaffold(
       backgroundColor: ColorsManager.seatBg,
@@ -246,12 +268,11 @@ class _IndirectPassengerFormScreenState
         listeners: [
           BlocListener<SeatMapCubit, SeatMapState>(
             listener: (context, state) {
+              final l10n = AppLocalizations.of(context)!;
               if (state is CartSuccess) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text(
-                      AppLocalizations.of(context)!.indirectTripAddedToCart,
-                    ),
+                    content: Text(l10n.indirectTripAddedToCart),
                     backgroundColor: Colors.green,
                   ),
                 );
@@ -264,9 +285,29 @@ class _IndirectPassengerFormScreenState
               if (state is CartError) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text(state.message),
+                    content: Text(
+                      ErrorLocalizer.localize(context, state.message),
+                    ),
                     backgroundColor: Colors.red,
                   ),
+                );
+              }
+              if (state is CartAddedButCheckoutFailed) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      l10n.ticketAddedButCheckoutFailed(
+                        ErrorLocalizer.localize(context, state.message),
+                      ),
+                    ),
+                    backgroundColor: Colors.orange,
+                    duration: const Duration(seconds: 4),
+                  ),
+                );
+                Navigator.pushNamedAndRemoveUntil(
+                  context,
+                  AppRoutes.cartScreen,
+                  (route) => route.isFirst,
                 );
               }
             },
@@ -289,23 +330,19 @@ class _IndirectPassengerFormScreenState
                   children: [
                     ...() {
                       final widgets = <Widget>[];
-                      for (
-                        int index = 0;
-                        index < widget.bookingState.requiredSeatCount;
-                        index++
-                      ) {
+                      for (int index = 0; index < _passengerCount; index++) {
                         widgets.add(
                           PassengerCard(
-                            index: index + 1,
+                            label: AppLocalizations.of(
+                              context,
+                            )!.passengerN('${index + 1}'),
                             controllers: _controllers[index],
                             isTrain: hasTrain,
                           ),
                         );
 
                         // Show autofill banner after the FIRST card for bus only with 2+ seats
-                        if (index == 0 &&
-                            !hasTrain &&
-                            widget.bookingState.requiredSeatCount > 1) {
+                        if (index == 0 && !hasTrain && _passengerCount > 1) {
                           widgets.add(
                             PassengerAutofillBanner(
                               autofilled: _autofilled,
@@ -316,57 +353,153 @@ class _IndirectPassengerFormScreenState
                       }
                       return widgets;
                     }(),
+                    PointsRedemptionWidget(
+                      cartTotal: _journeyTotal,
+                      walletPoints: loyaltyBalance,
+                      onPointsChanged: (pts) =>
+                          setState(() => _selectedPoints = pts),
+                    ),
+                    const SizedBox(height: 8),
                   ],
                 ),
               ),
             ),
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: const BoxDecoration(
-                color: ColorsManager.seatContainerBg,
-                borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-              ),
-              child: SafeArea(
-                child: SizedBox(
-                  width: double.infinity,
-                  height: 52,
-                  child: ElevatedButton(
-                    onPressed: _submit,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: ColorsManager.accentCyan,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(26),
-                      ),
-                    ),
-                    child: BlocBuilder<SeatMapCubit, SeatMapState>(
-                      builder: (context, state) {
-                        if (state is SeatMapLoading) {
-                          return const SizedBox(
-                            width: 24,
-                            height: 24,
-                            child: CircularProgressIndicator(
-                              color: Colors.white,
-                              strokeWidth: 2,
-                            ),
-                          );
-                        }
-                        return Text(
-                          AppLocalizations.of(context)!.addEntireJourneyToCart,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                ),
-              ),
+            _IndirectFormBottomButtons(
+              onAddToCart: () => _submit(bookNow: false),
+              onBookNow: () => _submit(bookNow: true),
             ),
           ],
         ),
       ),
+    );
+  }
+}
+
+class _IndirectFormBottomButtons extends StatefulWidget {
+  final VoidCallback onAddToCart;
+  final VoidCallback onBookNow;
+
+  const _IndirectFormBottomButtons({
+    required this.onAddToCart,
+    required this.onBookNow,
+  });
+
+  @override
+  State<_IndirectFormBottomButtons> createState() =>
+      _IndirectFormBottomButtonsState();
+}
+
+class _IndirectFormBottomButtonsState
+    extends State<_IndirectFormBottomButtons> {
+  int _lastClicked = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocConsumer<SeatMapCubit, SeatMapState>(
+      listener: (context, state) {
+        if (state is CartSuccess ||
+            state is CartError ||
+            state is CartAddedButCheckoutFailed) {
+          setState(() => _lastClicked = 0);
+        }
+      },
+      builder: (context, state) {
+        final isLoading = state is CartAdding || state is SeatMapLoading;
+
+        return Container(
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+          decoration: const BoxDecoration(
+            color: ColorsManager.seatContainerBg,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          ),
+          child: SafeArea(
+            child: Row(
+              children: [
+                Expanded(
+                  child: SizedBox(
+                    height: 50,
+                    child: OutlinedButton(
+                      onPressed: isLoading
+                          ? null
+                          : () {
+                              setState(() => _lastClicked = 1);
+                              widget.onAddToCart();
+                            },
+                      style: OutlinedButton.styleFrom(
+                        side: const BorderSide(color: ColorsManager.accentCyan),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(25),
+                        ),
+                      ),
+                      child: isLoading && _lastClicked == 1
+                          ? const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: ColorsManager.accentCyan,
+                              ),
+                            )
+                          : Text(
+                              AppLocalizations.of(
+                                context,
+                              )!.addEntireJourneyToCart,
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(
+                                color: ColorsManager.accentCyan,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 13,
+                              ),
+                            ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: SizedBox(
+                    height: 50,
+                    child: ElevatedButton(
+                      onPressed: isLoading
+                          ? null
+                          : () {
+                              setState(() => _lastClicked = 2);
+                              widget.onBookNow();
+                            },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: ColorsManager.accentCyan,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(25),
+                        ),
+                        elevation: 0,
+                      ),
+                      child: isLoading && _lastClicked == 2
+                          ? const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Colors.white,
+                              ),
+                            )
+                          : Text(
+                              AppLocalizations.of(
+                                context,
+                              )!.bookEntireJourneyNow,
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 13,
+                              ),
+                            ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }

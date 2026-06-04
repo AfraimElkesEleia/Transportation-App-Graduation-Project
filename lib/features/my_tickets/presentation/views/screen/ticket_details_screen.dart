@@ -249,35 +249,18 @@ class _TicketDetailsScreenState extends State<TicketDetailsScreen> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(
-                            context.isArabic
-                                ? (_ticket.agencyNameAr ?? _ticket.agencyName)
-                                : _ticket.agencyName,
-                            style: const TextStyle(
-                              color: ColorsManager.accentCyan,
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 10,
-                              vertical: 4,
-                            ),
-                            decoration: BoxDecoration(
-                              color: _statusColor.withValues(alpha: 0.15),
-                              borderRadius: BorderRadius.circular(8),
-                              border: Border.all(
-                                color: _statusColor.withValues(alpha: 0.4),
-                              ),
-                            ),
+                          Expanded(
                             child: Text(
-                              _getLocalizedStatus(l10n, _ticket.status),
-                              style: TextStyle(
-                                color: _statusColor,
-                                fontSize: 12,
-                                fontWeight: FontWeight.w700,
+                              context.isArabic
+                                  ? (_ticket.agencyNameAr ?? _ticket.agencyName)
+                                  : _ticket.agencyName,
+                              style: const TextStyle(
+                                color: ColorsManager.accentCyan,
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
                               ),
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
                             ),
                           ),
                         ],
@@ -446,19 +429,46 @@ class _TicketDetailsScreenState extends State<TicketDetailsScreen> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text(
-                              l10n.bookingRef,
-                              style: const TextStyle(
-                                color: Colors.white54,
-                                fontSize: 12,
-                              ),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  l10n.bookingRef,
+                                  style: const TextStyle(
+                                    color: Colors.white54,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  'REF-${_ticket.bookingId}',
+                                  style: const TextStyle(
+                                    color: Colors.white70,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
                             ),
-                            Text(
-                              'REF-${_ticket.bookingId}',
-                              style: const TextStyle(
-                                color: Colors.white70,
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 4,
+                              ),
+                              decoration: BoxDecoration(
+                                color: _statusColor.withValues(alpha: 0.15),
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(
+                                  color: _statusColor.withValues(alpha: 0.4),
+                                ),
+                              ),
+                              child: Text(
+                                _getLocalizedStatus(l10n, _ticket.status),
+                                style: TextStyle(
+                                  color: _statusColor,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w700,
+                                ),
                               ),
                             ),
                           ],

@@ -37,98 +37,121 @@ class MultiDestinationBookingCubit extends Cubit<MultiDestinationBookingState> {
       params = SearchParams(
         isRoundTrip: false,
         travelDate: leg.apiDate,
-        passengers: 1,   
+        passengers: 1,
         fromDisplayName: leg.from,
         toDisplayName: leg.to,
-        fromGovernorate: leg.from, 
+        fromGovernorate: leg.from,
         toGovernorate: leg.to,
       );
     }
 
-    emit(state.copyWith(
-      isSearching: true,
-      clearSearchError: true,
-      searchResults: [],
-      currentActiveParams: params,
-    ));
+    emit(
+      state.copyWith(
+        isSearching: true,
+        clearSearchError: true,
+        searchResults: [],
+        currentActiveParams: params,
+      ),
+    );
 
     final result = await searchTripsUseCase(params);
     if (isClosed) return;
 
     result.fold(
-      (failure) => emit(state.copyWith(isSearching: false, searchError: failure.message)),
-      (paged) => emit(state.copyWith(
-        isSearching: false,
-        searchResults: paged.items,
-        currentPage: paged.currentPage,
-        totalPages: paged.totalPages,
-      )),
+      (failure) => emit(
+        state.copyWith(isSearching: false, searchError: failure.message),
+      ),
+      (paged) => emit(
+        state.copyWith(
+          isSearching: false,
+          searchResults: paged.items,
+          currentPage: paged.currentPage,
+          totalPages: paged.totalPages,
+        ),
+      ),
     );
   }
 
   Future<void> loadMore() async {
-    if (isClosed || state.isFetchingMore || state.currentPage >= state.totalPages) return;
+    if (isClosed ||
+        state.isFetchingMore ||
+        state.currentPage >= state.totalPages) {
+      return;
+    }
 
     emit(state.copyWith(isFetchingMore: true));
-    final nextParams = state.currentActiveParams!.copyWith(newPage: state.currentPage + 1);
+    final nextParams = state.currentActiveParams!.copyWith(
+      newPage: state.currentPage + 1,
+    );
     final result = await searchTripsUseCase(nextParams);
     if (isClosed) return;
 
-    result.fold(
-      (f) => emit(state.copyWith(isFetchingMore: false)),
-      (paged) {
-        final existingIds = state.searchResults!.map((t) => t.tripOccurrenceId).toSet();
-        final newItems = paged.items.where((t) => !existingIds.contains(t.tripOccurrenceId)).toList();
-        
-        emit(state.copyWith(
+    result.fold((f) => emit(state.copyWith(isFetchingMore: false)), (paged) {
+      final existingIds = state.searchResults!
+          .map((t) => t.tripOccurrenceId)
+          .toSet();
+      final newItems = paged.items
+          .where((t) => !existingIds.contains(t.tripOccurrenceId))
+          .toList();
+
+      emit(
+        state.copyWith(
           isFetchingMore: false,
           searchResults: [...state.searchResults!, ...newItems],
           currentPage: paged.currentPage,
           totalPages: paged.totalPages,
-        ));
-      },
-    );
+        ),
+      );
+    });
   }
 
   void applyFilters(SearchParams newParams) {
-    emit(state.copyWith(
-      currentActiveParams: state.currentActiveParams!.copyWith(
-        transport: newParams.transport,
-        sortBy: newParams.sortBy,
-        maxPrice: newParams.maxPrice,
-        clearMaxPrice: newParams.maxPrice == null,
-        departureFrom: newParams.departureFrom,
-        departureTo: newParams.departureTo,
-        arrivalFrom: newParams.arrivalFrom,
-        arrivalTo: newParams.arrivalTo,
-        clearTimeFilters: !newParams.hasTimeFilters,
-        newPage: 1,
+    emit(
+      state.copyWith(
+        currentActiveParams: state.currentActiveParams!.copyWith(
+          transport: newParams.transport,
+          sortBy: newParams.sortBy,
+          maxPrice: newParams.maxPrice,
+          clearMaxPrice: newParams.maxPrice == null,
+          departureFrom: newParams.departureFrom,
+          departureTo: newParams.departureTo,
+          arrivalFrom: newParams.arrivalFrom,
+          arrivalTo: newParams.arrivalTo,
+          clearTimeFilters: !newParams.hasTimeFilters,
+          newPage: 1,
+        ),
       ),
-    ));
+    );
     _searchCurrentLeg();
   }
 
   void selectTripForLeg(TripResultEntity trip, CoachClassEntity coachClass) {
     final updatedTrips = Map<int, TripResultEntity>.from(state.selectedTrips);
-    final updatedClasses = Map<int, CoachClassEntity>.from(state.selectedClasses);
-    
+    final updatedClasses = Map<int, CoachClassEntity>.from(
+      state.selectedClasses,
+    );
+
     updatedTrips[state.currentSearchLegIndex] = trip;
     updatedClasses[state.currentSearchLegIndex] = coachClass;
 
     if (state.currentSearchLegIndex < state.legSummaries.length - 1) {
-      emit(state.copyWith(
-        selectedTrips: updatedTrips,
-        selectedClasses: updatedClasses,
-        currentSearchLegIndex: state.currentSearchLegIndex + 1,
-      ));
+      emit(
+        state.copyWith(
+          selectedTrips: updatedTrips,
+          selectedClasses: updatedClasses,
+          currentSearchLegIndex: state.currentSearchLegIndex + 1,
+        ),
+      );
       _searchCurrentLeg();
     } else {
-      emit(state.copyWith(
-        selectedTrips: updatedTrips,
-        selectedClasses: updatedClasses,
-        currentStep: MultiDestinationBookingStep.selectSeats,
-        currentSeatLegIndex: 0,
-      ));
+      emit(
+        state.copyWith(
+          selectedTrips: updatedTrips,
+          selectedClasses: updatedClasses,
+          currentStep: MultiDestinationBookingStep.selectSeats,
+          currentSeatLegIndex: 0,
+        ),
+      );
     }
   }
 
@@ -139,37 +162,51 @@ class MultiDestinationBookingCubit extends Cubit<MultiDestinationBookingState> {
     updatedSeats[state.currentSeatLegIndex] = seats;
 
     if (state.currentSeatLegIndex < state.legSummaries.length - 1) {
-      emit(state.copyWith(
-        selectedSeats: updatedSeats,
-        currentSeatLegIndex: state.currentSeatLegIndex + 1,
-      ));
+      emit(
+        state.copyWith(
+          selectedSeats: updatedSeats,
+          currentSeatLegIndex: state.currentSeatLegIndex + 1,
+        ),
+      );
     } else {
-      emit(state.copyWith(
-        selectedSeats: updatedSeats,
-        currentStep: MultiDestinationBookingStep.summary,
-      ));
+      emit(
+        state.copyWith(
+          selectedSeats: updatedSeats,
+          currentStep: MultiDestinationBookingStep.summary,
+        ),
+      );
     }
   }
 
   void goBack() {
     if (state.currentStep == MultiDestinationBookingStep.summary) {
-      emit(state.copyWith(
-        currentStep: MultiDestinationBookingStep.selectSeats,
-        currentSeatLegIndex: state.legSummaries.length - 1,
-      ));
+      emit(
+        state.copyWith(
+          currentStep: MultiDestinationBookingStep.selectSeats,
+          currentSeatLegIndex: state.legSummaries.length - 1,
+        ),
+      );
     } else if (state.currentStep == MultiDestinationBookingStep.selectSeats) {
       if (state.currentSeatLegIndex > 0) {
-        emit(state.copyWith(currentSeatLegIndex: state.currentSeatLegIndex - 1));
+        emit(
+          state.copyWith(currentSeatLegIndex: state.currentSeatLegIndex - 1),
+        );
       } else {
-        emit(state.copyWith(
-          currentStep: MultiDestinationBookingStep.searchLegs,
-          currentSearchLegIndex: state.legSummaries.length - 1,
-        ));
+        emit(
+          state.copyWith(
+            currentStep: MultiDestinationBookingStep.searchLegs,
+            currentSearchLegIndex: state.legSummaries.length - 1,
+          ),
+        );
         _searchCurrentLeg(); // Re-search the last leg
       }
     } else if (state.currentStep == MultiDestinationBookingStep.searchLegs) {
       if (state.currentSearchLegIndex > 0) {
-        emit(state.copyWith(currentSearchLegIndex: state.currentSearchLegIndex - 1));
+        emit(
+          state.copyWith(
+            currentSearchLegIndex: state.currentSearchLegIndex - 1,
+          ),
+        );
         _searchCurrentLeg();
       }
     }
@@ -182,25 +219,22 @@ class MultiDestinationBookingCubit extends Cubit<MultiDestinationBookingState> {
     required Map<int, List<Map<String, dynamic>>> allPassengers,
   }) async {
     if (isClosed) return;
-    emit(state.copyWith(isAddingToCart: true, clearCartError: true));
+    emit(
+      state.copyWith(
+        isAddingToCart: true,
+        clearCartError: true,
+        cartSuccess: false,
+        checkoutSuccess: false,
+      ),
+    );
 
     try {
-      for (int i = 0; i < state.legSummaries.length; i++) {
-        final trip = state.selectedTrips[i]!;
-        final c = state.selectedClasses[i]!;
-        final pass = allPassengers[i]!;
-
-        final payload = {
-          'tripOccurrenceId': trip.tripOccurrenceId,
-          'coachClassId': c.coachClassId,
-          'originStationId': trip.originStationId,
-          'destinationStationId': trip.destinationStationId,
-          'contactName': contactName,
-          'contactPhone': contactPhone,
-          'contactEmail': contactEmail,
-          'passengers': pass,
-        };
-
+      for (final payload in _buildPayloads(
+        contactName: contactName,
+        contactPhone: contactPhone,
+        contactEmail: contactEmail,
+        allPassengers: allPassengers,
+      )) {
         await bookingRemoteDatasource.addToCart(payload);
         if (isClosed) return;
       }
@@ -209,5 +243,65 @@ class MultiDestinationBookingCubit extends Cubit<MultiDestinationBookingState> {
       if (isClosed) return;
       emit(state.copyWith(isAddingToCart: false, cartError: e.toString()));
     }
+  }
+
+  Future<void> bookNow({
+    required String contactName,
+    required String contactPhone,
+    required String contactEmail,
+    required Map<int, List<Map<String, dynamic>>> allPassengers,
+    required int pointsToRedeem,
+  }) async {
+    if (isClosed) return;
+    emit(
+      state.copyWith(
+        isBookingNow: true,
+        clearCartError: true,
+        cartSuccess: false,
+        checkoutSuccess: false,
+      ),
+    );
+
+    try {
+      for (final payload in _buildPayloads(
+        contactName: contactName,
+        contactPhone: contactPhone,
+        contactEmail: contactEmail,
+        allPassengers: allPassengers,
+      )) {
+        await bookingRemoteDatasource.addToCart(payload);
+        if (isClosed) return;
+      }
+      await bookingRemoteDatasource.checkout(pointsToRedeem: pointsToRedeem);
+      if (isClosed) return;
+      emit(state.copyWith(isBookingNow: false, checkoutSuccess: true));
+    } catch (e) {
+      if (isClosed) return;
+      emit(state.copyWith(isBookingNow: false, cartError: e.toString()));
+    }
+  }
+
+  List<Map<String, dynamic>> _buildPayloads({
+    required String contactName,
+    required String contactPhone,
+    required String contactEmail,
+    required Map<int, List<Map<String, dynamic>>> allPassengers,
+  }) {
+    return List.generate(state.legSummaries.length, (i) {
+      final trip = state.selectedTrips[i]!;
+      final c = state.selectedClasses[i]!;
+      final pass = allPassengers[i]!;
+
+      return {
+        'tripOccurrenceId': trip.tripOccurrenceId,
+        'coachClassId': c.coachClassId,
+        'originStationId': trip.originStationId,
+        'destinationStationId': trip.destinationStationId,
+        'contactName': contactName,
+        'contactPhone': contactPhone,
+        'contactEmail': contactEmail,
+        'passengers': pass,
+      };
+    });
   }
 }

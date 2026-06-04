@@ -534,9 +534,67 @@
   "reFill": "Re-fill",
   "fillSeat1Info": "Fill seat 1, then copy name & phone to all other seats.",
   "addEntireJourneyToCart": "Add Entire Journey to Cart",
+  "bookEntireJourneyNow": "Book Entire Journey Now",
   "buildJourney": "Build Journey",
+  "multiDestination": "Multi-Destination",
+  "selectTripForLeg": "Select Trip for Leg {n}",
+  "@selectTripForLeg": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "selectSeatsForLeg": "Select Seats for Leg {n}",
+  "@selectSeatsForLeg": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "reviewCheckout": "Review & Checkout",
+  "noTripsFoundForLeg": "No trips found for this leg.",
+  "tryAdjustingFilters": "Try adjusting the filters above.",
   "suggestedTransferRoute": "Suggested Transfer Route",
   "transferAt": "Transfer at",
+  "journeySummary": "Journey Summary",
+  "journeyOverview": "Journey Overview",
+  "connectionLayover": "Connection layover",
+  "totalJourneyDuration": "Total journey duration",
+  "routeLabel": "Route",
+  "durationLabel": "Duration",
+  "pricePerSeat": "Price per seat",
+  "legTotal": "Leg total",
+  "selectedSeats": "Selected seats",
+  "noArrivalTime": "Arrival time unavailable",
+  "durationHoursMinutes": "{hours}h {minutes}m",
+  "@durationHoursMinutes": {
+    "placeholders": {
+      "hours": {
+        "type": "String"
+      },
+      "minutes": {
+        "type": "String"
+      }
+    }
+  },
+  "durationMinutes": "{minutes}m",
+  "@durationMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "String"
+      }
+    }
+  },
+  "legsCount": "{n} legs",
+  "@legsCount": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
   "legN": "Leg {n}",
   "@legN": {
     "placeholders": {
@@ -680,6 +738,10 @@
   "clearFilters": "Clear Filters",
   "buyTicket": "Buy Ticket",
   "buyNow": "Buy Now",
+  "trainBooking": "Train Booking",
+  "busBooking": "Bus Booking",
+  "trainPassengerRequirements": "Name, ID type & number required for each passenger",
+  "busPassengerRequirements": "Name & phone number required for each passenger",
   "agencyLabel": "Agency",
   "originLabel": "Origin",
   "destinationLabel": "Destination",

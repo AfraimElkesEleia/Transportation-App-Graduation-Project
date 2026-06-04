@@ -5,8 +5,8 @@ import 'package:transportation_app/features/search/domain/entities/trip_result_e
 
 enum IndirectBookingStep {
   searchLeg1,
-  seatLeg1,
   searchLeg2,
+  seatLeg1,
   seatLeg2,
   summary
 }
@@ -93,6 +93,7 @@ class IndirectBookingState extends Equatable {
     int? requiredSeatCount,
     bool clearLeg1Error = false,
     bool clearLeg2Error = false,
+    bool clearLeg2Selection = false,
   }) {
     return IndirectBookingState(
       currentStep: currentStep ?? this.currentStep,
@@ -112,8 +113,12 @@ class IndirectBookingState extends Equatable {
       selectedTripLeg1: selectedTripLeg1 ?? this.selectedTripLeg1,
       selectedClassLeg1: selectedClassLeg1 ?? this.selectedClassLeg1,
       selectedSeatsLeg1: selectedSeatsLeg1 ?? this.selectedSeatsLeg1,
-      selectedTripLeg2: selectedTripLeg2 ?? this.selectedTripLeg2,
-      selectedClassLeg2: selectedClassLeg2 ?? this.selectedClassLeg2,
+      selectedTripLeg2: clearLeg2Selection
+          ? null
+          : (selectedTripLeg2 ?? this.selectedTripLeg2),
+      selectedClassLeg2: clearLeg2Selection
+          ? null
+          : (selectedClassLeg2 ?? this.selectedClassLeg2),
       selectedSeatsLeg2: selectedSeatsLeg2 ?? this.selectedSeatsLeg2,
       requiredSeatCount: requiredSeatCount ?? this.requiredSeatCount,
     );

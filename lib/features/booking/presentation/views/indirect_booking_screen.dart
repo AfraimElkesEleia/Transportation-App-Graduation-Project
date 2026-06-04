@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
 import 'package:transportation_app/core/di/injection_container.dart';
+import 'package:transportation_app/core/l10n/app_localizations.dart';
 import 'package:transportation_app/core/routing/routes.dart';
 import 'package:transportation_app/core/theming/colors.dart';
 import 'package:transportation_app/features/booking/data/datasources/booking_remote_datasource.dart';
@@ -73,24 +75,49 @@ class _IndirectBookingScreenState extends State<IndirectBookingScreen> {
   Widget build(BuildContext context) {
     return BlocBuilder<IndirectBookingCubit, IndirectBookingState>(
       builder: (context, state) {
-        return Scaffold(
-          backgroundColor: ColorsManager.seatBg,
-          appBar: AppBar(
-            backgroundColor: ColorsManager.surfaceDark,
-            title: const Text(
-              'Build Journey',
-              style: TextStyle(color: Colors.white, fontSize: 16),
+        return PopScope(
+          canPop: state.currentStep == IndirectBookingStep.searchLeg1,
+          onPopInvokedWithResult: (didPop, result) {
+            if (didPop) return;
+            _handleBack(state);
+          },
+          child: Scaffold(
+            backgroundColor: ColorsManager.seatBg,
+            appBar: AppBar(
+              backgroundColor: ColorsManager.surfaceDark,
+              title: Text(
+                AppLocalizations.of(context)!.buildJourney,
+                style: const TextStyle(color: Colors.white, fontSize: 16),
+              ),
+              iconTheme: const IconThemeData(color: Colors.white),
+              bottom: PreferredSize(
+                preferredSize: const Size.fromHeight(40),
+                child: _Stepper(currentStep: state.currentStep),
+              ),
+              leading: BackButton(onPressed: () => _handleBack(state)),
             ),
-            iconTheme: const IconThemeData(color: Colors.white),
-            bottom: PreferredSize(
-              preferredSize: const Size.fromHeight(40),
-              child: _Stepper(currentStep: state.currentStep),
-            ),
+            body: SafeArea(child: _buildStepContent(context, state)),
           ),
-          body: SafeArea(child: _buildStepContent(context, state)),
         );
       },
     );
+  }
+
+  void _handleBack(IndirectBookingState state) {
+    final cubit = context.read<IndirectBookingCubit>();
+
+    switch (state.currentStep) {
+      case IndirectBookingStep.searchLeg1:
+        Navigator.pop(context);
+      case IndirectBookingStep.searchLeg2:
+        cubit.goBackToLeg1Search();
+      case IndirectBookingStep.seatLeg1:
+        cubit.goBackToLeg2Search();
+      case IndirectBookingStep.seatLeg2:
+        cubit.goBackToLeg1Seats();
+      case IndirectBookingStep.summary:
+        cubit.setStep(IndirectBookingStep.seatLeg2);
+    }
   }
 
   Widget _buildStepContent(BuildContext context, IndirectBookingState state) {
@@ -174,9 +201,26 @@ class _IndirectBookingScreenState extends State<IndirectBookingScreen> {
             child: TripResultCard(
               trip: t,
               onBookOverride: (trip, coachClass) {
-                context.read<IndirectBookingCubit>().selectTripLeg1(
-                  trip,
-                  coachClass,
+                final cubit = context.read<IndirectBookingCubit>();
+                cubit.selectTripLeg1(trip, coachClass);
+                cubit.searchLeg2(
+                  fromStationId: widget.indirectTrip.secondLeg.originStationId,
+                  toStationId:
+                      widget.indirectTrip.secondLeg.destinationStationId,
+                  fromDisplayName:
+                      widget.indirectTrip.secondLeg.originStationName.isNotEmpty
+                      ? widget.indirectTrip.secondLeg.originStationName
+                      : widget.indirectTrip.secondLeg.originGovernorate,
+                  toDisplayName:
+                      widget
+                          .indirectTrip
+                          .secondLeg
+                          .destinationStationName
+                          .isNotEmpty
+                      ? widget.indirectTrip.secondLeg.destinationStationName
+                      : widget.indirectTrip.secondLeg.destinationGovernorate,
+                  date: widget.dateLeg2,
+                  leg1ArrivalTime: trip.arrivalTime ?? DateTime.now(),
                 );
               },
             ),
@@ -200,25 +244,9 @@ class _IndirectBookingScreenState extends State<IndirectBookingScreen> {
         trip: state.selectedTripLeg1!,
         coachClass: state.selectedClassLeg1!,
         onCancel: () =>
-            context.read<IndirectBookingCubit>().goBackToLeg1Search(),
+            context.read<IndirectBookingCubit>().goBackToLeg2Search(),
         onProceed: (seats) {
           context.read<IndirectBookingCubit>().saveSeatsLeg1(seats);
-          // Trigger search Leg 2
-          context.read<IndirectBookingCubit>().searchLeg2(
-            fromStationId: widget.indirectTrip.secondLeg.originStationId,
-            toStationId: widget.indirectTrip.secondLeg.destinationStationId,
-            fromDisplayName:
-                widget.indirectTrip.secondLeg.originStationName.isNotEmpty
-                ? widget.indirectTrip.secondLeg.originStationName
-                : widget.indirectTrip.secondLeg.originGovernorate,
-            toDisplayName:
-                widget.indirectTrip.secondLeg.destinationStationName.isNotEmpty
-                ? widget.indirectTrip.secondLeg.destinationStationName
-                : widget.indirectTrip.secondLeg.destinationGovernorate,
-            date: widget.dateLeg2,
-            leg1ArrivalTime:
-                state.selectedTripLeg1!.arrivalTime ?? DateTime.now(),
-          );
         },
       ),
     );
@@ -295,9 +323,9 @@ class _IndirectBookingScreenState extends State<IndirectBookingScreen> {
             ),
             TextButton(
               onPressed: () =>
-                  context.read<IndirectBookingCubit>().goBackToLeg1Seats(),
+                  context.read<IndirectBookingCubit>().goBackToLeg1Search(),
               child: const Text(
-                'Back to Leg 1 Details',
+                'Back to Leg 1 Trip',
                 style: TextStyle(color: ColorsManager.accentCyan),
               ),
             ),
@@ -317,7 +345,7 @@ class _IndirectBookingScreenState extends State<IndirectBookingScreen> {
               IconButton(
                 icon: const Icon(Icons.arrow_back, color: Colors.white),
                 onPressed: () =>
-                    context.read<IndirectBookingCubit>().goBackToLeg1Seats(),
+                    context.read<IndirectBookingCubit>().goBackToLeg1Search(),
               ),
               const Expanded(
                 child: Text(
@@ -392,9 +420,9 @@ class _IndirectBookingScreenState extends State<IndirectBookingScreen> {
       child: EmbeddedSeatSelection(
         trip: state.selectedTripLeg2!,
         coachClass: state.selectedClassLeg2!,
-        enforcedSeatCount: state.requiredSeatCount,
+        enforcedSeatCount: state.selectedSeatsLeg1.length,
         onCancel: () =>
-            context.read<IndirectBookingCubit>().clearLeg2Selection(),
+            context.read<IndirectBookingCubit>().goBackToLeg1Seats(),
         onProceed: (seats) {
           context.read<IndirectBookingCubit>().saveSeatsLeg2(seats);
         },
@@ -415,23 +443,35 @@ class _IndirectBookingScreenState extends State<IndirectBookingScreen> {
     final total1 = s1.length * c1.price;
     final total2 = s2.length * c2.price;
     final grand = total1 + total2;
+    final loc = AppLocalizations.of(context)!;
+    final layover = t2.departureTime.difference(
+      t1.arrivalTime ?? t2.departureTime,
+    );
+    final totalDuration = t2.arrivalTime?.difference(t1.departureTime);
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const Text(
-            'Journey Summary',
-            style: TextStyle(
+          Text(
+            loc.journeySummary,
+            style: const TextStyle(
               color: Colors.white,
               fontSize: 22,
               fontWeight: FontWeight.bold,
             ),
           ),
+          const SizedBox(height: 8),
+          _JourneyOverview(
+            passengerCount: s1.length,
+            layover: layover,
+            totalDuration: totalDuration,
+            grandTotal: grand,
+          ),
           const SizedBox(height: 16),
           _SummaryLegInfo(
-            title: 'Leg 1',
+            title: loc.legN('1'),
             trip: t1,
             c: c1,
             seats: s1,
@@ -439,7 +479,7 @@ class _IndirectBookingScreenState extends State<IndirectBookingScreen> {
           ),
           const SizedBox(height: 16),
           _SummaryLegInfo(
-            title: 'Leg 2',
+            title: loc.legN('2'),
             trip: t2,
             c: c2,
             seats: s2,
@@ -449,12 +489,15 @@ class _IndirectBookingScreenState extends State<IndirectBookingScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                'Grand Total',
-                style: TextStyle(color: ColorsManager.textMuted, fontSize: 16),
+              Text(
+                loc.grandTotal,
+                style: const TextStyle(
+                  color: ColorsManager.textMuted,
+                  fontSize: 16,
+                ),
               ),
               Text(
-                'EGP $grand',
+                '${loc.egp} ${grand.toStringAsFixed(0)}',
                 style: const TextStyle(
                   color: ColorsManager.accentCyan,
                   fontSize: 24,
@@ -471,15 +514,70 @@ class _IndirectBookingScreenState extends State<IndirectBookingScreen> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: ColorsManager.buttonBlue,
               ),
-              child: const Text(
-                'Proceed to Passenger Details',
-                style: TextStyle(
+              child: Text(
+                loc.proceedToPassenger,
+                style: const TextStyle(
                   color: Colors.white,
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
                 ),
               ),
             ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _JourneyOverview extends StatelessWidget {
+  final int passengerCount;
+  final Duration layover;
+  final Duration? totalDuration;
+  final double grandTotal;
+
+  const _JourneyOverview({
+    required this.passengerCount,
+    required this.layover,
+    required this.totalDuration,
+    required this.grandTotal,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
+
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: ColorsManager.surfaceDark,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: ColorsManager.borderDim),
+      ),
+      child: Wrap(
+        spacing: 10,
+        runSpacing: 10,
+        children: [
+          _InfoPill(
+            icon: Icons.group_outlined,
+            label: loc.passengersCount('$passengerCount'),
+          ),
+          _InfoPill(
+            icon: Icons.sync_alt_rounded,
+            label:
+                '${loc.connectionLayover}: ${_formatDuration(context, layover)}',
+          ),
+          if (totalDuration != null)
+            _InfoPill(
+              icon: Icons.schedule_rounded,
+              label:
+                  '${loc.totalJourneyDuration}: ${_formatDuration(context, totalDuration!)}',
+            ),
+          _InfoPill(
+            icon: Icons.payments_outlined,
+            label:
+                '${loc.grandTotal}: ${loc.egp} ${grandTotal.toStringAsFixed(0)}',
+            highlighted: true,
           ),
         ],
       ),
@@ -504,49 +602,108 @@ class _SummaryLegInfo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
+    final timeFormat = DateFormat(
+      'EEE, d MMM - h:mm a',
+      Localizations.localeOf(context).toLanguageTag(),
+    );
+    final from = _stationLabel(context, trip, isOrigin: true);
+    final to = _stationLabel(context, trip, isOrigin: false);
+    final agency = _localizedAgency(context, trip);
+    final className = _localizedClass(context, c);
+    final seatsLabel = seats.where((s) => s.trim().isNotEmpty).join(', ');
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: ColorsManager.surfaceChip,
         borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: ColorsManager.borderSubtle),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: ColorsManager.accentCyan.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: const Icon(
+                  Icons.route_outlined,
+                  color: ColorsManager.accentCyan,
+                  size: 18,
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  title,
+                  style: const TextStyle(
+                    color: ColorsManager.accentCyan,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 15,
+                  ),
+                ),
+              ),
+              Text(
+                '${loc.egp} ${total.toStringAsFixed(0)}',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 15,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
           Text(
-            title,
+            '$from -> $to',
             style: const TextStyle(
-              color: ColorsManager.accentCyan,
-              fontWeight: FontWeight.bold,
+              color: Colors.white,
+              fontSize: 16,
+              fontWeight: FontWeight.w700,
             ),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
           ),
           const SizedBox(height: 8),
           Text(
-            '${trip.originStationName.isNotEmpty ? trip.originStationName : trip.originGovernorate} ➔ ${trip.destinationStationName.isNotEmpty ? trip.destinationStationName : trip.destinationGovernorate}',
-            style: const TextStyle(color: Colors.white, fontSize: 16),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            '${trip.agencyName} - ${c.className}',
+            '$agency - $className',
             style: const TextStyle(
               color: ColorsManager.textMuted,
               fontSize: 13,
             ),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
           ),
           const SizedBox(height: 12),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          _TimelineRow(
+            departure: timeFormat.format(trip.departureTime),
+            arrival: trip.arrivalTime == null
+                ? loc.noArrivalTime
+                : timeFormat.format(trip.arrivalTime!),
+          ),
+          const SizedBox(height: 12),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
             children: [
-              Text(
-                '${seats.length} Seats',
-                style: const TextStyle(color: Colors.white70),
+              _InfoPill(
+                icon: Icons.timelapse_rounded,
+                label: '${loc.durationLabel}: ${_durationLabel(context, trip)}',
               ),
-              Text(
-                'EGP $total',
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                ),
+              _InfoPill(
+                icon: Icons.event_seat_outlined,
+                label:
+                    '${loc.selectedSeats}: ${seatsLabel.isEmpty ? loc.passengersCount('${seats.length}') : seatsLabel}',
+              ),
+              _InfoPill(
+                icon: Icons.sell_outlined,
+                label:
+                    '${loc.pricePerSeat}: ${loc.egp} ${c.price.toStringAsFixed(0)}',
               ),
             ],
           ),
@@ -554,6 +711,216 @@ class _SummaryLegInfo extends StatelessWidget {
       ),
     );
   }
+}
+
+class _TimelineRow extends StatelessWidget {
+  final String departure;
+  final String arrival;
+
+  const _TimelineRow({required this.departure, required this.arrival});
+
+  @override
+  Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
+
+    return Row(
+      children: [
+        Expanded(
+          child: _TimeBlock(
+            label: loc.departure,
+            value: departure,
+            icon: Icons.trip_origin,
+          ),
+        ),
+        Container(width: 30, height: 1, color: ColorsManager.borderSubtle),
+        Expanded(
+          child: _TimeBlock(
+            label: loc.arrival,
+            value: arrival,
+            icon: Icons.location_on_outlined,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _TimeBlock extends StatelessWidget {
+  final String label;
+  final String value;
+  final IconData icon;
+
+  const _TimeBlock({
+    required this.label,
+    required this.value,
+    required this.icon,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: ColorsManager.surfaceDark,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: ColorsManager.borderDim),
+      ),
+      child: Row(
+        children: [
+          Icon(icon, color: ColorsManager.accentCyan, size: 16),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: const TextStyle(
+                    color: ColorsManager.textMuted,
+                    fontSize: 11,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  value,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _InfoPill extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final bool highlighted;
+
+  const _InfoPill({
+    required this.icon,
+    required this.label,
+    this.highlighted = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final color = highlighted ? ColorsManager.accentCyan : Colors.white70;
+    final maxTextWidth = MediaQuery.sizeOf(context).width - 90;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+      decoration: BoxDecoration(
+        color: highlighted
+            ? ColorsManager.accentCyan.withValues(alpha: 0.1)
+            : Colors.white.withValues(alpha: 0.04),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(
+          color: highlighted
+              ? ColorsManager.accentCyan.withValues(alpha: 0.35)
+              : Colors.white.withValues(alpha: 0.07),
+        ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, color: color, size: 15),
+          const SizedBox(width: 6),
+          ConstrainedBox(
+            constraints: BoxConstraints(maxWidth: maxTextWidth),
+            child: Text(
+              label,
+              style: TextStyle(
+                color: color,
+                fontSize: 12,
+                fontWeight: highlighted ? FontWeight.bold : FontWeight.w500,
+              ),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+String _stationLabel(
+  BuildContext context,
+  TripResultEntity trip, {
+  required bool isOrigin,
+}) {
+  final isArabic = Localizations.localeOf(context).languageCode == 'ar';
+  final station = isOrigin
+      ? (isArabic ? trip.originStationNameAr : trip.originStationName)
+      : (isArabic
+            ? trip.destinationStationNameAr
+            : trip.destinationStationName);
+  final governorate = isOrigin
+      ? (isArabic ? trip.originGovernorateAr : trip.originGovernorate)
+      : (isArabic
+            ? trip.destinationGovernorateAr
+            : trip.destinationGovernorate);
+  final fallbackStation = isOrigin
+      ? trip.originStationName
+      : trip.destinationStationName;
+  final fallbackGovernorate = isOrigin
+      ? trip.originGovernorate
+      : trip.destinationGovernorate;
+
+  final governorateText = governorate?.trim().isNotEmpty == true
+      ? governorate!.trim()
+      : fallbackGovernorate.trim();
+  final stationText = station?.trim().isNotEmpty == true
+      ? station!.trim()
+      : fallbackStation.trim();
+  final subText =
+      stationText.isNotEmpty &&
+          stationText.toLowerCase() != governorateText.toLowerCase()
+      ? stationText
+      : '';
+  return subText.isEmpty ? governorateText : '$governorateText - $subText';
+}
+
+String _localizedAgency(BuildContext context, TripResultEntity trip) {
+  final isArabic = Localizations.localeOf(context).languageCode == 'ar';
+  if (isArabic && trip.agencyNameAr?.trim().isNotEmpty == true) {
+    return trip.agencyNameAr!.trim();
+  }
+  return trip.agencyName;
+}
+
+String _localizedClass(BuildContext context, CoachClassEntity c) {
+  final isArabic = Localizations.localeOf(context).languageCode == 'ar';
+  if (isArabic && c.classNameAr?.trim().isNotEmpty == true) {
+    return c.classNameAr!.trim();
+  }
+  return c.className;
+}
+
+String _durationLabel(BuildContext context, TripResultEntity trip) {
+  final minutes = trip.totalDurationMinutes;
+  if (minutes == null) return '--';
+  return _formatDuration(context, Duration(minutes: minutes));
+}
+
+String _formatDuration(BuildContext context, Duration duration) {
+  final loc = AppLocalizations.of(context)!;
+  final totalMinutes = duration.inMinutes < 0 ? 0 : duration.inMinutes;
+  final hours = totalMinutes ~/ 60;
+  final minutes = totalMinutes % 60;
+  if (hours > 0) {
+    return loc.durationHoursMinutes('$hours', '$minutes');
+  }
+  return loc.durationMinutes('$minutes');
 }
 
 class _Stepper extends StatelessWidget {

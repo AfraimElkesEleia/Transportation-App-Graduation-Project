@@ -25,7 +25,10 @@ class UnifiedTripList extends StatelessWidget {
     if (state.directItems.isEmpty &&
         !state.isFetchingMoreDirect &&
         !state.indirectSearched) {
-      return EmptyDirectView(onSearchIndirect: onSearchIndirect);
+      return EmptyDirectView(
+        onSearchIndirect: onSearchIndirect,
+        showIndirectOption: state.activeParams.activeFilterCount == 0,
+      );
     }
 
     // Build item list:

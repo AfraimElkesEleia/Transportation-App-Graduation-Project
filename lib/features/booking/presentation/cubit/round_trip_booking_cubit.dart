@@ -277,7 +277,14 @@ class RoundTripBookingCubit extends Cubit<RoundTripBookingState> {
     required List<Map<String, dynamic>> returnPassengers,
   }) async {
     if (isClosed) return;
-    emit(state.copyWith(isAddingToCart: true, clearCartError: true));
+    emit(
+      state.copyWith(
+        isAddingToCart: true,
+        clearCartError: true,
+        cartSuccess: false,
+        checkoutSuccess: false,
+      ),
+    );
 
     try {
       final outboundPayload = {
@@ -341,7 +348,14 @@ class RoundTripBookingCubit extends Cubit<RoundTripBookingState> {
     required int pointsToRedeem,
   }) async {
     if (isClosed) return;
-    emit(state.copyWith(isBookingNow: true, clearCartError: true));
+    emit(
+      state.copyWith(
+        isBookingNow: true,
+        clearCartError: true,
+        cartSuccess: false,
+        checkoutSuccess: false,
+      ),
+    );
 
     try {
       final outboundPayload = {
@@ -402,10 +416,8 @@ class RoundTripBookingCubit extends Cubit<RoundTripBookingState> {
     emit(
       state.copyWith(
         currentStep: RoundTripBookingStep.searchOutbound,
-        selectedOutboundTrip: null,
-        selectedOutboundClass: null,
-        selectedReturnTrip: null,
-        selectedReturnClass: null,
+        clearOutboundSelection: true,
+        clearReturnSelection: true,
         selectedOutboundSeats: const [],
         selectedReturnSeats: const [],
       ),
@@ -416,8 +428,7 @@ class RoundTripBookingCubit extends Cubit<RoundTripBookingState> {
     emit(
       state.copyWith(
         currentStep: RoundTripBookingStep.searchReturn,
-        selectedReturnTrip: null,
-        selectedReturnClass: null,
+        clearReturnSelection: true,
         selectedOutboundSeats: const [],
         selectedReturnSeats: const [],
       ),

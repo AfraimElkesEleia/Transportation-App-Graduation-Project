@@ -119,14 +119,16 @@ class IndirectBookingCubit extends Cubit<IndirectBookingState> {
       selectedTripLeg1: trip,
       selectedClassLeg1: coachClass,
       selectedSeatsLeg1: const [], // reset
-      currentStep: IndirectBookingStep.seatLeg1,
+      selectedSeatsLeg2: const [],
+      clearLeg2Selection: true,
+      currentStep: IndirectBookingStep.searchLeg2,
     ));
   }
 
   void saveSeatsLeg1(List<String> seats) {
     emit(state.copyWith(
       selectedSeatsLeg1: seats,
-      currentStep: IndirectBookingStep.searchLeg2,
+      currentStep: IndirectBookingStep.seatLeg2,
     ));
   }
 
@@ -243,13 +245,13 @@ class IndirectBookingCubit extends Cubit<IndirectBookingState> {
       selectedTripLeg2: trip,
       selectedClassLeg2: coachClass,
       selectedSeatsLeg2: const [], // reset
-      currentStep: IndirectBookingStep.seatLeg2,
+      currentStep: IndirectBookingStep.seatLeg1,
     ));
   }
 
   void saveSeatsLeg2(List<String> seats) {
-    // Validate count matches leg 1
-    if (seats.length != state.requiredSeatCount) {
+    final requiredCount = state.selectedSeatsLeg1.length;
+    if (requiredCount == 0 || seats.length != requiredCount) {
       // Ignored for UI, but the UI should prevent proceeding if not equal
       return; 
     }
@@ -268,12 +270,15 @@ class IndirectBookingCubit extends Cubit<IndirectBookingState> {
     emit(state.copyWith(currentStep: IndirectBookingStep.seatLeg1));
   }
 
+  void goBackToLeg2Search() {
+    emit(state.copyWith(currentStep: IndirectBookingStep.searchLeg2));
+  }
+
   void clearLeg2Selection() {
     // Return completely back to changing Leg 2 Date / Choice, preserving Leg 1
     emit(state.copyWith(
-      selectedTripLeg2: null,
-      selectedClassLeg2: null,
       selectedSeatsLeg2: const [],
+      clearLeg2Selection: true,
       currentStep: IndirectBookingStep.searchLeg2,
     ));
   }

@@ -1122,13 +1122,80 @@ class AppLocalizationsAr extends AppLocalizations {
   String get addEntireJourneyToCart => 'أضف الرحلة بالكامل إلى السلة';
 
   @override
+  String get bookEntireJourneyNow => 'احجز الرحلة بالكامل الآن';
+
+  @override
   String get buildJourney => 'ابنِ رحلتك';
+
+  @override
+  String selectTripForLeg(String n) {
+    return 'اختر رحلة للجزء $n';
+  }
+
+  @override
+  String selectSeatsForLeg(String n) {
+    return 'اختر مقاعد الجزء $n';
+  }
+
+  @override
+  String get reviewCheckout => 'مراجعة وإتمام';
+
+  @override
+  String get noTripsFoundForLeg => 'لا توجد رحلات لهذا الجزء.';
+
+  @override
+  String get tryAdjustingFilters => 'حاول تعديل الفلاتر أعلاه.';
 
   @override
   String get suggestedTransferRoute => 'مسار التحويل المقترح';
 
   @override
   String get transferAt => 'تحويل في';
+
+  @override
+  String get journeySummary => 'ملخص الرحلة';
+
+  @override
+  String get journeyOverview => 'نظرة عامة على الرحلة';
+
+  @override
+  String get connectionLayover => 'مدة الانتظار بين الرحلتين';
+
+  @override
+  String get totalJourneyDuration => 'المدة الإجمالية للرحلة';
+
+  @override
+  String get routeLabel => 'المسار';
+
+  @override
+  String get durationLabel => 'المدة';
+
+  @override
+  String get pricePerSeat => 'سعر المقعد';
+
+  @override
+  String get legTotal => 'إجمالي الجزء';
+
+  @override
+  String get selectedSeats => 'المقاعد المختارة';
+
+  @override
+  String get noArrivalTime => 'وقت الوصول غير متاح';
+
+  @override
+  String durationHoursMinutes(String hours, String minutes) {
+    return '$hours س $minutes د';
+  }
+
+  @override
+  String durationMinutes(String minutes) {
+    return '$minutes د';
+  }
+
+  @override
+  String legsCount(String n) {
+    return '$n أجزاء';
+  }
 
   @override
   String legN(String n) {
@@ -1313,6 +1380,19 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get buyNow => 'اشترِ الآن';
+
+  @override
+  String get trainBooking => 'حجز قطار';
+
+  @override
+  String get busBooking => 'حجز حافلة';
+
+  @override
+  String get trainPassengerRequirements =>
+      'الاسم ونوع الهوية ورقمها مطلوبة لكل مسافر';
+
+  @override
+  String get busPassengerRequirements => 'الاسم ورقم الهاتف مطلوبان لكل مسافر';
 
   @override
   String get agencyLabel => 'الوكالة';

@@ -11,6 +11,7 @@ import 'package:transportation_app/features/profile/domain/entities/profile_enti
 import 'package:transportation_app/features/profile/presentation/cubit/profile_cubit/profile_cubit.dart';
 import 'package:transportation_app/features/profile/presentation/cubit/profile_cubit/profile_states.dart';
 import 'package:transportation_app/features/search/domain/entities/trip_result_entity.dart';
+import 'package:transportation_app/features/booking/presentation/views/widgets/points_redemption_widget.dart';
 import 'package:transportation_app/features/booking/presentation/views/widgets/passenger_form/passenger_autofill_banner.dart';
 import 'package:transportation_app/features/booking/presentation/views/widgets/passenger_form/passenger_card.dart';
 import 'package:transportation_app/features/booking/presentation/views/widgets/passenger_form/passenger_form_controllers.dart';
@@ -33,6 +34,15 @@ class _MultiDestinationPassengerFormScreenState
   late final int _legCount;
   late final List<bool> _isTrainPerLeg;
   late final List<bool> _autofilledPerLeg;
+  int _selectedPoints = 0;
+
+  double _cartTotal(MultiDestinationBookingState state) {
+    double total = 0;
+    for (int i = 0; i < _legCount; i++) {
+      total += _seatCounts[i] * (state.selectedClasses[i]?.price ?? 0);
+    }
+    return total;
+  }
 
   @override
   void initState() {
@@ -192,7 +202,7 @@ class _MultiDestinationPassengerFormScreenState
     super.dispose();
   }
 
-  void _submit() {
+  void _submit({required bool bookNow}) {
     if (!_formKey.currentState!.validate()) return;
     final cubit = context.read<MultiDestinationBookingCubit>();
 
@@ -230,12 +240,22 @@ class _MultiDestinationPassengerFormScreenState
         firstLegControllers?.phoneController.text.trim() ?? 'Unknown';
     final contactEmail = firstLegControllers?.emailController.text.trim() ?? '';
 
-    cubit.submitCart(
-      contactName: contactName,
-      contactPhone: contactPhone,
-      contactEmail: contactEmail.isEmpty ? 'user@example.com' : contactEmail,
-      allPassengers: allLegPassengers,
-    );
+    if (bookNow) {
+      cubit.bookNow(
+        contactName: contactName,
+        contactPhone: contactPhone,
+        contactEmail: contactEmail.isEmpty ? 'user@example.com' : contactEmail,
+        allPassengers: allLegPassengers,
+        pointsToRedeem: _selectedPoints,
+      );
+    } else {
+      cubit.submitCart(
+        contactName: contactName,
+        contactPhone: contactPhone,
+        contactEmail: contactEmail.isEmpty ? 'user@example.com' : contactEmail,
+        allPassengers: allLegPassengers,
+      );
+    }
   }
 
   @override
@@ -263,10 +283,12 @@ class _MultiDestinationPassengerFormScreenState
             >(
               listenWhen: (prev, current) =>
                   prev.isAddingToCart != current.isAddingToCart ||
+                  prev.isBookingNow != current.isBookingNow ||
                   current.cartSuccess ||
+                  current.checkoutSuccess ||
                   current.cartError != null,
               listener: (context, state) {
-                if (state.cartSuccess) {
+                if (state.checkoutSuccess || state.cartSuccess) {
                   Navigator.pushNamedAndRemoveUntil(
                     context,
                     AppRoutes.cartScreen,
@@ -282,6 +304,11 @@ class _MultiDestinationPassengerFormScreenState
                 }
               },
               builder: (context, state) {
+                final profileState = context.watch<ProfileCubit>().state;
+                final loyaltyBalance = profileState is ProfileLoaded
+                    ? (profileState.profile.loyaltyPointsBalance ?? 0)
+                    : 0;
+
                 return SafeArea(
                   child: Form(
                     key: _formKey,
@@ -334,39 +361,22 @@ class _MultiDestinationPassengerFormScreenState
 
                                 const SizedBox(height: 8),
                               ],
+                              PointsRedemptionWidget(
+                                cartTotal: _cartTotal(state),
+                                walletPoints: loyaltyBalance,
+                                onPointsChanged: (pts) =>
+                                    setState(() => _selectedPoints = pts),
+                              ),
+                              const SizedBox(height: 8),
                             ],
                           ),
                         ),
 
-                        // ── Submit button ─────────────────────────────────────
-                        Container(
-                          padding: const EdgeInsets.all(16),
-                          color: ColorsManager.surfaceDark,
-                          child: SizedBox(
-                            width: double.infinity,
-                            height: 52,
-                            child: ElevatedButton(
-                              onPressed: state.isAddingToCart ? null : _submit,
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: ColorsManager.buttonBlue,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(26),
-                                ),
-                              ),
-                              child: state.isAddingToCart
-                                  ? const CircularProgressIndicator(
-                                      color: Colors.white,
-                                    )
-                                  : Text(
-                                      AppLocalizations.of(context)!.addToCart,
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                            ),
-                          ),
+                        _FormBottomButtons(
+                          isAdding: state.isAddingToCart,
+                          isBookingNow: state.isBookingNow,
+                          onAddToCart: () => _submit(bookNow: false),
+                          onBookNow: () => _submit(bookNow: true),
                         ),
                       ],
                     ),
@@ -374,6 +384,118 @@ class _MultiDestinationPassengerFormScreenState
                 );
               },
             ),
+      ),
+    );
+  }
+}
+
+class _FormBottomButtons extends StatefulWidget {
+  final bool isAdding;
+  final bool isBookingNow;
+  final VoidCallback onAddToCart;
+  final VoidCallback onBookNow;
+
+  const _FormBottomButtons({
+    required this.isAdding,
+    required this.isBookingNow,
+    required this.onAddToCart,
+    required this.onBookNow,
+  });
+
+  @override
+  State<_FormBottomButtons> createState() => _FormBottomButtonsState();
+}
+
+class _FormBottomButtonsState extends State<_FormBottomButtons> {
+  int _lastClicked = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    final isLoading = widget.isAdding || widget.isBookingNow;
+
+    return Container(
+      padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
+      decoration: const BoxDecoration(
+        color: ColorsManager.surfaceDark,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: SizedBox(
+              height: 50,
+              child: OutlinedButton(
+                onPressed: isLoading
+                    ? null
+                    : () {
+                        setState(() => _lastClicked = 1);
+                        widget.onAddToCart();
+                      },
+                style: OutlinedButton.styleFrom(
+                  side: const BorderSide(color: ColorsManager.accentCyan),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(25),
+                  ),
+                ),
+                child: isLoading && _lastClicked == 1
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: ColorsManager.accentCyan,
+                        ),
+                      )
+                    : Text(
+                        AppLocalizations.of(context)!.addToCart,
+                        style: const TextStyle(
+                          color: ColorsManager.accentCyan,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 15,
+                        ),
+                      ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: SizedBox(
+              height: 50,
+              child: ElevatedButton(
+                onPressed: isLoading
+                    ? null
+                    : () {
+                        setState(() => _lastClicked = 2);
+                        widget.onBookNow();
+                      },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: ColorsManager.accentCyan,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(25),
+                  ),
+                  elevation: 0,
+                ),
+                child: isLoading && _lastClicked == 2
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
+                      )
+                    : Text(
+                        AppLocalizations.of(context)!.bookNow,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 15,
+                        ),
+                      ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

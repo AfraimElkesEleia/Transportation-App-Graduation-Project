@@ -1126,13 +1126,80 @@ class AppLocalizationsEn extends AppLocalizations {
   String get addEntireJourneyToCart => 'Add Entire Journey to Cart';
 
   @override
+  String get bookEntireJourneyNow => 'Book Entire Journey Now';
+
+  @override
   String get buildJourney => 'Build Journey';
+
+  @override
+  String selectTripForLeg(String n) {
+    return 'Select Trip for Leg $n';
+  }
+
+  @override
+  String selectSeatsForLeg(String n) {
+    return 'Select Seats for Leg $n';
+  }
+
+  @override
+  String get reviewCheckout => 'Review & Checkout';
+
+  @override
+  String get noTripsFoundForLeg => 'No trips found for this leg.';
+
+  @override
+  String get tryAdjustingFilters => 'Try adjusting the filters above.';
 
   @override
   String get suggestedTransferRoute => 'Suggested Transfer Route';
 
   @override
   String get transferAt => 'Transfer at';
+
+  @override
+  String get journeySummary => 'Journey Summary';
+
+  @override
+  String get journeyOverview => 'Journey Overview';
+
+  @override
+  String get connectionLayover => 'Connection layover';
+
+  @override
+  String get totalJourneyDuration => 'Total journey duration';
+
+  @override
+  String get routeLabel => 'Route';
+
+  @override
+  String get durationLabel => 'Duration';
+
+  @override
+  String get pricePerSeat => 'Price per seat';
+
+  @override
+  String get legTotal => 'Leg total';
+
+  @override
+  String get selectedSeats => 'Selected seats';
+
+  @override
+  String get noArrivalTime => 'Arrival time unavailable';
+
+  @override
+  String durationHoursMinutes(String hours, String minutes) {
+    return '${hours}h ${minutes}m';
+  }
+
+  @override
+  String durationMinutes(String minutes) {
+    return '${minutes}m';
+  }
+
+  @override
+  String legsCount(String n) {
+    return '$n legs';
+  }
 
   @override
   String legN(String n) {
@@ -1317,6 +1384,20 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get buyNow => 'Buy Now';
+
+  @override
+  String get trainBooking => 'Train Booking';
+
+  @override
+  String get busBooking => 'Bus Booking';
+
+  @override
+  String get trainPassengerRequirements =>
+      'Name, ID type & number required for each passenger';
+
+  @override
+  String get busPassengerRequirements =>
+      'Name & phone number required for each passenger';
 
   @override
   String get agencyLabel => 'Agency';

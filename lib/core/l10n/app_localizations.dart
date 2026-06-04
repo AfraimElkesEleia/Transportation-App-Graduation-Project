@@ -2192,11 +2192,47 @@ abstract class AppLocalizations {
   /// **'Add Entire Journey to Cart'**
   String get addEntireJourneyToCart;
 
+  /// No description provided for @bookEntireJourneyNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Book Entire Journey Now'**
+  String get bookEntireJourneyNow;
+
   /// No description provided for @buildJourney.
   ///
   /// In en, this message translates to:
   /// **'Build Journey'**
   String get buildJourney;
+
+  /// No description provided for @selectTripForLeg.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Trip for Leg {n}'**
+  String selectTripForLeg(String n);
+
+  /// No description provided for @selectSeatsForLeg.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Seats for Leg {n}'**
+  String selectSeatsForLeg(String n);
+
+  /// No description provided for @reviewCheckout.
+  ///
+  /// In en, this message translates to:
+  /// **'Review & Checkout'**
+  String get reviewCheckout;
+
+  /// No description provided for @noTripsFoundForLeg.
+  ///
+  /// In en, this message translates to:
+  /// **'No trips found for this leg.'**
+  String get noTripsFoundForLeg;
+
+  /// No description provided for @tryAdjustingFilters.
+  ///
+  /// In en, this message translates to:
+  /// **'Try adjusting the filters above.'**
+  String get tryAdjustingFilters;
 
   /// No description provided for @suggestedTransferRoute.
   ///
@@ -2209,6 +2245,84 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Transfer at'**
   String get transferAt;
+
+  /// No description provided for @journeySummary.
+  ///
+  /// In en, this message translates to:
+  /// **'Journey Summary'**
+  String get journeySummary;
+
+  /// No description provided for @journeyOverview.
+  ///
+  /// In en, this message translates to:
+  /// **'Journey Overview'**
+  String get journeyOverview;
+
+  /// No description provided for @connectionLayover.
+  ///
+  /// In en, this message translates to:
+  /// **'Connection layover'**
+  String get connectionLayover;
+
+  /// No description provided for @totalJourneyDuration.
+  ///
+  /// In en, this message translates to:
+  /// **'Total journey duration'**
+  String get totalJourneyDuration;
+
+  /// No description provided for @routeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Route'**
+  String get routeLabel;
+
+  /// No description provided for @durationLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Duration'**
+  String get durationLabel;
+
+  /// No description provided for @pricePerSeat.
+  ///
+  /// In en, this message translates to:
+  /// **'Price per seat'**
+  String get pricePerSeat;
+
+  /// No description provided for @legTotal.
+  ///
+  /// In en, this message translates to:
+  /// **'Leg total'**
+  String get legTotal;
+
+  /// No description provided for @selectedSeats.
+  ///
+  /// In en, this message translates to:
+  /// **'Selected seats'**
+  String get selectedSeats;
+
+  /// No description provided for @noArrivalTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Arrival time unavailable'**
+  String get noArrivalTime;
+
+  /// No description provided for @durationHoursMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'{hours}h {minutes}m'**
+  String durationHoursMinutes(String hours, String minutes);
+
+  /// No description provided for @durationMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes}m'**
+  String durationMinutes(String minutes);
+
+  /// No description provided for @legsCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{n} legs'**
+  String legsCount(String n);
 
   /// No description provided for @legN.
   ///
@@ -2527,6 +2641,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Buy Now'**
   String get buyNow;
+
+  /// No description provided for @trainBooking.
+  ///
+  /// In en, this message translates to:
+  /// **'Train Booking'**
+  String get trainBooking;
+
+  /// No description provided for @busBooking.
+  ///
+  /// In en, this message translates to:
+  /// **'Bus Booking'**
+  String get busBooking;
+
+  /// No description provided for @trainPassengerRequirements.
+  ///
+  /// In en, this message translates to:
+  /// **'Name, ID type & number required for each passenger'**
+  String get trainPassengerRequirements;
+
+  /// No description provided for @busPassengerRequirements.
+  ///
+  /// In en, this message translates to:
+  /// **'Name & phone number required for each passenger'**
+  String get busPassengerRequirements;
 
   /// No description provided for @agencyLabel.
   ///

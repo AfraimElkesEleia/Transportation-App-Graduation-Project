@@ -414,9 +414,67 @@
   "reFill": "إعادة التعبئة",
   "fillSeat1Info": "أكمل المقعد الأول، ثم انسخ الاسم والهاتف للمقاعد الأخرى.",
   "addEntireJourneyToCart": "أضف الرحلة بالكامل إلى السلة",
+  "bookEntireJourneyNow": "احجز الرحلة بالكامل الآن",
   "buildJourney": "ابنِ رحلتك",
+  "multiDestination": "وجهات متعددة",
+  "selectTripForLeg": "اختر رحلة للجزء {n}",
+  "@selectTripForLeg": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "selectSeatsForLeg": "اختر مقاعد الجزء {n}",
+  "@selectSeatsForLeg": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "reviewCheckout": "مراجعة وإتمام",
+  "noTripsFoundForLeg": "لا توجد رحلات لهذا الجزء.",
+  "tryAdjustingFilters": "حاول تعديل الفلاتر أعلاه.",
   "suggestedTransferRoute": "مسار التحويل المقترح",
   "transferAt": "تحويل في",
+  "journeySummary": "ملخص الرحلة",
+  "journeyOverview": "نظرة عامة على الرحلة",
+  "connectionLayover": "مدة الانتظار بين الرحلتين",
+  "totalJourneyDuration": "المدة الإجمالية للرحلة",
+  "routeLabel": "المسار",
+  "durationLabel": "المدة",
+  "pricePerSeat": "سعر المقعد",
+  "legTotal": "إجمالي الجزء",
+  "selectedSeats": "المقاعد المختارة",
+  "noArrivalTime": "وقت الوصول غير متاح",
+  "durationHoursMinutes": "{hours} س {minutes} د",
+  "@durationHoursMinutes": {
+    "placeholders": {
+      "hours": {
+        "type": "String"
+      },
+      "minutes": {
+        "type": "String"
+      }
+    }
+  },
+  "durationMinutes": "{minutes} د",
+  "@durationMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "String"
+      }
+    }
+  },
+  "legsCount": "{n} أجزاء",
+  "@legsCount": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
   "legN": "الجزء {n}",
   "@legN": {
     "placeholders": {
@@ -560,6 +618,10 @@
   "clearFilters": "مسح الفلاتر",
   "buyTicket": "شراء التذكرة",
   "buyNow": "اشترِ الآن",
+  "trainBooking": "حجز قطار",
+  "busBooking": "حجز حافلة",
+  "trainPassengerRequirements": "الاسم ونوع الهوية ورقمها مطلوبة لكل مسافر",
+  "busPassengerRequirements": "الاسم ورقم الهاتف مطلوبان لكل مسافر",
   "agencyLabel": "الوكالة",
   "originLabel": "نقطة الانطلاق",
   "destinationLabel": "الوجهة",

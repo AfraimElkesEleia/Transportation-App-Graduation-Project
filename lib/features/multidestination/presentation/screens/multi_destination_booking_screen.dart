@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart' hide TextDirection;
 import 'package:transportation_app/core/di/injection_container.dart';
+import 'package:transportation_app/core/helper/extensions.dart';
 import 'package:transportation_app/core/routing/routes.dart';
 import 'package:transportation_app/core/theming/colors.dart';
 import 'package:transportation_app/features/booking/data/datasources/booking_remote_datasource.dart';
@@ -12,6 +14,9 @@ import 'package:transportation_app/features/booking/presentation/views/widgets/e
 import 'package:transportation_app/features/search/presentation/views/widgets/search_error_view.dart';
 import 'package:transportation_app/features/search/presentation/views/widgets/trips_result_card.dart';
 import 'package:transportation_app/features/search/presentation/views/widgets/filter_bottom_sheet.dart';
+import 'package:transportation_app/core/l10n/app_localizations.dart';
+import 'package:transportation_app/features/search/domain/entities/coach_class_entity.dart';
+import 'package:transportation_app/features/search/domain/entities/trip_result_entity.dart';
 
 class MultiDestinationBookingScreen extends StatefulWidget {
   const MultiDestinationBookingScreen({super.key});
@@ -53,62 +58,76 @@ class _MultiDestinationBookingScreenState
             ? (currentProgress / totalSteps)
             : 0.0;
 
-        return Scaffold(
-          backgroundColor: ColorsManager.seatBg,
-          appBar: AppBar(
-            backgroundColor: ColorsManager.surfaceDark,
-            title: const Text(
-              'Multi-Destination',
-              style: TextStyle(color: Colors.white, fontSize: 16),
-            ),
-            iconTheme: const IconThemeData(color: Colors.white),
-            bottom: PreferredSize(
-              preferredSize: const Size.fromHeight(40),
-              child: Column(
-                children: [
-                  LinearProgressIndicator(
-                    value: progressPercent,
-                    backgroundColor: Colors.white24,
-                    color: ColorsManager.accentCyan,
-                    minHeight: 4,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 8),
-                    child: Text(
-                      _getStepText(state),
-                      style: const TextStyle(
-                        color: ColorsManager.accentCyan,
-                        fontSize: 13,
-                        fontWeight: FontWeight.bold,
+        return PopScope(
+          canPop: currentProgress == 0,
+          onPopInvokedWithResult: (didPop, result) {
+            if (didPop) return;
+            _handleBack(currentProgress);
+          },
+          child: Scaffold(
+            backgroundColor: ColorsManager.seatBg,
+            appBar: AppBar(
+              backgroundColor: ColorsManager.surfaceDark,
+              title: Text(
+                AppLocalizations.of(context)!.multiDestination,
+                style: const TextStyle(color: Colors.white, fontSize: 16),
+              ),
+              iconTheme: const IconThemeData(color: Colors.white),
+              bottom: PreferredSize(
+                preferredSize: const Size.fromHeight(40),
+                child: Column(
+                  children: [
+                    LinearProgressIndicator(
+                      value: progressPercent,
+                      backgroundColor: Colors.white24,
+                      color: ColorsManager.accentCyan,
+                      minHeight: 4,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      child: Text(
+                        _getStepText(state),
+                        style: const TextStyle(
+                          color: ColorsManager.accentCyan,
+                          fontSize: 13,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
+              ),
+              leading: BackButton(
+                onPressed: () => _handleBack(currentProgress),
               ),
             ),
-            leading: BackButton(
-              onPressed: () {
-                if (currentProgress == 0) {
-                  Navigator.pop(context);
-                } else {
-                  context.read<MultiDestinationBookingCubit>().goBack();
-                }
-              },
-            ),
+            body: SafeArea(child: _buildStepContent(context, state)),
           ),
-          body: SafeArea(child: _buildStepContent(context, state)),
         );
       },
     );
   }
 
+  void _handleBack(int currentProgress) {
+    if (currentProgress == 0) {
+      Navigator.pop(context);
+      return;
+    }
+
+    context.read<MultiDestinationBookingCubit>().goBack();
+  }
+
   String _getStepText(MultiDestinationBookingState state) {
     if (state.currentStep == MultiDestinationBookingStep.searchLegs) {
-      return "Select Trip for Leg ${state.currentSearchLegIndex + 1}";
+      return AppLocalizations.of(
+        context,
+      )!.selectTripForLeg('${state.currentSearchLegIndex + 1}');
     } else if (state.currentStep == MultiDestinationBookingStep.selectSeats) {
-      return "Select Seats for Leg ${state.currentSeatLegIndex + 1}";
+      return AppLocalizations.of(
+        context,
+      )!.selectSeatsForLeg('${state.currentSeatLegIndex + 1}');
     }
-    return "Review & Checkout";
+    return AppLocalizations.of(context)!.reviewCheckout;
   }
 
   Widget _buildStepContent(
@@ -179,7 +198,7 @@ class _MultiDestinationBookingScreenState
                               children: [
                                 Flexible(
                                   child: Text(
-                                    leg.fromGov,
+                                    leg.fromGov.toLocalizedGov(context),
                                     style: const TextStyle(
                                       color: Colors.white,
                                       fontSize: 14,
@@ -200,7 +219,7 @@ class _MultiDestinationBookingScreenState
                                   ),
                                   Flexible(
                                     child: Text(
-                                      leg.fromSub!,
+                                      leg.fromSub!.toLocalizedStation(context),
                                       style: const TextStyle(
                                         color: Colors.white,
                                         fontSize: 14,
@@ -231,7 +250,7 @@ class _MultiDestinationBookingScreenState
                               children: [
                                 Flexible(
                                   child: Text(
-                                    leg.toGov,
+                                    leg.toGov.toLocalizedGov(context),
                                     style: const TextStyle(
                                       color: Colors.white,
                                       fontSize: 14,
@@ -252,7 +271,7 @@ class _MultiDestinationBookingScreenState
                                   ),
                                   Flexible(
                                     child: Text(
-                                      leg.toSub!,
+                                      leg.toSub!.toLocalizedStation(context),
                                       style: const TextStyle(
                                         color: Colors.white,
                                         fontSize: 14,
@@ -310,30 +329,33 @@ class _MultiDestinationBookingScreenState
             ),
           ),
           if (!hasResults)
-            const SliverFillRemaining(
+            SliverFillRemaining(
               hasScrollBody: false,
               child: Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(
+                    const Icon(
                       Icons.search_off_rounded,
                       color: Colors.white24,
                       size: 64,
                     ),
-                    SizedBox(height: 16),
+                    const SizedBox(height: 16),
                     Text(
-                      'No trips found for this leg.',
-                      style: TextStyle(
+                      AppLocalizations.of(context)!.noTripsFoundForLeg,
+                      style: const TextStyle(
                         color: Colors.white54,
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
-                    SizedBox(height: 8),
+                    const SizedBox(height: 8),
                     Text(
-                      'Try adjusting the filters above.',
-                      style: TextStyle(color: Colors.white30, fontSize: 13),
+                      AppLocalizations.of(context)!.tryAdjustingFilters,
+                      style: const TextStyle(
+                        color: Colors.white30,
+                        fontSize: 13,
+                      ),
                     ),
                   ],
                 ),
@@ -387,7 +409,9 @@ class _MultiDestinationBookingScreenState
           child: Padding(
             padding: const EdgeInsets.all(16),
             child: Text(
-              'Select Seats for Leg ${legIndex + 1}',
+              AppLocalizations.of(
+                context,
+              )!.selectSeatsForLeg('${legIndex + 1}'),
               style: const TextStyle(
                 color: Colors.white,
                 fontSize: 18,
@@ -426,10 +450,18 @@ class _MultiDestinationBookingScreenState
 
   Widget _buildSummary(MultiDestinationBookingState state) {
     double grandTotal = 0;
+    int totalSeats = 0;
+    int? totalDurationMinutes = 0;
+
     for (int i = 0; i < state.legSummaries.length; i++) {
-      grandTotal +=
-          (state.selectedSeats[i]?.length ?? 0) *
-          (state.selectedClasses[i]?.price ?? 0);
+      final seatCount = state.selectedSeats[i]?.length ?? 0;
+      grandTotal += seatCount * (state.selectedClasses[i]?.price ?? 0);
+      totalSeats += seatCount;
+
+      final duration = state.selectedTrips[i]?.totalDurationMinutes;
+      totalDurationMinutes = totalDurationMinutes == null || duration == null
+          ? null
+          : totalDurationMinutes + duration;
     }
 
     return SingleChildScrollView(
@@ -437,160 +469,49 @@ class _MultiDestinationBookingScreenState
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const Text(
-            'Journey Summary',
-            style: TextStyle(
+          Text(
+            AppLocalizations.of(context)!.journeySummary,
+            style: const TextStyle(
               color: Colors.white,
               fontSize: 22,
               fontWeight: FontWeight.bold,
             ),
           ),
+          const SizedBox(height: 8),
+          _MultiDestinationOverview(
+            legCount: state.legSummaries.length,
+            seatCount: totalSeats,
+            totalDuration: totalDurationMinutes == null
+                ? null
+                : Duration(minutes: totalDurationMinutes),
+            grandTotal: grandTotal,
+          ),
           const SizedBox(height: 16),
           for (int i = 0; i < state.legSummaries.length; i++) ...[
-            Container(
-              padding: const EdgeInsets.all(16),
-              margin: const EdgeInsets.only(bottom: 16),
-              decoration: BoxDecoration(
-                color: ColorsManager.surfaceChip,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Leg ${i + 1}',
-                    style: const TextStyle(
-                      color: ColorsManager.accentCyan,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Row(
-                    textDirection: TextDirection.ltr,
-                    children: [
-                      Flexible(
-                        child: Wrap(
-                          crossAxisAlignment: WrapCrossAlignment.center,
-                          textDirection: TextDirection.ltr,
-                          children: [
-                            Text(
-                              state.selectedTrips[i]!.originGovernorate,
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 16,
-                              ),
-                            ),
-                            if (state.selectedTrips[i]!.originStationName !=
-                                state.selectedTrips[i]!.originGovernorate) ...[
-                              const Text(
-                                ' - ',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 16,
-                                ),
-                              ),
-                              Text(
-                                state.selectedTrips[i]!.originStationName,
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 16,
-                                ),
-                              ),
-                            ],
-                          ],
-                        ),
-                      ),
-                      const Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 4.0),
-                        child: Text(
-                          '➔',
-                          style: TextStyle(color: Colors.white, fontSize: 16),
-                        ),
-                      ),
-                      Flexible(
-                        child: Wrap(
-                          crossAxisAlignment: WrapCrossAlignment.center,
-                          textDirection: TextDirection.ltr,
-                          children: [
-                            Text(
-                              state.selectedTrips[i]!.destinationGovernorate,
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 16,
-                              ),
-                            ),
-                            if (state
-                                    .selectedTrips[i]!
-                                    .destinationStationName !=
-                                state
-                                    .selectedTrips[i]!
-                                    .destinationGovernorate) ...[
-                              const Text(
-                                ' - ',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 16,
-                                ),
-                              ),
-                              Text(
-                                state.selectedTrips[i]!.destinationStationName,
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 16,
-                                ),
-                              ),
-                            ],
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  Wrap(
-                    crossAxisAlignment: WrapCrossAlignment.center,
-                    textDirection: TextDirection.ltr,
-                    children: [
-                      Text(
-                        state.selectedTrips[i]!.agencyName,
-                        style: const TextStyle(
-                          color: ColorsManager.textMuted,
-                          fontSize: 13,
-                        ),
-                      ),
-                      const Text(
-                        ' - ',
-                        style: TextStyle(
-                          color: ColorsManager.textMuted,
-                          fontSize: 13,
-                        ),
-                      ),
-                      Text(
-                        state.selectedClasses[i]!.className,
-                        style: const TextStyle(
-                          color: ColorsManager.textMuted,
-                          fontSize: 13,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    '${state.selectedSeats[i]?.length ?? 0} Seats: ${state.selectedSeats[i]?.join(", ")}',
-                    style: const TextStyle(color: Colors.white70),
-                  ),
-                ],
-              ),
+            _SummaryLegInfo(
+              title: AppLocalizations.of(context)!.legN('${i + 1}'),
+              trip: state.selectedTrips[i]!,
+              c: state.selectedClasses[i]!,
+              seats: state.selectedSeats[i] ?? const [],
+              total:
+                  (state.selectedSeats[i]?.length ?? 0) *
+                  state.selectedClasses[i]!.price,
             ),
+            const SizedBox(height: 16),
           ],
           const SizedBox(height: 16),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                'Grand Total',
-                style: TextStyle(color: ColorsManager.textMuted, fontSize: 16),
+              Text(
+                AppLocalizations.of(context)!.grandTotal,
+                style: const TextStyle(
+                  color: ColorsManager.textMuted,
+                  fontSize: 16,
+                ),
               ),
               Text(
-                'EGP $grandTotal',
+                '${AppLocalizations.of(context)!.egp} ${grandTotal.toStringAsFixed(0)}',
                 style: const TextStyle(
                   color: ColorsManager.accentCyan,
                   fontSize: 24,
@@ -613,9 +534,9 @@ class _MultiDestinationBookingScreenState
               style: ElevatedButton.styleFrom(
                 backgroundColor: ColorsManager.buttonBlue,
               ),
-              child: const Text(
-                'Proceed to Passenger Details',
-                style: TextStyle(
+              child: Text(
+                AppLocalizations.of(context)!.proceedToPassenger,
+                style: const TextStyle(
                   color: Colors.white,
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
@@ -627,6 +548,398 @@ class _MultiDestinationBookingScreenState
       ),
     );
   }
+}
+
+class _MultiDestinationOverview extends StatelessWidget {
+  final int legCount;
+  final int seatCount;
+  final Duration? totalDuration;
+  final double grandTotal;
+
+  const _MultiDestinationOverview({
+    required this.legCount,
+    required this.seatCount,
+    required this.totalDuration,
+    required this.grandTotal,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
+
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: ColorsManager.surfaceDark,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: ColorsManager.borderDim),
+      ),
+      child: Wrap(
+        spacing: 10,
+        runSpacing: 10,
+        children: [
+          _InfoPill(
+            icon: Icons.route_outlined,
+            label: loc.legsCount('$legCount'),
+          ),
+          _InfoPill(
+            icon: Icons.event_seat_outlined,
+            label: loc.nSeats('$seatCount'),
+          ),
+          if (totalDuration != null)
+            _InfoPill(
+              icon: Icons.schedule_rounded,
+              label:
+                  '${loc.totalJourneyDuration}: ${_formatDuration(context, totalDuration!)}',
+            ),
+          _InfoPill(
+            icon: Icons.payments_outlined,
+            label:
+                '${loc.grandTotal}: ${loc.egp} ${grandTotal.toStringAsFixed(0)}',
+            highlighted: true,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SummaryLegInfo extends StatelessWidget {
+  final String title;
+  final TripResultEntity trip;
+  final CoachClassEntity c;
+  final List<String> seats;
+  final double total;
+
+  const _SummaryLegInfo({
+    required this.title,
+    required this.trip,
+    required this.c,
+    required this.seats,
+    required this.total,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
+    final timeFormat = DateFormat(
+      'EEE, d MMM - h:mm a',
+      Localizations.localeOf(context).toLanguageTag(),
+    );
+    final from = _stationLabel(context, trip, isOrigin: true);
+    final to = _stationLabel(context, trip, isOrigin: false);
+    final agency = _localizedAgency(context, trip);
+    final className = _localizedClass(context, c);
+    final seatsLabel = seats.where((s) => s.trim().isNotEmpty).join(', ');
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: ColorsManager.surfaceChip,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: ColorsManager.borderSubtle),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: ColorsManager.accentCyan.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: const Icon(
+                  Icons.route_outlined,
+                  color: ColorsManager.accentCyan,
+                  size: 18,
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  title,
+                  style: const TextStyle(
+                    color: ColorsManager.accentCyan,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 15,
+                  ),
+                ),
+              ),
+              Text(
+                '${loc.egp} ${total.toStringAsFixed(0)}',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 15,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          Text(
+            '$from -> $to',
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 16,
+              fontWeight: FontWeight.w700,
+            ),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
+          const SizedBox(height: 8),
+          Text(
+            '$agency - $className',
+            style: const TextStyle(
+              color: ColorsManager.textMuted,
+              fontSize: 13,
+            ),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
+          const SizedBox(height: 12),
+          _TimelineRow(
+            departure: timeFormat.format(trip.departureTime),
+            arrival: trip.arrivalTime == null
+                ? loc.noArrivalTime
+                : timeFormat.format(trip.arrivalTime!),
+          ),
+          const SizedBox(height: 12),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              _InfoPill(
+                icon: Icons.timelapse_rounded,
+                label: '${loc.durationLabel}: ${_durationLabel(context, trip)}',
+              ),
+              _InfoPill(
+                icon: Icons.event_seat_outlined,
+                label:
+                    '${loc.selectedSeats}: ${seatsLabel.isEmpty ? loc.nSeats('${seats.length}') : seatsLabel}',
+              ),
+              _InfoPill(
+                icon: Icons.sell_outlined,
+                label:
+                    '${loc.pricePerSeat}: ${loc.egp} ${c.price.toStringAsFixed(0)}',
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _TimelineRow extends StatelessWidget {
+  final String departure;
+  final String arrival;
+
+  const _TimelineRow({required this.departure, required this.arrival});
+
+  @override
+  Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
+
+    return Row(
+      children: [
+        Expanded(
+          child: _TimeBlock(
+            label: loc.departure,
+            value: departure,
+            icon: Icons.trip_origin,
+          ),
+        ),
+        Container(width: 30, height: 1, color: ColorsManager.borderSubtle),
+        Expanded(
+          child: _TimeBlock(
+            label: loc.arrival,
+            value: arrival,
+            icon: Icons.location_on_outlined,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _TimeBlock extends StatelessWidget {
+  final String label;
+  final String value;
+  final IconData icon;
+
+  const _TimeBlock({
+    required this.label,
+    required this.value,
+    required this.icon,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: ColorsManager.surfaceDark,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: ColorsManager.borderDim),
+      ),
+      child: Row(
+        children: [
+          Icon(icon, color: ColorsManager.accentCyan, size: 16),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: const TextStyle(
+                    color: ColorsManager.textMuted,
+                    fontSize: 11,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  value,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _InfoPill extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final bool highlighted;
+
+  const _InfoPill({
+    required this.icon,
+    required this.label,
+    this.highlighted = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final color = highlighted ? ColorsManager.accentCyan : Colors.white70;
+    final maxTextWidth = MediaQuery.sizeOf(context).width - 90;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+      decoration: BoxDecoration(
+        color: highlighted
+            ? ColorsManager.accentCyan.withValues(alpha: 0.1)
+            : Colors.white.withValues(alpha: 0.04),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(
+          color: highlighted
+              ? ColorsManager.accentCyan.withValues(alpha: 0.35)
+              : Colors.white.withValues(alpha: 0.07),
+        ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, color: color, size: 15),
+          const SizedBox(width: 6),
+          ConstrainedBox(
+            constraints: BoxConstraints(maxWidth: maxTextWidth),
+            child: Text(
+              label,
+              style: TextStyle(
+                color: color,
+                fontSize: 12,
+                fontWeight: highlighted ? FontWeight.bold : FontWeight.w500,
+              ),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+String _stationLabel(
+  BuildContext context,
+  TripResultEntity trip, {
+  required bool isOrigin,
+}) {
+  final isArabic = Localizations.localeOf(context).languageCode == 'ar';
+  final station = isOrigin
+      ? (isArabic ? trip.originStationNameAr : trip.originStationName)
+      : (isArabic
+            ? trip.destinationStationNameAr
+            : trip.destinationStationName);
+  final governorate = isOrigin
+      ? (isArabic ? trip.originGovernorateAr : trip.originGovernorate)
+      : (isArabic
+            ? trip.destinationGovernorateAr
+            : trip.destinationGovernorate);
+  final fallbackStation = isOrigin
+      ? trip.originStationName
+      : trip.destinationStationName;
+  final fallbackGovernorate = isOrigin
+      ? trip.originGovernorate
+      : trip.destinationGovernorate;
+
+  final governorateText = governorate?.trim().isNotEmpty == true
+      ? governorate!.trim()
+      : fallbackGovernorate.trim();
+  final stationText = station?.trim().isNotEmpty == true
+      ? station!.trim()
+      : fallbackStation.trim();
+  final subText =
+      stationText.isNotEmpty &&
+          stationText.toLowerCase() != governorateText.toLowerCase()
+      ? stationText
+      : '';
+  return subText.isEmpty ? governorateText : '$governorateText - $subText';
+}
+
+String _localizedAgency(BuildContext context, TripResultEntity trip) {
+  final isArabic = Localizations.localeOf(context).languageCode == 'ar';
+  if (isArabic && trip.agencyNameAr?.trim().isNotEmpty == true) {
+    return trip.agencyNameAr!.trim();
+  }
+  return trip.agencyName;
+}
+
+String _localizedClass(BuildContext context, CoachClassEntity c) {
+  final isArabic = Localizations.localeOf(context).languageCode == 'ar';
+  if (isArabic && c.classNameAr?.trim().isNotEmpty == true) {
+    return c.classNameAr!.trim();
+  }
+  return c.className;
+}
+
+String _durationLabel(BuildContext context, TripResultEntity trip) {
+  final minutes = trip.totalDurationMinutes;
+  if (minutes == null) return '--';
+  return _formatDuration(context, Duration(minutes: minutes));
+}
+
+String _formatDuration(BuildContext context, Duration duration) {
+  final loc = AppLocalizations.of(context)!;
+  final totalMinutes = duration.inMinutes < 0 ? 0 : duration.inMinutes;
+  final hours = totalMinutes ~/ 60;
+  final minutes = totalMinutes % 60;
+  if (hours > 0) {
+    return loc.durationHoursMinutes('$hours', '$minutes');
+  }
+  return loc.durationMinutes('$minutes');
 }
 
 class _StickyHeaderDelegate extends SliverPersistentHeaderDelegate {

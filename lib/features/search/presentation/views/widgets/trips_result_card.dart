@@ -397,110 +397,127 @@ class _FloorGroupTile extends StatelessWidget {
         : loc.standardClass;
 
     return Padding(
-      padding: const EdgeInsets.only(bottom: 10),
-      child: Row(
-        children: [
-          // ── Class name + floor label ─────────────────
-          ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 120),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: ColorsManager.surfaceChip.withValues(alpha: 0.4),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: ColorsManager.borderSubtle.withValues(alpha: 0.3),
+            width: 1,
+          ),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Row 1: Class Name / Floor Badge & Book Button
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: ColorsManager.surfaceChip,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
+                Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         displayName,
                         style: const TextStyle(
-                          color: Colors.white70,
-                          fontSize: 13,
-                          height: 1.3,
+                          color: Colors.white,
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
-                      const SizedBox(height: 2),
+                      const SizedBox(height: 4),
                       Text(
                         floorBadge,
                         style: const TextStyle(
                           color: ColorsManager.accentCyan,
                           fontSize: 11,
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
                     ],
                   ),
                 ),
+                const SizedBox(width: 8),
+                // Book button
+                SizedBox(
+                  height: 36,
+                  child: ElevatedButton(
+                    onPressed: floor.hasSeats
+                        ? () {
+                            final cls = floor.classes
+                                .where((c) => c.hasSeats)
+                                .reduce((a, b) => a.price <= b.price ? a : b);
+                            onBook(cls);
+                          }
+                        : null,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: floor.hasSeats
+                          ? ColorsManager.buttonBlue
+                          : ColorsManager.surfaceMid,
+                      disabledBackgroundColor: ColorsManager.surfaceMid,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(18),
+                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      elevation: 0,
+                    ),
+                    child: Text(
+                      floor.hasSeats ? loc.book : loc.fullSeats,
+                      style: TextStyle(
+                        color: floor.hasSeats ? Colors.white : Colors.white38,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 13,
+                      ),
+                    ),
+                  ),
+                ),
               ],
             ),
-          ),
-          const SizedBox(width: 8),
-
-          // ── Total seats (combined Single + Double) ───
-          Text(
-            loc.seatsCount('${floor.totalSeats}'),
-            style: TextStyle(
-              color: floor.totalSeats < 5
-                  ? Colors.orangeAccent
-                  : Colors.white38,
-              fontSize: 12,
-            ),
-          ),
-          const Spacer(),
-
-          // ── Price ────────────────────────────────────
-          Text(
-            '${AppLocalizations.of(context)!.egp} ${floor.lowestPrice.toStringAsFixed(0)}',
-            style: const TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-              fontSize: 15,
-            ),
-          ),
-          const SizedBox(width: 12),
-
-          // ── Book button ──────────────────────────────
-          SizedBox(
-            height: 36,
-            child: ElevatedButton(
-              onPressed: floor.hasSeats
-                  ? () {
-                      final cls = floor.classes
-                          .where((c) => c.hasSeats)
-                          .reduce((a, b) => a.price <= b.price ? a : b);
-                      onBook(cls);
-                    }
-                  : null,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: floor.hasSeats
-                    ? ColorsManager.buttonBlue
-                    : ColorsManager.surfaceMid,
-                disabledBackgroundColor: ColorsManager.surfaceMid,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(18),
+            const SizedBox(height: 10),
+            const Divider(color: ColorsManager.borderSubtle, height: 1),
+            const SizedBox(height: 10),
+            // Row 2: Seats Count & Price
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                // Seats Count with Seat Icon
+                Row(
+                  children: [
+                    Icon(
+                      Icons.event_seat_outlined,
+                      size: 16,
+                      color: floor.totalSeats < 5
+                          ? Colors.orangeAccent
+                          : Colors.white38,
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      loc.seatsCount('${floor.totalSeats}'),
+                      style: TextStyle(
+                        color: floor.totalSeats < 5
+                            ? Colors.orangeAccent
+                            : Colors.white38,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
                 ),
-                padding: const EdgeInsets.symmetric(horizontal: 8),
-                elevation: 0,
-              ),
-              child: Text(
-                floor.hasSeats
-                    ? AppLocalizations.of(context)!.book
-                    : AppLocalizations.of(context)!.fullSeats,
-                style: TextStyle(
-                  color: floor.hasSeats ? Colors.white : Colors.white38,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 13,
+                // Lowest Price
+                Text(
+                  '${loc.egp} ${floor.lowestPrice.toStringAsFixed(0)}',
+                  style: const TextStyle(
+                    color: ColorsManager.accentCyan,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 15,
+                  ),
                 ),
-              ),
+              ],
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

@@ -79,6 +79,43 @@ class SeatMapCubit extends Cubit<SeatMapState> {
     }
   }
 
+  Future<void> bookMultipleNow({
+    required List<Map<String, dynamic>> payloads,
+    int pointsToRedeem = 0,
+  }) async {
+    if (isClosed) return;
+    emit(CartAdding());
+    try {
+      for (final p in payloads) {
+        await datasource.addToCart(p);
+        if (isClosed) return;
+      }
+      try {
+        await datasource.getCart();
+        if (isClosed) return;
+        await datasource.checkout(pointsToRedeem: pointsToRedeem);
+        if (isClosed) return;
+
+        await LocalAlarmScheduler.cancelCartExpiry();
+        if (isClosed) return;
+
+        emit(CartSuccess());
+      } on ServerException catch (e) {
+        if (isClosed) return;
+        emit(CartAddedButCheckoutFailed(e.message));
+      }
+    } on ServerException catch (e) {
+      if (isClosed) return;
+      emit(CartError(e.message));
+    } on NetworkException {
+      if (isClosed) return;
+      emit(const CartError('No internet connection.'));
+    } catch (_) {
+      if (isClosed) return;
+      emit(const CartError('Unexpected error occurred'));
+    }
+  }
+
   Future<void> bookNow({
     required int tripOccurrenceId,
     required int coachClassId,

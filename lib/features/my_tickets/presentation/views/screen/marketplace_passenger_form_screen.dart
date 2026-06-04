@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:transportation_app/core/l10n/app_localizations.dart';
 import 'package:transportation_app/core/theming/colors.dart';
 import 'package:transportation_app/features/booking/presentation/views/widgets/passenger_form/passenger_autofill_banner.dart';
 import 'package:transportation_app/features/booking/presentation/views/widgets/passenger_form/passenger_card.dart';
@@ -123,6 +124,7 @@ class _MarketplacePassengerFormScreenState
 
   /// Auto-fill all seats with first passenger's Name & Phone (Bus only).
   void _autofill() {
+    final loc = AppLocalizations.of(context)!;
     final srcName = _controllers.first.nameController.text.trim();
     final srcPhone = _controllers.first.phoneController.text.trim();
 
@@ -130,14 +132,14 @@ class _MarketplacePassengerFormScreenState
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Row(
-            children: const [
-              Icon(Icons.warning_amber_rounded, color: Colors.white, size: 18),
-              SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  'Please fill in Name and Phone for the first passenger first.',
-                ),
+            children: [
+              const Icon(
+                Icons.warning_amber_rounded,
+                color: Colors.white,
+                size: 18,
               ),
+              const SizedBox(width: 8),
+              Expanded(child: Text(loc.fillNamePhoneFirst)),
             ],
           ),
           backgroundColor: Colors.orange.shade700,
@@ -161,7 +163,7 @@ class _MarketplacePassengerFormScreenState
             const SizedBox(width: 8),
             Expanded(
               child: Text(
-                'Filled ${_controllers.length - 1} seat(s) with "$srcName"',
+                loc.filledNSeats('${_controllers.length - 1}', srcName),
               ),
             ),
           ],
@@ -251,7 +253,11 @@ class _MarketplacePassengerFormScreenState
           ],
           child: Column(
             children: [
-              PassengerFormAppBar(subtitle: isTrain ? 'Train' : 'Bus'),
+              PassengerFormAppBar(
+                subtitle: isTrain
+                    ? AppLocalizations.of(context)!.train
+                    : AppLocalizations.of(context)!.bus,
+              ),
               Expanded(
                 child: Form(
                   key: _formKey,
@@ -315,6 +321,7 @@ class _TransportBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       decoration: BoxDecoration(
@@ -343,7 +350,7 @@ class _TransportBadge extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  isTrain ? 'Train Booking' : 'Bus Booking',
+                  isTrain ? loc.trainBooking : loc.busBooking,
                   style: TextStyle(
                     color: isTrain
                         ? ColorsManager.accentCyan
@@ -355,8 +362,8 @@ class _TransportBadge extends StatelessWidget {
                 const SizedBox(height: 2),
                 Text(
                   isTrain
-                      ? 'Name, ID type & number required for each passenger'
-                      : 'Name & phone number required for each passenger',
+                      ? loc.trainPassengerRequirements
+                      : loc.busPassengerRequirements,
                   style: const TextStyle(color: Colors.white54, fontSize: 11),
                 ),
               ],
@@ -392,12 +399,15 @@ class _FormBottomButtons extends StatelessWidget {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        'Total Price',
-                        style: TextStyle(color: Colors.white54, fontSize: 12),
+                      Text(
+                        AppLocalizations.of(context)!.totalPrice,
+                        style: const TextStyle(
+                          color: Colors.white54,
+                          fontSize: 12,
+                        ),
                       ),
                       Text(
-                        '$totalPrice EGP',
+                        '${totalPrice.toStringAsFixed(0)} ${AppLocalizations.of(context)!.egp}',
                         style: const TextStyle(
                           color: ColorsManager.successGreen,
                           fontSize: 20,
@@ -428,9 +438,9 @@ class _FormBottomButtons extends StatelessWidget {
                                 color: Colors.white,
                               ),
                             )
-                          : const Text(
-                              'Buy Now',
-                              style: TextStyle(
+                          : Text(
+                              AppLocalizations.of(context)!.buyNow,
+                              style: const TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold,
                                 fontSize: 16,
