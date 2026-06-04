@@ -380,6 +380,12 @@ abstract class AppLocalizations {
   /// **'Recent Searches'**
   String get recentSearches;
 
+  /// No description provided for @noRecentSearches.
+  ///
+  /// In en, this message translates to:
+  /// **'No recent searches'**
+  String get noRecentSearches;
+
   /// No description provided for @myTickets.
   ///
   /// In en, this message translates to:
@@ -1573,6 +1579,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Damietta'**
   String get gov_Damietta;
+
+  /// No description provided for @gov_Matrouh.
+  ///
+  /// In en, this message translates to:
+  /// **'Matrouh'**
+  String get gov_Matrouh;
+
+  /// No description provided for @gov_PortSaid.
+  ///
+  /// In en, this message translates to:
+  /// **'Port Said'**
+  String get gov_PortSaid;
 
   /// No description provided for @challenges.
   ///
@@ -2923,6 +2941,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'One or more selected seats were just taken. Please refresh the seat map.'**
   String get seatsTakenError;
+
+  /// No description provided for @chooseCompany.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose Company'**
+  String get chooseCompany;
+
+  /// No description provided for @allCompanies.
+  ///
+  /// In en, this message translates to:
+  /// **'All companies'**
+  String get allCompanies;
+
+  /// No description provided for @arrivalTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Arrival Time'**
+  String get arrivalTime;
 }
 
 class _AppLocalizationsDelegate

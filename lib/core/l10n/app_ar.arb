@@ -46,6 +46,7 @@
   "signOutBtn": "تسجيل الخروج",
   "language": "اللغة",
   "recentSearches": "البحث الأخير",
+  "noRecentSearches": "لا توجد عمليات بحث سابقة",
   "myTickets": "تذاكري",
   "digitalWallet": "محفظة رحلاتك الرقمية",
   "tabUpcoming": "القادمة",
@@ -245,6 +246,8 @@
   "gov_Ismailia": "الإسماعيلية",
   "gov_Suez": "السويس",
   "gov_Damietta": "دمياط",
+  "gov_Matrouh": "مطروح",
+  "gov_PortSaid": "بورسعيد",
   "challenges": "التحديات",
   "pointsHistory": "سجل النقاط",
   "noChallengesFound": "لا توجد تحديات.",
@@ -651,5 +654,10 @@
   "checkoutFailed": "فشل إتمام الدفع",
   "ticketAddedButCheckoutFailed": "تمت إضافة التذكرة إلى السلة، ولكن فشل إتمام الدفع: {error}",
   "originalPrice": "السعر الأصلي: {price} {currency}",
-  "seatsTakenError": "تم حجز واحد أو أكثر من المقاعد المختارة للتو. يرجى تحديث خريطة المقاعد."
+  "seatsTakenError": "تم حجز واحد أو أكثر من المقاعد المختارة للتو. يرجى تحديث خريطة المقاعد.",
+  "chooseCompany": "اختر الشركة",
+  "allCompanies": "كل الشركات",
+  "from": "من",
+  "to": "إلى",
+  "arrivalTime": "وقت الوصول"
 }

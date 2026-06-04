@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:transportation_app/core/helper/extensions.dart';
 import 'package:transportation_app/core/l10n/app_localizations.dart';
 import 'package:transportation_app/core/theming/colors.dart';
 import 'package:transportation_app/features/my_tickets/presentation/cubit/marketplace_cubit.dart';
@@ -109,12 +110,14 @@ class _ResellTicketsScreenState extends State<ResellTicketsScreen> {
                 );
               }
               // Only upcoming + confirmed + NOT a marketplace purchase
+              // + refund must NOT be in progress or accepted
               final resellableTickets = allTickets
                   .where(
                     (t) =>
                         t.isUpcoming &&
                         !t.isMarketplacePurchase &&
-                        t.status == 'Confirmed',
+                        t.status == 'Confirmed' &&
+                        (t.refundStatus == null || t.refundStatus == 'Rejected'),
                   )
                   .toList();
               debugPrint('Resellable count: ${resellableTickets.length}');
@@ -598,99 +601,123 @@ class _ResellTicketCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Route
-                Row(
-                  children: [
-                    Expanded(
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Flexible(
-                            child: Text(
-                              ticket.originGovernorate,
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 15,
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                          if (ticket.originStation.isNotEmpty && ticket.originStation != ticket.originGovernorate) ...[
-                            const Text(
-                              ' - ',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 15,
-                              ),
-                            ),
-                            Flexible(
-                              child: Text(
-                                ticket.originStation,
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 15,
+                Builder(
+                  builder: (context) {
+                    final isAr = context.isArabic;
+                    final originGov = isAr
+                        ? (ticket.originGovernorateAr ?? ticket.originGovernorate)
+                        : ticket.originGovernorate;
+                    final originStation = isAr
+                        ? (ticket.originStationNameAr ?? ticket.originStation)
+                        : ticket.originStation;
+                    final destGov = isAr
+                        ? (ticket.destinationGovernorateAr ?? ticket.destinationGovernorate)
+                        : ticket.destinationGovernorate;
+                    final destStation = isAr
+                        ? (ticket.destinationStationNameAr ?? ticket.destinationStation)
+                        : ticket.destinationStation;
+
+                    // Show station only when it meaningfully differs from the governorate
+                    final showOriginStation = originStation.isNotEmpty &&
+                        originStation.toLowerCase() != originGov.toLowerCase();
+                    final showDestStation = destStation.isNotEmpty &&
+                        destStation.toLowerCase() != destGov.toLowerCase();
+
+                    return Row(
+                      children: [
+                        Expanded(
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Flexible(
+                                child: Text(
+                                  originGov,
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 15,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
                                 ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
                               ),
-                            ),
-                          ],
-                        ],
-                      ),
-                    ),
-                    const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 8),
-                      child: Icon(
-                        Icons.arrow_forward,
-                        color: ColorsManager.accentCyan,
-                        size: 16,
-                      ),
-                    ),
-                    Expanded(
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Flexible(
-                            child: Text(
-                              ticket.destinationGovernorate,
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 15,
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                          if (ticket.destinationStation.isNotEmpty && ticket.destinationStation != ticket.destinationGovernorate) ...[
-                            const Text(
-                              ' - ',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 15,
-                              ),
-                            ),
-                            Flexible(
-                              child: Text(
-                                ticket.destinationStation,
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 15,
+                              if (showOriginStation) ...[
+                                const Text(
+                                  ' - ',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 15,
+                                  ),
                                 ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
+                                Flexible(
+                                  child: Text(
+                                    originStation,
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 15,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
+                            ],
+                          ),
+                        ),
+                        const Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 8),
+                          child: Icon(
+                            Icons.arrow_forward,
+                            color: ColorsManager.accentCyan,
+                            size: 16,
+                          ),
+                        ),
+                        Expanded(
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Flexible(
+                                child: Text(
+                                  destGov,
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 15,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
                               ),
-                            ),
-                          ],
-                        ],
-                      ),
-                    ),
-                  ],
+                              if (showDestStation) ...[
+                                const Text(
+                                  ' - ',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 15,
+                                  ),
+                                ),
+                                Flexible(
+                                  child: Text(
+                                    destStation,
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 15,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
+                            ],
+                          ),
+                        ),
+                      ],
+                    );
+                  },
                 ),
                 const SizedBox(height: 8),
 

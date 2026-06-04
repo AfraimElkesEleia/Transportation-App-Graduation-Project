@@ -1,0 +1,23 @@
+Alexandria -> الإسكندرية
+Assiut -> أسيوط
+Aswan -> أسوان
+Beheira -> البحيرة
+Beni Suef -> بني سويف
+Cairo -> القاهرة
+Dakahlia -> الدقهلية
+Damietta -> دمياط
+Fayoum -> الفيوم
+Gharbia -> الغربية
+Giza -> الجيزة
+Ismailia -> الإسماعيلية
+Kafr El Sheikh -> كفر الشيخ
+Luxor -> الأقصر
+Matrouh -> مطروح
+Minya -> المنيا
+Monufia -> المنوفية
+Port Said -> بورسعيد
+Qalyubia -> القليوبية
+Qena -> قنا
+Sharqia -> الشرقية
+Sohag -> سوهاج
+Suez -> السويس

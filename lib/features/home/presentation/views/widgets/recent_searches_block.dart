@@ -7,6 +7,8 @@ import 'package:transportation_app/features/home/domain/entities/search_params.d
 import 'package:transportation_app/features/search/data/models/recent_search_model.dart';
 import 'package:transportation_app/features/search/data/datasources/recent_search_local_data_source.dart';
 import 'package:transportation_app/core/di/injection_container.dart';
+import 'package:transportation_app/core/l10n/app_localizations.dart';
+import 'package:transportation_app/core/helper/extensions.dart';
 
 class RecentSearchesList extends StatelessWidget {
   const RecentSearchesList({super.key});
@@ -23,7 +25,7 @@ class RecentSearchesList extends StatelessWidget {
           return Padding(
             padding: const EdgeInsets.symmetric(vertical: 16),
             child: Text(
-              "No recent searches",
+              AppLocalizations.of(context)!.noRecentSearches,
               style: AppStyles.regular15White(
                 context,
               ).copyWith(color: Colors.white70),
@@ -98,12 +100,16 @@ class RecentSearchItem extends StatelessWidget {
   }
 
   ListTile recentSearchesItem(BuildContext context) {
+    final from = search.fromDisplayName.toLocalizedGov(context).toLocalizedStation(context);
+    final to = search.toDisplayName.toLocalizedGov(context).toLocalizedStation(context);
     final routeText = search.isRoundTrip
-        ? "${search.fromDisplayName} <-> ${search.toDisplayName}"
-        : "${search.fromDisplayName} -> ${search.toDisplayName}";
+        ? "$from <-> $to"
+        : "$from -> $to";
 
+    final isAr = context.isArabic;
+    final toWord = isAr ? "إلى" : "to";
     final dateText = search.isRoundTrip && search.returnDate != null
-        ? "${search.travelDate} to ${search.returnDate}"
+        ? "${search.travelDate} $toWord ${search.returnDate}"
         : search.travelDate;
 
     return ListTile(

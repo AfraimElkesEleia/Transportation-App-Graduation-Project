@@ -194,10 +194,16 @@ class _TicketDetailsScreenState extends State<TicketDetailsScreen> {
       builder: (context, state) {
         final isRequesting = state is RefundRequestingState;
 
-        // Show refund button only for confirmed upcoming trips or if refund is requested/accepted/rejected
+        // Show refund button only for confirmed upcoming trips
+        // Disabled when: refund already in progress/accepted, ticket is listed
+        // on the marketplace, or it was purchased from the marketplace.
         final canRequestRefund =
             _ticket.boardingTime.isAfter(DateTime.now()) &&
-            (_ticket.status == 'Confirmed' || _ticket.refundStatus != null);
+            (_ticket.status == 'Confirmed' || _ticket.refundStatus != null) &&
+            !_ticket.isMarketplacePurchase;
+
+        // Locked because the ticket is currently listed for resale
+        final isLockedByResale = _ticket.isOfferedForResale;
 
         return Scaffold(
           backgroundColor: ColorsManager.darkBlue,
@@ -470,6 +476,7 @@ class _TicketDetailsScreenState extends State<TicketDetailsScreen> {
                       l10n: l10n,
                       isRequesting: isRequesting,
                       refundStatus: _ticket.refundStatus,
+                      isLockedByResale: isLockedByResale,
                       onPressed: () async {
                         final confirmed = await _showRefundConfirmDialog(l10n);
                         if (confirmed && context.mounted) {
@@ -621,19 +628,22 @@ class _RefundButton extends StatelessWidget {
   final AppLocalizations l10n;
   final bool isRequesting;
   final String? refundStatus;
+  /// True when the ticket is currently listed on the resale marketplace.
+  final bool isLockedByResale;
   final VoidCallback onPressed;
 
   const _RefundButton({
     required this.l10n,
     required this.isRequesting,
     this.refundStatus,
+    this.isLockedByResale = false,
     required this.onPressed,
   });
 
   @override
   Widget build(BuildContext context) {
     final hasStatus = refundStatus == 'Requested' || refundStatus == 'Accepted' || refundStatus == 'Approved' || refundStatus == 'Rejected';
-    final isDisabled = hasStatus || isRequesting;
+    final isDisabled = hasStatus || isRequesting || isLockedByResale;
 
     return AnimatedContainer(
       duration: const Duration(milliseconds: 300),
@@ -726,6 +736,21 @@ class _RefundButton extends StatelessWidget {
                     l10n.refundAlreadyRequested,
                     style: const TextStyle(
                       color: Colors.white54,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 15,
+                    ),
+                  ),
+                ] else if (isLockedByResale) ...[
+                  const Icon(
+                    Icons.storefront,
+                    color: Colors.orange,
+                    size: 20,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    l10n.listedOnMarketplace,
+                    style: const TextStyle(
+                      color: Colors.orange,
                       fontWeight: FontWeight.w600,
                       fontSize: 15,
                     ),

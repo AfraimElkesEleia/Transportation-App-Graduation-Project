@@ -150,6 +150,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get recentSearches => 'Recent Searches';
 
   @override
+  String get noRecentSearches => 'No recent searches';
+
+  @override
   String get myTickets => 'My Tickets';
 
   @override
@@ -779,6 +782,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get gov_Damietta => 'Damietta';
+
+  @override
+  String get gov_Matrouh => 'Matrouh';
+
+  @override
+  String get gov_PortSaid => 'Port Said';
 
   @override
   String get challenges => 'Challenges';
@@ -1535,4 +1544,13 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get seatsTakenError =>
       'One or more selected seats were just taken. Please refresh the seat map.';
+
+  @override
+  String get chooseCompany => 'Choose Company';
+
+  @override
+  String get allCompanies => 'All companies';
+
+  @override
+  String get arrivalTime => 'Arrival Time';
 }

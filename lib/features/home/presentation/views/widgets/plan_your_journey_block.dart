@@ -215,6 +215,12 @@ class _PlanYourJourneyBlockState extends State<PlanYourJourneyBlock>
     final toDisplay =
         _selectedToStation?.englishName ?? _selectedToGroup!.governorate;
 
+    // Arabic display names — used when app is in Arabic mode
+    final fromDisplayAr =
+        _selectedFromStation?.arabicName ?? _selectedFromGroup!.governorateAr;
+    final toDisplayAr =
+        _selectedToStation?.arabicName ?? _selectedToGroup!.governorateAr;
+
     return SearchParams(
       isRoundTrip: _isRoundTrip,
       travelDate: _formatDateForApi(dateController.text),
@@ -225,6 +231,8 @@ class _PlanYourJourneyBlockState extends State<PlanYourJourneyBlock>
       transport: _apiTransportValue,
       fromDisplayName: fromDisplay,
       toDisplayName: toDisplay,
+      fromDisplayNameAr: fromDisplayAr,
+      toDisplayNameAr: toDisplayAr,
       fromStationId: _selectedFromStation?.id,
       fromGovernorate: _selectedFromStation == null
           ? _selectedFromGroup!.governorate

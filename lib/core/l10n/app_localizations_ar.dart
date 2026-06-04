@@ -150,6 +150,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get recentSearches => 'البحث الأخير';
 
   @override
+  String get noRecentSearches => 'لا توجد عمليات بحث سابقة';
+
+  @override
   String get myTickets => 'تذاكري';
 
   @override
@@ -778,6 +781,12 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get gov_Damietta => 'دمياط';
+
+  @override
+  String get gov_Matrouh => 'مطروح';
+
+  @override
+  String get gov_PortSaid => 'بورسعيد';
 
   @override
   String get challenges => 'التحديات';
@@ -1530,4 +1539,13 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get seatsTakenError =>
       'تم حجز واحد أو أكثر من المقاعد المختارة للتو. يرجى تحديث خريطة المقاعد.';
+
+  @override
+  String get chooseCompany => 'اختر الشركة';
+
+  @override
+  String get allCompanies => 'كل الشركات';
+
+  @override
+  String get arrivalTime => 'وقت الوصول';
 }

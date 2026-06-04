@@ -46,6 +46,7 @@
   "signOutBtn": "Sign Out",
   "language": "Language",
   "recentSearches": "Recent Searches",
+  "noRecentSearches": "No recent searches",
   "myTickets": "My Tickets",
   "digitalWallet": "Your digital travel wallet",
   "tabUpcoming": "Upcoming",
@@ -341,6 +342,8 @@
   "gov_Ismailia": "Ismailia",
   "gov_Suez": "Suez",
   "gov_Damietta": "Damietta",
+  "gov_Matrouh": "Matrouh",
+  "gov_PortSaid": "Port Said",
   "challenges": "Challenges",
   "pointsHistory": "Points History",
   "noChallengesFound": "No challenges found.",
@@ -798,5 +801,10 @@
       }
     }
   },
-  "seatsTakenError": "One or more selected seats were just taken. Please refresh the seat map."
+  "seatsTakenError": "One or more selected seats were just taken. Please refresh the seat map.",
+  "chooseCompany": "Choose Company",
+  "allCompanies": "All companies",
+  "from": "From",
+  "to": "To",
+  "arrivalTime": "Arrival Time"
 }

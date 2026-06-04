@@ -96,7 +96,6 @@ class _HomeContent extends StatelessWidget {
                   ),
                 ),
               ),
-              SliverToBoxAdapter(child: LatestNewsBlock()),
             ],
           ),
         );

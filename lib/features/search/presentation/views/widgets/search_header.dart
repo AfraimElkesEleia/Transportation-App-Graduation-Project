@@ -17,10 +17,24 @@ class SearchHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isAr = context.isArabic;
+
+    // Arabic: prefer the stored Arabic name (station or gov) directly.
+    // English: apply toLocalizedGov + toLocalizedStation extensions.
     final fromRaw = params?.fromDisplayName ?? '—';
-    final from = fromRaw == '—' ? '—' : fromRaw.toLocalizedGov(context).toLocalizedStation(context);
+    final from = fromRaw == '—'
+        ? '—'
+        : (isAr && params?.fromDisplayNameAr != null)
+            ? params!.fromDisplayNameAr!
+            : fromRaw.toLocalizedGov(context).toLocalizedStation(context);
+
     final toRaw = params?.toDisplayName ?? '—';
-    final to = toRaw == '—' ? '—' : toRaw.toLocalizedGov(context).toLocalizedStation(context);
+    final to = toRaw == '—'
+        ? '—'
+        : (isAr && params?.toDisplayNameAr != null)
+            ? params!.toDisplayNameAr!
+            : toRaw.toLocalizedGov(context).toLocalizedStation(context);
+
     final date = params?.travelDate ?? '';
 
     return Padding(

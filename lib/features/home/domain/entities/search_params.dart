@@ -41,6 +41,9 @@ class SearchParams extends Equatable {
   final int passengers;
   final String fromDisplayName;
   final String toDisplayName;
+  /// Arabic display name — shown when app is in Arabic locale.
+  final String? fromDisplayNameAr;
+  final String? toDisplayNameAr;
   final String? fromGovernorate;
   final int? fromStationId;
 
@@ -65,6 +68,8 @@ class SearchParams extends Equatable {
     required this.passengers,
     required this.toDisplayName,
     required this.fromDisplayName,
+    this.fromDisplayNameAr,
+    this.toDisplayNameAr,
     this.fromGovernorate,
     this.fromStationId,
     this.toGovernorate,
@@ -120,6 +125,7 @@ class SearchParams extends Equatable {
     if (transport != TransportType.all) n++;
     if (sortBy != SortBy.departureTime) n++;
     if (hasTimeFilters) n++;
+    if (preferredAgencies.isNotEmpty) n++;
     return n;
   }
 
@@ -147,6 +153,8 @@ class SearchParams extends Equatable {
       passengers: passengers ?? this.passengers,
       toDisplayName: toDisplayName,
       fromDisplayName: fromDisplayName,
+      fromDisplayNameAr: fromDisplayNameAr,
+      toDisplayNameAr: toDisplayNameAr,
       fromGovernorate: fromGovernorate,
       fromStationId: fromStationId,
       toGovernorate: toGovernorate,

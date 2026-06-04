@@ -31,9 +31,10 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
       vsync: this,
       duration: const Duration(milliseconds: 600),
     );
-    _bounceAnim = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _bounceCtrl, curve: Curves.elasticOut),
-    );
+    _bounceAnim = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _bounceCtrl, curve: Curves.elasticOut));
   }
 
   @override
@@ -46,8 +47,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
   void _submit() {
     if (!(_formKey.currentState?.validate() ?? false)) return;
     context.read<PasswordCubit>().forgotPassword(
-          email: _emailController.text.trim(),
-        );
+      email: _emailController.text.trim(),
+    );
   }
 
   @override
@@ -107,7 +108,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
                             end: Alignment.bottomRight,
                           ),
                           border: Border.all(
-                            color: ColorsManager.accentCyan.withValues(alpha: 0.4),
+                            color: ColorsManager.accentCyan.withValues(
+                              alpha: 0.4,
+                            ),
                             width: 1.5,
                           ),
                         ),
@@ -153,7 +156,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
                       icon: FontAwesomeIcons.circleCheck,
                       iconColor: ColorsManager.successGreen,
                       borderColor: ColorsManager.successGreen,
-                      bgColor: ColorsManager.successGreen.withValues(alpha: 0.08),
+                      bgColor: ColorsManager.successGreen.withValues(
+                        alpha: 0.08,
+                      ),
                       title: l10n.emailSentTitle,
                       message: l10n.emailSentMessage,
                     ),
@@ -198,8 +203,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
                       onPressed: isLoading ? null : _submit,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: ColorsManager.cyanBlue,
-                        disabledBackgroundColor:
-                            ColorsManager.cyanBlue.withValues(alpha: 0.5),
+                        disabledBackgroundColor: ColorsManager.cyanBlue
+                            .withValues(alpha: 0.5),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16),
                         ),
@@ -229,7 +234,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
                                     color: Colors.white,
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,
-                                    fontFamily: GoogleFonts.poppins().fontFamily,
+                                    fontFamily:
+                                        GoogleFonts.poppins().fontFamily,
                                   ),
                                 ),
                               ],
