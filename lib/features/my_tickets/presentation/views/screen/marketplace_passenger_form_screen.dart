@@ -8,6 +8,9 @@ import 'package:transportation_app/features/booking/presentation/views/widgets/p
 import 'package:transportation_app/features/booking/presentation/views/widgets/passenger_form/passenger_form_controllers.dart';
 import 'package:transportation_app/features/my_tickets/presentation/cubit/marketplace_cubit.dart';
 import 'package:transportation_app/features/my_tickets/presentation/cubit/marketplace_states.dart';
+import 'package:transportation_app/features/profile/domain/entities/profile_entity.dart';
+import 'package:transportation_app/features/profile/presentation/cubit/profile_cubit/profile_cubit.dart';
+import 'package:transportation_app/features/profile/presentation/cubit/profile_cubit/profile_states.dart';
 
 class MarketplacePassengerFormScreen extends StatefulWidget {
   final Map<String, dynamic> item;
@@ -42,10 +45,42 @@ class _MarketplacePassengerFormScreenState
     );
     _controllers.first.nameController.addListener(_onFirstChanged);
     _controllers.first.phoneController.addListener(_onFirstChanged);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final profileState = context.read<ProfileCubit>().state;
+      if (profileState is ProfileLoaded) {
+        _prefillFromProfile(profileState.profile);
+      }
+    });
   }
 
   void _onFirstChanged() {
     if (_autofilled) setState(() => _autofilled = false);
+  }
+
+  void _prefillFromProfile(ProfileEntity profile) {
+    if (_controllers.isEmpty) return;
+
+    final first = _controllers.first;
+    if (first.nameController.text.trim().isEmpty) {
+      first.nameController.text = profile.fullName;
+    }
+    if (first.phoneController.text.trim().isEmpty) {
+      first.phoneController.text = profile.phoneNumber;
+    }
+    if (isTrain && profile.idNumber != null && profile.idNumber!.isNotEmpty) {
+      if (first.idController.text.trim().isEmpty) {
+        first.idController.text = profile.idNumber!;
+      }
+      if (profile.idType != null) {
+        setState(() {
+          first.selectedIdType = profile.idType == 2
+              ? 'Passport'
+              : 'NationalId';
+        });
+      }
+    }
   }
 
   @override
@@ -167,42 +202,53 @@ class _MarketplacePassengerFormScreenState
     return Scaffold(
       backgroundColor: ColorsManager.seatBg,
       body: SafeArea(
-        child: BlocListener<MarketplaceCubit, MarketplaceState>(
-          listener: (context, state) {
-            if (state is MarketplaceBoughtState) {
-              Navigator.pop(context); // Go back to marketplace
-            } else if (state is MarketplaceBuyErrorState) {
-              ScaffoldMessenger.of(context)
-                ..hideCurrentSnackBar()
-                ..showSnackBar(
-                  SnackBar(
-                    content: Row(
-                      children: [
-                        const Icon(
-                          Icons.error_outline,
-                          color: Colors.white,
-                          size: 18,
+        child: MultiBlocListener(
+          listeners: [
+            BlocListener<MarketplaceCubit, MarketplaceState>(
+              listener: (context, state) {
+                if (state is MarketplaceBoughtState) {
+                  Navigator.pop(context); // Go back to marketplace
+                } else if (state is MarketplaceBuyErrorState) {
+                  ScaffoldMessenger.of(context)
+                    ..hideCurrentSnackBar()
+                    ..showSnackBar(
+                      SnackBar(
+                        content: Row(
+                          children: [
+                            const Icon(
+                              Icons.error_outline,
+                              color: Colors.white,
+                              size: 18,
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Text(
+                                state.message,
+                                style: const TextStyle(color: Colors.white),
+                              ),
+                            ),
+                          ],
                         ),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: Text(
-                            state.message,
-                            style: const TextStyle(color: Colors.white),
-                          ),
+                        backgroundColor: const Color(0xFFB00020),
+                        behavior: SnackBarBehavior.floating,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
                         ),
-                      ],
-                    ),
-                    backgroundColor: const Color(0xFFB00020),
-                    behavior: SnackBarBehavior.floating,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    margin: const EdgeInsets.all(16),
-                    duration: const Duration(seconds: 4),
-                  ),
-                );
-            }
-          },
+                        margin: const EdgeInsets.all(16),
+                        duration: const Duration(seconds: 4),
+                      ),
+                    );
+                }
+              },
+            ),
+            BlocListener<ProfileCubit, ProfileState>(
+              listener: (context, state) {
+                if (state is ProfileLoaded) {
+                  _prefillFromProfile(state.profile);
+                }
+              },
+            ),
+          ],
           child: Column(
             children: [
               PassengerFormAppBar(subtitle: isTrain ? 'Train' : 'Bus'),
