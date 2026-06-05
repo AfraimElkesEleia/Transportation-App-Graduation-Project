@@ -764,5 +764,12 @@
   "identityDetails": "تفاصيل الهوية",
   "identityDetailsWarning": "بمجرد التعيين، لا يمكن تغيير تفاصيل الهوية. يرجى التأكد من صحة البيانات المدخلة.",
   "nationalIdRequired": "الرقم القومي مطلوب.",
-  "passportNumberRequired": "رقم جواز السفر مطلوب."
+  "passportNumberRequired": "رقم جواز السفر مطلوب.",
+  "gender": "الجنس",
+  "genderMale": "ذكر",
+  "genderFemale": "أنثى",
+  "enterPhoneNumber": "أدخل رقم الهاتف",
+  "selectCountryCode": "اختر رمز الدولة",
+  "searchCountryOrCode": "البحث عن الدولة أو الرمز...",
+  "selectDate": "اختر التاريخ"
 }

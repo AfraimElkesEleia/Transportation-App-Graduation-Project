@@ -1721,4 +1721,25 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get passportNumberRequired => 'رقم جواز السفر مطلوب.';
+
+  @override
+  String get gender => 'الجنس';
+
+  @override
+  String get genderMale => 'ذكر';
+
+  @override
+  String get genderFemale => 'أنثى';
+
+  @override
+  String get enterPhoneNumber => 'أدخل رقم الهاتف';
+
+  @override
+  String get selectCountryCode => 'اختر رمز الدولة';
+
+  @override
+  String get searchCountryOrCode => 'البحث عن الدولة أو الرمز...';
+
+  @override
+  String get selectDate => 'اختر التاريخ';
 }

@@ -3271,6 +3271,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Passport number is required.'**
   String get passportNumberRequired;
+
+  /// No description provided for @gender.
+  ///
+  /// In en, this message translates to:
+  /// **'Gender'**
+  String get gender;
+
+  /// No description provided for @genderMale.
+  ///
+  /// In en, this message translates to:
+  /// **'Male'**
+  String get genderMale;
+
+  /// No description provided for @genderFemale.
+  ///
+  /// In en, this message translates to:
+  /// **'Female'**
+  String get genderFemale;
+
+  /// No description provided for @enterPhoneNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter phone number'**
+  String get enterPhoneNumber;
+
+  /// No description provided for @selectCountryCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Country Code'**
+  String get selectCountryCode;
+
+  /// No description provided for @searchCountryOrCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Search country or code...'**
+  String get searchCountryOrCode;
+
+  /// No description provided for @selectDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Select date'**
+  String get selectDate;
 }
 
 class _AppLocalizationsDelegate

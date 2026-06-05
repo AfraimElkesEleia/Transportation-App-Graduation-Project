@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:transportation_app/core/l10n/app_localizations.dart';
 
 enum Gender {
   male(0),
@@ -6,6 +7,16 @@ enum Gender {
 
   const Gender(this.value);
   final int value;
+
+  String getLocalizedLabel(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    switch (this) {
+      case Gender.male:
+        return l10n.genderMale;
+      case Gender.female:
+        return l10n.genderFemale;
+    }
+  }
 
   String get label {
     switch (this) {

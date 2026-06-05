@@ -1730,4 +1730,25 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get passportNumberRequired => 'Passport number is required.';
+
+  @override
+  String get gender => 'Gender';
+
+  @override
+  String get genderMale => 'Male';
+
+  @override
+  String get genderFemale => 'Female';
+
+  @override
+  String get enterPhoneNumber => 'Enter phone number';
+
+  @override
+  String get selectCountryCode => 'Select Country Code';
+
+  @override
+  String get searchCountryOrCode => 'Search country or code...';
+
+  @override
+  String get selectDate => 'Select date';
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:transportation_app/core/l10n/app_localizations.dart';
 
 class AppDatePickerField extends StatelessWidget {
   const AppDatePickerField({
@@ -64,7 +65,7 @@ class AppDatePickerField extends StatelessWidget {
                 const SizedBox(width: 14),
                 Expanded(
                   child: Text(
-                    formatted ?? 'Select date',
+                    formatted ?? AppLocalizations.of(context)!.selectDate,
                     style: TextStyle(
                       color: formatted != null
                           ? Colors.white

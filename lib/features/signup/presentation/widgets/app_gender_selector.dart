@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:transportation_app/core/l10n/app_localizations.dart';
 import 'package:transportation_app/features/signup/presentation/widgets/gender.dart';
 
 class AppGenderSelector extends StatelessWidget {
@@ -16,12 +17,13 @@ class AppGenderSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // ── Label ─────────────────────────────
         Text(
-          'Gender',
+          l10n.gender,
           style: TextStyle(
             color: Colors.white,
             fontSize: 14,
@@ -114,7 +116,7 @@ class _GenderChip extends StatelessWidget {
             Icon(gender.icon, color: Colors.white, size: 20),
             const SizedBox(width: 8),
             Text(
-              gender.label,
+              gender.getLocalizedLabel(context),
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 14,

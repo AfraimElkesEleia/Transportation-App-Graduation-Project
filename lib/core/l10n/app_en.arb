@@ -911,5 +911,12 @@
   "identityDetails": "Identity Details",
   "identityDetailsWarning": "Once set, identity details cannot be changed. Please make sure the entered details are correct.",
   "nationalIdRequired": "National ID is required.",
-  "passportNumberRequired": "Passport number is required."
+  "passportNumberRequired": "Passport number is required.",
+  "gender": "Gender",
+  "genderMale": "Male",
+  "genderFemale": "Female",
+  "enterPhoneNumber": "Enter phone number",
+  "selectCountryCode": "Select Country Code",
+  "searchCountryOrCode": "Search country or code...",
+  "selectDate": "Select date"
 }
