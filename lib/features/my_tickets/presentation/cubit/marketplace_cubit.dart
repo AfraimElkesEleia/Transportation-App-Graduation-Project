@@ -90,9 +90,15 @@ class MarketplaceCubit extends Cubit<MarketplaceState> {
     });
   }
 
-  Future<void> buyTicket(int listingId, List<Map<String, dynamic>> passengers) async {
+  Future<void> buyTicket(
+    int listingId,
+    List<Map<String, dynamic>> passengers,
+  ) async {
     emit(MarketplaceBuyingState());
-    final result = await repository.buyTicket(listingId: listingId, passengers: passengers);
+    final result = await repository.buyTicket(
+      listingId: listingId,
+      passengers: passengers,
+    );
     if (isClosed) return;
     result.fold(
       (failure) => emit(MarketplaceBuyErrorState(failure.message)),

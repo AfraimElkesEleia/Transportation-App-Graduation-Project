@@ -8,7 +8,7 @@ import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:transportation_app/features/my_tickets/presentation/views/widgets/boarding_pass_helpers.dart';
-import 'package:transportation_app/features/profile/domain/entities/ticket_entity.dart';
+import 'package:transportation_app/features/my_tickets/domain/entities/ticket_entity.dart';
 
 class BoardingPassPdfService {
   final TicketEntity ticket;

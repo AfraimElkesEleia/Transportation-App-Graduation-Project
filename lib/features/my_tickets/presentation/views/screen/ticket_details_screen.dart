@@ -5,7 +5,7 @@ import 'package:transportation_app/core/theming/colors.dart';
 import 'package:transportation_app/features/my_tickets/presentation/cubit/my_tickets_cubit.dart';
 import 'package:transportation_app/features/my_tickets/presentation/cubit/my_tickets_states.dart';
 import 'package:transportation_app/features/my_tickets/presentation/views/widgets/boarding_pass_sheet.dart';
-import 'package:transportation_app/features/profile/domain/entities/ticket_entity.dart';
+import 'package:transportation_app/features/my_tickets/domain/entities/ticket_entity.dart';
 import 'package:transportation_app/core/helper/extensions.dart';
 import 'package:transportation_app/core/l10n/app_localizations.dart';
 
@@ -292,8 +292,10 @@ class _TicketDetailsScreenState extends State<TicketDetailsScreen> {
                                   ),
                                 ),
                                 Text(
-                                  (_ticket.originGovernorateAr ??
-                                          _ticket.originGovernorate)
+                                  (context.isArabic
+                                          ? (_ticket.originGovernorateAr ??
+                                                _ticket.originGovernorate)
+                                          : _ticket.originGovernorate)
                                       .toLocalizedGov(context),
                                   style: const TextStyle(
                                     color: Colors.white,
@@ -331,8 +333,10 @@ class _TicketDetailsScreenState extends State<TicketDetailsScreen> {
                                   ),
                                 ),
                                 Text(
-                                  (_ticket.destinationGovernorateAr ??
-                                          _ticket.destinationGovernorate)
+                                  (context.isArabic
+                                          ? (_ticket.destinationGovernorateAr ??
+                                                _ticket.destinationGovernorate)
+                                          : _ticket.destinationGovernorate)
                                       .toLocalizedGov(context),
                                   style: const TextStyle(
                                     color: Colors.white,

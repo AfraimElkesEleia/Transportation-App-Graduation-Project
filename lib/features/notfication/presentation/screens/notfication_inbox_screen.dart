@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:transportation_app/core/l10n/app_localizations.dart';
 import 'package:transportation_app/core/theming/colors.dart';
 import 'package:transportation_app/core/widgets/basic_container.dart';
 import 'package:transportation_app/features/notfication/domain/entities/app_notfication.dart';
@@ -106,7 +107,7 @@ class _NotificationList extends StatelessWidget {
                     child: Padding(
                       padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
                       child: NotificationSectionHeader(
-                        label: entry.key,
+                        label: _sectionLabel(context, entry.key),
                         count: entry.value.length,
                       ),
                     ),
@@ -118,17 +119,15 @@ class _NotificationList extends StatelessWidget {
                         final notif = entry.value[i];
                         return NotificationCard(
                           notification: notif,
-                          onTap: () => _onTap(context, notif),
-                          onDismiss: () => context
-                              .read<NotificationCubit>()
-                              .dismiss(notif.id),
+                          onTap: notif.isRead
+                              ? null
+                              : () => _onTap(context, notif),
                         );
                       }, childCount: entry.value.length),
                     ),
                   ),
                   const SliverToBoxAdapter(child: SizedBox(height: 6)),
                 ],
-                const SliverToBoxAdapter(child: _SwipeHint()),
                 const SliverToBoxAdapter(child: SizedBox(height: 24)),
               ],
             ),
@@ -153,38 +152,16 @@ class _NotificationList extends StatelessWidget {
       case NotificationType.gamification:
         // Navigator.of(context).pushNamed(AppRoutes.pr);
         break;
+      case NotificationType.general:
+        break;
     }
   }
-}
 
-// ─── Swipe hint ───────────────────────────────────────────────────────────────
-
-class _SwipeHint extends StatelessWidget {
-  const _SwipeHint();
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.swipe_left_rounded,
-            size: 13,
-            color: ColorsManager.textMuted.withValues(alpha: 0.3),
-          ),
-          const SizedBox(width: 6),
-          Text(
-            'Swipe left to dismiss',
-            style: TextStyle(
-              fontSize: 11,
-              color: ColorsManager.textMuted.withValues(alpha: 0.3),
-            ),
-          ),
-        ],
-      ),
-    );
+  String _sectionLabel(BuildContext context, String label) {
+    final loc = AppLocalizations.of(context)!;
+    if (label == 'Today') return loc.todayLabel;
+    if (label == 'Yesterday') return loc.yesterdayLabel;
+    return label;
   }
 }
 
@@ -257,6 +234,7 @@ class _ErrorState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
     return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -287,9 +265,9 @@ class _ErrorState extends StatelessWidget {
                   color: ColorsManager.cyanBlue.withValues(alpha: 0.25),
                 ),
               ),
-              child: const Text(
-                'Try again',
-                style: TextStyle(
+              child: Text(
+                loc.tryAgain,
+                style: const TextStyle(
                   color: ColorsManager.cyanBlue,
                   fontWeight: FontWeight.w600,
                   fontSize: 13,

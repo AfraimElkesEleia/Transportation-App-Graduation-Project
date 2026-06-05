@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:transportation_app/features/profile/domain/entities/ticket_entity.dart';
+import 'package:transportation_app/features/my_tickets/domain/entities/ticket_entity.dart';
 import 'package:transportation_app/features/profile/domain/entities/wallet_transaction_entity.dart';
 
 abstract class MyTicketsState extends Equatable {

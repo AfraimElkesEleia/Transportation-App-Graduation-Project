@@ -92,25 +92,17 @@ class ProfileCubit extends Cubit<ProfileState> {
       ),
     );
     if (isClosed) return;
-    result.fold((failure) {
-      final message = failure.errors.isNotEmpty
-          ? failure.errors.join('\n')
-          : failure.message;
-      emit(WalletDepositFailure(message));
-    }, (_) {
-      emit(WalletDepositSuccess());
-      loadProfile();
-    });
-  }
-
-  Future<void> loadMyTickets() async {
-    if (isClosed) return;
-    emit(TicketsLoading());
-    final result = await profileRepository.getMyTickets();
-    if (isClosed) return;
     result.fold(
-      (failure) => emit(TicketsError(failure.message)),
-      (tickets) => emit(TicketsLoaded(tickets)),
+      (failure) {
+        final message = failure.errors.isNotEmpty
+            ? failure.errors.join('\n')
+            : failure.message;
+        emit(WalletDepositFailure(message));
+      },
+      (_) {
+        emit(WalletDepositSuccess());
+        loadProfile();
+      },
     );
   }
 

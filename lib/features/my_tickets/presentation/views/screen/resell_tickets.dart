@@ -8,7 +8,7 @@ import 'package:transportation_app/features/my_tickets/presentation/cubit/market
 import 'package:transportation_app/features/my_tickets/presentation/cubit/marketplace_states.dart';
 import 'package:transportation_app/features/my_tickets/presentation/cubit/my_tickets_cubit.dart';
 import 'package:transportation_app/features/my_tickets/presentation/cubit/my_tickets_states.dart';
-import 'package:transportation_app/features/profile/domain/entities/ticket_entity.dart';
+import 'package:transportation_app/features/my_tickets/domain/entities/ticket_entity.dart';
 
 class ResellTicketsScreen extends StatefulWidget {
   const ResellTicketsScreen({super.key});
@@ -117,7 +117,8 @@ class _ResellTicketsScreenState extends State<ResellTicketsScreen> {
                         t.isUpcoming &&
                         !t.isMarketplacePurchase &&
                         t.status == 'Confirmed' &&
-                        (t.refundStatus == null || t.refundStatus == 'Rejected'),
+                        (t.refundStatus == null ||
+                            t.refundStatus == 'Rejected'),
                   )
                   .toList();
               debugPrint('Resellable count: ${resellableTickets.length}');
@@ -203,6 +204,7 @@ class _ResellTicketsScreenState extends State<ResellTicketsScreen> {
     String ticketKey,
   ) {
     final l10n = AppLocalizations.of(context)!;
+    final display = _localizedTicketValues(ticket, context.isArabic);
     final priceCtrl = TextEditingController(
       text: ticket.totalPrice.round().toString(),
     );
@@ -241,53 +243,26 @@ class _ResellTicketsScreenState extends State<ResellTicketsScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Wrap(
-                      crossAxisAlignment: WrapCrossAlignment.center,
-                      children: [
-                        Text(
-                          ticket.originGovernorate,
-                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-                        ),
-                        if (ticket.originStation.isNotEmpty && ticket.originStation != ticket.originGovernorate) ...[
-                          const Text(
-                            ' - ',
-                            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-                          ),
-                          Text(
-                            ticket.originStation,
-                            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-                          ),
-                        ],
-                        const Text(
-                          ' → ',
-                          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-                        ),
-                        Text(
-                          ticket.destinationGovernorate,
-                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-                        ),
-                        if (ticket.destinationStation.isNotEmpty && ticket.destinationStation != ticket.destinationGovernorate) ...[
-                          const Text(
-                            ' - ',
-                            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-                          ),
-                          Text(
-                            ticket.destinationStation,
-                            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-                          ),
-                        ],
-                      ],
+                    _RouteSummary(
+                      originGovernorate: display.originGovernorate,
+                      destinationGovernorate: display.destinationGovernorate,
+                      originStation: display.originStation,
+                      destinationStation: display.destinationStation,
+                      compact: true,
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      '${l10n.seatsCount(ticket.seatsBooked.toString())} · ${ticket.agencyName}',
+                      '${l10n.seatsCount(ticket.seatsBooked.toString())} · ${display.agencyName}',
                       style: const TextStyle(
                         color: Colors.white54,
                         fontSize: 12,
                       ),
                     ),
                     Text(
-                      l10n.originalPrice(ticket.totalPrice.round().toString(), l10n.egp),
+                      l10n.originalPrice(
+                        ticket.totalPrice.round().toString(),
+                        l10n.egp,
+                      ),
                       style: const TextStyle(
                         color: ColorsManager.accentCyan,
                         fontSize: 12,
@@ -382,9 +357,16 @@ class _ResellTicketsScreenState extends State<ResellTicketsScreen> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Row(
           children: [
-            const Icon(Icons.warning_amber_rounded, color: Colors.orange, size: 24),
+            const Icon(
+              Icons.warning_amber_rounded,
+              color: Colors.orange,
+              size: 24,
+            ),
             const SizedBox(width: 8),
-            Text(AppLocalizations.of(context)!.cancelListing, style: const TextStyle(color: Colors.white)),
+            Text(
+              AppLocalizations.of(context)!.cancelListing,
+              style: const TextStyle(color: Colors.white),
+            ),
           ],
         ),
         content: Text(
@@ -394,7 +376,10 @@ class _ResellTicketsScreenState extends State<ResellTicketsScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: Text(AppLocalizations.of(context)!.no, style: const TextStyle(color: Colors.white54)),
+            child: Text(
+              AppLocalizations.of(context)!.no,
+              style: const TextStyle(color: Colors.white54),
+            ),
           ),
           ElevatedButton(
             onPressed: () {
@@ -520,7 +505,12 @@ class _ResellTicketCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final isListed = ticket.isOfferedForResale;
-    final date = DateFormat('EEE, dd MMM yyyy').format(ticket.boardingTime);
+    final display = _localizedTicketValues(ticket, context.isArabic);
+    final locale = Localizations.localeOf(context).languageCode;
+    final date = DateFormat(
+      'EEE, dd MMM yyyy',
+      locale,
+    ).format(ticket.boardingTime);
     final time = DateFormat('HH:mm').format(ticket.boardingTime);
     final daysLeft = ticket.boardingTime.difference(DateTime.now()).inDays;
 
@@ -560,7 +550,9 @@ class _ResellTicketCard extends StatelessWidget {
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    isListed ? AppLocalizations.of(context)!.listedOnMarketplace : AppLocalizations.of(context)!.availableForSale,
+                    isListed
+                        ? AppLocalizations.of(context)!.listedOnMarketplace
+                        : AppLocalizations.of(context)!.availableForSale,
                     style: TextStyle(
                       color: isListed
                           ? Colors.orange
@@ -601,123 +593,11 @@ class _ResellTicketCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Route
-                Builder(
-                  builder: (context) {
-                    final isAr = context.isArabic;
-                    final originGov = isAr
-                        ? (ticket.originGovernorateAr ?? ticket.originGovernorate)
-                        : ticket.originGovernorate;
-                    final originStation = isAr
-                        ? (ticket.originStationNameAr ?? ticket.originStation)
-                        : ticket.originStation;
-                    final destGov = isAr
-                        ? (ticket.destinationGovernorateAr ?? ticket.destinationGovernorate)
-                        : ticket.destinationGovernorate;
-                    final destStation = isAr
-                        ? (ticket.destinationStationNameAr ?? ticket.destinationStation)
-                        : ticket.destinationStation;
-
-                    // Show station only when it meaningfully differs from the governorate
-                    final showOriginStation = originStation.isNotEmpty &&
-                        originStation.toLowerCase() != originGov.toLowerCase();
-                    final showDestStation = destStation.isNotEmpty &&
-                        destStation.toLowerCase() != destGov.toLowerCase();
-
-                    return Row(
-                      children: [
-                        Expanded(
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Flexible(
-                                child: Text(
-                                  originGov,
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 15,
-                                  ),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                              if (showOriginStation) ...[
-                                const Text(
-                                  ' - ',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 15,
-                                  ),
-                                ),
-                                Flexible(
-                                  child: Text(
-                                    originStation,
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 15,
-                                    ),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
-                              ],
-                            ],
-                          ),
-                        ),
-                        const Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 8),
-                          child: Icon(
-                            Icons.arrow_forward,
-                            color: ColorsManager.accentCyan,
-                            size: 16,
-                          ),
-                        ),
-                        Expanded(
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Flexible(
-                                child: Text(
-                                  destGov,
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 15,
-                                  ),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                              if (showDestStation) ...[
-                                const Text(
-                                  ' - ',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 15,
-                                  ),
-                                ),
-                                Flexible(
-                                  child: Text(
-                                    destStation,
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 15,
-                                    ),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
-                              ],
-                            ],
-                          ),
-                        ),
-                      ],
-                    );
-                  },
+                _RouteSummary(
+                  originGovernorate: display.originGovernorate,
+                  destinationGovernorate: display.destinationGovernorate,
+                  originStation: display.originStation,
+                  destinationStation: display.destinationStation,
                 ),
                 const SizedBox(height: 8),
 
@@ -734,7 +614,11 @@ class _ResellTicketCard extends StatelessWidget {
                     ),
                     _MetaChip(
                       icon: Icons.directions_bus,
-                      label: ticket.agencyName,
+                      label: display.agencyName,
+                    ),
+                    _MetaChip(
+                      icon: Icons.airline_seat_recline_normal_outlined,
+                      label: display.className,
                     ),
                   ],
                 ),
@@ -745,8 +629,12 @@ class _ResellTicketCard extends StatelessWidget {
                   children: [
                     Text(
                       AppLocalizations.of(context)!.totalPrice,
-                      style: const TextStyle(color: Colors.white54, fontSize: 13),
+                      style: const TextStyle(
+                        color: Colors.white54,
+                        fontSize: 13,
+                      ),
                     ),
+                    const SizedBox(width: 6),
                     Text(
                       '${ticket.totalPrice.round()} ${l10n.egp}',
                       style: const TextStyle(
@@ -772,7 +660,11 @@ class _ResellTicketCard extends StatelessWidget {
                               isListed ? Icons.cancel_outlined : Icons.sell,
                               size: 16,
                             ),
-                            label: Text(isListed ? AppLocalizations.of(context)!.cancel : AppLocalizations.of(context)!.sell),
+                            label: Text(
+                              isListed
+                                  ? AppLocalizations.of(context)!.cancel
+                                  : AppLocalizations.of(context)!.sell,
+                            ),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: isListed
                                   ? Colors.redAccent
@@ -800,6 +692,165 @@ class _ResellTicketCard extends StatelessWidget {
       ),
     );
   }
+}
+
+class _RouteSummary extends StatelessWidget {
+  final String originGovernorate;
+  final String destinationGovernorate;
+  final String originStation;
+  final String destinationStation;
+  final bool compact;
+
+  const _RouteSummary({
+    required this.originGovernorate,
+    required this.destinationGovernorate,
+    required this.originStation,
+    required this.destinationStation,
+    this.compact = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final showOriginStation = _isDifferent(originStation, originGovernorate);
+    final showDestinationStation = _isDifferent(
+      destinationStation,
+      destinationGovernorate,
+    );
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Expanded(
+              child: Text(
+                originGovernorate,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: compact ? 14 : 16,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 8),
+              child: Icon(
+                Icons.arrow_forward,
+                color: ColorsManager.accentCyan,
+                size: 16,
+              ),
+            ),
+            Expanded(
+              child: Text(
+                destinationGovernorate,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: compact ? 14 : 16,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.end,
+              ),
+            ),
+          ],
+        ),
+        if (showOriginStation || showDestinationStation) ...[
+          SizedBox(height: compact ? 4 : 6),
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  showOriginStation ? originStation : '',
+                  style: TextStyle(
+                    color: Colors.white.withValues(alpha: 0.58),
+                    fontSize: compact ? 11 : 12,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 8),
+                child: Icon(Icons.more_horiz, color: Colors.white30, size: 16),
+              ),
+              Expanded(
+                child: Text(
+                  showDestinationStation ? destinationStation : '',
+                  style: TextStyle(
+                    color: Colors.white.withValues(alpha: 0.58),
+                    fontSize: compact ? 11 : 12,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.end,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ],
+    );
+  }
+
+  bool _isDifferent(String value, String comparison) {
+    return value.trim().isNotEmpty &&
+        value.trim().toLowerCase() != comparison.trim().toLowerCase();
+  }
+}
+
+class _LocalizedTicketValues {
+  final String agencyName;
+  final String className;
+  final String originGovernorate;
+  final String originStation;
+  final String destinationGovernorate;
+  final String destinationStation;
+
+  const _LocalizedTicketValues({
+    required this.agencyName,
+    required this.className,
+    required this.originGovernorate,
+    required this.originStation,
+    required this.destinationGovernorate,
+    required this.destinationStation,
+  });
+}
+
+_LocalizedTicketValues _localizedTicketValues(TicketEntity ticket, bool isAr) {
+  return _LocalizedTicketValues(
+    agencyName: _localizedValue(ticket.agencyName, ticket.agencyNameAr, isAr),
+    className: _localizedValue(ticket.className, ticket.classNameAr, isAr),
+    originGovernorate: _localizedValue(
+      ticket.originGovernorate,
+      ticket.originGovernorateAr,
+      isAr,
+    ),
+    originStation: _localizedValue(
+      ticket.originStation,
+      ticket.originStationNameAr,
+      isAr,
+    ),
+    destinationGovernorate: _localizedValue(
+      ticket.destinationGovernorate,
+      ticket.destinationGovernorateAr,
+      isAr,
+    ),
+    destinationStation: _localizedValue(
+      ticket.destinationStation,
+      ticket.destinationStationNameAr,
+      isAr,
+    ),
+  );
+}
+
+String _localizedValue(String original, String? localized, bool useLocalized) {
+  if (useLocalized && localized != null && localized.trim().isNotEmpty) {
+    return localized.trim();
+  }
+  return original.trim();
 }
 
 // ── Meta chip ──────────────────────────────────────────────────────────────────

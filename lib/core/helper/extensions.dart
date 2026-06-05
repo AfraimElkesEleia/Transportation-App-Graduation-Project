@@ -26,7 +26,7 @@ extension Navigation on BuildContext {
 }
 
 extension LocaleHelper on BuildContext {
-  bool get isArabic => watch<LocaleCubit>().isArabic;
+  bool get isArabic => read<LocaleCubit>().isArabic;
 }
 
 extension GovernorateHelper on String {

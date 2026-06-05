@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:transportation_app/core/theming/colors.dart';
 import 'package:transportation_app/features/my_tickets/presentation/cubit/my_tickets_cubit.dart';
-import 'package:transportation_app/features/profile/domain/entities/ticket_entity.dart';
+import 'package:transportation_app/features/my_tickets/domain/entities/ticket_entity.dart';
 import 'package:transportation_app/core/helper/extensions.dart';
 import 'package:transportation_app/core/routing/routes.dart';
 import 'package:intl/intl.dart';
@@ -190,8 +190,10 @@ class TicketDetailCard extends StatelessWidget {
                           ),
                         ),
                         Text(
-                          (ticket.originGovernorateAr ??
-                                  ticket.originGovernorate)
+                          (context.isArabic
+                                  ? (ticket.originGovernorateAr ??
+                                        ticket.originGovernorate)
+                                  : ticket.originGovernorate)
                               .toLocalizedGov(context),
                           style: const TextStyle(
                             color: Colors.white,
@@ -270,8 +272,10 @@ class TicketDetailCard extends StatelessWidget {
                           ),
                         ),
                         Text(
-                          (ticket.destinationGovernorateAr ??
-                                  ticket.destinationGovernorate)
+                          (context.isArabic
+                                  ? (ticket.destinationGovernorateAr ??
+                                        ticket.destinationGovernorate)
+                                  : ticket.destinationGovernorate)
                               .toLocalizedGov(context),
                           style: const TextStyle(
                             color: Colors.white,

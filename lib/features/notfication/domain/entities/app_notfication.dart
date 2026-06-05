@@ -1,8 +1,4 @@
-enum NotificationType {
-  marketplace,
-  gamification,
-  boarding,
-}
+enum NotificationType { marketplace, gamification, boarding, general }
 
 class AppNotification {
   final String id;

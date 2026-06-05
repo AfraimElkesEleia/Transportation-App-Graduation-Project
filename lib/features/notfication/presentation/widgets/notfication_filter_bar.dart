@@ -3,7 +3,7 @@ import 'package:transportation_app/core/l10n/app_localizations.dart';
 import 'package:transportation_app/core/theming/colors.dart';
 import 'package:transportation_app/features/notfication/presentation/cubit/notfication_state.dart';
 
-/// Horizontal scrollable filter chips: All | Unread (with badge) | Marketplace.
+/// Horizontal scrollable filter chips.
 class NotificationFilterBar extends StatelessWidget {
   final NotificationFilter active;
   final int unreadCount;
@@ -39,6 +39,18 @@ class NotificationFilterBar extends StatelessWidget {
           ),
           const SizedBox(width: 8),
           _Chip(
+            label: loc.filterBoarding,
+            isActive: active == NotificationFilter.boarding,
+            onTap: () => onChanged(NotificationFilter.boarding),
+          ),
+          const SizedBox(width: 8),
+          _Chip(
+            label: loc.filterGamification,
+            isActive: active == NotificationFilter.gamification,
+            onTap: () => onChanged(NotificationFilter.gamification),
+          ),
+          const SizedBox(width: 8),
+          _Chip(
             label: loc.filterAll,
             isActive: active == NotificationFilter.all,
             onTap: () => onChanged(NotificationFilter.all),
@@ -65,8 +77,12 @@ class _Chip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final activeColor = ColorsManager.accentCyan;
-    final bg = isActive ? activeColor.withValues(alpha: 0.15) : ColorsManager.surfaceMid;
-    final border = isActive ? activeColor.withValues(alpha: 0.5) : ColorsManager.borderSubtle;
+    final bg = isActive
+        ? activeColor.withValues(alpha: 0.15)
+        : ColorsManager.surfaceMid;
+    final border = isActive
+        ? activeColor.withValues(alpha: 0.5)
+        : ColorsManager.borderSubtle;
     final textColor = isActive ? activeColor : ColorsManager.textMuted;
 
     return GestureDetector(

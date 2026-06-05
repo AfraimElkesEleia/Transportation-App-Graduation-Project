@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:transportation_app/core/di/injection_container.dart';
+import 'package:transportation_app/core/networking/dio_client.dart';
 import 'package:transportation_app/core/routing/routes.dart';
 import 'package:transportation_app/features/booking/data/datasources/booking_remote_datasource.dart';
 import 'package:transportation_app/features/booking/presentation/cubit/seat_map_cubit.dart';
@@ -27,7 +28,7 @@ import 'package:transportation_app/features/notfication/presentation/screens/not
 import 'package:transportation_app/features/notfication/presentation/cubit/notfication_cubit.dart';
 import 'package:transportation_app/features/onboarding/presentation/views/onboarding_screen.dart';
 import 'package:transportation_app/features/profile/domain/entities/profile_entity.dart';
-import 'package:transportation_app/features/profile/domain/entities/ticket_entity.dart';
+import 'package:transportation_app/features/my_tickets/domain/entities/ticket_entity.dart';
 import 'package:transportation_app/features/profile/presentation/cubit/profile_cubit/profile_cubit.dart';
 import 'package:transportation_app/features/profile/presentation/views/screen/edit_profile_screen.dart';
 import 'package:transportation_app/features/search/data/datasources/recent_search_local_data_source.dart';
@@ -52,7 +53,9 @@ import 'package:transportation_app/features/signup/presentation/screen/sign_up_s
 import 'package:transportation_app/features/profile/presentation/cubit/loyalty_hub_cubit/loyalty_hub_cubit.dart';
 import 'package:transportation_app/features/profile/presentation/views/screen/loyalty_hub_screen.dart';
 import 'package:transportation_app/features/support/cubit/support_cubit.dart';
+import 'package:transportation_app/features/support/cubit/support_tickets_cubit.dart';
 import 'package:transportation_app/features/support/screens/report_issue_screen.dart';
+import 'package:transportation_app/features/support/screens/support_tickets_screen.dart';
 
 class AppRouter {
   Route<dynamic>? generateRoute(RouteSettings settings) {
@@ -64,9 +67,9 @@ class AppRouter {
       case AppRoutes.multidestinationScreen:
         return MaterialPageRoute(
           builder: (_) => BlocProvider(
-            create: (_) => StationsCubit(
-              getStationsUseCase: sl<GetStationsUseCase>(),
-            )..loadStations(),
+            create: (_) =>
+                StationsCubit(getStationsUseCase: sl<GetStationsUseCase>())
+                  ..loadStations(),
             child: const MultidestinationScreen(),
           ),
         );
@@ -102,7 +105,9 @@ class AppRouter {
         return MaterialPageRoute(
           builder: (_) => MultiBlocProvider(
             providers: [
-              BlocProvider(create: (_) => sl<MarketplaceCubit>()..fetchActiveListings()),
+              BlocProvider(
+                create: (_) => sl<MarketplaceCubit>()..fetchActiveListings(),
+              ),
               BlocProvider(create: (_) => sl<ProfileCubit>()..loadProfile()),
             ],
             child: MarketplaceScreen(),
@@ -201,9 +206,7 @@ class AppRouter {
                 create: (_) =>
                     SeatMapCubit(datasource: sl<BookingRemoteDatasource>()),
               ),
-              BlocProvider(
-                create: (_) => sl<ProfileCubit>()..loadProfile(),
-              ),
+              BlocProvider(create: (_) => sl<ProfileCubit>()..loadProfile()),
             ],
             child: PassengerFormScreen(
               trip: trip,
@@ -221,9 +224,7 @@ class AppRouter {
                 create: (_) =>
                     CartCubit(datasource: sl<BookingRemoteDatasource>()),
               ),
-              BlocProvider(
-                create: (_) => sl<ProfileCubit>()..loadProfile(),
-              ),
+              BlocProvider(create: (_) => sl<ProfileCubit>()..loadProfile()),
             ],
             child: const CartScreen(),
           ),
@@ -257,9 +258,7 @@ class AppRouter {
                 create: (_) =>
                     SeatMapCubit(datasource: sl<BookingRemoteDatasource>()),
               ),
-              BlocProvider(
-                create: (_) => sl<ProfileCubit>()..loadProfile(),
-              ),
+              BlocProvider(create: (_) => sl<ProfileCubit>()..loadProfile()),
             ],
             child: IndirectPassengerFormScreen(bookingState: state),
           ),
@@ -320,6 +319,14 @@ class AppRouter {
           builder: (_) => BlocProvider(
             create: (_) => sl<SupportCubit>(),
             child: const ReportIssueScreen(),
+          ),
+        );
+      case AppRoutes.supportTicketsScreen:
+        return MaterialPageRoute(
+          builder: (_) => BlocProvider(
+            create: (_) =>
+                SupportTicketsCubit(DioClient.getInstance())..loadTickets(),
+            child: const SupportTicketsScreen(),
           ),
         );
       default:

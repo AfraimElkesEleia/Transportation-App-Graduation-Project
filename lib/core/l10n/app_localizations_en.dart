@@ -1332,7 +1332,72 @@ class AppLocalizationsEn extends AppLocalizations {
   String get filterMarketplace => 'Marketplace';
 
   @override
+  String get filterBoarding => 'Boarding';
+
+  @override
+  String get filterGamification => 'Gamification';
+
+  @override
   String get dismiss => 'Dismiss';
+
+  @override
+  String get tryAgain => 'Try again';
+
+  @override
+  String get todayLabel => 'Today';
+
+  @override
+  String get yesterdayLabel => 'Yesterday';
+
+  @override
+  String get justNow => 'Just now';
+
+  @override
+  String minutesAgo(int count) {
+    return '$count min ago';
+  }
+
+  @override
+  String hoursAgo(int count) {
+    return '$count hr ago';
+  }
+
+  @override
+  String get notificationGeneral => 'General';
+
+  @override
+  String get emptyMarketplaceTitle => 'No marketplace activity yet';
+
+  @override
+  String get emptyMarketplaceSubtitle =>
+      'Offers and sales notifications will appear here.';
+
+  @override
+  String get emptyUnreadTitle => 'You\'re all caught up!';
+
+  @override
+  String get emptyUnreadSubtitle => 'No unread notifications at the moment.';
+
+  @override
+  String get emptyBoardingTitle => 'No boarding alerts';
+
+  @override
+  String get emptyBoardingSubtitle =>
+      'Upcoming trip reminders will appear here.';
+
+  @override
+  String get emptyGamificationTitle => 'No rewards activity';
+
+  @override
+  String get emptyGamificationSubtitle =>
+      'Points and challenge notifications will appear here.';
+
+  @override
+  String get emptyNotificationsTitle => 'No notifications yet';
+
+  @override
+  String get emptyNotificationsSubtitle =>
+      'Important updates about your trips and marketplace activity will show here.';
 
   @override
   String get seatLegendAvailable => 'Available';
@@ -1418,6 +1483,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get classLabel => 'Class';
 
   @override
+  String get sellerLabel => 'Seller';
+
+  @override
   String get priceLabel => 'Price';
 
   @override
@@ -1490,6 +1558,21 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get backToLogin => 'Back to Login';
+
+  @override
+  String get supportTickets => 'Support Tickets';
+
+  @override
+  String get noSupportTickets => 'No support tickets yet';
+
+  @override
+  String get supportTicketsEmptyBody => 'Submitted issues will appear here.';
+
+  @override
+  String get untitledTicket => 'Untitled ticket';
+
+  @override
+  String get noDescriptionProvided => 'No description provided.';
 
   @override
   String get reportIssue => 'Report an Issue';

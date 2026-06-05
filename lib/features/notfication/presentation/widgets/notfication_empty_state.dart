@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:transportation_app/core/l10n/app_localizations.dart';
 import 'package:transportation_app/core/theming/colors.dart';
 
 /// Centered empty-state illustration displayed when the notification list is empty.
-/// The [filter] string matches [NotificationFilter.name]: `'all'`, `'marketplace'`, `'unread'`.
+/// The [filter] string matches [NotificationFilter.name].
 class NotificationEmptyState extends StatelessWidget {
   final String filter;
 
@@ -10,7 +11,7 @@ class NotificationEmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final config = _config(filter);
+    final config = _config(context, filter);
     return Center(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 40),
@@ -23,9 +24,16 @@ class NotificationEmptyState extends StatelessWidget {
               decoration: BoxDecoration(
                 color: ColorsManager.surfaceMid,
                 shape: BoxShape.circle,
-                border: Border.all(color: ColorsManager.borderSubtle, width: 1.5),
+                border: Border.all(
+                  color: ColorsManager.borderSubtle,
+                  width: 1.5,
+                ),
               ),
-              child: Icon(config.icon, size: 36, color: ColorsManager.textMuted),
+              child: Icon(
+                config.icon,
+                size: 36,
+                color: ColorsManager.textMuted,
+              ),
             ),
             const SizedBox(height: 20),
             Text(
@@ -53,25 +61,38 @@ class NotificationEmptyState extends StatelessWidget {
     );
   }
 
-  _EmptyConfig _config(String filter) {
+  _EmptyConfig _config(BuildContext context, String filter) {
+    final loc = AppLocalizations.of(context)!;
     switch (filter) {
       case 'marketplace':
-        return const _EmptyConfig(
+        return _EmptyConfig(
           icon: Icons.storefront_rounded,
-          title: 'No marketplace activity yet',
-          subtitle: 'Offers and sales notifications will appear here.',
+          title: loc.emptyMarketplaceTitle,
+          subtitle: loc.emptyMarketplaceSubtitle,
         );
       case 'unread':
-        return const _EmptyConfig(
+        return _EmptyConfig(
           icon: Icons.mark_email_read_rounded,
-          title: "You're all caught up!",
-          subtitle: 'No unread notifications at the moment.',
+          title: loc.emptyUnreadTitle,
+          subtitle: loc.emptyUnreadSubtitle,
+        );
+      case 'boarding':
+        return _EmptyConfig(
+          icon: Icons.directions_bus_rounded,
+          title: loc.emptyBoardingTitle,
+          subtitle: loc.emptyBoardingSubtitle,
+        );
+      case 'gamification':
+        return _EmptyConfig(
+          icon: Icons.emoji_events_rounded,
+          title: loc.emptyGamificationTitle,
+          subtitle: loc.emptyGamificationSubtitle,
         );
       default:
-        return const _EmptyConfig(
+        return _EmptyConfig(
           icon: Icons.notifications_off_rounded,
-          title: 'No notifications yet',
-          subtitle: 'Important updates about your trips and marketplace activity will show here.',
+          title: loc.emptyNotificationsTitle,
+          subtitle: loc.emptyNotificationsSubtitle,
         );
     }
   }
@@ -81,5 +102,9 @@ class _EmptyConfig {
   final IconData icon;
   final String title;
   final String subtitle;
-  const _EmptyConfig({required this.icon, required this.title, required this.subtitle});
+  const _EmptyConfig({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+  });
 }

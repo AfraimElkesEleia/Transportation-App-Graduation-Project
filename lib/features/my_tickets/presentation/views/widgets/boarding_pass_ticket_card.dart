@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:transportation_app/features/my_tickets/presentation/views/widgets/boarding_pass_helpers.dart';
 import 'package:transportation_app/features/my_tickets/presentation/views/widgets/boarding_pass_passenger_section.dart';
 import 'package:transportation_app/features/my_tickets/presentation/views/widgets/boarding_pass_route_section.dart';
-import 'package:transportation_app/features/profile/domain/entities/ticket_entity.dart';
+import 'package:transportation_app/features/my_tickets/domain/entities/ticket_entity.dart';
 
 class BoardingPassTicketCard extends StatelessWidget {
   final TicketEntity ticket;

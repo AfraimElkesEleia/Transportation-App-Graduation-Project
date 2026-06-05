@@ -68,19 +68,6 @@ class NotificationCubit extends Cubit<NotificationState> {
     }
   }
 
-  // ── Dismiss locally (no backend delete endpoint) ───────────────────────────
-
-  Future<void> dismiss(String notificationId) async {
-    final current = state;
-    if (current is! NotificationLoaded) return;
-
-    final updated = current.notifications
-        .where((n) => n.id != notificationId)
-        .toList();
-
-    emit(current.copyWith(notifications: updated));
-  }
-
   // ── Offer actions (informational only — no sub-type from backend) ──────────
 
   Future<void> acceptOffer(String offerId) async {

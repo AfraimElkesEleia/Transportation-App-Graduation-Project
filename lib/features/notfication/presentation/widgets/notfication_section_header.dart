@@ -29,10 +29,7 @@ class NotificationSectionHeader extends StatelessWidget {
           ),
           const SizedBox(width: 10),
           Expanded(
-            child: Container(
-              height: 1,
-              color: ColorsManager.borderSubtle,
-            ),
+            child: Container(height: 1, color: ColorsManager.borderSubtle),
           ),
         ],
       ),

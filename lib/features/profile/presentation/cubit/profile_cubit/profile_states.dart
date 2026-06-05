@@ -1,6 +1,5 @@
 import 'package:equatable/equatable.dart';
 import 'package:transportation_app/features/profile/domain/entities/profile_entity.dart';
-import 'package:transportation_app/features/profile/domain/entities/ticket_entity.dart';
 import 'package:transportation_app/features/profile/domain/entities/wallet_transaction_entity.dart';
 
 abstract class ProfileState extends Equatable {
@@ -9,8 +8,9 @@ abstract class ProfileState extends Equatable {
   List<Object?> get props => [];
 }
 
-class ProfileInitial  extends ProfileState {}
-class ProfileLoading  extends ProfileState {}
+class ProfileInitial extends ProfileState {}
+
+class ProfileLoading extends ProfileState {}
 
 class ProfileLoaded extends ProfileState {
   final ProfileEntity profile;
@@ -36,7 +36,7 @@ class ProfileUpdateSuccess extends ProfileState {
 }
 
 class ProfileUpdateFailure extends ProfileState {
-  final String       message;
+  final String message;
   final List<String> errors;
   const ProfileUpdateFailure({required this.message, this.errors = const []});
   @override
@@ -61,27 +61,12 @@ class ProfilePictureUploadFailure extends ProfileState {
 
 // ── Wallet Deposit ───────────────────────────────────────────────────
 class WalletDepositLoading extends ProfileState {}
+
 class WalletDepositSuccess extends ProfileState {}
+
 class WalletDepositFailure extends ProfileState {
   final String message;
   const WalletDepositFailure(this.message);
-  @override
-  List<Object> get props => [message];
-}
-
-// ── Tickets ──────────────────────────────────────────────────────────
-class TicketsLoading extends ProfileState {}
-
-class TicketsLoaded extends ProfileState {
-  final List<TicketEntity> tickets;
-  const TicketsLoaded(this.tickets);
-  @override
-  List<Object> get props => [tickets];
-}
-
-class TicketsError extends ProfileState {
-  final String message;
-  const TicketsError(this.message);
   @override
   List<Object> get props => [message];
 }

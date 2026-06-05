@@ -1,5 +1,5 @@
 import 'package:transportation_app/core/utils/typedef.dart';
-import 'package:transportation_app/features/profile/domain/entities/ticket_entity.dart';
+import 'package:transportation_app/features/my_tickets/domain/entities/ticket_entity.dart';
 import 'package:transportation_app/features/profile/domain/entities/wallet_transaction_entity.dart';
 
 abstract class MyTicketsRepository {
@@ -26,7 +26,10 @@ abstract class MyTicketsRepository {
     String? travelDate,
   });
   ResultVoid listTicket({required int bookingId, required double askingPrice});
-  ResultVoid buyTicket({required int listingId, required List<Map<String, dynamic>> passengers});
+  ResultVoid buyTicket({
+    required int listingId,
+    required List<Map<String, dynamic>> passengers,
+  });
   ResultVoid cancelListing({required int listingId});
   ResultVoid requestRefund({required int bookingId});
 }

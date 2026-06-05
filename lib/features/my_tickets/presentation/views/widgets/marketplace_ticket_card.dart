@@ -20,6 +20,10 @@ class MarketplaceTicketCard extends StatelessWidget {
   final String? originGov;
   final String? destinationGov;
   final String? agencyName;
+  final String forSaleLabel;
+  final String classLabel;
+  final String sellerLabel;
+  final String buyNowLabel;
 
   const MarketplaceTicketCard({
     super.key,
@@ -37,6 +41,10 @@ class MarketplaceTicketCard extends StatelessWidget {
     this.originGov,
     this.destinationGov,
     this.agencyName,
+    required this.forSaleLabel,
+    required this.classLabel,
+    required this.sellerLabel,
+    required this.buyNowLabel,
   });
 
   @override
@@ -93,7 +101,7 @@ class MarketplaceTicketCard extends StatelessWidget {
                   ),
                   overflow: TextOverflow.ellipsis,
                   maxLines: 1,
-                  textDirection: TextDirection.rtl,
+                  textDirection: Directionality.of(context),
                 ),
               ),
               const SizedBox(width: 8),
@@ -109,9 +117,9 @@ class MarketplaceTicketCard extends StatelessWidget {
                     color: ColorsManager.successGreen.withValues(alpha: 0.3),
                   ),
                 ),
-                child: const Text(
-                  'For Sale',
-                  style: TextStyle(
+                child: Text(
+                  forSaleLabel,
+                  style: const TextStyle(
                     color: ColorsManager.successGreen,
                     fontSize: 11,
                     fontWeight: FontWeight.w600,
@@ -219,7 +227,7 @@ class MarketplaceTicketCard extends StatelessWidget {
             children: [
               Expanded(
                 child: _LabelValue(
-                  label: 'Class',
+                  label: classLabel,
                   value: className,
                   icon: Icons.airline_seat_recline_normal_outlined,
                 ),
@@ -227,7 +235,7 @@ class MarketplaceTicketCard extends StatelessWidget {
               const SizedBox(width: 8),
               Expanded(
                 child: _LabelValue(
-                  label: 'Seller',
+                  label: sellerLabel,
                   value: sellerName,
                   icon: Icons.person_outline_rounded,
                   accent: true,
@@ -298,9 +306,9 @@ class MarketplaceTicketCard extends StatelessWidget {
               ElevatedButton.icon(
                 onPressed: onBuy,
                 icon: const Icon(Icons.shopping_cart_outlined, size: 16),
-                label: const Text(
-                  'Buy Now',
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                label: Text(
+                  buyNowLabel,
+                  style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: ColorsManager.successGreen,

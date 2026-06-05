@@ -29,7 +29,7 @@ class NotficationModel {
       titleAr: json['titleAr'] as String?,
       message: json['message'] as String? ?? '',
       messageAr: json['messageAr'] as String?,
-      type: json['type'] as String? ?? 'Marketplace',
+      type: json['type'] as String? ?? '',
     );
   }
   AppNotification toEntity() => AppNotification(
@@ -44,15 +44,19 @@ class NotficationModel {
     payload: {'type': type},
   );
   NotificationType _mapType(String t) {
-    switch (t) {
-      case 'Marketplace':
+    switch (t.trim().toUpperCase()) {
+      case 'MARKETPLACE':
+      case 'TICKET_SOLD':
         return NotificationType.marketplace;
-      case 'Gamification':
+      case 'GAMIFICATION':
+      case 'POINTS_EARNED':
+      case 'CHALLENGE_COMPLETED':
         return NotificationType.gamification;
-      case 'Boarding':
+      case 'BOARDING':
+      case 'BOARDING_SOON':
         return NotificationType.boarding;
       default:
-        return NotificationType.marketplace;
+        return NotificationType.general;
     }
   }
 }

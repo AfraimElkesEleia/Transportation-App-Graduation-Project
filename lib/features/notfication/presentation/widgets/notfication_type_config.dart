@@ -18,6 +18,8 @@ abstract class NotificationTypeConfig {
         return Icons.emoji_events_rounded;
       case NotificationType.boarding:
         return Icons.directions_bus_rounded;
+      case NotificationType.general:
+        return Icons.notifications_rounded;
     }
   }
 
@@ -29,6 +31,8 @@ abstract class NotificationTypeConfig {
         return ColorsManager.successGreen;
       case NotificationType.boarding:
         return ColorsManager.brightBlue;
+      case NotificationType.general:
+        return ColorsManager.textMuted;
     }
   }
 
@@ -40,6 +44,8 @@ abstract class NotificationTypeConfig {
         return 'Gamification';
       case NotificationType.boarding:
         return 'Boarding';
+      case NotificationType.general:
+        return 'General';
     }
   }
 }

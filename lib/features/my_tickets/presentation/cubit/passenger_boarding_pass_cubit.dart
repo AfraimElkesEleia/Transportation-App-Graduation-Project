@@ -20,7 +20,8 @@ class PassengerBoardingPassError extends PassengerBoardingPassState {
 class PassengerBoardingPassCubit extends Cubit<PassengerBoardingPassState> {
   final MyTicketsRepository repository;
 
-  PassengerBoardingPassCubit({required this.repository}) : super(PassengerBoardingPassInitial());
+  PassengerBoardingPassCubit({required this.repository})
+    : super(PassengerBoardingPassInitial());
 
   Future<void> fetchQrPayload(int bookingId, int passengerId) async {
     emit(PassengerBoardingPassLoading());

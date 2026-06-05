@@ -4,7 +4,7 @@ import 'package:qr_flutter/qr_flutter.dart';
 import 'package:transportation_app/core/theming/colors.dart';
 import 'package:transportation_app/features/my_tickets/presentation/cubit/passenger_boarding_pass_cubit.dart';
 import 'package:transportation_app/features/my_tickets/presentation/views/widgets/boarding_pass_helpers.dart';
-import 'package:transportation_app/features/profile/domain/entities/ticket_entity.dart';
+import 'package:transportation_app/features/my_tickets/domain/entities/ticket_entity.dart';
 
 class BoardingPassPassengerSection extends StatelessWidget {
   final TicketEntity ticket;

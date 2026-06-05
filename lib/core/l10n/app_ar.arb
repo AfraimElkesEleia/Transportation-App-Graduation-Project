@@ -600,7 +600,40 @@
   "filterAll": "الكل",
   "filterUnread": "غير مقروء",
   "filterMarketplace": "السوق",
+  "filterBoarding": "الصعود",
+  "filterGamification": "المكافآت",
   "dismiss": "إغلاق",
+  "tryAgain": "حاول مرة أخرى",
+  "todayLabel": "اليوم",
+  "yesterdayLabel": "أمس",
+  "justNow": "الآن",
+  "minutesAgo": "منذ {count} دقيقة",
+  "@minutesAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "hoursAgo": "منذ {count} ساعة",
+  "@hoursAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "notificationGeneral": "عام",
+  "emptyMarketplaceTitle": "لا يوجد نشاط في السوق بعد",
+  "emptyMarketplaceSubtitle": "ستظهر إشعارات العروض والمبيعات هنا.",
+  "emptyUnreadTitle": "أنت مطلع على كل شيء!",
+  "emptyUnreadSubtitle": "لا توجد إشعارات غير مقروءة حالياً.",
+  "emptyBoardingTitle": "لا توجد تنبيهات صعود",
+  "emptyBoardingSubtitle": "ستظهر تذكيرات الرحلات القادمة هنا.",
+  "emptyGamificationTitle": "لا يوجد نشاط مكافآت",
+  "emptyGamificationSubtitle": "ستظهر إشعارات النقاط والتحديات هنا.",
+  "emptyNotificationsTitle": "لا توجد إشعارات بعد",
+  "emptyNotificationsSubtitle": "ستظهر هنا التحديثات المهمة حول رحلاتك ونشاط السوق.",
   "seatLegendAvailable": "متاح",
   "seatLegendSelected": "محدد",
   "seatLegendTaken": "محجوز",
@@ -628,6 +661,7 @@
   "dateLabel": "التاريخ",
   "timeLabel": "الوقت",
   "classLabel": "الدرجة",
+  "sellerLabel": "البائع",
   "priceLabel": "السعر",
   "areYouSureBuyTicket": "هل أنت متأكد من شراء هذه التذكرة؟",
   "ticketPurchasedSuccessfully": "تم شراء التذكرة بنجاح!",
@@ -676,6 +710,11 @@
   "idTypePassport": "جواز سفر",
   "idNumberLabel": "رقم بطاقة الهوية",
   "passportNumberLabel": "رقم جواز السفر",
+  "supportTickets": "تذاكر الدعم",
+  "noSupportTickets": "لا توجد تذاكر دعم حتى الآن",
+  "supportTicketsEmptyBody": "ستظهر المشكلات المرسلة هنا.",
+  "untitledTicket": "تذكرة بدون عنوان",
+  "noDescriptionProvided": "لا يوجد وصف.",
   "reportIssue": "الإبلاغ عن مشكلة",
   "reportIssueTitle": "الإبلاغ عن مشكلة",
   "reportIssueHeaderTitle": "نحن هنا للمساعدة",

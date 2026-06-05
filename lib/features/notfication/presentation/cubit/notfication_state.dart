@@ -35,6 +35,14 @@ class NotificationLoaded extends NotificationState {
         return notifications
             .where((n) => n.type == NotificationType.marketplace)
             .toList();
+      case NotificationFilter.boarding:
+        return notifications
+            .where((n) => n.type == NotificationType.boarding)
+            .toList();
+      case NotificationFilter.gamification:
+        return notifications
+            .where((n) => n.type == NotificationType.gamification)
+            .toList();
       case NotificationFilter.unread:
         return notifications.where((n) => !n.isRead).toList();
     }
@@ -50,7 +58,10 @@ class NotificationLoaded extends NotificationState {
 
     for (final notif in filtered) {
       final d = DateTime(
-          notif.receivedAt.year, notif.receivedAt.month, notif.receivedAt.day);
+        notif.receivedAt.year,
+        notif.receivedAt.month,
+        notif.receivedAt.day,
+      );
       final String key;
       if (d == today) {
         key = 'Today';
@@ -67,9 +78,20 @@ class NotificationLoaded extends NotificationState {
   }
 
   String _month(int m) => const [
-        '', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-        'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
-      ][m];
+    '',
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec',
+  ][m];
 
   @override
   List<Object?> get props => [notifications, activeFilter];
@@ -94,4 +116,4 @@ class NotificationError extends NotificationState {
   List<Object?> get props => [message];
 }
 
-enum NotificationFilter { all, marketplace, unread }
+enum NotificationFilter { all, marketplace, boarding, gamification, unread }

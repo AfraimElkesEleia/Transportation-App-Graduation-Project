@@ -13,7 +13,7 @@ import 'package:transportation_app/features/my_tickets/presentation/cubit/my_tic
 import 'package:transportation_app/features/my_tickets/presentation/cubit/my_tickets_states.dart';
 import 'package:transportation_app/features/my_tickets/presentation/views/widgets/action_buttons_row.dart';
 import 'package:transportation_app/features/my_tickets/presentation/views/widgets/ticket_detail_card.dart';
-import 'package:transportation_app/features/profile/domain/entities/ticket_entity.dart';
+import 'package:transportation_app/features/my_tickets/domain/entities/ticket_entity.dart';
 
 class MyTickets extends StatefulWidget {
   const MyTickets({super.key});
@@ -198,14 +198,29 @@ class _MyTicketsState extends State<MyTickets>
                       tabChildren = [errorView, errorView, errorView];
                     } else if (state is TicketsLoadedState) {
                       final upcoming = state.tickets
-                          .where((t) => t.isUpcoming && t.refundStatus != 'Accepted' && t.refundStatus != 'Approved')
+                          .where(
+                            (t) =>
+                                t.isUpcoming &&
+                                t.refundStatus != 'Accepted' &&
+                                t.refundStatus != 'Approved',
+                          )
                           .toList();
 
                       final activeNow = state.tickets
-                          .where((t) => t.isActiveNow && t.refundStatus != 'Accepted' && t.refundStatus != 'Approved')
+                          .where(
+                            (t) =>
+                                t.isActiveNow &&
+                                t.refundStatus != 'Accepted' &&
+                                t.refundStatus != 'Approved',
+                          )
                           .toList();
                       final past = state.tickets
-                          .where((t) => t.isPast || t.refundStatus == 'Accepted' || t.refundStatus == 'Approved')
+                          .where(
+                            (t) =>
+                                t.isPast ||
+                                t.refundStatus == 'Accepted' ||
+                                t.refundStatus == 'Approved',
+                          )
                           .toList();
 
                       tabChildren = [

@@ -8,7 +8,7 @@ import 'package:transportation_app/features/my_tickets/presentation/views/widget
 import 'package:transportation_app/features/my_tickets/presentation/views/widgets/boarding_pass_header.dart';
 import 'package:transportation_app/features/my_tickets/presentation/views/widgets/boarding_pass_pdf_service.dart';
 import 'package:transportation_app/features/my_tickets/presentation/views/widgets/boarding_pass_ticket_card.dart';
-import 'package:transportation_app/features/profile/domain/entities/ticket_entity.dart';
+import 'package:transportation_app/features/my_tickets/domain/entities/ticket_entity.dart';
 
 /// Shows the boarding pass bottom sheet for a specific passenger.
 void showBoardingPassSheet(

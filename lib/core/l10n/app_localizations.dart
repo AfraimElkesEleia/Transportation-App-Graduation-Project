@@ -2534,11 +2534,125 @@ abstract class AppLocalizations {
   /// **'Marketplace'**
   String get filterMarketplace;
 
+  /// No description provided for @filterBoarding.
+  ///
+  /// In en, this message translates to:
+  /// **'Boarding'**
+  String get filterBoarding;
+
+  /// No description provided for @filterGamification.
+  ///
+  /// In en, this message translates to:
+  /// **'Gamification'**
+  String get filterGamification;
+
   /// No description provided for @dismiss.
   ///
   /// In en, this message translates to:
   /// **'Dismiss'**
   String get dismiss;
+
+  /// No description provided for @tryAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Try again'**
+  String get tryAgain;
+
+  /// No description provided for @todayLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Today'**
+  String get todayLabel;
+
+  /// No description provided for @yesterdayLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Yesterday'**
+  String get yesterdayLabel;
+
+  /// No description provided for @justNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Just now'**
+  String get justNow;
+
+  /// No description provided for @minutesAgo.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} min ago'**
+  String minutesAgo(int count);
+
+  /// No description provided for @hoursAgo.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} hr ago'**
+  String hoursAgo(int count);
+
+  /// No description provided for @notificationGeneral.
+  ///
+  /// In en, this message translates to:
+  /// **'General'**
+  String get notificationGeneral;
+
+  /// No description provided for @emptyMarketplaceTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No marketplace activity yet'**
+  String get emptyMarketplaceTitle;
+
+  /// No description provided for @emptyMarketplaceSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Offers and sales notifications will appear here.'**
+  String get emptyMarketplaceSubtitle;
+
+  /// No description provided for @emptyUnreadTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'re all caught up!'**
+  String get emptyUnreadTitle;
+
+  /// No description provided for @emptyUnreadSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No unread notifications at the moment.'**
+  String get emptyUnreadSubtitle;
+
+  /// No description provided for @emptyBoardingTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No boarding alerts'**
+  String get emptyBoardingTitle;
+
+  /// No description provided for @emptyBoardingSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Upcoming trip reminders will appear here.'**
+  String get emptyBoardingSubtitle;
+
+  /// No description provided for @emptyGamificationTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No rewards activity'**
+  String get emptyGamificationTitle;
+
+  /// No description provided for @emptyGamificationSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Points and challenge notifications will appear here.'**
+  String get emptyGamificationSubtitle;
+
+  /// No description provided for @emptyNotificationsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No notifications yet'**
+  String get emptyNotificationsTitle;
+
+  /// No description provided for @emptyNotificationsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Important updates about your trips and marketplace activity will show here.'**
+  String get emptyNotificationsSubtitle;
 
   /// No description provided for @seatLegendAvailable.
   ///
@@ -2702,6 +2816,12 @@ abstract class AppLocalizations {
   /// **'Class'**
   String get classLabel;
 
+  /// No description provided for @sellerLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Seller'**
+  String get sellerLabel;
+
   /// No description provided for @priceLabel.
   ///
   /// In en, this message translates to:
@@ -2833,6 +2953,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Back to Login'**
   String get backToLogin;
+
+  /// No description provided for @supportTickets.
+  ///
+  /// In en, this message translates to:
+  /// **'Support Tickets'**
+  String get supportTickets;
+
+  /// No description provided for @noSupportTickets.
+  ///
+  /// In en, this message translates to:
+  /// **'No support tickets yet'**
+  String get noSupportTickets;
+
+  /// No description provided for @supportTicketsEmptyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Submitted issues will appear here.'**
+  String get supportTicketsEmptyBody;
+
+  /// No description provided for @untitledTicket.
+  ///
+  /// In en, this message translates to:
+  /// **'Untitled ticket'**
+  String get untitledTicket;
+
+  /// No description provided for @noDescriptionProvided.
+  ///
+  /// In en, this message translates to:
+  /// **'No description provided.'**
+  String get noDescriptionProvided;
 
   /// No description provided for @reportIssue.
   ///

@@ -720,7 +720,40 @@
   "filterAll": "All",
   "filterUnread": "Unread",
   "filterMarketplace": "Marketplace",
+  "filterBoarding": "Boarding",
+  "filterGamification": "Gamification",
   "dismiss": "Dismiss",
+  "tryAgain": "Try again",
+  "todayLabel": "Today",
+  "yesterdayLabel": "Yesterday",
+  "justNow": "Just now",
+  "minutesAgo": "{count} min ago",
+  "@minutesAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "hoursAgo": "{count} hr ago",
+  "@hoursAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "notificationGeneral": "General",
+  "emptyMarketplaceTitle": "No marketplace activity yet",
+  "emptyMarketplaceSubtitle": "Offers and sales notifications will appear here.",
+  "emptyUnreadTitle": "You're all caught up!",
+  "emptyUnreadSubtitle": "No unread notifications at the moment.",
+  "emptyBoardingTitle": "No boarding alerts",
+  "emptyBoardingSubtitle": "Upcoming trip reminders will appear here.",
+  "emptyGamificationTitle": "No rewards activity",
+  "emptyGamificationSubtitle": "Points and challenge notifications will appear here.",
+  "emptyNotificationsTitle": "No notifications yet",
+  "emptyNotificationsSubtitle": "Important updates about your trips and marketplace activity will show here.",
   "seatLegendAvailable": "Available",
   "seatLegendSelected": "Selected",
   "seatLegendTaken": "Taken",
@@ -748,6 +781,7 @@
   "dateLabel": "Date",
   "timeLabel": "Time",
   "classLabel": "Class",
+  "sellerLabel": "Seller",
   "priceLabel": "Price",
   "areYouSureBuyTicket": "Are you sure you want to buy this ticket?",
   "ticketPurchasedSuccessfully": "Ticket purchased successfully!",
@@ -796,6 +830,11 @@
   "idTypePassport": "Passport",
   "idNumberLabel": "National ID Number",
   "passportNumberLabel": "Passport Number",
+  "supportTickets": "Support Tickets",
+  "noSupportTickets": "No support tickets yet",
+  "supportTicketsEmptyBody": "Submitted issues will appear here.",
+  "untitledTicket": "Untitled ticket",
+  "noDescriptionProvided": "No description provided.",
   "reportIssue": "Report an Issue",
   "reportIssueTitle": "Report an Issue",
   "reportIssueHeaderTitle": "We're here to help",

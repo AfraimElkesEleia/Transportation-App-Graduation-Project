@@ -58,6 +58,14 @@ class QuickActionsSection extends StatelessWidget {
             Navigator.pushNamed(context, AppRoutes.reportIssueScreen);
           },
         ),
+        _buildActionTile(
+          context: context,
+          icon: Icons.assignment_outlined,
+          title: l10n.supportTickets,
+          onTap: () {
+            Navigator.pushNamed(context, AppRoutes.supportTicketsScreen);
+          },
+        ),
         BlocBuilder<LocaleCubit, Locale>(
           builder: (context, locale) {
             final isArabic = locale.languageCode == 'ar';

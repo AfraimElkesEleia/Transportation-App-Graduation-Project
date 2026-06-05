@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:transportation_app/core/constants/api_constants.dart';
 import 'package:transportation_app/core/error/exceptions.dart';
-import 'package:transportation_app/features/profile/domain/entities/ticket_entity.dart';
+import 'package:transportation_app/features/my_tickets/domain/entities/ticket_entity.dart';
 import 'package:transportation_app/features/profile/domain/entities/wallet_transaction_entity.dart';
 
 abstract class MyTicketsRemoteDatasource {
@@ -29,7 +29,10 @@ abstract class MyTicketsRemoteDatasource {
     required int bookingId,
     required double askingPrice,
   });
-  Future<void> buyTicket({required int listingId, required List<Map<String, dynamic>> passengers});
+  Future<void> buyTicket({
+    required int listingId,
+    required List<Map<String, dynamic>> passengers,
+  });
   Future<void> cancelListing({required int listingId});
   Future<void> requestRefund({required int bookingId});
 }
@@ -133,7 +136,9 @@ class MyTicketsRemoteDatasourceImpl implements MyTicketsRemoteDatasource {
     required int passengerId,
   }) async {
     try {
-      final res = await dio.get('/Bookings/$bookingId/passengers/$passengerId/qr-payload');
+      final res = await dio.get(
+        '/Bookings/$bookingId/passengers/$passengerId/qr-payload',
+      );
       final body = res.data as Map<String, dynamic>;
       if (body['success'] != true) {
         throw ServerException(
@@ -207,9 +212,15 @@ class MyTicketsRemoteDatasourceImpl implements MyTicketsRemoteDatasource {
   }
 
   @override
-  Future<void> buyTicket({required int listingId, required List<Map<String, dynamic>> passengers}) async {
+  Future<void> buyTicket({
+    required int listingId,
+    required List<Map<String, dynamic>> passengers,
+  }) async {
     try {
-      final res = await dio.post('${ApiConstants.marketplaceBuy}/$listingId', data: {'passengers': passengers});
+      final res = await dio.post(
+        '${ApiConstants.marketplaceBuy}/$listingId',
+        data: {'passengers': passengers},
+      );
       final body = res.data as Map<String, dynamic>;
       if (body['success'] != true) {
         throw ServerException(message: body['message'] ?? 'Purchase failed');
@@ -276,13 +287,31 @@ class MyTicketsRemoteDatasourceImpl implements MyTicketsRemoteDatasource {
       agencyNameAr: json['agencyNameAr'] as String?,
       className: json['className'] as String? ?? '',
       classNameAr: json['classNameAr'] as String?,
-      originGovernorate: json['originGov'] as String? ?? 'Cairo',
-      originGovernorateAr: json['originGovernorateAr'] as String?,
-      originStation: json['originStation'] as String? ?? '',
+      originGovernorate:
+          json['originGovEn'] as String? ??
+          json['originGovernorate'] as String? ??
+          json['originGov'] as String? ??
+          'Cairo',
+      originGovernorateAr:
+          json['originGovAr'] as String? ??
+          json['originGovernorateAr'] as String?,
+      originStation:
+          json['originStationNameEn'] as String? ??
+          json['originStation'] as String? ??
+          '',
       originStationNameAr: json['originStationNameAr'] as String?,
-      destinationGovernorate: json['destinationGov'] as String? ?? 'Alexandria',
-      destinationGovernorateAr: json['destinationGovernorateAr'] as String?,
-      destinationStation: json['destinationStation'] as String? ?? '',
+      destinationGovernorate:
+          json['destinationGovEn'] as String? ??
+          json['destinationGovernorate'] as String? ??
+          json['destinationGov'] as String? ??
+          'Alexandria',
+      destinationGovernorateAr:
+          json['destinationGovAr'] as String? ??
+          json['destinationGovernorateAr'] as String?,
+      destinationStation:
+          json['destinationStationNameEn'] as String? ??
+          json['destinationStation'] as String? ??
+          '',
       destinationStationNameAr: json['destinationStationNameAr'] as String?,
       boardingTime:
           DateTime.tryParse(json['boardingTime'] as String? ?? '') ??

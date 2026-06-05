@@ -32,7 +32,10 @@ class NotficationRemoteDatasourceImpl implements NotficationRemoteDatasource {
     final body = res.data as Map<String, dynamic>;
     final data = body['data'] as List<dynamic>? ?? [];
     return data
-        .map((j) => NotficationModel.fromJson(j as Map<String, dynamic>).toEntity())
+        .map(
+          (j) =>
+              NotficationModel.fromJson(j as Map<String, dynamic>).toEntity(),
+        )
         .toList();
   }
 

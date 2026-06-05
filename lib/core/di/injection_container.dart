@@ -61,6 +61,7 @@ import 'package:transportation_app/features/signup/domain/repositories/register_
 import 'package:transportation_app/features/signup/domain/usecases/register_use_case.dart';
 import 'package:transportation_app/features/signup/presentation/cubit/signup_cubit.dart';
 import 'package:transportation_app/features/support/cubit/support_cubit.dart';
+import 'package:transportation_app/features/support/cubit/support_tickets_cubit.dart';
 
 final sl = GetIt.instance;
 
@@ -100,14 +101,20 @@ Future<void> init() async {
     () => LoginRemoteDataSourceImpl(dio: DioClient.getInstance()),
   );
   // ── Password (forgot / reset / change) ────────────────────────────
-  sl.registerLazySingleton(() => ForgotPasswordUsecase(loginRepository: sl<LoginRepository>()));
-  sl.registerLazySingleton(() => ResetPasswordUsecase(loginRepository: sl<LoginRepository>()));
+  sl.registerLazySingleton(
+    () => ForgotPasswordUsecase(loginRepository: sl<LoginRepository>()),
+  );
+  sl.registerLazySingleton(
+    () => ResetPasswordUsecase(loginRepository: sl<LoginRepository>()),
+  );
   sl.registerLazySingleton(() => ChangePasswordUseCase(sl<LoginRepository>()));
-  sl.registerFactory(() => PasswordCubit(
-    forgotPasswordUseCase: sl<ForgotPasswordUsecase>(),
-    resetPasswordUseCase: sl<ResetPasswordUsecase>(),
-    changePasswordUseCase: sl<ChangePasswordUseCase>(),
-  ));
+  sl.registerFactory(
+    () => PasswordCubit(
+      forgotPasswordUseCase: sl<ForgotPasswordUsecase>(),
+      resetPasswordUseCase: sl<ResetPasswordUsecase>(),
+      changePasswordUseCase: sl<ChangePasswordUseCase>(),
+    ),
+  );
   sl.registerLazySingleton<ProfileRemoteDatasource>(
     () => ProfileRemoteDatasourceImpl(dio: DioClient.getInstance()),
   );
@@ -168,8 +175,11 @@ Future<void> init() async {
     () => SearchIndirectTripsUseCase(sl<SearchRepository>()),
   );
   sl.registerFactory(
-    () =>
-        SearchCubit(searchTripsUseCase: sl(), searchIndirectTripsUseCase: sl(),recentSearchLocalDataSource: sl()),
+    () => SearchCubit(
+      searchTripsUseCase: sl(),
+      searchIndirectTripsUseCase: sl(),
+      recentSearchLocalDataSource: sl(),
+    ),
   );
   sl.registerLazySingleton<BookingRemoteDatasource>(
     () => BookingRemoteDatasourceImpl(dio: DioClient.getInstance()),
@@ -214,7 +224,8 @@ Future<void> init() async {
   );
 
   // ── Support Tickets ─────────────────────────────────────────────────
-  sl.registerFactory<SupportCubit>(
-    () => SupportCubit(DioClient.getInstance()),
+  sl.registerFactory<SupportCubit>(() => SupportCubit(DioClient.getInstance()));
+  sl.registerFactory<SupportTicketsCubit>(
+    () => SupportTicketsCubit(DioClient.getInstance()),
   );
 }

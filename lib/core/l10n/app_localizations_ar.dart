@@ -1328,7 +1328,69 @@ class AppLocalizationsAr extends AppLocalizations {
   String get filterMarketplace => 'السوق';
 
   @override
+  String get filterBoarding => 'الصعود';
+
+  @override
+  String get filterGamification => 'المكافآت';
+
+  @override
   String get dismiss => 'إغلاق';
+
+  @override
+  String get tryAgain => 'حاول مرة أخرى';
+
+  @override
+  String get todayLabel => 'اليوم';
+
+  @override
+  String get yesterdayLabel => 'أمس';
+
+  @override
+  String get justNow => 'الآن';
+
+  @override
+  String minutesAgo(int count) {
+    return 'منذ $count دقيقة';
+  }
+
+  @override
+  String hoursAgo(int count) {
+    return 'منذ $count ساعة';
+  }
+
+  @override
+  String get notificationGeneral => 'عام';
+
+  @override
+  String get emptyMarketplaceTitle => 'لا يوجد نشاط في السوق بعد';
+
+  @override
+  String get emptyMarketplaceSubtitle => 'ستظهر إشعارات العروض والمبيعات هنا.';
+
+  @override
+  String get emptyUnreadTitle => 'أنت مطلع على كل شيء!';
+
+  @override
+  String get emptyUnreadSubtitle => 'لا توجد إشعارات غير مقروءة حالياً.';
+
+  @override
+  String get emptyBoardingTitle => 'لا توجد تنبيهات صعود';
+
+  @override
+  String get emptyBoardingSubtitle => 'ستظهر تذكيرات الرحلات القادمة هنا.';
+
+  @override
+  String get emptyGamificationTitle => 'لا يوجد نشاط مكافآت';
+
+  @override
+  String get emptyGamificationSubtitle => 'ستظهر إشعارات النقاط والتحديات هنا.';
+
+  @override
+  String get emptyNotificationsTitle => 'لا توجد إشعارات بعد';
+
+  @override
+  String get emptyNotificationsSubtitle =>
+      'ستظهر هنا التحديثات المهمة حول رحلاتك ونشاط السوق.';
 
   @override
   String get seatLegendAvailable => 'متاح';
@@ -1413,6 +1475,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get classLabel => 'الدرجة';
 
   @override
+  String get sellerLabel => 'البائع';
+
+  @override
   String get priceLabel => 'السعر';
 
   @override
@@ -1485,6 +1550,21 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get backToLogin => 'العودة لتسجيل الدخول';
+
+  @override
+  String get supportTickets => 'تذاكر الدعم';
+
+  @override
+  String get noSupportTickets => 'لا توجد تذاكر دعم حتى الآن';
+
+  @override
+  String get supportTicketsEmptyBody => 'ستظهر المشكلات المرسلة هنا.';
+
+  @override
+  String get untitledTicket => 'تذكرة بدون عنوان';
+
+  @override
+  String get noDescriptionProvided => 'لا يوجد وصف.';
 
   @override
   String get reportIssue => 'الإبلاغ عن مشكلة';

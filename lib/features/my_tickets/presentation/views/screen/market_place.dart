@@ -153,7 +153,9 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
                                   : Colors.white,
                             ),
                             label: Text(
-                              isFilterActive ? l10n.filtersActive : l10n.filters,
+                              isFilterActive
+                                  ? l10n.filtersActive
+                                  : l10n.filters,
                               style: TextStyle(
                                 color: isFilterActive
                                     ? ColorsManager.accentCyan
@@ -175,7 +177,9 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               backgroundColor: isFilterActive
-                                  ? ColorsManager.accentCyan.withValues(alpha: 0.08)
+                                  ? ColorsManager.accentCyan.withValues(
+                                      alpha: 0.08,
+                                    )
                                   : Colors.transparent,
                             ),
                           ),
@@ -224,7 +228,9 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
                         if (filter.destinationGovernorate != null &&
                             filter.destinationGovernorate!.isNotEmpty)
                           _ActiveFilterChip(
-                            label: l10n.filterTo(filter.destinationGovernorate!),
+                            label: l10n.filterTo(
+                              filter.destinationGovernorate!,
+                            ),
                             onRemove: () => cubit.fetchActiveListings(
                               filter: filter.copyWith(clearDestination: true),
                             ),
@@ -314,7 +320,8 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
                           child: Text(
                             l10n.retry,
                             style: const TextStyle(
-                                color: ColorsManager.accentCyan),
+                              color: ColorsManager.accentCyan,
+                            ),
                           ),
                         ),
                       ],
@@ -382,15 +389,69 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
                             state.listings[index] as Map<String, dynamic>;
                         final trip =
                             item['tripDetails'] as Map<String, dynamic>? ?? {};
+                        final isArabic =
+                            Localizations.localeOf(ctx).languageCode == 'ar';
 
                         // ── Correct API field names ──────────────────────
-                        final originGov = trip['originGov'] as String? ?? '';
-                        final destinationGov =
-                            trip['destinationGov'] as String? ?? '';
+                        final originGov = _localizedField(
+                          trip,
+                          isArabic: isArabic,
+                          key: 'originGov',
+                          arabicKeys: const [
+                            'originGovAr',
+                            'originGovernorateAr',
+                          ],
+                        );
+                        final destinationGov = _localizedField(
+                          trip,
+                          isArabic: isArabic,
+                          key: 'destinationGov',
+                          arabicKeys: const [
+                            'destinationGovAr',
+                            'destinationGovernorateAr',
+                          ],
+                        );
                         // Arabic station/city names — used as subtitle
-                        final originCity = trip['origin'] as String? ?? '';
-                        final destinationCity =
-                            trip['destination'] as String? ?? '';
+                        final originCity = _localizedField(
+                          trip,
+                          isArabic: isArabic,
+                          key: 'origin',
+                          arabicKeys: const [
+                            'originAr',
+                            'originStationNameAr',
+                            'originNameAr',
+                          ],
+                        );
+                        final destinationCity = _localizedField(
+                          trip,
+                          isArabic: isArabic,
+                          key: 'destination',
+                          arabicKeys: const [
+                            'destinationAr',
+                            'destinationStationNameAr',
+                            'destinationNameAr',
+                          ],
+                        );
+                        final agencyName = _localizedField(
+                          trip,
+                          isArabic: isArabic,
+                          key: 'agencyName',
+                          arabicKeys: const ['agencyNameAr', 'agencyAr'],
+                          fallback: _localizedField(
+                            item,
+                            isArabic: isArabic,
+                            key: 'agencyName',
+                            arabicKeys: const ['agencyNameAr', 'agencyAr'],
+                            fallback: item['agency'] as String?,
+                          ),
+                        );
+                        final className = _localizedField(
+                          trip,
+                          isArabic: isArabic,
+                          key: 'class',
+                          arabicKeys: const ['classNameAr', 'classAr'],
+                          fallback: 'Standard',
+                        );
 
                         // Header: English gov names; fall back to Arabic
                         final fromLabel = originGov.isNotEmpty
@@ -434,17 +495,17 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
                             date: '${dt.day}/${dt.month}/${dt.year}',
                             time:
                                 '${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}',
-                            className: _cleanClassName(
-                              trip['class'] as String? ?? 'Standard',
-                            ),
+                            className: _cleanClassName(className),
                             sellerName:
                                 item['sellerName'] as String? ?? 'Seller',
-                            agencyName:
-                                item['agencyName'] as String? ??
-                                item['agency'] as String?,
+                            agencyName: agencyName,
                             oldPrice: '$oldPrice EGP',
                             newPrice: '$newPrice EGP',
                             discount: percentageLabel,
+                            forSaleLabel: l10n.availableForSale,
+                            classLabel: l10n.classLabel,
+                            sellerLabel: l10n.sellerLabel,
+                            buyNowLabel: l10n.buyNow,
                             onBuy: () => _showBuyDialog(context, item, cubit),
                           ),
                         );
@@ -490,17 +551,74 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
     return deduped.join(' - ');
   }
 
+  String _localizedField(
+    Map<String, dynamic> source, {
+    required bool isArabic,
+    required String key,
+    required List<String> arabicKeys,
+    String? fallback,
+  }) {
+    if (isArabic) {
+      for (final arabicKey in arabicKeys) {
+        final value = source[arabicKey]?.toString().trim();
+        if (value != null && value.isNotEmpty) return value;
+      }
+    }
+
+    final original = source[key]?.toString().trim();
+    if (original != null && original.isNotEmpty) return original;
+    return fallback?.trim() ?? '';
+  }
+
   void _showBuyDialog(
     BuildContext context,
     Map<String, dynamic> item,
     MarketplaceCubit cubit,
   ) {
     final trip = item['tripDetails'] as Map<String, dynamic>? ?? {};
+    final isArabic = Localizations.localeOf(context).languageCode == 'ar';
     // Correct API field names
-    final originGov = trip['originGov'] as String? ?? '';
-    final destinationGov = trip['destinationGov'] as String? ?? '';
-    final originCity = trip['origin'] as String? ?? '';
-    final destinationCity = trip['destination'] as String? ?? '';
+    final originGov = _localizedField(
+      trip,
+      isArabic: isArabic,
+      key: 'originGov',
+      arabicKeys: const ['originGovAr', 'originGovernorateAr'],
+    );
+    final destinationGov = _localizedField(
+      trip,
+      isArabic: isArabic,
+      key: 'destinationGov',
+      arabicKeys: const ['destinationGovAr', 'destinationGovernorateAr'],
+    );
+    final originCity = _localizedField(
+      trip,
+      isArabic: isArabic,
+      key: 'origin',
+      arabicKeys: const ['originAr', 'originStationNameAr', 'originNameAr'],
+    );
+    final destinationCity = _localizedField(
+      trip,
+      isArabic: isArabic,
+      key: 'destination',
+      arabicKeys: const [
+        'destinationAr',
+        'destinationStationNameAr',
+        'destinationNameAr',
+      ],
+    );
+    final agencyName = _localizedField(
+      trip,
+      isArabic: isArabic,
+      key: 'agencyName',
+      arabicKeys: const ['agencyNameAr', 'agencyAr'],
+      fallback: _localizedField(
+        item,
+        isArabic: isArabic,
+        key: 'agencyName',
+        arabicKeys: const ['agencyNameAr', 'agencyAr'],
+        fallback: item['agency'] as String?,
+      ),
+    );
     // Build display strings: "Sohag, سوهاج الشهيد"
     final originDisplay = [
       originGov,
@@ -512,7 +630,15 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
     ].where((s) => s.isNotEmpty).join(', ');
     final timeStr = trip['time'] as String? ?? '';
     final dt = DateTime.tryParse(timeStr) ?? DateTime.now();
-    final className = _cleanClassName(trip['class'] as String? ?? 'Standard');
+    final className = _cleanClassName(
+      _localizedField(
+        trip,
+        isArabic: isArabic,
+        key: 'class',
+        arabicKeys: const ['classNameAr', 'classAr'],
+        fallback: 'Standard',
+      ),
+    );
     final newPrice = (item['askingPrice'] as num? ?? 0).toDouble();
 
     showDialog(
@@ -520,106 +646,108 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
       builder: (ctx) {
         final l10n = AppLocalizations.of(ctx)!;
         return AlertDialog(
-        backgroundColor: ColorsManager.cardBg,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: Row(
-          children: [
-            const Icon(
-              Icons.shopping_cart,
-              color: ColorsManager.accentCyan,
-              size: 22,
-            ),
-            const SizedBox(width: 8),
-            Text(
-              l10n.buyTicket,
-              style: const TextStyle(color: Colors.white, fontSize: 18),
-            ),
-          ],
-        ),
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
+          backgroundColor: ColorsManager.cardBg,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          title: Row(
             children: [
-              Text(
-                '${l10n.agencyLabel}: ${item['agencyName'] ?? 'Unknown'}',
-                style: const TextStyle(color: Colors.white70),
+              const Icon(
+                Icons.shopping_cart,
+                color: ColorsManager.accentCyan,
+                size: 22,
               ),
-              const SizedBox(height: 8),
-              if (originDisplay.isNotEmpty)
-                Text(
-                  '${l10n.originLabel}: $originDisplay',
-                  style: const TextStyle(color: Colors.white70),
-                ),
-              if (destinationDisplay.isNotEmpty)
-                Text(
-                  '${l10n.destinationLabel}: $destinationDisplay',
-                  style: const TextStyle(color: Colors.white70),
-                ),
-              const SizedBox(height: 8),
+              const SizedBox(width: 8),
               Text(
-                '${l10n.dateLabel}: ${dt.day}/${dt.month}/${dt.year}',
-                style: const TextStyle(color: Colors.white70),
-              ),
-              Text(
-                '${l10n.timeLabel}: ${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}',
-                style: const TextStyle(color: Colors.white70),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                '${l10n.classLabel}: $className',
-                style: const TextStyle(color: Colors.white70),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                '${l10n.priceLabel}: $newPrice EGP',
-                style: const TextStyle(
-                  color: ColorsManager.successGreen,
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 16),
-              Text(
-                l10n.areYouSureBuyTicket,
-                style: const TextStyle(color: Colors.white),
+                l10n.buyTicket,
+                style: const TextStyle(color: Colors.white, fontSize: 18),
               ),
             ],
           ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: Text(
-              l10n.cancel,
-              style: const TextStyle(color: Colors.white38),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '${l10n.agencyLabel}: ${agencyName.isEmpty ? 'Unknown' : agencyName}',
+                  style: const TextStyle(color: Colors.white70),
+                ),
+                const SizedBox(height: 8),
+                if (originDisplay.isNotEmpty)
+                  Text(
+                    '${l10n.originLabel}: $originDisplay',
+                    style: const TextStyle(color: Colors.white70),
+                  ),
+                if (destinationDisplay.isNotEmpty)
+                  Text(
+                    '${l10n.destinationLabel}: $destinationDisplay',
+                    style: const TextStyle(color: Colors.white70),
+                  ),
+                const SizedBox(height: 8),
+                Text(
+                  '${l10n.dateLabel}: ${dt.day}/${dt.month}/${dt.year}',
+                  style: const TextStyle(color: Colors.white70),
+                ),
+                Text(
+                  '${l10n.timeLabel}: ${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}',
+                  style: const TextStyle(color: Colors.white70),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  '${l10n.classLabel}: $className',
+                  style: const TextStyle(color: Colors.white70),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  '${l10n.priceLabel}: $newPrice EGP',
+                  style: const TextStyle(
+                    color: ColorsManager.successGreen,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  l10n.areYouSureBuyTicket,
+                  style: const TextStyle(color: Colors.white),
+                ),
+              ],
             ),
           ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(ctx);
-              Navigator.pushNamed(
-                context,
-                AppRoutes.marketplacePassengerFormScreen,
-                arguments: {'item': item, 'cubit': cubit},
-              );
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: ColorsManager.successGreen,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: Text(
+                l10n.cancel,
+                style: const TextStyle(color: Colors.white38),
               ),
             ),
-            child: Text(
-              l10n.buyNow,
-              style: const TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(ctx);
+                Navigator.pushNamed(
+                  context,
+                  AppRoutes.marketplacePassengerFormScreen,
+                  arguments: {'item': item, 'cubit': cubit},
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: ColorsManager.successGreen,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              child: Text(
+                l10n.buyNow,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
-          ),
-        ],
-      );
+          ],
+        );
       },
     );
   }
@@ -658,7 +786,9 @@ class _ActiveFilterChip extends StatelessWidget {
       decoration: BoxDecoration(
         color: ColorsManager.accentCyan.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: ColorsManager.accentCyan.withValues(alpha: 0.4)),
+        border: Border.all(
+          color: ColorsManager.accentCyan.withValues(alpha: 0.4),
+        ),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,

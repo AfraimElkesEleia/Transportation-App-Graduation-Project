@@ -1,6 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:transportation_app/features/my_tickets/domain/repositories/my_tickets_repository.dart';
-import 'package:transportation_app/features/profile/domain/entities/ticket_entity.dart';
+import 'package:transportation_app/features/my_tickets/domain/entities/ticket_entity.dart';
 import 'my_tickets_states.dart';
 
 class MyTicketsCubit extends Cubit<MyTicketsState> {
@@ -27,13 +27,12 @@ class MyTicketsCubit extends Cubit<MyTicketsState> {
     emit(TicketsLoadingState());
     final result = await repository.getMyTickets();
     if (isClosed) return;
-    result.fold(
-      (failure) => emit(TicketsErrorState(failure.message)),
-      (tickets) {
-        _cachedTickets = tickets;
-        emit(TicketsLoadedState(tickets));
-      },
-    );
+    result.fold((failure) => emit(TicketsErrorState(failure.message)), (
+      tickets,
+    ) {
+      _cachedTickets = tickets;
+      emit(TicketsLoadedState(tickets));
+    });
   }
 
   // ── Wallet balance ────────────────────────────────────────────────
@@ -41,13 +40,12 @@ class MyTicketsCubit extends Cubit<MyTicketsState> {
     emit(WalletBalanceLoadingState());
     final result = await repository.getWalletBalance();
     if (isClosed) return;
-    result.fold(
-      (failure) => emit(WalletBalanceErrorState(failure.message)),
-      (balance) {
-        _cachedBalance = balance;
-        emit(WalletBalanceLoadedState(balance));
-      },
-    );
+    result.fold((failure) => emit(WalletBalanceErrorState(failure.message)), (
+      balance,
+    ) {
+      _cachedBalance = balance;
+      emit(WalletBalanceLoadedState(balance));
+    });
   }
 
   // ── Wallet history ────────────────────────────────────────────────
@@ -76,19 +74,18 @@ class MyTicketsCubit extends Cubit<MyTicketsState> {
       cvv: cvv,
     );
     if (isClosed) return;
-    result.fold(
-      (failure) => emit(WalletDepositErrorState(failure.message)),
-      (_) async {
-        // Reload balance after successful deposit
-        final balResult = await repository.getWalletBalance();
-        if (isClosed) return;
-        final newBal = balResult.fold((_) => _cachedBalance + amount, (b) {
-          _cachedBalance = b;
-          return b;
-        });
-        emit(WalletDepositedState(newBal));
-      },
-    );
+    result.fold((failure) => emit(WalletDepositErrorState(failure.message)), (
+      _,
+    ) async {
+      // Reload balance after successful deposit
+      final balResult = await repository.getWalletBalance();
+      if (isClosed) return;
+      final newBal = balResult.fold((_) => _cachedBalance + amount, (b) {
+        _cachedBalance = b;
+        return b;
+      });
+      emit(WalletDepositedState(newBal));
+    });
   }
 
   // ── Refund ────────────────────────────────────────────────────────

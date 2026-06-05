@@ -16,13 +16,18 @@ abstract class AppRoutes {
   static const roundTripPassengerFormScreen =
       '/round_trip_passenger_form_screen';
   static const multidestinationScreen = '/multidestination_screen';
-  static const multidestinationSummaryScreen = '/multidestination_summary_screen';
-  static const multidestinationBookingScreen = '/multidestination_booking_screen';
-  static const multidestinationPassengerFormScreen = '/multidestination_passenger_form_screen';
+  static const multidestinationSummaryScreen =
+      '/multidestination_summary_screen';
+  static const multidestinationBookingScreen =
+      '/multidestination_booking_screen';
+  static const multidestinationPassengerFormScreen =
+      '/multidestination_passenger_form_screen';
   static const ticketDetailsScreen = '/ticket_details_screen';
   static const loyaltyHub = '/loyalty_hub';
   static const notificationsScreen = '/notifications_screen';
-  static const marketplacePassengerFormScreen = '/marketplace_passenger_form_screen';
+  static const marketplacePassengerFormScreen =
+      '/marketplace_passenger_form_screen';
   static const String forgotPasswordScreen = '/forgot_password_screen';
   static const String reportIssueScreen = '/report_issue_screen';
+  static const String supportTicketsScreen = '/support_tickets_screen';
 }

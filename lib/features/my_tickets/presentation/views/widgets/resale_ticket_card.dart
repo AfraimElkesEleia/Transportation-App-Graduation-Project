@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:transportation_app/core/l10n/app_localizations.dart';
 import 'package:transportation_app/core/theming/colors.dart';
-import 'package:transportation_app/features/profile/domain/entities/ticket_entity.dart';
+import 'package:transportation_app/features/my_tickets/domain/entities/ticket_entity.dart';
 
 /// A card summarising a [TicketEntity] for the resell screen.
 ///
