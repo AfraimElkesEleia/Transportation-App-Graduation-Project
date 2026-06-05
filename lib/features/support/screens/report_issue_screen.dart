@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:transportation_app/core/l10n/app_localizations.dart';
+import 'package:transportation_app/core/utils/error_localizer.dart';
 import 'package:transportation_app/features/support/cubit/support_cubit.dart';
 
 class ReportIssueScreen extends StatefulWidget {
@@ -28,10 +29,7 @@ class _ReportIssueScreenState extends State<ReportIssueScreen>
       vsync: this,
       duration: const Duration(milliseconds: 600),
     );
-    _fadeAnim = CurvedAnimation(
-      parent: _animController,
-      curve: Curves.easeOut,
-    );
+    _fadeAnim = CurvedAnimation(parent: _animController, curve: Curves.easeOut);
     _animController.forward();
   }
 
@@ -44,40 +42,40 @@ class _ReportIssueScreenState extends State<ReportIssueScreen>
   }
 
   List<_CategoryOption> _getCategories(AppLocalizations l10n) => [
-        _CategoryOption(
-          value: 1,
-          label: l10n.issueCategoryPayment,
-          icon: Icons.payment_outlined,
-        ),
-        _CategoryOption(
-          value: 2,
-          label: l10n.issueCategoryTrip,
-          icon: Icons.directions_bus_outlined,
-        ),
-        _CategoryOption(
-          value: 3,
-          label: l10n.issueCategoryAppBug,
-          icon: Icons.bug_report_outlined,
-        ),
-        _CategoryOption(
-          value: 4,
-          label: l10n.issueCategoryAccount,
-          icon: Icons.manage_accounts_outlined,
-        ),
-        _CategoryOption(
-          value: 5,
-          label: l10n.issueCategoryOther,
-          icon: Icons.help_outline,
-        ),
-      ];
+    _CategoryOption(
+      value: 1,
+      label: l10n.issueCategoryPayment,
+      icon: Icons.payment_outlined,
+    ),
+    _CategoryOption(
+      value: 2,
+      label: l10n.issueCategoryTrip,
+      icon: Icons.directions_bus_outlined,
+    ),
+    _CategoryOption(
+      value: 3,
+      label: l10n.issueCategoryAppBug,
+      icon: Icons.bug_report_outlined,
+    ),
+    _CategoryOption(
+      value: 4,
+      label: l10n.issueCategoryAccount,
+      icon: Icons.manage_accounts_outlined,
+    ),
+    _CategoryOption(
+      value: 5,
+      label: l10n.issueCategoryOther,
+      icon: Icons.help_outline,
+    ),
+  ];
 
   void _submit() {
     if (!_formKey.currentState!.validate()) return;
     context.read<SupportCubit>().submitTicket(
-          title: _titleController.text.trim(),
-          description: _descController.text.trim(),
-          issueCategory: _selectedCategory,
-        );
+      title: _titleController.text.trim(),
+      description: _descController.text.trim(),
+      issueCategory: _selectedCategory,
+    );
   }
 
   @override
@@ -98,7 +96,7 @@ class _ReportIssueScreenState extends State<ReportIssueScreen>
                   const SizedBox(width: 10),
                   Expanded(
                     child: Text(
-                      state.message,
+                      ErrorLocalizer.localize(context, state.message),
                       style: const TextStyle(color: Colors.white),
                     ),
                   ),
@@ -221,9 +219,7 @@ class _ReportIssueScreenState extends State<ReportIssueScreen>
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: Colors.cyan.withValues(alpha: 0.15),
-        ),
+        border: Border.all(color: Colors.cyan.withValues(alpha: 0.15)),
       ),
       child: Row(
         children: [

@@ -465,7 +465,7 @@ class _CardTab extends StatelessWidget {
             Expanded(
               child: _SheetField(
                 controller: cvvCtrl,
-                label: 'CVV',
+                label: l10n.cvvLabel,
                 hint: '•••',
                 icon: Icons.lock_outline,
                 obscureText: true,
@@ -565,9 +565,25 @@ class _SheetField extends StatelessWidget {
 class _WalletHistorySheet extends StatelessWidget {
   const _WalletHistorySheet();
 
+  String _localizeType(String type, AppLocalizations l10n) {
+    switch (type.toUpperCase()) {
+      case 'DEPOSIT':
+        return l10n.txDeposit;
+      case 'TICKET_PURCHASE':
+        return l10n.txTicketPurchase;
+      case 'REDEMPTION':
+        return l10n.txRedemption;
+      case 'REWARD':
+        return l10n.txReward;
+      default:
+        return type;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final isArabic = Localizations.localeOf(context).languageCode == 'ar';
     return DraggableScrollableSheet(
       initialChildSize: 0.65,
       maxChildSize: 0.92,
@@ -633,6 +649,12 @@ class _WalletHistorySheet extends StatelessWidget {
                           const Divider(color: Colors.white12),
                       itemBuilder: (_, i) {
                         final t = state.transactions[i];
+                        final description =
+                            isArabic &&
+                                t.descriptionAr != null &&
+                                t.descriptionAr!.trim().isNotEmpty
+                            ? t.descriptionAr!
+                            : t.description;
                         return ListTile(
                           contentPadding: EdgeInsets.zero,
                           leading: Container(
@@ -656,7 +678,7 @@ class _WalletHistorySheet extends StatelessWidget {
                             ),
                           ),
                           title: Text(
-                            t.type,
+                            _localizeType(t.type, l10n),
                             style: const TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.w600,
@@ -664,7 +686,7 @@ class _WalletHistorySheet extends StatelessWidget {
                             ),
                           ),
                           subtitle: Text(
-                            t.description,
+                            description,
                             style: const TextStyle(
                               color: Colors.white54,
                               fontSize: 11,
@@ -673,7 +695,7 @@ class _WalletHistorySheet extends StatelessWidget {
                             overflow: TextOverflow.ellipsis,
                           ),
                           trailing: Text(
-                            '${t.isCredit ? '+' : ''}${t.amount.toStringAsFixed(2)} EGP',
+                            '${t.isCredit ? '+' : ''}${t.amount.toStringAsFixed(2)} ${l10n.egp}',
                             style: TextStyle(
                               color: t.isCredit
                                   ? const Color(0xFF00C853)

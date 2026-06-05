@@ -450,7 +450,7 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
                           isArabic: isArabic,
                           key: 'class',
                           arabicKeys: const ['classNameAr', 'classAr'],
-                          fallback: 'Standard',
+                          fallback: l10n.standardClass,
                         );
 
                         // Header: English gov names; fall back to Arabic
@@ -497,10 +497,13 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
                                 '${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}',
                             className: _cleanClassName(className),
                             sellerName:
-                                item['sellerName'] as String? ?? 'Seller',
+                                item['sellerName'] as String? ??
+                                l10n.sellerLabel,
                             agencyName: agencyName,
-                            oldPrice: '$oldPrice EGP',
-                            newPrice: '$newPrice EGP',
+                            oldPrice:
+                                '${oldPrice.toStringAsFixed(2)} ${l10n.egp}',
+                            newPrice:
+                                '${newPrice.toStringAsFixed(2)} ${l10n.egp}',
                             discount: percentageLabel,
                             forSaleLabel: l10n.availableForSale,
                             classLabel: l10n.classLabel,
@@ -636,7 +639,7 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
         isArabic: isArabic,
         key: 'class',
         arabicKeys: const ['classNameAr', 'classAr'],
-        fallback: 'Standard',
+        fallback: AppLocalizations.of(context)!.standardClass,
       ),
     );
     final newPrice = (item['askingPrice'] as num? ?? 0).toDouble();
@@ -670,7 +673,7 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  '${l10n.agencyLabel}: ${agencyName.isEmpty ? 'Unknown' : agencyName}',
+                  '${l10n.agencyLabel}: ${agencyName.isEmpty ? l10n.unknown : agencyName}',
                   style: const TextStyle(color: Colors.white70),
                 ),
                 const SizedBox(height: 8),
@@ -700,7 +703,7 @@ class _MarketplaceScreenState extends State<MarketplaceScreen> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  '${l10n.priceLabel}: $newPrice EGP',
+                  '${l10n.priceLabel}: ${newPrice.toStringAsFixed(2)} ${l10n.egp}',
                   style: const TextStyle(
                     color: ColorsManager.successGreen,
                     fontSize: 16,

@@ -11,6 +11,7 @@
   "loading": "جاري التحميل...",
   "error": "خطأ",
   "noData": "لا توجد بيانات متاحة",
+  "unknown": "غير معروف",
   "no": "لا",
   "onboardingSubtitle1": "سافر بذكاء",
   "onboardingTitle1": "اكتشف مصر",
@@ -208,6 +209,7 @@
   "enterValidAmount": "أدخل مبلغاً صحيحاً",
   "amountMustBeRange": "يجب أن يكون المبلغ بين 10 و 10000 جنيه",
   "cardNumber": "رقم البطاقة",
+  "cvvLabel": "CVV",
   "mustBe16Digits": "يجب أن يكون 16 رقماً",
   "expiry": "تاريخ انتهاء الصلاحية",
   "formatMmYy": "الصيغة: شش/سس",
@@ -779,5 +781,6 @@
   "enterPhoneNumber": "أدخل رقم الهاتف",
   "selectCountryCode": "اختر رمز الدولة",
   "searchCountryOrCode": "البحث عن الدولة أو الرمز...",
-  "selectDate": "اختر التاريخ"
+  "selectDate": "اختر التاريخ",
+  "noInternetConnection": "لا يوجد اتصال بالإنترنت. يرجى التحقق من الاتصال والمحاولة مرة أخرى."
 }

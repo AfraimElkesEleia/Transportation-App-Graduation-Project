@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:transportation_app/core/di/injection_container.dart';
 import 'package:transportation_app/core/l10n/app_localizations.dart';
 import 'package:transportation_app/core/theming/colors.dart';
+import 'package:transportation_app/core/utils/token_manager.dart';
 import 'package:transportation_app/core/utils/error_localizer.dart';
 import 'package:transportation_app/core/widgets/app_shimmer.dart';
 import 'package:transportation_app/core/widgets/basic_container.dart';
@@ -9,8 +11,6 @@ import 'package:transportation_app/features/booking/presentation/cubit/cart_cubi
 import 'package:transportation_app/features/booking/presentation/cubit/cart_state.dart';
 import 'package:transportation_app/features/booking/presentation/views/widgets/cart_item_card.dart';
 import 'package:transportation_app/features/booking/presentation/views/widgets/points_redemption_widget.dart';
-import 'package:transportation_app/features/profile/presentation/cubit/profile_cubit/profile_cubit.dart';
-import 'package:transportation_app/features/profile/presentation/cubit/profile_cubit/profile_states.dart';
 
 class CartScreen extends StatefulWidget {
   const CartScreen({super.key});
@@ -94,7 +94,9 @@ class _CartScreenState extends State<CartScreen> {
                     } else if (state is CheckoutError) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          content: Text(ErrorLocalizer.localize(context, state.message)),
+                          content: Text(
+                            ErrorLocalizer.localize(context, state.message),
+                          ),
                           backgroundColor: Colors.red,
                         ),
                       );
@@ -116,7 +118,10 @@ class _CartScreenState extends State<CartScreen> {
                       return _buildEmptyCart(l10n);
                     }
                     if (state is CartError) {
-                      return _buildError(ErrorLocalizer.localize(context, state.message), l10n);
+                      return _buildError(
+                        ErrorLocalizer.localize(context, state.message),
+                        l10n,
+                      );
                     }
                     if (state is CartLoaded) {
                       return _buildCartList(state);
@@ -154,7 +159,10 @@ class _CartScreenState extends State<CartScreen> {
           const SizedBox(height: 8),
           Text(
             l10n.addTripsToCart,
-            style: const TextStyle(color: ColorsManager.textMuted, fontSize: 14),
+            style: const TextStyle(
+              color: ColorsManager.textMuted,
+              fontSize: 14,
+            ),
           ),
         ],
       ),
@@ -261,15 +269,20 @@ class _CartBottomBar extends StatefulWidget {
 
 class _CartBottomBarState extends State<_CartBottomBar> {
   int _selectedPoints = 0;
+  int _loyaltyBalance = 0;
 
-  /// Returns the user's loyalty points balance.
-  /// ProfileCubit is always provided in scope by the router.
-  int _getLoyaltyBalance(BuildContext context) {
-    final state = context.watch<ProfileCubit>().state;
-    if (state is ProfileLoaded) {
-      return state.profile.loyaltyPointsBalance ?? 0;
-    }
-    return 0;
+  @override
+  void initState() {
+    super.initState();
+    _loadCachedLoyaltyBalance();
+  }
+
+  Future<void> _loadCachedLoyaltyBalance() async {
+    final user = await sl<TokenManager>().getUser();
+    if (!mounted) return;
+    setState(() {
+      _loyaltyBalance = user?.loyaltyPointsBalance ?? 0;
+    });
   }
 
   void _handleCheckout(BuildContext context) {
@@ -279,7 +292,6 @@ class _CartBottomBarState extends State<_CartBottomBar> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final loyaltyBalance = _getLoyaltyBalance(context);
 
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
@@ -296,7 +308,7 @@ class _CartBottomBarState extends State<_CartBottomBar> {
         children: [
           PointsRedemptionWidget(
             cartTotal: widget.grandTotal,
-            walletPoints: loyaltyBalance,
+            walletPoints: _loyaltyBalance,
             onPointsChanged: (pts) => setState(() => _selectedPoints = pts),
           ),
           const SizedBox(height: 16),

@@ -11,6 +11,7 @@
   "loading": "Loading...",
   "error": "Error",
   "noData": "No data available",
+  "unknown": "Unknown",
   "no": "No",
   "onboardingSubtitle1": "TRAVEL SMART",
   "onboardingTitle1": "Discover Egypt",
@@ -236,6 +237,7 @@
   "enterValidAmount": "Enter a valid amount",
   "amountMustBeRange": "Amount must be 10–10,000 EGP",
   "cardNumber": "Card Number",
+  "cvvLabel": "CVV",
   "mustBe16Digits": "Must be 16 digits",
   "expiry": "Expiry",
   "formatMmYy": "Format: MM/YY",
@@ -926,5 +928,6 @@
   "enterPhoneNumber": "Enter phone number",
   "selectCountryCode": "Select Country Code",
   "searchCountryOrCode": "Search country or code...",
-  "selectDate": "Select date"
+  "selectDate": "Select date",
+  "noInternetConnection": "No internet connection. Please check your connection and try again."
 }

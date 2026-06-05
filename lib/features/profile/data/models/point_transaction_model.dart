@@ -5,6 +5,7 @@ class PointTransactionModel extends PointTransaction {
     required super.transactionId,
     required super.amount,
     required super.description,
+    super.descriptionAr,
     required super.source,
     required super.status,
     required super.createdAt,
@@ -15,9 +16,12 @@ class PointTransactionModel extends PointTransaction {
       transactionId: json['transactionId'] ?? 0,
       amount: json['amount'] ?? 0,
       description: json['description'] ?? '',
+      descriptionAr: json['descriptionAr'] as String?,
       source: json['source'] ?? '',
       status: json['status'] ?? '',
-      createdAt: json['createdAt'] != null ? DateTime.parse(json['createdAt']).toLocal() : DateTime.now(),
+      createdAt: json['createdAt'] != null
+          ? DateTime.parse(json['createdAt']).toLocal()
+          : DateTime.now(),
     );
   }
 }

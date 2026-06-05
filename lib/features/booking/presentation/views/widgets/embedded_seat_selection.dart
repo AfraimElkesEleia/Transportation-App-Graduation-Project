@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:transportation_app/core/l10n/app_localizations.dart';
 import 'package:transportation_app/core/theming/colors.dart';
+import 'package:transportation_app/core/utils/error_localizer.dart';
 import 'package:transportation_app/features/booking/domain/entities/seat_map.dart';
 import 'package:transportation_app/features/booking/presentation/cubit/seat_map_cubit.dart';
 import 'package:transportation_app/features/booking/presentation/cubit/seat_map_state.dart';
@@ -63,7 +64,9 @@ class _EmbeddedSeatSelectionState extends State<EmbeddedSeatSelection> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                AppLocalizations.of(context)!.canOnlySelectNSeats('${widget.enforcedSeatCount}'),
+                AppLocalizations.of(
+                  context,
+                )!.canOnlySelectNSeats('${widget.enforcedSeatCount}'),
               ),
               backgroundColor: Colors.red,
             ),
@@ -87,7 +90,9 @@ class _EmbeddedSeatSelectionState extends State<EmbeddedSeatSelection> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            AppLocalizations.of(context)!.selectExactlyNSeats('${widget.enforcedSeatCount}'),
+            AppLocalizations.of(
+              context,
+            )!.selectExactlyNSeats('${widget.enforcedSeatCount}'),
           ),
           backgroundColor: Colors.red,
         ),
@@ -113,7 +118,9 @@ class _EmbeddedSeatSelectionState extends State<EmbeddedSeatSelection> {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(
-                  AppLocalizations.of(context)!.pleaseSelectNPassengers('${widget.enforcedSeatCount}'),
+                  AppLocalizations.of(
+                    context,
+                  )!.pleaseSelectNPassengers('${widget.enforcedSeatCount}'),
                 ),
                 backgroundColor: Colors.red,
               ),
@@ -137,7 +144,7 @@ class _EmbeddedSeatSelectionState extends State<EmbeddedSeatSelection> {
 
           if (state is SeatMapError) {
             return SeatMapErrorView(
-              message: state.message,
+              message: ErrorLocalizer.localize(context, state.message),
               onRetry: () => context.read<SeatMapCubit>().loadSeatMap(
                 widget.trip.tripOccurrenceId,
                 widget.coachClass.coachClassId,

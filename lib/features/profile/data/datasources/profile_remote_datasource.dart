@@ -171,6 +171,7 @@ class ProfileRemoteDatasourceImpl implements ProfileRemoteDatasource {
           amount: (json['amount'] as num).toDouble(),
           type: json['type'] as String? ?? '',
           description: json['description'] as String? ?? '',
+          descriptionAr: json['descriptionAr'] as String?,
           bookingId: json['bookingId'] as int?,
           createdAt:
               DateTime.tryParse(json['createdAt'] as String? ?? '') ??

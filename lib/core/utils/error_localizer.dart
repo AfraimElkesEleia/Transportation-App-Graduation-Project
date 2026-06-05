@@ -18,7 +18,16 @@ class ErrorLocalizer {
     }
 
     final lowerMessage = message.toLowerCase();
-    if (lowerMessage.contains("insufficient funds") || lowerMessage.contains("insufficient_wallet_balance")) {
+    if ((lowerMessage.contains("internet") &&
+            (lowerMessage.contains("connection") ||
+                lowerMessage.contains("network"))) ||
+        lowerMessage.contains("connection error") ||
+        lowerMessage.contains("network error")) {
+      return l10n.noInternetConnection;
+    }
+
+    if (lowerMessage.contains("insufficient funds") ||
+        lowerMessage.contains("insufficient_wallet_balance")) {
       return l10n.insufficientFunds;
     }
 
@@ -28,7 +37,9 @@ class ErrorLocalizer {
 
     // Match: seat(s) taken / already taken / just taken
     if (lowerMessage.contains("seat") &&
-        (lowerMessage.contains("taken") || lowerMessage.contains("already booked") || lowerMessage.contains("no longer available"))) {
+        (lowerMessage.contains("taken") ||
+            lowerMessage.contains("already booked") ||
+            lowerMessage.contains("no longer available"))) {
       return l10n.seatsTakenError;
     }
 

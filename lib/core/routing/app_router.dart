@@ -218,14 +218,8 @@ class AppRouter {
         );
       case AppRoutes.cartScreen:
         return MaterialPageRoute(
-          builder: (_) => MultiBlocProvider(
-            providers: [
-              BlocProvider(
-                create: (_) =>
-                    CartCubit(datasource: sl<BookingRemoteDatasource>()),
-              ),
-              BlocProvider(create: (_) => sl<ProfileCubit>()..loadProfile()),
-            ],
+          builder: (_) => BlocProvider(
+            create: (_) => CartCubit(datasource: sl<BookingRemoteDatasource>()),
             child: const CartScreen(),
           ),
         );

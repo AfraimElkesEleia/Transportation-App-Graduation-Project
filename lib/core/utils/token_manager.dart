@@ -48,6 +48,9 @@ class TokenManager {
       'totalTrips': user.totalTrips,
       'totalDistanceKm': user.totalDistanceKm,
       'walletBalance': user.walletBalance,
+      'loyaltyPointsBalance': user.loyaltyPointsBalance,
+      'expiringPointsAmount': user.expiringPointsAmount,
+      'nextExpiryDate': user.nextExpiryDate,
     };
     await _storage.write(key: _cachedUserKey, value: jsonEncode(map));
   }
@@ -71,6 +74,9 @@ class TokenManager {
       totalTrips: map['totalTrips'] as int?,
       totalDistanceKm: (map['totalDistanceKm'] as num?)?.toDouble(),
       walletBalance: (map['walletBalance'] as num?)?.toDouble(),
+      loyaltyPointsBalance: map['loyaltyPointsBalance'] as int?,
+      expiringPointsAmount: map['expiringPointsAmount'] as int?,
+      nextExpiryDate: map['nextExpiryDate'] as String?,
     );
   }
 

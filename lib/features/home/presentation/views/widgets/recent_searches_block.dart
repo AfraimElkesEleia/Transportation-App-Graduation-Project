@@ -100,6 +100,7 @@ class RecentSearchItem extends StatelessWidget {
   }
 
   ListTile recentSearchesItem(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final from = search.fromDisplayName
         .toLocalizedGov(context)
         .toLocalizedStation(context);
@@ -108,10 +109,8 @@ class RecentSearchItem extends StatelessWidget {
         .toLocalizedStation(context);
     final routeText = search.isRoundTrip ? "$from <-> $to" : "$from -> $to";
 
-    final isAr = context.isArabic;
-    final toWord = isAr ? "إلى" : "to";
     final dateText = search.isRoundTrip && search.returnDate != null
-        ? "${search.travelDate} $toWord ${search.returnDate}"
+        ? "${search.travelDate} ${l10n.to} ${search.returnDate}"
         : search.travelDate;
 
     return ListTile(
@@ -122,6 +121,8 @@ class RecentSearchItem extends StatelessWidget {
       title: Text(
         routeText,
         style: AppStyles.bold18DarkBlue(context).copyWith(color: Colors.white),
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
       ),
       subtitle: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -130,6 +131,8 @@ class RecentSearchItem extends StatelessWidget {
           Text(
             dateText,
             style: AppStyles.regular15White(context).copyWith(fontSize: 14),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
         ],
       ),

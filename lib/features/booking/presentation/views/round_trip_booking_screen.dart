@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:transportation_app/core/di/injection_container.dart';
 import 'package:transportation_app/core/routing/routes.dart';
 import 'package:transportation_app/core/theming/colors.dart';
+import 'package:transportation_app/core/utils/error_localizer.dart';
 import 'package:transportation_app/features/booking/data/datasources/booking_remote_datasource.dart';
 import 'package:transportation_app/features/booking/presentation/cubit/round_trip_booking_cubit.dart';
 import 'package:transportation_app/features/booking/presentation/cubit/round_trip_booking_state.dart';
@@ -493,7 +494,9 @@ class _RoundTripBookingScreenState extends State<RoundTripBookingScreen> {
         } else if (current.cartError != null) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(current.cartError!),
+              content: Text(
+                ErrorLocalizer.localize(context, current.cartError!),
+              ),
               backgroundColor: Colors.red,
             ),
           );

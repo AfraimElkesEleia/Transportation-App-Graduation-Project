@@ -38,6 +38,8 @@ class PointTransactionTile extends StatelessWidget {
         return loc.txStatusSpent;
       case 'Expired':
         return loc.txStatusExpired;
+      case 'Pending':
+        return loc.statusPending;
       default:
         return status;
     }
@@ -51,10 +53,20 @@ class PointTransactionTile extends StatelessWidget {
     final icon = isEarned
         ? Icons.arrow_upward_rounded
         : Icons.arrow_downward_rounded;
+    final isArabic = Localizations.localeOf(context).languageCode == 'ar';
+    final description =
+        isArabic &&
+            transaction.descriptionAr != null &&
+            transaction.descriptionAr!.trim().isNotEmpty
+        ? transaction.descriptionAr!
+        : transaction.description;
 
     final localizedSource = _localizeSource(transaction.source, loc);
     final localizedStatus = _localizeStatus(transaction.status, loc);
-    final dateStr = DateFormat('MMM dd, yyyy').format(transaction.createdAt);
+    final dateStr = DateFormat(
+      'MMM dd, yyyy',
+      Localizations.localeOf(context).toLanguageTag(),
+    ).format(transaction.createdAt);
 
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
@@ -90,7 +102,7 @@ class PointTransactionTile extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  transaction.description,
+                  description,
                   style: const TextStyle(color: Colors.white70, fontSize: 13),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,

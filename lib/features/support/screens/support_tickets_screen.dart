@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:transportation_app/core/l10n/app_localizations.dart';
 import 'package:transportation_app/core/theming/colors.dart';
+import 'package:transportation_app/core/utils/error_localizer.dart';
 import 'package:transportation_app/features/support/cubit/support_tickets_cubit.dart';
 import 'package:transportation_app/features/support/domain/entities/support_ticket_entity.dart';
 
@@ -48,7 +49,7 @@ class SupportTicketsScreen extends StatelessWidget {
 
             if (state is SupportTicketsError) {
               return _SupportTicketsErrorView(
-                message: state.message,
+                message: ErrorLocalizer.localize(context, state.message),
                 onRetry: () => _refresh(context),
                 retryLabel: l10n.retry,
               );

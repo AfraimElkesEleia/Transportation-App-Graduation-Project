@@ -45,6 +45,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get noData => 'لا توجد بيانات متاحة';
 
   @override
+  String get unknown => 'غير معروف';
+
+  @override
   String get no => 'لا';
 
   @override
@@ -631,6 +634,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get cardNumber => 'رقم البطاقة';
+
+  @override
+  String get cvvLabel => 'CVV';
 
   @override
   String get mustBe16Digits => 'يجب أن يكون 16 رقماً';
@@ -1747,4 +1753,8 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get selectDate => 'اختر التاريخ';
+
+  @override
+  String get noInternetConnection =>
+      'لا يوجد اتصال بالإنترنت. يرجى التحقق من الاتصال والمحاولة مرة أخرى.';
 }

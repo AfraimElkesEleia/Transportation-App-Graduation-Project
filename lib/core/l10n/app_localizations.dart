@@ -170,6 +170,12 @@ abstract class AppLocalizations {
   /// **'No data available'**
   String get noData;
 
+  /// No description provided for @unknown.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown'**
+  String get unknown;
+
   /// No description provided for @no.
   ///
   /// In en, this message translates to:
@@ -1309,6 +1315,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Card Number'**
   String get cardNumber;
+
+  /// No description provided for @cvvLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'CVV'**
+  String get cvvLabel;
 
   /// No description provided for @mustBe16Digits.
   ///
@@ -3319,6 +3331,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Select date'**
   String get selectDate;
+
+  /// No description provided for @noInternetConnection.
+  ///
+  /// In en, this message translates to:
+  /// **'No internet connection. Please check your connection and try again.'**
+  String get noInternetConnection;
 }
 
 class _AppLocalizationsDelegate

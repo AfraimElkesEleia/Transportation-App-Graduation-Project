@@ -6,6 +6,7 @@ import 'package:transportation_app/core/helper/spacing.dart';
 import 'package:transportation_app/core/notfications/notfication_permission_manager.dart';
 import 'package:transportation_app/core/theming/colors.dart';
 import 'package:transportation_app/core/theming/styles.dart';
+import 'package:transportation_app/core/utils/error_localizer.dart';
 import 'package:transportation_app/core/widgets/app_shimmer.dart';
 import 'package:transportation_app/core/widgets/block_container.dart';
 import 'package:transportation_app/features/home/domain/usecases/get_stations_use_case.dart';
@@ -56,7 +57,9 @@ class _HomeContent extends StatelessWidget {
 
         // ── Error state → show retry screen ──────────────────────────────
         if (state is StationsError) {
-          return _HomeErrorView(message: state.message);
+          return _HomeErrorView(
+            message: ErrorLocalizer.localize(context, state.message),
+          );
         }
 
         // ── Loaded state → show full home content ─────────────────────────
