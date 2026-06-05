@@ -311,6 +311,7 @@ class _MultiDestinationBookingScreenState
                                     transport: TransportType.all,
                                     sortBy: SortBy.departureTime,
                                     clearMaxPrice: true,
+                                    preferredAgencies: const [],
                                     clearTimeFilters: true,
                                     newPage: 1,
                                   );

@@ -16,6 +16,9 @@ import 'package:transportation_app/features/booking/presentation/views/widgets/p
 import 'package:transportation_app/features/booking/presentation/views/widgets/passenger_form/passenger_card.dart';
 import 'package:transportation_app/features/booking/presentation/views/widgets/passenger_form/passenger_form_controllers.dart';
 
+bool _keepHomeRoute(Route<dynamic> route) =>
+    route.settings.name == AppRoutes.homeScreen || route.isFirst;
+
 class IndirectPassengerFormScreen extends StatefulWidget {
   final IndirectBookingState bookingState;
 
@@ -279,7 +282,7 @@ class _IndirectPassengerFormScreenState
                 Navigator.pushNamedAndRemoveUntil(
                   context,
                   AppRoutes.cartScreen,
-                  (route) => route.isFirst,
+                  _keepHomeRoute,
                 );
               }
               if (state is CartError) {
@@ -307,7 +310,7 @@ class _IndirectPassengerFormScreenState
                 Navigator.pushNamedAndRemoveUntil(
                   context,
                   AppRoutes.cartScreen,
-                  (route) => route.isFirst,
+                  _keepHomeRoute,
                 );
               }
             },

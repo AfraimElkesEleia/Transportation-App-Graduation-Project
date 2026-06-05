@@ -17,6 +17,9 @@ import 'package:transportation_app/features/booking/presentation/views/widgets/p
 import 'package:transportation_app/features/booking/presentation/views/widgets/passenger_form/passenger_form_app_bar.dart';
 import 'package:transportation_app/features/booking/presentation/views/widgets/passenger_form/passenger_form_controllers.dart';
 
+bool _keepHomeRoute(Route<dynamic> route) =>
+    route.settings.name == AppRoutes.homeScreen || route.isFirst;
+
 class PassengerFormScreen extends StatefulWidget {
   final TripResultEntity trip;
   final CoachClassEntity coachClass;
@@ -244,15 +247,15 @@ class _PassengerFormScreenState extends State<PassengerFormScreen> {
                 final l10n = AppLocalizations.of(context)!;
                 if (state is CartSuccess) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Success!'),
+                    SnackBar(
+                      content: Text(l10n.journeyAddedToCart),
                       backgroundColor: Colors.green,
                     ),
                   );
                   Navigator.pushNamedAndRemoveUntil(
                     context,
                     AppRoutes.cartScreen,
-                    (route) => route.isFirst,
+                    _keepHomeRoute,
                   );
                 }
                 if (state is CartError) {
@@ -280,7 +283,7 @@ class _PassengerFormScreenState extends State<PassengerFormScreen> {
                   Navigator.pushNamedAndRemoveUntil(
                     context,
                     AppRoutes.cartScreen,
-                    (route) => route.isFirst,
+                    _keepHomeRoute,
                   );
                 }
               },

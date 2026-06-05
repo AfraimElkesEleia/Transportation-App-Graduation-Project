@@ -38,7 +38,7 @@ class PopularRoutesSection extends StatelessWidget {
               ),
               const SizedBox(height: 12),
               SizedBox(
-                height: 100,
+                height: 110,
                 child: ListView.builder(
                   scrollDirection: Axis.horizontal,
                   itemCount: state.routes.length,
@@ -149,7 +149,7 @@ class _RouteCard extends StatelessWidget {
       onTap: () => _onTap(context),
       child: Container(
         width: 280,
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
         decoration: ShapeDecoration(
           color: const Color(0XFF11255E),
           shape: RoundedRectangleBorder(

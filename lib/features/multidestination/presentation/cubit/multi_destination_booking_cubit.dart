@@ -113,6 +113,7 @@ class MultiDestinationBookingCubit extends Cubit<MultiDestinationBookingState> {
           sortBy: newParams.sortBy,
           maxPrice: newParams.maxPrice,
           clearMaxPrice: newParams.maxPrice == null,
+          preferredAgencies: newParams.preferredAgencies,
           departureFrom: newParams.departureFrom,
           departureTo: newParams.departureTo,
           arrivalFrom: newParams.arrivalFrom,

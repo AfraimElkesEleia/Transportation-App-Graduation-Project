@@ -16,6 +16,9 @@ import 'package:transportation_app/features/booking/presentation/views/widgets/p
 import 'package:transportation_app/features/booking/presentation/views/widgets/passenger_form/passenger_form_app_bar.dart';
 import 'package:transportation_app/features/booking/presentation/views/widgets/passenger_form/passenger_form_controllers.dart';
 
+bool _keepHomeRoute(Route<dynamic> route) =>
+    route.settings.name == AppRoutes.homeScreen || route.isFirst;
+
 class RoundTripPassengerFormScreen extends StatefulWidget {
   const RoundTripPassengerFormScreen({super.key});
 
@@ -379,7 +382,24 @@ class _RoundTripPassengerFormScreenState
                 prev.cartSuccess != current.cartSuccess ||
                 prev.checkoutSuccess != current.checkoutSuccess,
             listener: (context, state) {
-              if (state.checkoutSuccess) {
+              if (state.cartError != null && state.cartSuccess) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      AppLocalizations.of(
+                        context,
+                      )!.ticketAddedButCheckoutFailed(state.cartError!),
+                    ),
+                    backgroundColor: Colors.orange,
+                    duration: const Duration(seconds: 4),
+                  ),
+                );
+                Navigator.pushNamedAndRemoveUntil(
+                  context,
+                  AppRoutes.cartScreen,
+                  _keepHomeRoute,
+                );
+              } else if (state.checkoutSuccess) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text(
@@ -391,7 +411,7 @@ class _RoundTripPassengerFormScreenState
                 Navigator.pushNamedAndRemoveUntil(
                   context,
                   AppRoutes.cartScreen,
-                  (route) => route.isFirst,
+                  _keepHomeRoute,
                 );
               } else if (state.cartSuccess) {
                 ScaffoldMessenger.of(context).showSnackBar(
@@ -405,7 +425,7 @@ class _RoundTripPassengerFormScreenState
                 Navigator.pushNamedAndRemoveUntil(
                   context,
                   AppRoutes.cartScreen,
-                  (route) => route.isFirst,
+                  _keepHomeRoute,
                 );
               } else if (state.cartError != null) {
                 ScaffoldMessenger.of(context).showSnackBar(

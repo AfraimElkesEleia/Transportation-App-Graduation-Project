@@ -16,6 +16,9 @@ import 'package:transportation_app/features/booking/presentation/views/widgets/p
 import 'package:transportation_app/features/booking/presentation/views/widgets/passenger_form/passenger_card.dart';
 import 'package:transportation_app/features/booking/presentation/views/widgets/passenger_form/passenger_form_controllers.dart';
 
+bool _keepHomeRoute(Route<dynamic> route) =>
+    route.settings.name == AppRoutes.homeScreen || route.isFirst;
+
 class MultiDestinationPassengerFormScreen extends StatefulWidget {
   const MultiDestinationPassengerFormScreen({super.key});
 
@@ -289,10 +292,20 @@ class _MultiDestinationPassengerFormScreenState
                   current.cartError != null,
               listener: (context, state) {
                 if (state.checkoutSuccess || state.cartSuccess) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        state.checkoutSuccess
+                            ? AppLocalizations.of(context)!.bookingSuccessful
+                            : AppLocalizations.of(context)!.journeyAddedToCart,
+                      ),
+                      backgroundColor: Colors.green,
+                    ),
+                  );
                   Navigator.pushNamedAndRemoveUntil(
                     context,
                     AppRoutes.cartScreen,
-                    (route) => route.settings.name == AppRoutes.homeScreen,
+                    _keepHomeRoute,
                   );
                 } else if (state.cartError != null) {
                   ScaffoldMessenger.of(context).showSnackBar(

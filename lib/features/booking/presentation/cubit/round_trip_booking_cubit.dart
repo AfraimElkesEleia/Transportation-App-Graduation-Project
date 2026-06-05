@@ -112,6 +112,7 @@ class RoundTripBookingCubit extends Cubit<RoundTripBookingState> {
           sortBy: newParams.sortBy,
           maxPrice: newParams.maxPrice,
           clearMaxPrice: newParams.maxPrice == null,
+          preferredAgencies: newParams.preferredAgencies,
           departureFrom: newParams.departureFrom,
           departureTo: newParams.departureTo,
           arrivalFrom: newParams.arrivalFrom,
@@ -159,6 +160,7 @@ class RoundTripBookingCubit extends Cubit<RoundTripBookingState> {
       transport: returnParams.transport,
       sortBy: returnParams.sortBy,
       maxPrice: returnParams.maxPrice,
+      preferredAgencies: returnParams.preferredAgencies,
       departureFrom: returnParams.departureFrom,
       departureTo: returnParams.departureTo,
       arrivalFrom: returnParams.arrivalFrom,
@@ -214,6 +216,7 @@ class RoundTripBookingCubit extends Cubit<RoundTripBookingState> {
       sortBy: returnParams.sortBy,
       pageNumber: returnParams.pageNumber,
       maxPrice: returnParams.maxPrice,
+      preferredAgencies: returnParams.preferredAgencies,
       departureFrom: returnParams.departureFrom,
       departureTo: returnParams.departureTo,
       arrivalFrom: returnParams.arrivalFrom,
@@ -327,6 +330,7 @@ class RoundTripBookingCubit extends Cubit<RoundTripBookingState> {
         emit(
           state.copyWith(
             isAddingToCart: false,
+            cartSuccess: true,
             cartError:
                 'Sorry, the return trip seats are no longer available. Please select a different return trip. (Note: Outbound trip was added to cart)',
           ),
@@ -400,6 +404,7 @@ class RoundTripBookingCubit extends Cubit<RoundTripBookingState> {
         emit(
           state.copyWith(
             isBookingNow: false,
+            cartSuccess: true,
             cartError: 'Failed to complete booking: ${e.toString()}',
           ),
         );
