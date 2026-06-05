@@ -595,6 +595,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get editProfile => 'Edit Profile';
 
   @override
+  String profileTripsCount(String count) {
+    return '$count trips';
+  }
+
+  @override
   String get loyaltyHub => 'Loyalty Hub';
 
   @override

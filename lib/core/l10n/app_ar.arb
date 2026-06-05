@@ -189,6 +189,14 @@
   "marketplace": "السوق",
   "quickActions": "إجراءات سريعة",
   "editProfile": "تعديل الملف الشخصي",
+  "profileTripsCount": "{count} رحلة",
+  "@profileTripsCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
   "loyaltyHub": "مركز التحديات والمكافآت",
   "signOut": "تسجيل الخروج",
   "signOutConfirm": "تسجيل الخروج؟",

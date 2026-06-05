@@ -1238,6 +1238,12 @@ abstract class AppLocalizations {
   /// **'Edit Profile'**
   String get editProfile;
 
+  /// No description provided for @profileTripsCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} trips'**
+  String profileTripsCount(String count);
+
   /// No description provided for @loyaltyHub.
   ///
   /// In en, this message translates to:

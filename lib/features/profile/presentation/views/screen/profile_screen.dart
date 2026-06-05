@@ -37,7 +37,10 @@ class _ProfileViewState extends State<ProfileScreen> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Text(
           l10n.signOutConfirm,
-          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          style: const TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         content: Text(
           l10n.signOutBody,
@@ -58,7 +61,10 @@ class _ProfileViewState extends State<ProfileScreen> {
             },
             child: Text(
               l10n.signOut,
-              style: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+              style: const TextStyle(
+                color: Colors.red,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
         ],
@@ -144,6 +150,7 @@ class _ProfileViewState extends State<ProfileScreen> {
                       ProfileCard(
                         fullName: profile?.fullName ?? '',
                         email: profile?.email ?? '',
+                        totalTrips: profile?.totalTrips,
                         profilePictureUrl: ApiConstants.mediaUrl(
                           profile?.profilePictureUrl,
                         ),

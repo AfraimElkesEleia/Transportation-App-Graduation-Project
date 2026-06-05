@@ -217,6 +217,14 @@
   "marketplace": "Marketplace",
   "quickActions": "Quick Actions",
   "editProfile": "Edit Profile",
+  "profileTripsCount": "{count} trips",
+  "@profileTripsCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
   "loyaltyHub": "Loyalty Hub",
   "signOut": "Sign Out",
   "signOutConfirm": "Sign Out?",

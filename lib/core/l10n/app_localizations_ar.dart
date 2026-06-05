@@ -595,6 +595,11 @@ class AppLocalizationsAr extends AppLocalizations {
   String get editProfile => 'تعديل الملف الشخصي';
 
   @override
+  String profileTripsCount(String count) {
+    return '$count رحلة';
+  }
+
+  @override
   String get loyaltyHub => 'مركز التحديات والمكافآت';
 
   @override
