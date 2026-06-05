@@ -9,6 +9,7 @@ import 'package:transportation_app/core/notfications/signalr_service.dart';
 class AuthInterceptor extends Interceptor {
   final Dio dio;
   final TokenManager _tokenManager = TokenManager();
+  static const _retriedAfterRefreshKey = 'retriedAfterRefresh';
   static const _publicEndpoints = [
     ApiConstants.register,
     ApiConstants.login,
@@ -44,12 +45,23 @@ class AuthInterceptor extends Interceptor {
     final isPublic = _publicEndpoints.any(
       (e) => err.requestOptions.path.contains(e),
     );
+    final statusCode = err.response?.statusCode;
     final tokenExpired = err.response?.headers.value('Token-Expired') == 'true';
-    if (tokenExpired) {
-      debugPrint('🔵 [AuthInterceptor] token expired — trying silent refresh');
+    final alreadyRetried =
+        err.requestOptions.extra[_retriedAfterRefreshKey] == true;
+    final shouldTryRefresh =
+        !isPublic && !alreadyRetried && (tokenExpired || statusCode == 401);
+
+    if (shouldTryRefresh) {
+      debugPrint('🔵 [AuthInterceptor] trying silent token refresh');
       final refreshed = await _tryRefreshToken();
       if (refreshed) {
         final newToken = await _tokenManager.getAccessToken();
+        if (newToken == null) {
+          _forceLogout();
+          return handler.next(err);
+        }
+        err.requestOptions.extra[_retriedAfterRefreshKey] = true;
         err.requestOptions.headers['Authorization'] = 'Bearer $newToken';
         try {
           final retried = await dio.fetch(err.requestOptions);
@@ -57,10 +69,9 @@ class AuthInterceptor extends Interceptor {
         } on DioException catch (retryError) {
           return handler.next(retryError);
         }
-      } else if (!isPublic) {
-        _forceLogout();
       }
-    } else if (err.response?.statusCode == 401 && !isPublic) {
+      _forceLogout();
+    } else if (!isPublic && alreadyRetried && statusCode == 401) {
       _forceLogout();
     }
     debugPrint('🔵 [AuthInterceptor] forwarding error to next handler');
