@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import 'package:transportation_app/core/helper/extensions.dart';
 import 'package:transportation_app/core/theming/colors.dart';
 import 'package:transportation_app/features/my_tickets/presentation/cubit/passenger_boarding_pass_cubit.dart';
 import 'package:transportation_app/features/my_tickets/presentation/views/widgets/boarding_pass_helpers.dart';
@@ -18,6 +19,10 @@ class BoardingPassPassengerSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final className = context.isArabic
+        ? (ticket.classNameAr ?? ticket.className)
+        : ticket.className;
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
       child: Column(
@@ -26,6 +31,7 @@ class BoardingPassPassengerSection extends StatelessWidget {
           BoardingPassPassengerIdentity(passenger: passenger),
           const SizedBox(height: 14),
           Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               BoardingPassInfoChip(
                 label: 'SEAT',
@@ -35,10 +41,13 @@ class BoardingPassPassengerSection extends StatelessWidget {
                 valueColor: Colors.white,
               ),
               const SizedBox(width: 16),
-              BoardingPassInfoChip(
-                label: 'CLASS',
-                value: ticket.className.isNotEmpty ? ticket.className : '-',
-                valueColor: ColorsManager.accentCyan,
+              Expanded(
+                child: BoardingPassInfoChip(
+                  label: 'CLASS',
+                  value: className.isNotEmpty ? className : '-',
+                  valueColor: ColorsManager.accentCyan,
+                  valueMaxLines: 2,
+                ),
               ),
               const SizedBox(width: 16),
               BoardingPassInfoChip(

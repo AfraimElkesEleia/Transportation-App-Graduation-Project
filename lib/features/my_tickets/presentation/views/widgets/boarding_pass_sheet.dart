@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:transportation_app/core/di/injection_container.dart';
-import 'package:transportation_app/core/helper/extensions.dart';
 import 'package:transportation_app/core/theming/colors.dart';
 import 'package:transportation_app/features/my_tickets/presentation/cubit/passenger_boarding_pass_cubit.dart';
 import 'package:transportation_app/features/my_tickets/presentation/views/widgets/boarding_pass_action_bar.dart';
@@ -51,7 +50,6 @@ class BoardingPassSheet extends StatelessWidget {
     final pdfService = BoardingPassPdfService(
       ticket: ticket,
       passenger: passenger,
-      isArabic: context.isArabic,
     );
 
     return DraggableScrollableSheet(

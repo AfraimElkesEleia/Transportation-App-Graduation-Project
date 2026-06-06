@@ -49,12 +49,16 @@ class BoardingPassInfoChip extends StatelessWidget {
   final String label;
   final String value;
   final Color valueColor;
+  final int valueMaxLines;
+  final TextOverflow valueOverflow;
 
   const BoardingPassInfoChip({
     super.key,
     required this.label,
     required this.value,
     required this.valueColor,
+    this.valueMaxLines = 1,
+    this.valueOverflow = TextOverflow.ellipsis,
   });
 
   @override
@@ -79,6 +83,8 @@ class BoardingPassInfoChip extends StatelessWidget {
             fontSize: 13,
             fontWeight: FontWeight.bold,
           ),
+          maxLines: valueMaxLines,
+          overflow: valueOverflow,
         ),
       ],
     );

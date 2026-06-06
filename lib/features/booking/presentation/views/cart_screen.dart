@@ -268,8 +268,13 @@ class _CartBottomBar extends StatefulWidget {
 }
 
 class _CartBottomBarState extends State<_CartBottomBar> {
+  static const double _pointValueEgp = 0.05;
+
   int _selectedPoints = 0;
   int _loyaltyBalance = 0;
+
+  double get _discountEgp => _selectedPoints * _pointValueEgp;
+  double get _payableTotal => widget.grandTotal - _discountEgp;
 
   @override
   void initState() {
@@ -312,6 +317,12 @@ class _CartBottomBarState extends State<_CartBottomBar> {
             onPointsChanged: (pts) => setState(() => _selectedPoints = pts),
           ),
           const SizedBox(height: 16),
+          _CheckoutTotalSummary(
+            cartTotal: widget.grandTotal,
+            discount: _discountEgp,
+            payableTotal: _payableTotal,
+          ),
+          const SizedBox(height: 16),
           // ── Checkout button ─────────────────────────────────────────
           BlocBuilder<CartCubit, CartState>(
             builder: (context, state) {
@@ -349,6 +360,95 @@ class _CartBottomBarState extends State<_CartBottomBar> {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _CheckoutTotalSummary extends StatelessWidget {
+  final double cartTotal;
+  final double discount;
+  final double payableTotal;
+
+  const _CheckoutTotalSummary({
+    required this.cartTotal,
+    required this.discount,
+    required this.payableTotal,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: ColorsManager.surfaceMid,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: ColorsManager.borderDim),
+      ),
+      child: Column(
+        children: [
+          _SummaryRow(
+            label: l10n.grandTotal,
+            value: '${cartTotal.toStringAsFixed(2)} ${l10n.egp}',
+          ),
+          if (discount > 0) ...[
+            const SizedBox(height: 8),
+            _SummaryRow(
+              label: l10n.discount,
+              value: '- ${discount.toStringAsFixed(2)} ${l10n.egp}',
+              valueColor: ColorsManager.successGreen,
+            ),
+          ],
+          const Divider(color: Colors.white24, height: 20),
+          _SummaryRow(
+            label: l10n.finalTotal,
+            value: '${payableTotal.toStringAsFixed(2)} ${l10n.egp}',
+            valueColor: ColorsManager.accentCyan,
+            isEmphasized: true,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SummaryRow extends StatelessWidget {
+  final String label;
+  final String value;
+  final Color valueColor;
+  final bool isEmphasized;
+
+  const _SummaryRow({
+    required this.label,
+    required this.value,
+    this.valueColor = Colors.white,
+    this.isEmphasized = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          child: Text(
+            label,
+            style: TextStyle(
+              color: Colors.white70,
+              fontSize: isEmphasized ? 15 : 13,
+              fontWeight: isEmphasized ? FontWeight.bold : FontWeight.w500,
+            ),
+          ),
+        ),
+        Text(
+          value,
+          style: TextStyle(
+            color: valueColor,
+            fontSize: isEmphasized ? 18 : 14,
+            fontWeight: isEmphasized ? FontWeight.bold : FontWeight.w600,
+          ),
+        ),
+      ],
     );
   }
 }

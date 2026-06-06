@@ -50,15 +50,21 @@ class SeatGrid extends StatelessWidget {
   }
 
   @override
-  @override
   Widget build(BuildContext context) {
     final cols = _columns;
     final totalCols = cols.left + cols.right;
     final seatMap = {for (final s in classMap.seats) s.seatNumber: s};
+    final countedSeats =
+        classMap.availableCount + classMap.pendingCount + classMap.bookedCount;
+    final seatCount = classMap.totalSeats > 0
+        ? classMap.totalSeats
+        : classMap.seats.isNotEmpty
+        ? classMap.seats.length
+        : countedSeats > 0
+        ? countedSeats
+        : classMap.remainingSeats;
 
-    final rows = classMap.seats.isEmpty
-        ? (classMap.remainingSeats / totalCols).ceil()
-        : (classMap.seats.length / totalCols).ceil();
+    final rows = (seatCount / totalCols).ceil();
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 24),
@@ -88,6 +94,9 @@ class SeatGrid extends StatelessWidget {
                     children: labels.map((label) {
                       if (label == null) {
                         return const SizedBox(width: 24);
+                      }
+                      if ((int.tryParse(label) ?? 0) > seatCount) {
+                        return const SizedBox(width: 52, height: 52);
                       }
                       return _buildSeat(
                         label: label,
@@ -132,9 +141,12 @@ class SeatGrid extends StatelessWidget {
     }
 
     final isSelected = selectedSeats.contains(label);
-    final displayStatus = isSelected ? SeatStatus.pending : status;
-    final canTap =
-        status == SeatStatus.available || status == SeatStatus.pending;
+    final displayStatus = isSelected && status == SeatStatus.available
+        ? SeatStatus.pending
+        : status == SeatStatus.pending
+        ? SeatStatus.booked
+        : status;
+    final canTap = status == SeatStatus.available;
 
     return GestureDetector(
       onTap: canTap ? () => onSeatToggle(label) : null,
