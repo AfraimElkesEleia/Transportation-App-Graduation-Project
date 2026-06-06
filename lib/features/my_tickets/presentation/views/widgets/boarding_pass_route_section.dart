@@ -33,6 +33,7 @@ class BoardingPassRouteSection extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Expanded(
+            flex: 3,
             child: BoardingPassStopColumn(
               code: boardingPassLocationCode(originGov),
               governorate: originGov,
@@ -40,14 +41,18 @@ class BoardingPassRouteSection extends StatelessWidget {
               time: formatBoardingPassTime(ticket.boardingTime),
             ),
           ),
-          BoardingPassTimeline(
-            duration: boardingPassDuration(
-              ticket.boardingTime,
-              ticket.dropoffTime,
+          Expanded(
+            flex: 2,
+            child: BoardingPassTimeline(
+              duration: boardingPassDuration(
+                ticket.boardingTime,
+                ticket.dropoffTime,
+              ),
+              agency: agency,
             ),
-            agency: agency,
           ),
           Expanded(
+            flex: 3,
             child: BoardingPassStopColumn(
               code: boardingPassLocationCode(destinationGov),
               governorate: destinationGov,
@@ -93,17 +98,23 @@ class BoardingPassStopColumn extends StatelessWidget {
             fontWeight: FontWeight.bold,
             letterSpacing: 2,
           ),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
         ),
         Text(
           governorate,
           style: const TextStyle(color: Colors.white60, fontSize: 13),
           textAlign: alignEnd ? TextAlign.end : TextAlign.start,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
         ),
         if (station.isNotEmpty)
           Text(
             station,
             style: const TextStyle(color: Colors.white38, fontSize: 11),
             textAlign: alignEnd ? TextAlign.end : TextAlign.start,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
           ),
         Text(
           time,
@@ -112,6 +123,8 @@ class BoardingPassStopColumn extends StatelessWidget {
             fontSize: 18,
             fontWeight: FontWeight.bold,
           ),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
         ),
       ],
     );
@@ -137,14 +150,27 @@ class BoardingPassTimeline extends StatelessWidget {
           Text(
             duration,
             style: const TextStyle(color: Colors.white38, fontSize: 11),
+            textAlign: TextAlign.center,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
           const SizedBox(height: 4),
           Row(
             children: [
               _TimelineDot(),
-              Container(width: 60, height: 1, color: Colors.white24),
+              Expanded(
+                child: Container(
+                  height: 1,
+                  color: Colors.white24,
+                ),
+              ),
               const Icon(Icons.train, color: Colors.white38, size: 18),
-              Container(width: 60, height: 1, color: Colors.white24),
+              Expanded(
+                child: Container(
+                  height: 1,
+                  color: Colors.white24,
+                ),
+              ),
               _TimelineDot(),
             ],
           ),
@@ -152,6 +178,9 @@ class BoardingPassTimeline extends StatelessWidget {
           Text(
             agency,
             style: const TextStyle(color: Colors.white38, fontSize: 11),
+            textAlign: TextAlign.center,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
         ],
       ),
