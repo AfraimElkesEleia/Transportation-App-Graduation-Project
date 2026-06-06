@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:transportation_app/features/home/domain/entities/search_params.dart';
 import 'package:transportation_app/features/search/domain/entities/trip_result_entity.dart';
-import 'package:transportation_app/features/search/data/datasources/recent_search_local_data_source.dart';
-import 'package:transportation_app/features/search/data/models/recent_search_model.dart';
+import 'package:transportation_app/features/search/domain/entities/recent_search_entity.dart';
+import 'package:transportation_app/features/search/domain/usecases/save_recent_search_usecase.dart';
 import 'package:transportation_app/features/search/domain/usecases/search_indirect_trips_usecase.dart';
 import 'package:transportation_app/features/search/domain/usecases/search_trips_usecase.dart';
 import 'package:transportation_app/features/search/presentation/cubit/search_states.dart';
@@ -14,12 +14,12 @@ import 'package:uuid/uuid.dart';
 class SearchCubit extends Cubit<SearchState> {
   final SearchTripsUseCase searchTripsUseCase;
   final SearchIndirectTripsUseCase searchIndirectTripsUseCase;
-  final RecentSearchLocalDataSource recentSearchLocalDataSource;
+  final SaveRecentSearchUseCase saveRecentSearchUseCase;
 
   SearchCubit({
     required this.searchTripsUseCase,
     required this.searchIndirectTripsUseCase,
-    required this.recentSearchLocalDataSource,
+    required this.saveRecentSearchUseCase,
   }) : super(SearchInitial());
 
   Future<void> search(SearchParams params) async {
@@ -242,7 +242,7 @@ class SearchCubit extends Cubit<SearchState> {
 
   Future<void> _saveToRecentSearches(SearchParams params) async {
     try {
-      final model = RecentSearchModel(
+      final recentSearch = RecentSearchEntity(
         id: const Uuid().v4(),
         fromDisplayName: params.fromDisplayName,
         toDisplayName: params.toDisplayName,
@@ -256,7 +256,7 @@ class SearchCubit extends Cubit<SearchState> {
         passengers: params.passengers,
         createdAt: DateTime.now(),
       );
-      await recentSearchLocalDataSource.saveSearch(model);
+      await saveRecentSearchUseCase(recentSearch);
     } catch (e) {
       debugPrint('Failed to save recent search: $e');
     }

@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
-import 'package:transportation_app/features/search/data/model/route_stops_model.dart';
 import 'package:transportation_app/features/search/domain/entities/floor_group.dart';
+import 'package:transportation_app/features/search/domain/entities/route_stop_entity.dart';
 import 'coach_class_entity.dart';
 import 'package:intl/intl.dart';
 
@@ -23,7 +23,7 @@ class TripResultEntity extends Equatable {
   final String destinationGovernorate;
   final String? destinationGovernorateAr;
   final List<CoachClassEntity> availableClasses;
-  final List<RouteStopsModel>? routeStops;
+  final List<RouteStopEntity>? routeStops;
 
   const TripResultEntity({
     required this.tripOccurrenceId,
@@ -67,7 +67,7 @@ class TripResultEntity extends Equatable {
     return h > 0 ? '${h}h ${m}m' : '${m}m';
   }
 
-  List<RouteStopsModel> get safeRouteStops => routeStops ?? const [];
+  List<RouteStopEntity> get safeRouteStops => routeStops ?? const [];
   List<FloorGroup> get floorGroups {
     final Map<int?, List<CoachClassEntity>> bucket = {};
 

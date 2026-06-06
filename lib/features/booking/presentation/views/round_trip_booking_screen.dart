@@ -5,7 +5,6 @@ import 'package:transportation_app/core/di/injection_container.dart';
 import 'package:transportation_app/core/routing/routes.dart';
 import 'package:transportation_app/core/theming/colors.dart';
 import 'package:transportation_app/core/utils/error_localizer.dart';
-import 'package:transportation_app/features/booking/data/datasources/booking_remote_datasource.dart';
 import 'package:transportation_app/features/booking/presentation/cubit/round_trip_booking_cubit.dart';
 import 'package:transportation_app/features/booking/presentation/cubit/round_trip_booking_state.dart';
 import 'package:transportation_app/features/booking/presentation/cubit/seat_map_cubit.dart';
@@ -711,7 +710,7 @@ class _UnifiedSeatSelectionLayerState
                 'outbound_seat_${widget.outboundTrip.tripOccurrenceId}',
               ),
               create: (_) =>
-                  SeatMapCubit(datasource: sl<BookingRemoteDatasource>())
+                  sl<SeatMapCubit>()
                     ..loadSeatMap(
                       widget.outboundTrip.tripOccurrenceId,
                       widget.outboundClass.coachClassId,
@@ -764,7 +763,7 @@ class _UnifiedSeatSelectionLayerState
                   'return_seat_${widget.returnTrip.tripOccurrenceId}',
                 ),
                 create: (_) =>
-                    SeatMapCubit(datasource: sl<BookingRemoteDatasource>())
+                    sl<SeatMapCubit>()
                       ..loadSeatMap(
                         widget.returnTrip.tripOccurrenceId,
                         widget.returnClass.coachClassId,

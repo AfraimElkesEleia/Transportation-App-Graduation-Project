@@ -5,7 +5,6 @@ import 'package:transportation_app/core/di/injection_container.dart';
 import 'package:transportation_app/core/helper/extensions.dart';
 import 'package:transportation_app/core/routing/routes.dart';
 import 'package:transportation_app/core/theming/colors.dart';
-import 'package:transportation_app/features/booking/data/datasources/booking_remote_datasource.dart';
 import 'package:transportation_app/features/home/domain/entities/search_params.dart';
 import 'package:transportation_app/features/multidestination/presentation/cubit/multi_destination_booking_cubit.dart';
 import 'package:transportation_app/features/multidestination/presentation/cubit/multi_destination_booking_state.dart';
@@ -427,7 +426,7 @@ class _MultiDestinationBookingScreenState
             child: BlocProvider(
               key: ValueKey('seat_leg_$legIndex'),
               create: (_) =>
-                  SeatMapCubit(datasource: sl<BookingRemoteDatasource>())
+                  sl<SeatMapCubit>()
                     ..loadSeatMap(trip.tripOccurrenceId, cClass.coachClassId),
               child: EmbeddedSeatSelection(
                 trip: trip,

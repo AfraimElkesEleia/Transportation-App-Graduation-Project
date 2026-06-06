@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:transportation_app/features/booking/data/datasources/booking_remote_datasource.dart';
+import 'package:transportation_app/features/booking/domain/usecases/add_to_cart_usecase.dart';
+import 'package:transportation_app/features/booking/domain/usecases/checkout_usecase.dart';
 import 'package:transportation_app/features/home/domain/entities/search_params.dart';
 import 'package:transportation_app/features/search/domain/usecases/search_trips_usecase.dart';
 import 'package:transportation_app/features/multidestination/presentation/cubit/multi_destination_booking_state.dart';
@@ -9,12 +10,14 @@ import 'package:transportation_app/features/search/domain/entities/trip_result_e
 
 class MultiDestinationBookingCubit extends Cubit<MultiDestinationBookingState> {
   final SearchTripsUseCase searchTripsUseCase;
-  final BookingRemoteDatasource bookingRemoteDatasource;
+  final AddToCartUseCase addToCartUseCase;
+  final CheckoutUseCase checkoutUseCase;
 
   MultiDestinationBookingCubit({
     required List<MultiDestinationLegSummary> legs,
     required this.searchTripsUseCase,
-    required this.bookingRemoteDatasource,
+    required this.addToCartUseCase,
+    required this.checkoutUseCase,
   }) : super(MultiDestinationBookingState(legSummaries: legs));
 
   void startFlow() {
@@ -236,8 +239,13 @@ class MultiDestinationBookingCubit extends Cubit<MultiDestinationBookingState> {
         contactEmail: contactEmail,
         allPassengers: allPassengers,
       )) {
-        await bookingRemoteDatasource.addToCart(payload);
+        final result = await addToCartUseCase(payload);
         if (isClosed) return;
+        final failed = result.fold((failure) {
+          emit(state.copyWith(isAddingToCart: false, cartError: failure.message));
+          return true;
+        }, (_) => false);
+        if (failed) return;
       }
       emit(state.copyWith(isAddingToCart: false, cartSuccess: true));
     } catch (e) {
@@ -270,12 +278,20 @@ class MultiDestinationBookingCubit extends Cubit<MultiDestinationBookingState> {
         contactEmail: contactEmail,
         allPassengers: allPassengers,
       )) {
-        await bookingRemoteDatasource.addToCart(payload);
+        final result = await addToCartUseCase(payload);
         if (isClosed) return;
+        final failed = result.fold((failure) {
+          emit(state.copyWith(isBookingNow: false, cartError: failure.message));
+          return true;
+        }, (_) => false);
+        if (failed) return;
       }
-      await bookingRemoteDatasource.checkout(pointsToRedeem: pointsToRedeem);
+      final checkoutResult = await checkoutUseCase(pointsToRedeem: pointsToRedeem);
       if (isClosed) return;
-      emit(state.copyWith(isBookingNow: false, checkoutSuccess: true));
+      checkoutResult.fold(
+        (failure) => emit(state.copyWith(isBookingNow: false, cartError: failure.message)),
+        (_) => emit(state.copyWith(isBookingNow: false, checkoutSuccess: true)),
+      );
     } catch (e) {
       if (isClosed) return;
       emit(state.copyWith(isBookingNow: false, cartError: e.toString()));

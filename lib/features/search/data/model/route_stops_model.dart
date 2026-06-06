@@ -1,19 +1,15 @@
-class RouteStopsModel {
-  final String stationName;
-  final String? arabicName;
-  final String? governorateAr;
-  final String? arrivalTime;
-  final String? departureTime;
-  final int stopSequence;
+import 'package:transportation_app/features/search/domain/entities/route_stop_entity.dart';
 
-  RouteStopsModel({
-    required this.stationName,
-    this.arabicName,
-    this.governorateAr,
-    required this.arrivalTime,
-    required this.departureTime,
-    required this.stopSequence,
+class RouteStopsModel extends RouteStopEntity {
+  const RouteStopsModel({
+    required super.stationName,
+    super.arabicName,
+    super.governorateAr,
+    required super.arrivalTime,
+    required super.departureTime,
+    required super.stopSequence,
   });
+
   factory RouteStopsModel.fromJson(Map<String, dynamic> json) {
     return RouteStopsModel(
       stationName: json['stationName'] as String? ?? '',
@@ -24,15 +20,4 @@ class RouteStopsModel {
       stopSequence: json['stopSequence'] as int,
     );
   }
-  String formatTime(String? timeValue) {
-    if (timeValue == null || timeValue.isEmpty) return '--:--';
-    if (timeValue.length >= 5) {
-      return timeValue.substring(0, 5);
-    }
-    return timeValue; // fallback for edge cases
-  }
-
-  String get displayTime => formatTime(departureTime ?? arrivalTime);
-  bool get isOrigin => arrivalTime == '' && departureTime != '';
-  bool get isDestination => departureTime == '' && arrivalTime != '';
 }

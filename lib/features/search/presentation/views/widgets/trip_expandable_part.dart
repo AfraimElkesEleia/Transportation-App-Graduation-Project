@@ -1,12 +1,12 @@
 // lib/features/search/presentation/widgets/trip_expandable_section.dart
 import 'package:flutter/material.dart';
 import 'package:transportation_app/core/theming/colors.dart';
-import 'package:transportation_app/features/search/data/model/route_stops_model.dart';
+import 'package:transportation_app/features/search/domain/entities/route_stop_entity.dart';
 import 'package:transportation_app/core/l10n/app_localizations.dart';
 import 'package:transportation_app/core/helper/extensions.dart';
 
 class TripExpandableSection extends StatefulWidget {
-  final List<RouteStopsModel> routeStops;
+  final List<RouteStopEntity> routeStops;
 
   const TripExpandableSection({super.key, required this.routeStops});
 
@@ -99,7 +99,7 @@ class _TripExpandableSectionState extends State<TripExpandableSection>
 
 // ✅ Static content widget - rebuilds ONLY when expanded state changes (not on every animation frame)
 class _ExpandableContent extends StatelessWidget {
-  final List<RouteStopsModel> routeStops;
+  final List<RouteStopEntity> routeStops;
 
   const _ExpandableContent({required this.routeStops});
 
@@ -132,7 +132,7 @@ class _ExpandableContent extends StatelessWidget {
 }
 
 class _StopRow extends StatelessWidget {
-  final RouteStopsModel stop;
+  final RouteStopEntity stop;
 
   const _StopRow({required this.stop});
 

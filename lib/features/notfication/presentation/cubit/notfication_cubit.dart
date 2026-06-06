@@ -1,24 +1,30 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:transportation_app/features/notfication/data/datasources/notfication_remote_datasource.dart';
+import 'package:transportation_app/features/notfication/domain/usecases/get_notifications_usecase.dart';
+import 'package:transportation_app/features/notfication/domain/usecases/mark_all_notifications_read_usecase.dart';
+import 'package:transportation_app/features/notfication/domain/usecases/mark_notification_read_usecase.dart';
 import 'package:transportation_app/features/notfication/presentation/cubit/notfication_state.dart';
 
 class NotificationCubit extends Cubit<NotificationState> {
-  final NotficationRemoteDatasource _datasource;
+  final GetNotificationsUseCase getNotificationsUseCase;
+  final MarkNotificationReadUseCase markNotificationReadUseCase;
+  final MarkAllNotificationsReadUseCase markAllNotificationsReadUseCase;
 
-  NotificationCubit(this._datasource) : super(const NotificationInitial());
+  NotificationCubit({
+    required this.getNotificationsUseCase,
+    required this.markNotificationReadUseCase,
+    required this.markAllNotificationsReadUseCase,
+  }) : super(const NotificationInitial());
 
   // ── Load ───────────────────────────────────────────────────────────────────
 
   Future<void> loadNotifications() async {
     emit(const NotificationLoading());
-    try {
-      final items = await _datasource.getNotifications();
-      if (isClosed) return;
-      emit(NotificationLoaded(notifications: items));
-    } catch (_) {
-      if (isClosed) return;
-      emit(const NotificationError('Failed to load notifications'));
-    }
+    final result = await getNotificationsUseCase();
+    if (isClosed) return;
+    result.fold(
+      (failure) => emit(NotificationError(failure.message)),
+      (items) => emit(NotificationLoaded(notifications: items)),
+    );
   }
 
   // ── Filter ─────────────────────────────────────────────────────────────────
@@ -43,7 +49,7 @@ class NotificationCubit extends Cubit<NotificationState> {
     emit(current.copyWith(notifications: updated));
 
     try {
-      await _datasource.markRead(notificationId);
+      await markNotificationReadUseCase(notificationId);
     } catch (_) {
       // Optimistic update stands — backend sync will resolve on next load.
     }
@@ -62,7 +68,7 @@ class NotificationCubit extends Cubit<NotificationState> {
     emit(current.copyWith(notifications: updated));
 
     try {
-      await _datasource.markAllRead();
+      await markAllNotificationsReadUseCase();
     } catch (_) {
       // Optimistic update stands.
     }

@@ -16,8 +16,9 @@ class CartItemCard extends StatelessWidget {
     final n = item.agencyName.toLowerCase();
     if (n.contains('gobus')) return ColorsManager.agencyGoBus;
     if (n.contains('blue')) return ColorsManager.agencyBlueBus;
-    if (n.contains('rail') || n.contains('train') || n.contains('enr'))
+    if (n.contains('rail') || n.contains('train') || n.contains('enr')) {
       return ColorsManager.agencyRailway;
+    }
     if (n.contains('horus')) return ColorsManager.agencyHorus;
     return ColorsManager.agencyDefault;
   }

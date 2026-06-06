@@ -5,7 +5,6 @@ import 'package:transportation_app/core/di/injection_container.dart';
 import 'package:transportation_app/core/l10n/app_localizations.dart';
 import 'package:transportation_app/core/routing/routes.dart';
 import 'package:transportation_app/core/theming/colors.dart';
-import 'package:transportation_app/features/booking/data/datasources/booking_remote_datasource.dart';
 import 'package:transportation_app/features/booking/presentation/cubit/indirect_booking_cubit.dart';
 import 'package:transportation_app/features/booking/presentation/cubit/indirect_booking_state.dart';
 import 'package:transportation_app/features/booking/presentation/cubit/seat_map_cubit.dart';
@@ -236,7 +235,7 @@ class _IndirectBookingScreenState extends State<IndirectBookingScreen> {
     return BlocProvider(
       key: ValueKey('leg1_seat_${state.selectedTripLeg1!.tripOccurrenceId}'),
       create: (_) =>
-          SeatMapCubit(datasource: sl<BookingRemoteDatasource>())..loadSeatMap(
+          sl<SeatMapCubit>()..loadSeatMap(
             state.selectedTripLeg1!.tripOccurrenceId,
             state.selectedClassLeg1!.coachClassId,
           ),
@@ -413,7 +412,7 @@ class _IndirectBookingScreenState extends State<IndirectBookingScreen> {
     return BlocProvider(
       key: ValueKey('leg2_seat_${state.selectedTripLeg2!.tripOccurrenceId}'),
       create: (_) =>
-          SeatMapCubit(datasource: sl<BookingRemoteDatasource>())..loadSeatMap(
+          sl<SeatMapCubit>()..loadSeatMap(
             state.selectedTripLeg2!.tripOccurrenceId,
             state.selectedClassLeg2!.coachClassId,
           ),

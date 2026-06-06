@@ -1,13 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:transportation_app/core/di/injection_container.dart';
 import 'package:transportation_app/core/utils/token_manager.dart';
-import 'package:transportation_app/features/profile/data/datasources/profile_remote_datasource.dart';
+import 'package:transportation_app/features/profile/domain/usecases/update_language_usecase.dart';
 import 'locale_box.dart';
 
 class LocaleCubit extends Cubit<Locale> {
-  LocaleCubit() : super(const Locale('ar'));
+  final TokenManager tokenManager;
+  final UpdateLanguageUseCase updateLanguageUseCase;
+
+  LocaleCubit({
+    required this.tokenManager,
+    required this.updateLanguageUseCase,
+  }) : super(const Locale('ar'));
 
   /// Called at startup — reads Hive, falls back to device locale, and syncs
   Future<void> init() async {
@@ -35,15 +40,13 @@ class LocaleCubit extends Cubit<Locale> {
   /// Syncs the current local language preference with the backend if the user is authenticated.
   Future<void> syncLanguageWithBackend() async {
     try {
-      final tokenManager = sl<TokenManager>();
       final token = await tokenManager.getAccessToken();
       if (token != null) {
-        final datasource = sl<ProfileRemoteDatasource>();
-        await datasource.updateLanguage(languageCode: state.languageCode);
-        debugPrint('🌐 [LocaleCubit] Successfully synced language "${state.languageCode}" with backend.');
+        await updateLanguageUseCase(languageCode: state.languageCode);
+        debugPrint('Synced language "${state.languageCode}" with backend.');
       }
     } catch (e) {
-      debugPrint('⚠️ [LocaleCubit] Failed to sync language with backend: $e');
+      debugPrint('Failed to sync language with backend: $e');
     }
   }
 

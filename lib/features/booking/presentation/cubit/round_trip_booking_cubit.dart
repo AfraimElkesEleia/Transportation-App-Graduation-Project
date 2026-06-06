@@ -1,18 +1,21 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:transportation_app/features/booking/domain/usecases/add_to_cart_usecase.dart';
+import 'package:transportation_app/features/booking/domain/usecases/checkout_usecase.dart';
 import 'package:transportation_app/features/home/domain/entities/search_params.dart';
 import 'package:transportation_app/features/search/domain/usecases/search_trips_usecase.dart';
-import 'package:transportation_app/features/booking/data/datasources/booking_remote_datasource.dart';
 import 'package:transportation_app/features/booking/presentation/cubit/round_trip_booking_state.dart';
 import 'package:transportation_app/features/search/domain/entities/trip_result_entity.dart';
 import 'package:transportation_app/features/search/domain/entities/coach_class_entity.dart';
 
 class RoundTripBookingCubit extends Cubit<RoundTripBookingState> {
   final SearchTripsUseCase searchTripsUseCase;
-  final BookingRemoteDatasource bookingRemoteDatasource;
+  final AddToCartUseCase addToCartUseCase;
+  final CheckoutUseCase checkoutUseCase;
 
   RoundTripBookingCubit({
     required this.searchTripsUseCase,
-    required this.bookingRemoteDatasource,
+    required this.addToCartUseCase,
+    required this.checkoutUseCase,
   }) : super(const RoundTripBookingState());
 
   void setStep(RoundTripBookingStep step) {
@@ -313,32 +316,31 @@ class RoundTripBookingCubit extends Cubit<RoundTripBookingState> {
         'passengers': returnPassengers,
       };
 
-      // 1. Add Outbound
-      await bookingRemoteDatasource.addToCart(outboundPayload);
+      final outboundResult = await addToCartUseCase(outboundPayload);
       if (isClosed) return;
+      final outboundFailed = outboundResult.fold((failure) {
+        emit(state.copyWith(isAddingToCart: false, cartError: failure.message));
+        return true;
+      }, (_) => false);
+      if (outboundFailed) return;
 
-      try {
-        // 2. Add Return
-        await bookingRemoteDatasource.addToCart(returnPayload);
-        if (isClosed) return;
-        emit(state.copyWith(isAddingToCart: false, cartSuccess: true));
-      } catch (e) {
-        if (isClosed) return;
-        // Leg 2 failed -> Rollback attempt
-        // Currently API might not support an explicit rollback for a specific item easily
-        // We will do a generic clear cart or just instruct the user.
-        emit(
-          state.copyWith(
-            isAddingToCart: false,
-            cartSuccess: true,
-            cartError:
-                'Sorry, the return trip seats are no longer available. Please select a different return trip. (Note: Outbound trip was added to cart)',
-          ),
-        );
-      }
+      final returnResult = await addToCartUseCase(returnPayload);
+      if (isClosed) return;
+      returnResult.fold(
+        (failure) {
+          emit(
+            state.copyWith(
+              isAddingToCart: false,
+              cartSuccess: true,
+              cartError:
+                  'Sorry, the return trip seats are no longer available. Please select a different return trip. (Note: Outbound trip was added to cart)',
+            ),
+          );
+        },
+        (_) => emit(state.copyWith(isAddingToCart: false, cartSuccess: true)),
+      );
     } catch (e) {
       if (isClosed) return;
-      // Outbound failed
       emit(state.copyWith(isAddingToCart: false, cartError: e.toString()));
     }
   }
@@ -385,33 +387,45 @@ class RoundTripBookingCubit extends Cubit<RoundTripBookingState> {
         'passengers': returnPassengers,
       };
 
-      // 1. Add Outbound to Cart
-      await bookingRemoteDatasource.addToCart(outboundPayload);
+      final outboundResult = await addToCartUseCase(outboundPayload);
       if (isClosed) return;
+      final outboundFailed = outboundResult.fold((failure) {
+        emit(state.copyWith(isBookingNow: false, cartError: failure.message));
+        return true;
+      }, (_) => false);
+      if (outboundFailed) return;
 
-      try {
-        // 2. Add Return to Cart
-        await bookingRemoteDatasource.addToCart(returnPayload);
-        if (isClosed) return;
-
-        // 3. Checkout
-        await bookingRemoteDatasource.checkout(pointsToRedeem: pointsToRedeem);
-        if (isClosed) return;
-        emit(state.copyWith(isBookingNow: false, checkoutSuccess: true));
-      } catch (e) {
-        if (isClosed) return;
-        // Leg 2 or Checkout failed
+      final returnResult = await addToCartUseCase(returnPayload);
+      if (isClosed) return;
+      final returnFailed = returnResult.fold((failure) {
         emit(
           state.copyWith(
             isBookingNow: false,
             cartSuccess: true,
-            cartError: 'Failed to complete booking: ${e.toString()}',
+            cartError: 'Failed to complete booking: ${failure.message}',
           ),
         );
-      }
+        return true;
+      }, (_) => false);
+      if (returnFailed) return;
+
+      final checkoutResult = await checkoutUseCase(pointsToRedeem: pointsToRedeem);
+      if (isClosed) return;
+      checkoutResult.fold(
+        (failure) => emit(
+          state.copyWith(
+            isBookingNow: false,
+            cartSuccess: true,
+            cartError: 'Failed to complete booking: ${failure.message}',
+          ),
+        ),
+        (_) {
+          if (isClosed) return;
+          emit(state.copyWith(isBookingNow: false, checkoutSuccess: true));
+        },
+      );
     } catch (e) {
       if (isClosed) return;
-      // Outbound failed
       emit(state.copyWith(isBookingNow: false, cartError: e.toString()));
     }
   }

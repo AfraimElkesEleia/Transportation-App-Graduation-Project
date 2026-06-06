@@ -4,8 +4,8 @@ import 'package:transportation_app/core/routing/routes.dart';
 import 'package:transportation_app/core/theming/colors.dart';
 import 'package:transportation_app/core/theming/styles.dart';
 import 'package:transportation_app/features/home/domain/entities/search_params.dart';
-import 'package:transportation_app/features/search/data/models/recent_search_model.dart';
-import 'package:transportation_app/features/search/data/datasources/recent_search_local_data_source.dart';
+import 'package:transportation_app/features/search/domain/entities/recent_search_entity.dart';
+import 'package:transportation_app/features/search/domain/usecases/get_recent_searches_usecase.dart';
 import 'package:transportation_app/core/di/injection_container.dart';
 import 'package:transportation_app/core/l10n/app_localizations.dart';
 import 'package:transportation_app/core/helper/extensions.dart';
@@ -15,8 +15,10 @@ class RecentSearchesList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<List<RecentSearchModel>>(
-      future: sl<RecentSearchLocalDataSource>().getRecentSearches(),
+    return FutureBuilder<List<RecentSearchEntity>>(
+      future: sl<GetRecentSearchesUseCase>()().then(
+        (result) => result.fold((_) => <RecentSearchEntity>[], (searches) => searches),
+      ),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
@@ -45,7 +47,7 @@ class RecentSearchesList extends StatelessWidget {
 }
 
 class RecentSearchItem extends StatelessWidget {
-  final RecentSearchModel search;
+  final RecentSearchEntity search;
   const RecentSearchItem({super.key, required this.search});
 
   @override

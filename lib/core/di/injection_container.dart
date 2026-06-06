@@ -3,7 +3,18 @@ import 'package:transportation_app/core/l10n/locale_cubit.dart';
 import 'package:transportation_app/core/networking/dio_client.dart';
 import 'package:transportation_app/core/utils/token_manager.dart';
 import 'package:transportation_app/features/booking/data/datasources/booking_remote_datasource.dart';
+import 'package:transportation_app/features/booking/data/repositories/booking_repository_impl.dart';
+import 'package:transportation_app/features/booking/domain/repositories/booking_repository.dart';
+import 'package:transportation_app/features/booking/domain/usecases/add_to_cart_usecase.dart';
+import 'package:transportation_app/features/booking/domain/usecases/cancel_cart_item_usecase.dart';
+import 'package:transportation_app/features/booking/domain/usecases/checkout_usecase.dart';
+import 'package:transportation_app/features/booking/domain/usecases/get_cart_usecase.dart';
+import 'package:transportation_app/features/booking/domain/usecases/get_seat_map_usecase.dart';
+import 'package:transportation_app/features/booking/presentation/cubit/cart_cubit.dart';
+import 'package:transportation_app/features/booking/presentation/cubit/round_trip_booking_cubit.dart';
 import 'package:transportation_app/features/booking/presentation/cubit/seat_map_cubit.dart';
+import 'package:transportation_app/features/multidestination/presentation/cubit/multi_destination_booking_cubit.dart';
+import 'package:transportation_app/features/multidestination/presentation/screens/multidestination_summary_screen.dart';
 import 'package:transportation_app/features/my_tickets/data/datasources/my_tickets_remote_datasource.dart';
 import 'package:transportation_app/features/my_tickets/data/repositories/my_tickets_repository_impl.dart';
 import 'package:transportation_app/features/my_tickets/domain/repositories/my_tickets_repository.dart';
@@ -11,6 +22,11 @@ import 'package:transportation_app/features/my_tickets/presentation/cubit/my_tic
 import 'package:transportation_app/features/my_tickets/presentation/cubit/marketplace_cubit.dart';
 import 'package:transportation_app/features/my_tickets/presentation/cubit/passenger_boarding_pass_cubit.dart';
 import 'package:transportation_app/features/notfication/data/datasources/notfication_remote_datasource.dart';
+import 'package:transportation_app/features/notfication/data/repositories/notfication_repository_impl.dart';
+import 'package:transportation_app/features/notfication/domain/repositories/notfication_repository.dart';
+import 'package:transportation_app/features/notfication/domain/usecases/get_notifications_usecase.dart';
+import 'package:transportation_app/features/notfication/domain/usecases/mark_all_notifications_read_usecase.dart';
+import 'package:transportation_app/features/notfication/domain/usecases/mark_notification_read_usecase.dart';
 import 'package:transportation_app/features/notfication/presentation/cubit/notfication_cubit.dart';
 import 'package:transportation_app/core/notfications/fcm_token_datasource.dart';
 import 'package:transportation_app/features/home/data/datasource/stations_remote_datasource.dart';
@@ -38,6 +54,7 @@ import 'package:transportation_app/features/profile/domain/repositories/profile_
 import 'package:transportation_app/features/profile/domain/usecases/deposit_wallet_usecase.dart';
 import 'package:transportation_app/features/profile/domain/usecases/get_profile_usecase.dart';
 import 'package:transportation_app/features/profile/domain/usecases/logout_usecase.dart';
+import 'package:transportation_app/features/profile/domain/usecases/update_language_usecase.dart';
 import 'package:transportation_app/features/profile/domain/usecases/update_profile_picture_usecase.dart';
 import 'package:transportation_app/features/profile/domain/usecases/update_profile_usecase.dart';
 import 'package:transportation_app/features/profile/presentation/cubit/logout_cubit/logout_cubit.dart';
@@ -50,8 +67,12 @@ import 'package:transportation_app/features/profile/presentation/cubit/loyalty_h
 import 'package:transportation_app/features/profile/presentation/cubit/profile_cubit/profile_cubit.dart';
 import 'package:transportation_app/features/search/data/datasources/recent_search_local_data_source.dart';
 import 'package:transportation_app/features/search/data/datasources/search_remote_datasource.dart';
+import 'package:transportation_app/features/search/data/repositories/recent_search_repository_impl.dart';
 import 'package:transportation_app/features/search/data/repositories/search_repository_imp.dart';
+import 'package:transportation_app/features/search/domain/repository/recent_search_repository.dart';
 import 'package:transportation_app/features/search/domain/repository/search_repository.dart';
+import 'package:transportation_app/features/search/domain/usecases/get_recent_searches_usecase.dart';
+import 'package:transportation_app/features/search/domain/usecases/save_recent_search_usecase.dart';
 import 'package:transportation_app/features/search/domain/usecases/search_indirect_trips_usecase.dart';
 import 'package:transportation_app/features/search/domain/usecases/search_trips_usecase.dart';
 import 'package:transportation_app/features/search/presentation/cubit/search_cubit.dart';
@@ -62,11 +83,15 @@ import 'package:transportation_app/features/signup/domain/usecases/register_use_
 import 'package:transportation_app/features/signup/presentation/cubit/signup_cubit.dart';
 import 'package:transportation_app/features/support/cubit/support_cubit.dart';
 import 'package:transportation_app/features/support/cubit/support_tickets_cubit.dart';
+import 'package:transportation_app/features/support/data/datasources/support_remote_datasource.dart';
+import 'package:transportation_app/features/support/data/repositories/support_repository_impl.dart';
+import 'package:transportation_app/features/support/domain/repositories/support_repository.dart';
+import 'package:transportation_app/features/support/domain/usecases/get_support_tickets_usecase.dart';
+import 'package:transportation_app/features/support/domain/usecases/submit_support_ticket_usecase.dart';
 
 final sl = GetIt.instance;
 
 Future<void> init() async {
-  sl.registerLazySingleton(() => LocaleCubit());
   sl.registerLazySingleton(() => TokenManager());
   sl.registerLazySingleton<AuthRemoteDataSource>(
     () => AuthRemoteDataSourceImpl(dio: DioClient.getInstance()),
@@ -128,6 +153,7 @@ Future<void> init() async {
   sl.registerLazySingleton(() => GetProfileUseCase(sl<ProfileRepository>()));
   sl.registerLazySingleton(() => LogoutUseCase(sl<ProfileRepository>()));
   sl.registerLazySingleton(() => UpdateProfileUseCase(sl<ProfileRepository>()));
+  sl.registerLazySingleton(() => UpdateLanguageUseCase(sl<ProfileRepository>()));
   sl.registerLazySingleton(
     () => UploadProfilePictureUseCase(sl<ProfileRepository>()),
   );
@@ -170,21 +196,67 @@ Future<void> init() async {
   sl.registerLazySingleton<RecentSearchLocalDataSource>(
     () => RecentSearchLocalDataSourceImpl(),
   );
+  sl.registerLazySingleton<RecentSearchRepository>(
+    () => RecentSearchRepositoryImpl(localDataSource: sl()),
+  );
   sl.registerLazySingleton(() => SearchTripsUseCase(sl<SearchRepository>()));
   sl.registerLazySingleton(
     () => SearchIndirectTripsUseCase(sl<SearchRepository>()),
   );
+  sl.registerLazySingleton(() => SaveRecentSearchUseCase(sl()));
+  sl.registerLazySingleton(() => GetRecentSearchesUseCase(sl()));
   sl.registerFactory(
     () => SearchCubit(
       searchTripsUseCase: sl(),
       searchIndirectTripsUseCase: sl(),
-      recentSearchLocalDataSource: sl(),
+      saveRecentSearchUseCase: sl(),
     ),
   );
   sl.registerLazySingleton<BookingRemoteDatasource>(
     () => BookingRemoteDatasourceImpl(dio: DioClient.getInstance()),
   );
-  sl.registerFactory(() => SeatMapCubit(datasource: sl()));
+  sl.registerLazySingleton<BookingRepository>(
+    () => BookingRepositoryImpl(remoteDatasource: sl()),
+  );
+  sl.registerLazySingleton(() => GetCartUseCase(sl()));
+  sl.registerLazySingleton(() => GetSeatMapUseCase(sl()));
+  sl.registerLazySingleton(() => AddToCartUseCase(sl()));
+  sl.registerLazySingleton(() => CheckoutUseCase(sl()));
+  sl.registerLazySingleton(() => CancelCartItemUsecase(sl()));
+  sl.registerFactory(
+    () => SeatMapCubit(
+      getSeatMapUseCase: sl(),
+      addToCartUseCase: sl(),
+      getCartUseCase: sl(),
+      checkoutUseCase: sl(),
+    ),
+  );
+  sl.registerFactory(
+    () => CartCubit(
+      getCartUseCase: sl(),
+      checkoutUseCase: sl(),
+      cancelCartItemUsecase: sl(),
+    ),
+  );
+  sl.registerFactoryParam<RoundTripBookingCubit, void, void>(
+    (_, _) => RoundTripBookingCubit(
+      searchTripsUseCase: sl(),
+      addToCartUseCase: sl(),
+      checkoutUseCase: sl(),
+    ),
+  );
+  sl.registerFactoryParam<
+    MultiDestinationBookingCubit,
+    List<MultiDestinationLegSummary>,
+    void
+  >(
+    (legs, _) => MultiDestinationBookingCubit(
+      legs: legs,
+      searchTripsUseCase: sl(),
+      addToCartUseCase: sl(),
+      checkoutUseCase: sl(),
+    ),
+  );
 
   // ── My Tickets feature ─────────────────────────────────────────────
   sl.registerLazySingleton<MyTicketsRemoteDatasource>(
@@ -216,16 +288,39 @@ Future<void> init() async {
   sl.registerLazySingleton<NotficationRemoteDatasource>(
     () => NotficationRemoteDatasourceImpl(dio: DioClient.getInstance()),
   );
+  sl.registerLazySingleton<NotificationRepository>(
+    () => NotificationRepositoryImpl(remoteDatasource: sl()),
+  );
+  sl.registerLazySingleton(() => GetNotificationsUseCase(sl()));
+  sl.registerLazySingleton(() => MarkNotificationReadUseCase(sl()));
+  sl.registerLazySingleton(() => MarkAllNotificationsReadUseCase(sl()));
   sl.registerFactory(
-    () => NotificationCubit(sl<NotficationRemoteDatasource>()),
+    () => NotificationCubit(
+      getNotificationsUseCase: sl(),
+      markNotificationReadUseCase: sl(),
+      markAllNotificationsReadUseCase: sl(),
+    ),
   );
   sl.registerLazySingleton<FcmTokenDatasource>(
     () => FcmTokenDatasource(DioClient.getInstance()),
   );
 
   // ── Support Tickets ─────────────────────────────────────────────────
-  sl.registerFactory<SupportCubit>(() => SupportCubit(DioClient.getInstance()));
-  sl.registerFactory<SupportTicketsCubit>(
-    () => SupportTicketsCubit(DioClient.getInstance()),
+  sl.registerLazySingleton<SupportRemoteDatasource>(
+    () => SupportRemoteDatasourceImpl(dio: DioClient.getInstance()),
+  );
+  sl.registerLazySingleton<SupportRepository>(
+    () => SupportRepositoryImpl(remoteDatasource: sl()),
+  );
+  sl.registerLazySingleton(() => SubmitSupportTicketUseCase(sl()));
+  sl.registerLazySingleton(() => GetSupportTicketsUseCase(sl()));
+  sl.registerFactory<SupportCubit>(() => SupportCubit(sl()));
+  sl.registerFactory<SupportTicketsCubit>(() => SupportTicketsCubit(sl()));
+
+  sl.registerLazySingleton(
+    () => LocaleCubit(
+      tokenManager: sl<TokenManager>(),
+      updateLanguageUseCase: sl<UpdateLanguageUseCase>(),
+    ),
   );
 }
