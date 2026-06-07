@@ -5,6 +5,7 @@ import 'package:transportation_app/core/helper/extensions.dart';
 import 'package:transportation_app/core/helper/spacing.dart';
 import 'package:transportation_app/core/routing/routes.dart';
 import 'package:transportation_app/core/theming/styles.dart';
+import 'package:transportation_app/core/utils/onboarding_preferences.dart';
 import 'package:transportation_app/core/l10n/app_localizations.dart';
 import 'package:transportation_app/core/widgets/basic_container.dart';
 import 'package:transportation_app/core/widgets/language_toggle_button.dart';
@@ -65,8 +66,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               padding: const EdgeInsets.all(16.0),
               child: NextButton(
                 isLastPage: index == 2,
-                onPressed: () {
+                onPressed: () async {
                   if (index == 2) {
+                    await OnboardingPreferences().markSeen();
+                    if (!context.mounted) return;
                     context.pushReplacementNamed(AppRoutes.loginScreen);
                   } else {
                     _pageController.animateToPage(
@@ -96,7 +99,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           child: const LanguageToggleButton(),
         ),
         TextButton(
-          onPressed: () {
+          onPressed: () async {
+            await OnboardingPreferences().markSeen();
+            if (!context.mounted) return;
             context.pushNamedAndRemoveuntil(
               AppRoutes.loginScreen,
               predicate: (route) => false,

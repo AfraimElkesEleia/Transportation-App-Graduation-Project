@@ -8,6 +8,7 @@ import 'package:transportation_app/core/routing/app_router.dart';
 import 'package:transportation_app/core/routing/navigator_key.dart';
 import 'package:transportation_app/core/routing/routes.dart';
 import 'package:transportation_app/core/utils/app_startup.dart';
+import 'package:transportation_app/core/utils/onboarding_preferences.dart';
 import 'package:transportation_app/core/utils/token_manager.dart';
 import 'package:transportation_app/features/search/data/models/recent_search_model.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -32,6 +33,7 @@ void main() async {
   final tokenManager = sl<TokenManager>();
   final startup = AppStartup(tokenManager);
   final isLoggedIn = await startup.isUserLoggedIn();
+  final hasSeenOnboarding = await OnboardingPreferences().hasSeenOnboarding();
   debugPrint('$isLoggedIn');
   runApp(
     DevicePreview(
@@ -40,7 +42,9 @@ void main() async {
         appRouter: AppRouter(),
         initialRoute: isLoggedIn
             ? AppRoutes.homeScreen
-            : AppRoutes.onBoardingScreen,
+            : hasSeenOnboarding
+                ? AppRoutes.loginScreen
+                : AppRoutes.onBoardingScreen,
       ),
     ),
   );

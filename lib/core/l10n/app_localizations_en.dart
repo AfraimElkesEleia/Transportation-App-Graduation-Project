@@ -78,6 +78,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get onboardingDesc3 => 'Book with confidence...';
 
   @override
+  String get getStarted => 'Get Started';
+
+  @override
   String get loginTitle => 'Welcome \nBack.';
 
   @override

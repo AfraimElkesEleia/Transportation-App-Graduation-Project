@@ -236,6 +236,12 @@ abstract class AppLocalizations {
   /// **'Book with confidence...'**
   String get onboardingDesc3;
 
+  /// No description provided for @getStarted.
+  ///
+  /// In en, this message translates to:
+  /// **'Get Started'**
+  String get getStarted;
+
   /// No description provided for @loginTitle.
   ///
   /// In en, this message translates to:

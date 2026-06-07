@@ -78,6 +78,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get onboardingDesc3 => 'احجز بثقة...';
 
   @override
+  String get getStarted => 'ابدأ الآن';
+
+  @override
   String get loginTitle => 'مرحباً \nبعودتك.';
 
   @override
