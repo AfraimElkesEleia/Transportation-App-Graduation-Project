@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
 import 'package:transportation_app/core/l10n/app_localizations.dart';
 import 'package:transportation_app/core/theming/colors.dart';
 import 'package:transportation_app/core/utils/error_localizer.dart';
@@ -102,16 +103,6 @@ class _SupportTicketCard extends StatelessWidget {
       localized: ticket.descriptionAr,
       original: ticket.description,
     );
-    final category = _localizedValue(
-      isArabic: isArabic,
-      localized: ticket.categoryAr,
-      original: ticket.category,
-    );
-    final status = _localizedValue(
-      isArabic: isArabic,
-      localized: ticket.statusAr,
-      original: ticket.status,
-    );
     final l10n = AppLocalizations.of(context)!;
 
     return Container(
@@ -130,7 +121,7 @@ class _SupportTicketCard extends StatelessWidget {
             crossAxisAlignment: WrapCrossAlignment.center,
             children: [
               _TicketIdBadge(ticketId: ticket.ticketId),
-              _StatusTag(status: status, statusKey: ticket.status),
+              _StatusTag(ticket: ticket),
             ],
           ),
           const SizedBox(height: 12),
@@ -161,7 +152,7 @@ class _SupportTicketCard extends StatelessWidget {
             runSpacing: 8,
             crossAxisAlignment: WrapCrossAlignment.center,
             children: [
-              _CategoryTag(category: category, categoryKey: ticket.category),
+              _CategoryTag(ticket: ticket),
               _CreatedDateLabel(createdAt: ticket.createdAt),
             ],
           ),
@@ -200,23 +191,19 @@ class _TicketIdBadge extends StatelessWidget {
 }
 
 class _CategoryTag extends StatelessWidget {
-  final String category;
-  final String categoryKey;
+  final SupportTicketEntity ticket;
 
-  const _CategoryTag({required this.category, required this.categoryKey});
+  const _CategoryTag({required this.ticket});
 
   Color get _color {
-    switch (categoryKey.toLowerCase()) {
+    switch (ticket.categoryKey) {
       case 'payment':
         return const Color(0xFFFFB74D);
-      case 'tripexperience':
-      case 'trip experience':
+      case 'tripExperience':
         return ColorsManager.accentCyan;
-      case 'appbug':
-      case 'app bug':
+      case 'appBug':
         return const Color(0xFFFF6B6B);
-      case 'accountissue':
-      case 'account issue':
+      case 'accountIssue':
         return const Color(0xFFB388FF);
       default:
         return const Color(0xFF90A4AE);
@@ -226,7 +213,11 @@ class _CategoryTag extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return _PillTag(
-      label: _readable(category),
+      label: _localizedCategoryLabel(
+        AppLocalizations.of(context)!,
+        ticket.categoryKey,
+        ticket.category,
+      ),
       color: _color,
       icon: Icons.label_outline,
     );
@@ -234,17 +225,15 @@ class _CategoryTag extends StatelessWidget {
 }
 
 class _StatusTag extends StatelessWidget {
-  final String status;
-  final String statusKey;
+  final SupportTicketEntity ticket;
 
-  const _StatusTag({required this.status, required this.statusKey});
+  const _StatusTag({required this.ticket});
 
   Color get _color {
-    switch (statusKey.toLowerCase()) {
+    switch (ticket.statusKey) {
       case 'open':
         return ColorsManager.accentCyan;
-      case 'inprogress':
-      case 'in progress':
+      case 'inProgress':
         return const Color(0xFFFFD54F);
       case 'resolved':
         return ColorsManager.successGreen;
@@ -258,7 +247,11 @@ class _StatusTag extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return _PillTag(
-      label: _readable(status),
+      label: _localizedStatusLabel(
+        AppLocalizations.of(context)!,
+        ticket.statusKey,
+        ticket.status,
+      ),
       color: _color,
       icon: Icons.flag_outlined,
     );
@@ -322,7 +315,7 @@ class _CreatedDateLabel extends StatelessWidget {
         const Icon(Icons.schedule_outlined, color: Colors.white38, size: 14),
         const SizedBox(width: 5),
         Text(
-          _formatDate(createdAt),
+          _formatDate(context, createdAt),
           style: const TextStyle(color: Colors.white54, fontSize: 12),
         ),
       ],
@@ -414,26 +407,10 @@ class _EmptySupportTicketsView extends StatelessWidget {
   }
 }
 
-String _formatDate(DateTime value) {
-  final months = [
-    'Jan',
-    'Feb',
-    'Mar',
-    'Apr',
-    'May',
-    'Jun',
-    'Jul',
-    'Aug',
-    'Sep',
-    'Oct',
-    'Nov',
-    'Dec',
-  ];
+String _formatDate(BuildContext context, DateTime value) {
   final local = value.toLocal();
-  final day = local.day.toString().padLeft(2, '0');
-  final hour = local.hour.toString().padLeft(2, '0');
-  final minute = local.minute.toString().padLeft(2, '0');
-  return '$day ${months[local.month - 1]} ${local.year}, $hour:$minute';
+  final locale = Localizations.localeOf(context).toLanguageTag();
+  return DateFormat.yMMMd(locale).add_Hm().format(local);
 }
 
 String _readable(String value) {
@@ -443,6 +420,31 @@ String _readable(String value) {
       .replaceAll('_', ' ')
       .trim();
   return spaced[0].toUpperCase() + spaced.substring(1);
+}
+
+String _localizedCategoryLabel(
+  AppLocalizations l10n,
+  String key,
+  String fallback,
+) {
+  return switch (key) {
+    'payment' => l10n.supportCategoryPayment,
+    'tripExperience' => l10n.supportCategoryTripExperience,
+    'appBug' => l10n.supportCategoryAppBug,
+    'accountIssue' => l10n.supportCategoryAccountIssue,
+    'other' => l10n.supportCategoryOther,
+    _ => _readable(fallback),
+  };
+}
+
+String _localizedStatusLabel(AppLocalizations l10n, String key, String fallback) {
+  return switch (key) {
+    'open' => l10n.supportStatusOpen,
+    'inProgress' => l10n.supportStatusInProgress,
+    'resolved' => l10n.supportStatusResolved,
+    'closed' => l10n.supportStatusClosed,
+    _ => _readable(fallback),
+  };
 }
 
 String _localizedValue({

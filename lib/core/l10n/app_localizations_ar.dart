@@ -1588,6 +1588,33 @@ class AppLocalizationsAr extends AppLocalizations {
   String get supportTicketsEmptyBody => 'ستظهر المشكلات المرسلة هنا.';
 
   @override
+  String get supportCategoryPayment => 'الدفع';
+
+  @override
+  String get supportCategoryTripExperience => 'تجربة الرحلة';
+
+  @override
+  String get supportCategoryAppBug => 'خطأ في التطبيق';
+
+  @override
+  String get supportCategoryAccountIssue => 'مشكلة في الحساب';
+
+  @override
+  String get supportCategoryOther => 'أخرى';
+
+  @override
+  String get supportStatusOpen => 'مفتوحة';
+
+  @override
+  String get supportStatusInProgress => 'قيد المعالجة';
+
+  @override
+  String get supportStatusResolved => 'تم حلها';
+
+  @override
+  String get supportStatusClosed => 'مغلقة';
+
+  @override
   String get untitledTicket => 'تذكرة بدون عنوان';
 
   @override

@@ -1596,6 +1596,33 @@ class AppLocalizationsEn extends AppLocalizations {
   String get supportTicketsEmptyBody => 'Submitted issues will appear here.';
 
   @override
+  String get supportCategoryPayment => 'Payment';
+
+  @override
+  String get supportCategoryTripExperience => 'Trip Experience';
+
+  @override
+  String get supportCategoryAppBug => 'App Bug';
+
+  @override
+  String get supportCategoryAccountIssue => 'Account Issue';
+
+  @override
+  String get supportCategoryOther => 'Other';
+
+  @override
+  String get supportStatusOpen => 'Open';
+
+  @override
+  String get supportStatusInProgress => 'In Progress';
+
+  @override
+  String get supportStatusResolved => 'Resolved';
+
+  @override
+  String get supportStatusClosed => 'Closed';
+
+  @override
   String get untitledTicket => 'Untitled ticket';
 
   @override

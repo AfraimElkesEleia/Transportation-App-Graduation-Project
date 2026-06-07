@@ -3020,6 +3020,60 @@ abstract class AppLocalizations {
   /// **'Submitted issues will appear here.'**
   String get supportTicketsEmptyBody;
 
+  /// No description provided for @supportCategoryPayment.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment'**
+  String get supportCategoryPayment;
+
+  /// No description provided for @supportCategoryTripExperience.
+  ///
+  /// In en, this message translates to:
+  /// **'Trip Experience'**
+  String get supportCategoryTripExperience;
+
+  /// No description provided for @supportCategoryAppBug.
+  ///
+  /// In en, this message translates to:
+  /// **'App Bug'**
+  String get supportCategoryAppBug;
+
+  /// No description provided for @supportCategoryAccountIssue.
+  ///
+  /// In en, this message translates to:
+  /// **'Account Issue'**
+  String get supportCategoryAccountIssue;
+
+  /// No description provided for @supportCategoryOther.
+  ///
+  /// In en, this message translates to:
+  /// **'Other'**
+  String get supportCategoryOther;
+
+  /// No description provided for @supportStatusOpen.
+  ///
+  /// In en, this message translates to:
+  /// **'Open'**
+  String get supportStatusOpen;
+
+  /// No description provided for @supportStatusInProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'In Progress'**
+  String get supportStatusInProgress;
+
+  /// No description provided for @supportStatusResolved.
+  ///
+  /// In en, this message translates to:
+  /// **'Resolved'**
+  String get supportStatusResolved;
+
+  /// No description provided for @supportStatusClosed.
+  ///
+  /// In en, this message translates to:
+  /// **'Closed'**
+  String get supportStatusClosed;
+
   /// No description provided for @untitledTicket.
   ///
   /// In en, this message translates to:
