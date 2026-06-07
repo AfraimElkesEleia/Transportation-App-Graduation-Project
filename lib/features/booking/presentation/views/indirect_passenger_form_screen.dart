@@ -196,7 +196,6 @@ class _IndirectPassengerFormScreenState
       if (isTrain) {
         p['idType'] = c.selectedIdType;
         p['idNumber'] = c.idController.text.trim();
-        p['seatNumber'] = '${i + 1}';
       } else {
         p['seatNumber'] = selectedSeats[i];
       }

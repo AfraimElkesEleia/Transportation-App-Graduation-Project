@@ -114,40 +114,50 @@ class TicketDetailCard extends StatelessWidget {
               ),
               child: Row(
                 children: [
-                  Flexible(
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: _agencyColor.withValues(alpha: 0.25),
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(
-                          color: _agencyColor.withValues(alpha: 0.6),
+                  Expanded(
+                    child: Row(
+                      children: [
+                        Flexible(
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: _agencyColor.withValues(alpha: 0.25),
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(
+                                color: _agencyColor.withValues(alpha: 0.6),
+                              ),
+                            ),
+                            child: Text(
+                              context.isArabic
+                                  ? (ticket.agencyNameAr ?? ticket.agencyName)
+                                  : ticket.agencyName,
+                              style: TextStyle(
+                                color: _agencyColor,
+                                fontSize: 11,
+                                fontWeight: FontWeight.bold,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ),
                         ),
-                      ),
-                      child: Text(
-                        context.isArabic
-                            ? (ticket.agencyNameAr ?? ticket.agencyName)
-                            : ticket.agencyName,
-                        style: TextStyle(
-                          color: _agencyColor,
-                          fontSize: 11,
-                          fontWeight: FontWeight.bold,
-                          overflow: TextOverflow.ellipsis,
+                        const SizedBox(width: 8),
+                        Flexible(
+                          child: Text(
+                            context.isArabic
+                                ? (ticket.classNameAr ?? ticket.className)
+                                : ticket.className,
+                            style: const TextStyle(
+                                color: Colors.white54, fontSize: 12),
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ),
-                      ),
+                      ],
                     ),
                   ),
                   const SizedBox(width: 8),
-                  Text(
-                    context.isArabic
-                        ? (ticket.classNameAr ?? ticket.className)
-                        : ticket.className,
-                    style: const TextStyle(color: Colors.white54, fontSize: 12),
-                  ),
-                  const Spacer(),
                   Container(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 10,

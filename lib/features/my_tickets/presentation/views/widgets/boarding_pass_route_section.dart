@@ -38,13 +38,14 @@ class BoardingPassRouteSection extends StatelessWidget {
               code: boardingPassLocationCode(originGov),
               governorate: originGov,
               station: originStation,
-              time: formatBoardingPassTime(ticket.boardingTime),
+              time: formatBoardingPassTime(context, ticket.boardingTime),
             ),
           ),
           Expanded(
             flex: 2,
             child: BoardingPassTimeline(
               duration: boardingPassDuration(
+                context,
                 ticket.boardingTime,
                 ticket.dropoffTime,
               ),
@@ -57,7 +58,7 @@ class BoardingPassRouteSection extends StatelessWidget {
               code: boardingPassLocationCode(destinationGov),
               governorate: destinationGov,
               station: destinationStation,
-              time: formatBoardingPassTime(ticket.dropoffTime),
+              time: formatBoardingPassTime(context, ticket.dropoffTime),
               alignEnd: true,
             ),
           ),

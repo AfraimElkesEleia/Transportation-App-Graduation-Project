@@ -67,10 +67,8 @@ class _RouteCard extends StatelessWidget {
   Future<void> _onTap(BuildContext context) async {
     final loc = AppLocalizations.of(context)!;
     final now = DateTime.now();
-
-    // First selectable date is tomorrow
-    final firstDate = DateTime(now.year, now.month, now.day + 1);
-    final lastDate = DateTime(now.year + 1, now.month, now.day);
+    final firstDate = DateTime(now.year, now.month, now.day);
+    final lastDate = firstDate.add(const Duration(days: 60));
 
     final picked = await showDatePicker(
       context: context,
@@ -97,25 +95,6 @@ class _RouteCard extends StatelessWidget {
     );
 
     if (picked == null) return; // user cancelled
-
-    // Double-check: picked must not be today
-    final isToday =
-        picked.year == now.year &&
-        picked.month == now.month &&
-        picked.day == now.day;
-
-    if (isToday) {
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(loc.dateCannotBeToday),
-            backgroundColor: Colors.redAccent,
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
-      }
-      return;
-    }
 
     if (!context.mounted) return;
 

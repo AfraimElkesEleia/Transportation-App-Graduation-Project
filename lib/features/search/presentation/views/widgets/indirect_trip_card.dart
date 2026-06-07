@@ -41,13 +41,15 @@ class _IndirectTripCardState extends State<IndirectTripCard> {
   Future<void> _pickDate(int leg) async {
     final initialDate = leg == 1 ? _dateLeg1 : _dateLeg2;
     // Leg 2 minimum date is Leg 1's date
-    final firstDate = leg == 1 ? DateTime.now() : _dateLeg1;
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final firstDate = leg == 1 ? today : _dateLeg1;
 
     final picked = await showDatePicker(
       context: context,
       initialDate: initialDate.isBefore(firstDate) ? firstDate : initialDate,
       firstDate: firstDate,
-      lastDate: DateTime.now().add(const Duration(days: 90)),
+      lastDate: today.add(const Duration(days: 60)),
       builder: (context, child) {
         return Theme(
           data: ThemeData.dark().copyWith(

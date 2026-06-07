@@ -2060,6 +2060,36 @@ abstract class AppLocalizations {
   /// **'Download PDF'**
   String get downloadPdf;
 
+  /// No description provided for @boardingPassTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Boarding Pass'**
+  String get boardingPassTitle;
+
+  /// No description provided for @boardingPassPassengerLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Passenger'**
+  String get boardingPassPassengerLabel;
+
+  /// No description provided for @boardingPassSeatLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Seat'**
+  String get boardingPassSeatLabel;
+
+  /// No description provided for @boardingPassClassLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Class'**
+  String get boardingPassClassLabel;
+
+  /// No description provided for @boardingPassDateLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Date'**
+  String get boardingPassDateLabel;
+
   /// No description provided for @ticketClass.
   ///
   /// In en, this message translates to:

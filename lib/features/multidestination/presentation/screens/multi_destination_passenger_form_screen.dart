@@ -220,12 +220,13 @@ class _MultiDestinationPassengerFormScreenState
         final c = _controllers[legIndex][pIndex];
         final pass = <String, dynamic>{
           'passengerName': c.nameController.text.trim(),
-          'seatNumber': seats[pIndex].toString(),
         };
 
         if (_isTrainPerLeg[legIndex]) {
           pass['idType'] = c.selectedIdType;
           pass['idNumber'] = c.idController.text.trim();
+        } else {
+          pass['seatNumber'] = seats[pIndex].toString();
         }
 
         legPass.add(pass);

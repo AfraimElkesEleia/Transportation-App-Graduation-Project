@@ -1,21 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:transportation_app/core/l10n/app_localizations.dart';
 
-String formatBoardingPassTime(DateTime dt) => DateFormat('hh:mm a').format(dt);
+String _localeName(BuildContext context) =>
+    Localizations.localeOf(context).toLanguageTag();
 
-String formatBoardingPassDate(DateTime dt) =>
-    DateFormat('dd MMM yyyy').format(dt);
+String formatBoardingPassTime(BuildContext context, DateTime dt) =>
+    DateFormat('hh:mm a', _localeName(context)).format(dt);
+
+String formatBoardingPassDate(BuildContext context, DateTime dt) =>
+    DateFormat('dd MMM yyyy', _localeName(context)).format(dt);
 
 String boardingPassLocationCode(String city) {
   if (city.length < 3) return city.toUpperCase();
   return city.substring(0, 3).toUpperCase();
 }
 
-String boardingPassDuration(DateTime from, DateTime to) {
+String boardingPassDuration(BuildContext context, DateTime from, DateTime to) {
   final diff = to.difference(from);
   final h = diff.inHours;
   final m = diff.inMinutes % 60;
-  return '${h}h ${m}m';
+  return AppLocalizations.of(
+    context,
+  )!.durationHoursMinutes(h.toString(), m.toString());
 }
 
 class BoardingPassDashedDivider extends StatelessWidget {

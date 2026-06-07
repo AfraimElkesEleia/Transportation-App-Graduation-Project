@@ -16,7 +16,9 @@ class CartItemCard extends StatelessWidget {
     final name = item.agencyName.toLowerCase();
     if (name.contains('gobus')) return ColorsManager.agencyGoBus;
     if (name.contains('blue')) return ColorsManager.agencyBlueBus;
-    if (name.contains('rail') || name.contains('train') || name.contains('enr')) {
+    if (name.contains('rail') ||
+        name.contains('train') ||
+        name.contains('enr')) {
       return ColorsManager.agencyRailway;
     }
     if (name.contains('horus')) return ColorsManager.agencyHorus;
@@ -100,31 +102,20 @@ class CartItemCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          _AgencyBadge(
-                            label: agencyName,
-                            color: _agencyColor,
-                          ),
-                          const SizedBox(height: 12),
-                          _RouteTitle(
-                            origin: originTitle,
-                            destination: destinationTitle,
-                            isRtl: isArabic,
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(width: 12),
+                    _AgencyBadge(label: agencyName, color: _agencyColor),
                     _PriceBadge(price: item.totalPrice),
                   ],
                 ),
+                const SizedBox(height: 16),
+                _RouteTitle(
+                  origin: originTitle,
+                  destination: destinationTitle,
+                  isRtl: isArabic,
+                ),
                 if (stationSubtitle.isNotEmpty) ...[
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 6),
                   Text(
                     stationSubtitle,
                     style: const TextStyle(
@@ -136,34 +127,22 @@ class CartItemCard extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                   ),
                 ],
-                const SizedBox(height: 18),
-                Row(
-                  children: [
-                    Expanded(
-                      child: _TripDetailTile(
-                        icon: Icons.departure_board_outlined,
-                        label: l10n.departure,
-                        value: _formatDeparture(context, item.boardingTime),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: _TripDetailTile(
-                        icon: Icons.event_seat_outlined,
-                        label: l10n.classLabel,
-                        value: '$agencyName - $className',
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: _TripDetailTile(
-                        icon: Icons.timer_outlined,
-                        label: l10n.expires,
-                        value: _formatExpiry(context, item.holdExpiresAt),
-                        isWarning: true,
-                      ),
-                    ),
-                  ],
+                const SizedBox(height: 16),
+                _DetailListRow(
+                  icon: Icons.calendar_today_outlined,
+                  label: l10n.departure,
+                  value: _formatDeparture(context, item.boardingTime),
+                ),
+                _DetailListRow(
+                  icon: Icons.computer_outlined,
+                  label: l10n.classLabel,
+                  value: '$agencyName - $className',
+                ),
+                _DetailListRow(
+                  icon: Icons.timer_outlined,
+                  label: l10n.expires,
+                  value: _formatExpiry(context, item.holdExpiresAt),
+                  isWarning: true,
                 ),
               ],
             ),
@@ -202,19 +181,30 @@ class _AgencyBadge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
-        color: color.withAlpha(35),
+        color: color.withAlpha(20),
         borderRadius: BorderRadius.circular(999),
-        border: Border.all(color: color.withAlpha(120)),
+        border: Border.all(color: color.withAlpha(90)),
       ),
-      child: Text(
-        label,
-        style: TextStyle(
-          color: color,
-          fontSize: 12,
-          fontWeight: FontWeight.w900,
-        ),
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            label,
+            style: TextStyle(
+              color: color,
+              fontSize: 12,
+              fontWeight: FontWeight.w900,
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+          const SizedBox(width: 6),
+          Container(
+            width: 6,
+            height: 6,
+            decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+          ),
+        ],
       ),
     );
   }
@@ -235,45 +225,40 @@ class _RouteTitle extends StatelessWidget {
   Widget build(BuildContext context) {
     return Align(
       alignment: AlignmentDirectional.centerStart,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Flexible(
-            fit: FlexFit.loose,
-            child: Text(
-              origin,
+      child: Text.rich(
+        TextSpan(
+          children: [
+            TextSpan(
+              text: origin,
               style: const TextStyle(
                 color: Colors.white,
                 fontSize: 19,
                 fontWeight: FontWeight.w900,
               ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8),
-            child: Icon(
-              isRtl ? Icons.arrow_back : Icons.arrow_forward,
-              color: ColorsManager.accentCyan,
-              size: 18,
+            WidgetSpan(
+              alignment: PlaceholderAlignment.middle,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                child: Icon(
+                  isRtl ? Icons.arrow_back : Icons.arrow_forward,
+                  color: ColorsManager.accentCyan,
+                  size: 18,
+                ),
+              ),
             ),
-          ),
-          Flexible(
-            fit: FlexFit.loose,
-            child: Text(
-              destination,
+            TextSpan(
+              text: destination,
               style: const TextStyle(
                 color: Colors.white,
                 fontSize: 19,
                 fontWeight: FontWeight.w900,
               ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
             ),
-          ),
-        ],
+          ],
+        ),
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
       ),
     );
   }
@@ -288,10 +273,10 @@ class _PriceBadge extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: ColorsManager.accentCyan.withAlpha(22),
-        borderRadius: BorderRadius.circular(14),
+        color: ColorsManager.accentCyan.withAlpha(20),
+        borderRadius: BorderRadius.circular(999),
         border: Border.all(color: ColorsManager.accentCyan.withAlpha(90)),
       ),
       child: Text(
@@ -306,13 +291,13 @@ class _PriceBadge extends StatelessWidget {
   }
 }
 
-class _TripDetailTile extends StatelessWidget {
+class _DetailListRow extends StatelessWidget {
   final IconData icon;
   final String label;
   final String value;
   final bool isWarning;
 
-  const _TripDetailTile({
+  const _DetailListRow({
     required this.icon,
     required this.label,
     required this.value,
@@ -321,47 +306,40 @@ class _TripDetailTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = isWarning ? Colors.orangeAccent : ColorsManager.accentCyan;
-    return Container(
-      height: 108,
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
-      decoration: BoxDecoration(
-        color: ColorsManager.surfaceDark,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: ColorsManager.borderDim),
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
+    final color = isWarning ? Colors.redAccent : ColorsManager.textMuted;
+    final valueColor = isWarning ? Colors.redAccent : Colors.white;
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Icon(icon, color: color, size: 17),
-          const SizedBox(height: 8),
-          Text(
-            label,
-            style: const TextStyle(
-              color: ColorsManager.textMuted,
-              fontSize: 11,
-              fontWeight: FontWeight.w600,
-            ),
-            maxLines: 1,
-            textAlign: TextAlign.center,
-            overflow: TextOverflow.ellipsis,
-          ),
-          const SizedBox(height: 6),
-          Expanded(
-            child: Center(
-              child: Text(
-                value,
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icon, color: color, size: 16),
+              const SizedBox(width: 8),
+              Text(
+                label,
                 style: TextStyle(
-                  color: isWarning ? Colors.orangeAccent : Colors.white,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w800,
-                  height: 1.15,
+                  color: color,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
                 ),
-                textAlign: TextAlign.center,
-                maxLines: 3,
-                overflow: TextOverflow.ellipsis,
               ),
+            ],
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Text(
+              value,
+              style: TextStyle(
+                color: valueColor,
+                fontSize: 13,
+                fontWeight: FontWeight.bold,
+              ),
+              textAlign: TextAlign.end,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
             ),
           ),
         ],
@@ -388,7 +366,7 @@ class _PassengersStrip extends StatelessWidget {
         title: Row(
           children: [
             const Icon(
-              Icons.people_outline,
+              Icons.person_outline,
               color: ColorsManager.textMuted,
               size: 18,
             ),
@@ -410,27 +388,34 @@ class _PassengersStrip extends StatelessWidget {
                     state.bookingId == item.bookingId;
                 if (isCancelling) {
                   return const SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: Colors.redAccent,
+                    width: 32,
+                    height: 32,
+                    child: Padding(
+                      padding: EdgeInsets.all(6.0),
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.redAccent,
+                      ),
                     ),
                   );
                 }
-                return IconButton(
-                  tooltip: l10n.cancelTripBtn,
-                  icon: const Icon(
-                    Icons.delete_outline,
-                    color: Colors.redAccent,
-                    size: 20,
+                return Container(
+                  width: 32,
+                  height: 32,
+                  decoration: BoxDecoration(
+                    color: Colors.redAccent.withAlpha(25),
+                    shape: BoxShape.circle,
                   ),
-                  onPressed: () => _confirmCancel(context, item.bookingId),
-                  constraints: const BoxConstraints(
-                    minWidth: 36,
-                    minHeight: 36,
+                  child: IconButton(
+                    tooltip: l10n.cancelTripBtn,
+                    icon: const Icon(
+                      Icons.delete_outline,
+                      color: Colors.redAccent,
+                      size: 16,
+                    ),
+                    onPressed: () => _confirmCancel(context, item.bookingId),
+                    padding: EdgeInsets.zero,
                   ),
-                  padding: EdgeInsets.zero,
                 );
               },
             ),

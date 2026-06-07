@@ -1045,6 +1045,21 @@ class AppLocalizationsAr extends AppLocalizations {
   String get downloadPdf => 'تنزيل PDF';
 
   @override
+  String get boardingPassTitle => 'بطاقة الصعود';
+
+  @override
+  String get boardingPassPassengerLabel => 'مسافر';
+
+  @override
+  String get boardingPassSeatLabel => 'مقعد';
+
+  @override
+  String get boardingPassClassLabel => 'الدرجة';
+
+  @override
+  String get boardingPassDateLabel => 'التاريخ';
+
+  @override
   String ticketClass(String className) {
     return 'درجة $className';
   }

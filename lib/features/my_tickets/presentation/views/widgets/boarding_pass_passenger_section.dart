@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:transportation_app/core/helper/extensions.dart';
+import 'package:transportation_app/core/l10n/app_localizations.dart';
 import 'package:transportation_app/core/theming/colors.dart';
 import 'package:transportation_app/features/my_tickets/presentation/cubit/passenger_boarding_pass_cubit.dart';
 import 'package:transportation_app/features/my_tickets/presentation/views/widgets/boarding_pass_helpers.dart';
@@ -19,6 +20,7 @@ class BoardingPassPassengerSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final className = context.isArabic
         ? (ticket.classNameAr ?? ticket.className)
         : ticket.className;
@@ -34,7 +36,7 @@ class BoardingPassPassengerSection extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               BoardingPassInfoChip(
-                label: 'SEAT',
+                label: l10n.boardingPassSeatLabel,
                 value: passenger.seatNumber.isNotEmpty
                     ? passenger.seatNumber
                     : '-',
@@ -43,7 +45,7 @@ class BoardingPassPassengerSection extends StatelessWidget {
               const SizedBox(width: 16),
               Expanded(
                 child: BoardingPassInfoChip(
-                  label: 'CLASS',
+                  label: l10n.boardingPassClassLabel,
                   value: className.isNotEmpty ? className : '-',
                   valueColor: ColorsManager.accentCyan,
                   valueMaxLines: 2,
@@ -51,8 +53,8 @@ class BoardingPassPassengerSection extends StatelessWidget {
               ),
               const SizedBox(width: 16),
               BoardingPassInfoChip(
-                label: 'DATE',
-                value: formatBoardingPassDate(ticket.boardingTime),
+                label: l10n.boardingPassDateLabel,
+                value: formatBoardingPassDate(context, ticket.boardingTime),
                 valueColor: Colors.white,
               ),
             ],
@@ -72,6 +74,8 @@ class BoardingPassPassengerIdentity extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -79,9 +83,9 @@ class BoardingPassPassengerIdentity extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                'PASSENGER',
-                style: TextStyle(
+              Text(
+                l10n.boardingPassPassengerLabel,
+                style: const TextStyle(
                   color: Colors.white38,
                   fontSize: 10,
                   letterSpacing: 1.5,
@@ -100,7 +104,7 @@ class BoardingPassPassengerIdentity extends StatelessWidget {
               if (passenger.idNumber.isNotEmpty) ...[
                 const SizedBox(height: 2),
                 Text(
-                  'ID: ${passenger.idNumber}',
+                  l10n.idNum(passenger.idNumber),
                   style: const TextStyle(color: Colors.white54, fontSize: 12),
                 ),
               ],

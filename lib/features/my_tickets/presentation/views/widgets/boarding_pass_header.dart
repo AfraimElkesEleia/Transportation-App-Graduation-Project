@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:transportation_app/core/l10n/app_localizations.dart';
 import 'package:transportation_app/features/my_tickets/domain/entities/ticket_entity.dart';
 
 class BoardingPassDragHandle extends StatelessWidget {
@@ -38,9 +39,9 @@ class BoardingPassHeader extends StatelessWidget {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                'Boarding Pass',
-                style: TextStyle(
+              Text(
+                AppLocalizations.of(context)!.boardingPassTitle,
+                style: const TextStyle(
                   color: Colors.white,
                   fontSize: 22,
                   fontWeight: FontWeight.bold,

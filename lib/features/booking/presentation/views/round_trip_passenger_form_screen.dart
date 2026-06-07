@@ -308,12 +308,13 @@ class _RoundTripPassengerFormScreenState
       final c = controllers[i];
       final payload = <String, dynamic>{
         'passengerName': c.nameController.text.trim(),
-        'seatNumber': seats[i],
       };
 
       if (isTrain) {
         payload['idType'] = c.selectedIdType;
         payload['idNumber'] = c.idController.text.trim();
+      } else {
+        payload['seatNumber'] = seats[i];
       }
 
       return payload;

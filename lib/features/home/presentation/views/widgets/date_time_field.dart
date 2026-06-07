@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:transportation_app/core/l10n/app_localizations.dart';
 import 'package:transportation_app/core/theming/colors.dart';
 import 'package:transportation_app/core/theming/styles.dart';
 
@@ -23,6 +24,31 @@ class DateTimeField extends StatefulWidget {
 class DateTimeFieldState extends State<DateTimeField> {
   late final TextEditingController _controller;
 
+  DateTime get _today {
+    final now = DateTime.now();
+    return DateTime(now.year, now.month, now.day);
+  }
+
+  DateTime get _latestTravelDate => _today.add(const Duration(days: 60));
+
+  DateTime? get _selectedDate {
+    final parts = _controller.text.trim().split('/');
+    if (parts.length != 3) return null;
+
+    final day = int.tryParse(parts[0]);
+    final month = int.tryParse(parts[1]);
+    final year = int.tryParse(parts[2]);
+    if (day == null || month == null || year == null) return null;
+
+    return DateTime(year, month, day);
+  }
+
+  String _formatDisplayDate(DateTime date) {
+    return '${date.day.toString().padLeft(2, '0')}/'
+        '${date.month.toString().padLeft(2, '0')}/'
+        '${date.year}';
+  }
+
   @override
   void initState() {
     super.initState();
@@ -43,7 +69,7 @@ class DateTimeFieldState extends State<DateTimeField> {
       style: AppStyles.regular18white(context),
       decoration: InputDecoration(
         hint: Text(
-          '${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year}',
+          AppLocalizations.of(context)!.selectDate,
           style: AppStyles.regular18white(context),
         ),
         prefixIcon: Icon(Icons.calendar_month, color: ColorsManager.iconsColor),
@@ -77,14 +103,20 @@ class DateTimeFieldState extends State<DateTimeField> {
   }
 
   Future<void> selectDate() async {
+    final firstDate = widget.minimumDate ?? _today;
+    final selectedDate = _selectedDate;
+    final initialDate =
+        selectedDate != null && !selectedDate.isBefore(firstDate)
+        ? selectedDate
+        : firstDate;
     final pickedDate = await showDatePicker(
       context: context,
-      firstDate: widget.minimumDate ?? DateTime.now(),
-      lastDate: DateTime(2100),
+      initialDate: initialDate,
+      firstDate: firstDate,
+      lastDate: _latestTravelDate,
     );
     if (pickedDate != null) {
-      _controller.text =
-          '${pickedDate.day}/${pickedDate.month}/${pickedDate.year}';
+      _controller.text = _formatDisplayDate(pickedDate);
       widget.onDateSelected?.call(pickedDate);
     }
   }

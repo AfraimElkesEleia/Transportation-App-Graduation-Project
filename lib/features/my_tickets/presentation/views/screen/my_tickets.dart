@@ -204,7 +204,8 @@ class _MyTicketsState extends State<MyTickets>
                                 t.refundStatus != 'Accepted' &&
                                 t.refundStatus != 'Approved',
                           )
-                          .toList();
+                          .toList()
+                        ..sort(_sortByBoardingSoonest);
 
                       final activeNow = state.tickets
                           .where(
@@ -213,7 +214,8 @@ class _MyTicketsState extends State<MyTickets>
                                 t.refundStatus != 'Accepted' &&
                                 t.refundStatus != 'Approved',
                           )
-                          .toList();
+                          .toList()
+                        ..sort(_sortByBoardingSoonest);
                       final past = state.tickets
                           .where(
                             (t) =>
@@ -221,7 +223,8 @@ class _MyTicketsState extends State<MyTickets>
                                 t.refundStatus == 'Accepted' ||
                                 t.refundStatus == 'Approved',
                           )
-                          .toList();
+                          .toList()
+                        ..sort(_sortByDropoffMostRecent);
 
                       tabChildren = [
                         _TicketListView(
@@ -262,6 +265,18 @@ class _MyTicketsState extends State<MyTickets>
       ),
     );
   }
+}
+
+int _sortByBoardingSoonest(TicketEntity a, TicketEntity b) {
+  final timeCompare = a.boardingTime.compareTo(b.boardingTime);
+  if (timeCompare != 0) return timeCompare;
+  return a.bookingId.compareTo(b.bookingId);
+}
+
+int _sortByDropoffMostRecent(TicketEntity a, TicketEntity b) {
+  final timeCompare = b.dropoffTime.compareTo(a.dropoffTime);
+  if (timeCompare != 0) return timeCompare;
+  return b.bookingId.compareTo(a.bookingId);
 }
 
 // ── Error view ───────────────────────────────────────────────────────

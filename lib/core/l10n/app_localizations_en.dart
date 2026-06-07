@@ -1048,6 +1048,21 @@ class AppLocalizationsEn extends AppLocalizations {
   String get downloadPdf => 'Download PDF';
 
   @override
+  String get boardingPassTitle => 'Boarding Pass';
+
+  @override
+  String get boardingPassPassengerLabel => 'Passenger';
+
+  @override
+  String get boardingPassSeatLabel => 'Seat';
+
+  @override
+  String get boardingPassClassLabel => 'Class';
+
+  @override
+  String get boardingPassDateLabel => 'Date';
+
+  @override
   String ticketClass(String className) {
     return '$className Class';
   }

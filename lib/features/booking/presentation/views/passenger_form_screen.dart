@@ -180,7 +180,6 @@ class _PassengerFormScreenState extends State<PassengerFormScreen> {
         payload['passengerName'] = c.nameController.text.trim();
         payload['idNumber'] = c.idController.text.trim();
         payload['idType'] = c.selectedIdType; // 'NationalId' or 'Passport'
-        payload['seatNumber'] = 'T-${i + 1}'; // auto placeholder
       } else {
         // Non-ENR (bus): only seat number is required per passenger
         payload['passengerName'] = c.nameController.text.trim();
