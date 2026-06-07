@@ -9,6 +9,8 @@ import 'package:transportation_app/core/notfications/signalr_service.dart';
 class AuthInterceptor extends Interceptor {
   final Dio dio;
   final TokenManager _tokenManager = TokenManager();
+  Future<_RefreshResult>? _refreshFuture;
+  bool _isLoggingOut = false;
   static const _retriedAfterRefreshKey = 'retriedAfterRefresh';
   static const _publicEndpoints = [
     ApiConstants.register,
@@ -54,11 +56,11 @@ class AuthInterceptor extends Interceptor {
 
     if (shouldTryRefresh) {
       debugPrint('🔵 [AuthInterceptor] trying silent token refresh');
-      final refreshed = await _tryRefreshToken();
-      if (refreshed) {
+      final refreshResult = await _refreshTokenOnce();
+      if (refreshResult == _RefreshResult.refreshed) {
         final newToken = await _tokenManager.getAccessToken();
         if (newToken == null) {
-          _forceLogout();
+          await _forceLogout();
           return handler.next(err);
         }
         err.requestOptions.extra[_retriedAfterRefreshKey] = true;
@@ -70,15 +72,21 @@ class AuthInterceptor extends Interceptor {
           return handler.next(retryError);
         }
       }
-      _forceLogout();
+
+      if (refreshResult == _RefreshResult.invalidSession) {
+        await _forceLogout();
+      }
     } else if (!isPublic && alreadyRetried && statusCode == 401) {
-      _forceLogout();
+      await _forceLogout();
     }
     debugPrint('🔵 [AuthInterceptor] forwarding error to next handler');
     handler.next(err);
   }
 
-  void _forceLogout() async {
+  Future<void> _forceLogout() async {
+    if (_isLoggingOut) return;
+    _isLoggingOut = true;
+
     await _tokenManager.clearAllTokens();
     SignalrService.disconnect();
     navigatorKey.currentState?.pushNamedAndRemoveUntil(
@@ -87,28 +95,74 @@ class AuthInterceptor extends Interceptor {
     );
   }
 
-  Future<bool> _tryRefreshToken() async {
+  Future<_RefreshResult> _refreshTokenOnce() {
+    final refreshFuture = _refreshFuture;
+    if (refreshFuture != null) return refreshFuture;
+
+    final future = _tryRefreshToken();
+    _refreshFuture = future;
+    return future.whenComplete(() {
+      if (identical(_refreshFuture, future)) {
+        _refreshFuture = null;
+      }
+    });
+  }
+
+  Future<_RefreshResult> _tryRefreshToken() async {
     try {
       final refreshToken = await _tokenManager.getRefreshToken();
-      if (refreshToken == null) return false;
-      final freshDio = Dio(BaseOptions(baseUrl: ApiConstants.baseUrl));
+      if (refreshToken == null) return _RefreshResult.invalidSession;
+
+      final freshDio = Dio(
+        BaseOptions(
+          baseUrl: ApiConstants.baseUrl,
+          connectTimeout: const Duration(seconds: 30),
+          receiveTimeout: const Duration(seconds: 30),
+          contentType: 'application/json',
+          headers: {'Accept': 'application/json'},
+        ),
+      );
       final response = await freshDio.post(
         ApiConstants.refresh,
         data: {'refreshToken': refreshToken},
       );
 
-      if (response.data['success'] == true) {
-        final data = response.data['data'];
+      final body = response.data as Map<String, dynamic>?;
+      if (body?['success'] == true) {
+        final data = body?['data'] as Map<String, dynamic>?;
+        if (data == null ||
+            data['accessToken'] is! String ||
+            data['refreshToken'] is! String) {
+          return _RefreshResult.failed;
+        }
         await _tokenManager.saveTokens(
           accessToken: data['accessToken'],
           refreshToken: data['refreshToken'],
         );
-        return true;
+        return _RefreshResult.refreshed;
       }
-      return false;
-    } catch (_) {
-      await _tokenManager.clearTokens();
-      return false;
+
+      return _RefreshResult.invalidSession;
+    } on DioException catch (error) {
+      final statusCode = error.response?.statusCode;
+      if (statusCode == 400 || statusCode == 401 || statusCode == 403) {
+        return _RefreshResult.invalidSession;
+      }
+      debugPrint(
+        '🔵 [AuthInterceptor] refresh failed without invalidating session: ${error.message}',
+      );
+      return _RefreshResult.failed;
+    } catch (error) {
+      debugPrint(
+        '🔵 [AuthInterceptor] unexpected refresh failure: $error',
+      );
+      return _RefreshResult.failed;
     }
   }
+}
+
+enum _RefreshResult {
+  refreshed,
+  invalidSession,
+  failed,
 }
