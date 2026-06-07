@@ -1,9 +1,9 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:transportation_app/core/constants/api_constants.dart';
+import 'package:transportation_app/core/routing/navigator_key.dart';
 import 'package:transportation_app/core/utils/token_manager.dart';
 import 'package:transportation_app/core/routing/routes.dart';
-import 'package:transportation_app/main.dart';
 import 'package:transportation_app/core/notfications/signalr_service.dart';
 
 class AuthInterceptor extends Interceptor {

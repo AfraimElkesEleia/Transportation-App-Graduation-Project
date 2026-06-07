@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:transportation_app/core/di/injection_container.dart';
 import 'package:transportation_app/core/l10n/app_localizations.dart';
+import 'package:transportation_app/core/notfications/notfication_permission_manager.dart';
 import 'package:transportation_app/core/routing/app_router.dart';
+import 'package:transportation_app/core/routing/navigator_key.dart';
 import 'package:transportation_app/core/routing/routes.dart';
 import 'package:transportation_app/core/utils/app_startup.dart';
 import 'package:transportation_app/core/utils/token_manager.dart';
@@ -14,8 +16,6 @@ import 'package:transportation_app/core/notfications/notfication_service.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:transportation_app/core/l10n/locale_box.dart';
 import 'package:transportation_app/core/l10n/locale_cubit.dart';
-
-final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -66,6 +66,9 @@ class TransportationApp extends StatelessWidget {
           locale: locale,
           supportedLocales: AppLocalizations.supportedLocales,
           localizationsDelegates: AppLocalizations.localizationsDelegates,
+          builder: (context, child) => NotficationPermissionGate(
+            child: child ?? const SizedBox.shrink(),
+          ),
           onGenerateRoute: appRouter.generateRoute,
           initialRoute: initialRoute,
         ),

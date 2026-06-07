@@ -2012,6 +2012,12 @@ abstract class AppLocalizations {
   /// **'Ticket Details'**
   String get ticketDetails;
 
+  /// No description provided for @downloadPdf.
+  ///
+  /// In en, this message translates to:
+  /// **'Download PDF'**
+  String get downloadPdf;
+
   /// No description provided for @ticketClass.
   ///
   /// In en, this message translates to:
@@ -2527,6 +2533,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Notifications'**
   String get notifications;
+
+  /// No description provided for @notificationPermissionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Stay in the loop'**
+  String get notificationPermissionTitle;
+
+  /// No description provided for @notificationPermissionBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable notifications to receive ticket offers, boarding reminders, cart expiry warnings, and important trip updates.'**
+  String get notificationPermissionBody;
+
+  /// No description provided for @notificationPermissionNotNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Not now'**
+  String get notificationPermissionNotNow;
+
+  /// No description provided for @notificationPermissionOpenSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Open settings'**
+  String get notificationPermissionOpenSettings;
 
   /// No description provided for @markAllRead.
   ///

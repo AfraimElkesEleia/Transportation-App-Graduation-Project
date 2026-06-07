@@ -1,8 +1,8 @@
 import 'dart:developer';
 
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:transportation_app/core/routing/navigator_key.dart';
 import 'package:transportation_app/core/routing/routes.dart';
-import 'package:transportation_app/main.dart';
 
 class NotficationService {
   static final _plugin = FlutterLocalNotificationsPlugin();

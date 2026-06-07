@@ -16,18 +16,17 @@ class FcmService {
   static final _messaging = FirebaseMessaging.instance;
 
   static Future<void> init() async {
-    // 1. Request permission (iOS + Android 13+)
-    final settings = await _messaging.requestPermission(
-      alert: true,
-      badge: true,
-      sound: true,
-    );
-    if (settings.authorizationStatus == AuthorizationStatus.denied) return;
+    if (!Platform.isAndroid) {
+      final settings = await _messaging.requestPermission(
+        alert: true,
+        badge: true,
+        sound: true,
+      );
+      if (settings.authorizationStatus == AuthorizationStatus.denied) return;
+    }
 
-    // 2. Register background handler
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
-    // 3. Foreground messages → show local notification
     FirebaseMessaging.onMessage.listen((message) {
       final notif = message.notification;
       if (notif == null) return;

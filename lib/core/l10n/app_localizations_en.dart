@@ -1022,6 +1022,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get ticketDetails => 'Ticket Details';
 
   @override
+  String get downloadPdf => 'Download PDF';
+
+  @override
   String ticketClass(String className) {
     return '$className Class';
   }
@@ -1329,6 +1332,19 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get notifications => 'Notifications';
+
+  @override
+  String get notificationPermissionTitle => 'Stay in the loop';
+
+  @override
+  String get notificationPermissionBody =>
+      'Enable notifications to receive ticket offers, boarding reminders, cart expiry warnings, and important trip updates.';
+
+  @override
+  String get notificationPermissionNotNow => 'Not now';
+
+  @override
+  String get notificationPermissionOpenSettings => 'Open settings';
 
   @override
   String get markAllRead => 'Mark all read';

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:transportation_app/core/l10n/app_localizations.dart';
 import 'package:transportation_app/core/theming/colors.dart';
 import 'package:transportation_app/features/my_tickets/presentation/cubit/passenger_boarding_pass_cubit.dart';
 
@@ -85,7 +86,7 @@ class BoardingPassDownloadButton extends StatelessWidget {
             ),
             const SizedBox(width: 8),
             Text(
-              'Download PDF',
+              AppLocalizations.of(context)!.downloadPdf,
               style: TextStyle(
                 color: enabled ? Colors.black : Colors.white38,
                 fontWeight: FontWeight.bold,

@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:transportation_app/core/di/injection_container.dart';
 import 'package:transportation_app/core/helper/spacing.dart';
-import 'package:transportation_app/core/notfications/notfication_permission_manager.dart';
 import 'package:transportation_app/core/theming/colors.dart';
 import 'package:transportation_app/core/theming/styles.dart';
 import 'package:transportation_app/core/utils/error_localizer.dart';
@@ -24,7 +23,6 @@ class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
   @override
   Widget build(BuildContext context) {
-    NotficationPermissionManager.requestIfNeeded(context);
     return MultiBlocProvider(
       providers: [
         BlocProvider(

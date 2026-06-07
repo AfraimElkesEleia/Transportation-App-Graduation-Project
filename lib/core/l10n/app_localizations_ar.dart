@@ -1019,6 +1019,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get ticketDetails => 'تفاصيل التذكرة';
 
   @override
+  String get downloadPdf => 'تنزيل PDF';
+
+  @override
   String ticketClass(String className) {
     return 'درجة $className';
   }
@@ -1325,6 +1328,19 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get notifications => 'الإشعارات';
+
+  @override
+  String get notificationPermissionTitle => 'ابقَ على اطلاع';
+
+  @override
+  String get notificationPermissionBody =>
+      'فعّل الإشعارات لتصلك عروض التذاكر، وتذكيرات الصعود، وتنبيهات انتهاء السلة، والتحديثات المهمة لرحلاتك.';
+
+  @override
+  String get notificationPermissionNotNow => 'ليس الآن';
+
+  @override
+  String get notificationPermissionOpenSettings => 'فتح الإعدادات';
 
   @override
   String get markAllRead => 'تحديد الكل كمقروء';
