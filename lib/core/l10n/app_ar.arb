@@ -331,6 +331,19 @@
       }
     }
   },
+  "checkoutAction": "إتمام الدفع",
+  "ticketPrice": "سعر التذكرة",
+  "pointsDiscount": "خصم النقاط",
+  "useLoyaltyPointsTitle": "استخدم نقاط الولاء",
+  "youHavePoints": "لديك {points} نقطة",
+  "@youHavePoints": {
+    "placeholders": {
+      "points": {
+        "type": "String"
+      }
+    }
+  },
+  "pointsConversionHint": "20 نقطة = 1 جنيه",
   "useLoyaltyPoints": "💎 استخدم نقاط الولاء",
   "noPointsYet": "ليس لديك أي نقاط بعد. أكمل رحلات لكسب النقاط!",
   "pointsCantBeApplied": "لا يمكن تطبيق النقاط - إجمالي السلة منخفض جداً (الحد الأدنى 10 جنيهات).",

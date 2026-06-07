@@ -158,19 +158,9 @@ class BoardingPassTimeline extends StatelessWidget {
           Row(
             children: [
               _TimelineDot(),
-              Expanded(
-                child: Container(
-                  height: 1,
-                  color: Colors.white24,
-                ),
-              ),
+              Expanded(child: Container(height: 1, color: Colors.white24)),
               const Icon(Icons.train, color: Colors.white38, size: 18),
-              Expanded(
-                child: Container(
-                  height: 1,
-                  color: Colors.white24,
-                ),
-              ),
+              Expanded(child: Container(height: 1, color: Colors.white24)),
               _TimelineDot(),
             ],
           ),

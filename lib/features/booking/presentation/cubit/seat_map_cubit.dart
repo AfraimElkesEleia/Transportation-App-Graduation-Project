@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:transportation_app/core/error/failures.dart';
 import 'package:transportation_app/core/notfications/local_alarm_scheduler.dart';
 import 'package:transportation_app/features/booking/domain/usecases/add_to_cart_usecase.dart';
 import 'package:transportation_app/features/booking/domain/usecases/checkout_usecase.dart';
@@ -18,6 +19,12 @@ class SeatMapCubit extends Cubit<SeatMapState> {
     required this.getCartUseCase,
     required this.checkoutUseCase,
   }) : super(SeatMapInitial());
+
+  String _failureMessage(Failure failure) {
+    final errors = failure.errors;
+    if (errors.isEmpty) return failure.message;
+    return '${failure.message}\n${errors.join('\n')}';
+  }
 
   Future<void> loadSeatMap(int occurrenceId, int coachClassId) async {
     if (isClosed) return;
@@ -57,7 +64,7 @@ class SeatMapCubit extends Cubit<SeatMapState> {
       });
     if (isClosed) return;
     result.fold(
-      (failure) => emit(CartError(failure.message)),
+      (failure) => emit(CartError(_failureMessage(failure))),
       (_) => emit(CartSuccess()),
     );
   }
@@ -70,7 +77,7 @@ class SeatMapCubit extends Cubit<SeatMapState> {
       final result = await addToCartUseCase(p);
       if (isClosed) return;
       final failed = result.fold((failure) {
-        emit(CartError(failure.message));
+        emit(CartError(_failureMessage(failure)));
         return true;
       }, (_) => false);
       if (failed) {
@@ -85,7 +92,7 @@ class SeatMapCubit extends Cubit<SeatMapState> {
       final result = await addToCartUseCase(p);
       if (isClosed) return false;
       final failed = result.fold((failure) {
-        emit(CartError(failure.message));
+        emit(CartError(_failureMessage(failure)));
         return true;
       }, (_) => false);
       if (failed) {
@@ -99,7 +106,7 @@ class SeatMapCubit extends Cubit<SeatMapState> {
     final cartResult = await getCartUseCase();
     if (isClosed) return;
     final cartFailed = cartResult.fold((failure) {
-      emit(CartAddedButCheckoutFailed(failure.message));
+      emit(CartAddedButCheckoutFailed(_failureMessage(failure)));
       return true;
     }, (_) => false);
     if (cartFailed) {
@@ -109,7 +116,7 @@ class SeatMapCubit extends Cubit<SeatMapState> {
     final checkoutResult = await checkoutUseCase(pointsToRedeem: pointsToRedeem);
     if (isClosed) return;
     checkoutResult.fold((failure) {
-      emit(CartAddedButCheckoutFailed(failure.message));
+      emit(CartAddedButCheckoutFailed(_failureMessage(failure)));
     }, (_) async {
       await LocalAlarmScheduler.cancelCartExpiry();
       if (isClosed) return;

@@ -969,6 +969,26 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String get checkoutAction => 'إتمام الدفع';
+
+  @override
+  String get ticketPrice => 'سعر التذكرة';
+
+  @override
+  String get pointsDiscount => 'خصم النقاط';
+
+  @override
+  String get useLoyaltyPointsTitle => 'استخدم نقاط الولاء';
+
+  @override
+  String youHavePoints(String points) {
+    return 'لديك $points نقطة';
+  }
+
+  @override
+  String get pointsConversionHint => '20 نقطة = 1 جنيه';
+
+  @override
   String get useLoyaltyPoints => '💎 استخدم نقاط الولاء';
 
   @override

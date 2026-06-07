@@ -451,6 +451,19 @@
       }
     }
   },
+  "checkoutAction": "Checkout",
+  "ticketPrice": "Ticket price",
+  "pointsDiscount": "Points discount",
+  "useLoyaltyPointsTitle": "Use Loyalty Points",
+  "youHavePoints": "You have {points} pts",
+  "@youHavePoints": {
+    "placeholders": {
+      "points": {
+        "type": "String"
+      }
+    }
+  },
+  "pointsConversionHint": "20 pts = 1.00 EGP",
   "useLoyaltyPoints": "💎 Use Loyalty Points",
   "noPointsYet": "You don't have any points yet. Complete trips to earn points!",
   "pointsCantBeApplied": "Points can't be applied — cart total is too low (10 EGP minimum final price).",

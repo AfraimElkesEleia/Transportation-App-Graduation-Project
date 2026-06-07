@@ -1922,6 +1922,42 @@ abstract class AppLocalizations {
   /// **'Continue with {n} Passenger(s)'**
   String continueWithNPassengers(String n);
 
+  /// No description provided for @checkoutAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Checkout'**
+  String get checkoutAction;
+
+  /// No description provided for @ticketPrice.
+  ///
+  /// In en, this message translates to:
+  /// **'Ticket price'**
+  String get ticketPrice;
+
+  /// No description provided for @pointsDiscount.
+  ///
+  /// In en, this message translates to:
+  /// **'Points discount'**
+  String get pointsDiscount;
+
+  /// No description provided for @useLoyaltyPointsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Use Loyalty Points'**
+  String get useLoyaltyPointsTitle;
+
+  /// No description provided for @youHavePoints.
+  ///
+  /// In en, this message translates to:
+  /// **'You have {points} pts'**
+  String youHavePoints(String points);
+
+  /// No description provided for @pointsConversionHint.
+  ///
+  /// In en, this message translates to:
+  /// **'20 pts = 1.00 EGP'**
+  String get pointsConversionHint;
+
   /// No description provided for @useLoyaltyPoints.
   ///
   /// In en, this message translates to:

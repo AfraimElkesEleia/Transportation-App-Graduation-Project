@@ -35,6 +35,62 @@ class ErrorLocalizer {
       return l10n.checkoutFailed;
     }
 
+    if (lowerMessage.contains("contactname") ||
+        lowerMessage.contains("contact name") ||
+        lowerMessage.contains("passengername") ||
+        lowerMessage.contains("passenger name")) {
+      if (lowerMessage.contains("required") ||
+          lowerMessage.contains("must not be empty")) {
+        return '${l10n.fullName}: ${l10n.requiredField}';
+      }
+    }
+
+    if (lowerMessage.contains("contactphone") ||
+        lowerMessage.contains("contact phone") ||
+        lowerMessage.contains("phone")) {
+      if (lowerMessage.contains("required") ||
+          lowerMessage.contains("must not be empty")) {
+        return '${l10n.phoneNumberLabel}: ${l10n.requiredField}';
+      }
+    }
+
+    if (lowerMessage.contains("contactemail") ||
+        lowerMessage.contains("contact email") ||
+        lowerMessage.contains("email")) {
+      if (lowerMessage.contains("valid") || lowerMessage.contains("invalid")) {
+        return l10n.emailAddressValid;
+      }
+      if (lowerMessage.contains("required") ||
+          lowerMessage.contains("must not be empty")) {
+        return '${l10n.emailOptional}: ${l10n.requiredField}';
+      }
+    }
+
+    if (lowerMessage.contains("idtype") ||
+        lowerMessage.contains("id type")) {
+      if (lowerMessage.contains("required") ||
+          lowerMessage.contains("must not be empty")) {
+        return '${l10n.idTypeLabel}: ${l10n.requiredField}';
+      }
+    }
+
+    if (lowerMessage.contains("idnumber") ||
+        lowerMessage.contains("id number")) {
+      if (lowerMessage.contains("required") ||
+          lowerMessage.contains("must not be empty")) {
+        return '${l10n.idNumberLabel}: ${l10n.requiredField}';
+      }
+    }
+
+    if (lowerMessage.contains("seatnumber") ||
+        lowerMessage.contains("seat number")) {
+      if (lowerMessage.contains("required") ||
+          lowerMessage.contains("mandatory") ||
+          lowerMessage.contains("must not be empty")) {
+        return l10n.noSeatsSelected;
+      }
+    }
+
     // Match: seat(s) taken / already taken / just taken
     if (lowerMessage.contains("seat") &&
         (lowerMessage.contains("taken") ||

@@ -971,6 +971,26 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get checkoutAction => 'Checkout';
+
+  @override
+  String get ticketPrice => 'Ticket price';
+
+  @override
+  String get pointsDiscount => 'Points discount';
+
+  @override
+  String get useLoyaltyPointsTitle => 'Use Loyalty Points';
+
+  @override
+  String youHavePoints(String points) {
+    return 'You have $points pts';
+  }
+
+  @override
+  String get pointsConversionHint => '20 pts = 1.00 EGP';
+
+  @override
   String get useLoyaltyPoints => '💎 Use Loyalty Points';
 
   @override

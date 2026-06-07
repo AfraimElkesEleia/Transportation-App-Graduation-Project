@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
 import 'package:transportation_app/core/l10n/app_localizations.dart';
 import 'package:transportation_app/core/theming/colors.dart';
 import 'package:transportation_app/features/booking/domain/entities/cart_entity.dart';
@@ -13,14 +13,14 @@ class CartItemCard extends StatelessWidget {
   const CartItemCard({super.key, required this.item});
 
   Color get _agencyColor {
-    final n = item.agencyName.toLowerCase();
-    if (n.contains('gobus')) return ColorsManager.agencyGoBus;
-    if (n.contains('blue')) return ColorsManager.agencyBlueBus;
-    if (n.contains('rail') || n.contains('train') || n.contains('enr')) {
+    final name = item.agencyName.toLowerCase();
+    if (name.contains('gobus')) return ColorsManager.agencyGoBus;
+    if (name.contains('blue')) return ColorsManager.agencyBlueBus;
+    if (name.contains('rail') || name.contains('train') || name.contains('enr')) {
       return ColorsManager.agencyRailway;
     }
-    if (n.contains('horus')) return ColorsManager.agencyHorus;
-    return ColorsManager.agencyDefault;
+    if (name.contains('horus')) return ColorsManager.agencyHorus;
+    return ColorsManager.accentCyan;
   }
 
   String _localizedValue(
@@ -46,360 +46,397 @@ class CartItemCard extends StatelessWidget {
       isArabic,
       fallback: l10n.unknown,
     );
-    final originGov = _localizedValue(
-      item.originGov,
-      item.originGovAr,
-      isArabic,
-    );
     final originStation = _localizedValue(item.origin, item.originAr, isArabic);
-    final destinationGov = _localizedValue(
-      item.destinationGov,
-      item.destinationGovAr,
-      isArabic,
-    );
     final destinationStation = _localizedValue(
       item.destination,
       item.destinationAr,
       isArabic,
     );
-    final originTitle = originGov.isNotEmpty ? originGov : originStation;
-    final destinationTitle = destinationGov.isNotEmpty
-        ? destinationGov
-        : destinationStation;
+    final originTitle = _localizedValue(
+      item.originGov,
+      item.originGovAr,
+      isArabic,
+      fallback: originStation.isNotEmpty ? originStation : l10n.unknown,
+    );
+    final destinationTitle = _localizedValue(
+      item.destinationGov,
+      item.destinationGovAr,
+      isArabic,
+      fallback: destinationStation.isNotEmpty
+          ? destinationStation
+          : l10n.unknown,
+    );
+    final className = _localizedValue(
+      item.className,
+      item.classNameAr,
+      isArabic,
+      fallback: l10n.standardClass,
+    );
     final stationSubtitle = [
       originStation,
       destinationStation,
-    ].where((value) => value.isNotEmpty).join('  •  ');
+    ].where((value) => value.trim().isNotEmpty).join('  •  ');
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 16),
+      margin: const EdgeInsets.only(bottom: 14),
       decoration: BoxDecoration(
         color: ColorsManager.cardBg,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(22),
         border: Border.all(color: ColorsManager.borderSubtle),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withAlpha(45),
+            blurRadius: 18,
+            offset: const Offset(0, 10),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // ── Header ──────────────────────────────────────────────────
-          Container(
-            padding: const EdgeInsets.all(14),
-            decoration: BoxDecoration(
-              color: _agencyColor.withAlpha(30),
-              borderRadius: const BorderRadius.vertical(
-                top: Radius.circular(16),
-              ),
-              border: Border(
-                bottom: BorderSide(color: _agencyColor.withAlpha(50)),
-              ),
-            ),
-            child: Row(
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Agency chip
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 3,
-                        ),
-                        decoration: BoxDecoration(
-                          color: _agencyColor.withAlpha(50),
-                          borderRadius: BorderRadius.circular(6),
-                          border: Border.all(
-                            color: _agencyColor.withAlpha(120),
-                          ),
-                        ),
-                        child: Text(
-                          agencyName,
-                          style: TextStyle(
-                            color: _agencyColor,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 11,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      // Row 1: gov → gov (large)
-                      Row(
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Flexible(
-                            child: Text(
-                              originTitle.isNotEmpty
-                                  ? originTitle
-                                  : l10n.unknown,
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w900,
-                                fontSize: 16,
-                              ),
-                              overflow: TextOverflow.ellipsis,
-                            ),
+                          _AgencyBadge(
+                            label: agencyName,
+                            color: _agencyColor,
                           ),
-                          const Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 8),
-                            child: Icon(
-                              Icons.arrow_forward,
-                              color: ColorsManager.accentCyan,
-                              size: 14,
-                            ),
-                          ),
-                          Flexible(
-                            child: Text(
-                              destinationTitle.isNotEmpty
-                                  ? destinationTitle
-                                  : l10n.unknown,
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w900,
-                                fontSize: 16,
-                              ),
-                              overflow: TextOverflow.ellipsis,
-                            ),
+                          const SizedBox(height: 12),
+                          _RouteTitle(
+                            origin: originTitle,
+                            destination: destinationTitle,
+                            isRtl: isArabic,
                           ),
                         ],
                       ),
-                      // Row 2: Arabic station names (muted)
-                      if (stationSubtitle.isNotEmpty)
-                        Padding(
-                          padding: const EdgeInsets.only(top: 3),
-                          child: Text(
-                            stationSubtitle,
-                            style: const TextStyle(
-                              color: ColorsManager.textMuted,
-                              fontSize: 12,
-                            ),
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                    ],
-                  ),
-                ),
-                const SizedBox(width: 10),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 6,
-                  ),
-                  decoration: BoxDecoration(
-                    color: ColorsManager.accentCyan.withAlpha(25),
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(
-                      color: ColorsManager.accentCyan.withAlpha(76),
                     ),
-                  ),
-                  child: Text(
-                    '${item.totalPrice} ${l10n.egp}',
-                    style: const TextStyle(
-                      color: ColorsManager.accentCyan,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14,
-                    ),
-                  ),
+                    const SizedBox(width: 12),
+                    _PriceBadge(price: item.totalPrice),
+                  ],
                 ),
-              ],
-            ),
-          ),
-
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                _buildTimeInfo(
-                  context,
-                  icon: Icons.departure_board,
-                  label: l10n.departure,
-                  time: item.boardingTime,
-                ),
-                _buildTimeInfo(
-                  context,
-                  icon: Icons.event_seat,
-                  label: l10n.classLabel,
-                  text: _localizedValue(
-                    item.className,
-                    item.classNameAr,
-                    isArabic,
-                    fallback: l10n.standardClass,
-                  ),
-                ),
-                _buildTimeInfo(
-                  context,
-                  icon: Icons.timer,
-                  label: l10n.expires,
-                  time: item.holdExpiresAt,
-                  isWarning: true,
-                ),
-              ],
-            ),
-          ),
-
-          // Passengers Expansion & Cancel Button
-          Theme(
-            data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
-            child: ExpansionTile(
-              iconColor: ColorsManager.accentCyan,
-              collapsedIconColor: ColorsManager.textMuted,
-              title: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
+                if (stationSubtitle.isNotEmpty) ...[
+                  const SizedBox(height: 8),
                   Text(
-                    l10n.passengersCount(item.seatsBooked.toString()),
+                    stationSubtitle,
                     style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
+                      color: ColorsManager.textMuted,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w500,
                     ),
-                  ),
-                  BlocBuilder<CartCubit, CartState>(
-                    builder: (context, state) {
-                      bool isCancelling =
-                          state is CartItemCancelling &&
-                          state.bookingId == item.bookingId;
-                      return isCancelling
-                          ? const SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: Colors.red,
-                              ),
-                            )
-                          : IconButton(
-                              icon: const Icon(
-                                Icons.delete_outline,
-                                color: Colors.redAccent,
-                                size: 20,
-                              ),
-                              onPressed: () =>
-                                  _confirmCancel(context, item.bookingId),
-                              constraints: const BoxConstraints(),
-                              padding: EdgeInsets.zero,
-                            );
-                    },
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ],
+                const SizedBox(height: 18),
+                Row(
+                  children: [
+                    Expanded(
+                      child: _TripDetailTile(
+                        icon: Icons.departure_board_outlined,
+                        label: l10n.departure,
+                        value: _formatDeparture(context, item.boardingTime),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: _TripDetailTile(
+                        icon: Icons.event_seat_outlined,
+                        label: l10n.classLabel,
+                        value: '$agencyName - $className',
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: _TripDetailTile(
+                        icon: Icons.timer_outlined,
+                        label: l10n.expires,
+                        value: _formatExpiry(context, item.holdExpiresAt),
+                        isWarning: true,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          _PassengersStrip(item: item),
+        ],
+      ),
+    );
+  }
+
+  String _formatDeparture(BuildContext context, DateTime? value) {
+    if (value == null) return AppLocalizations.of(context)!.unknown;
+    return DateFormat(
+      'MMM dd, HH:mm',
+      Localizations.localeOf(context).toString(),
+    ).format(value);
+  }
+
+  String _formatExpiry(BuildContext context, DateTime? value) {
+    final l10n = AppLocalizations.of(context)!;
+    if (value == null) return l10n.unknown;
+    final diff = value.difference(DateTime.now());
+    if (diff.isNegative) return l10n.expired;
+    return '${diff.inMinutes}m';
+  }
+}
+
+class _AgencyBadge extends StatelessWidget {
+  final String label;
+  final Color color;
+
+  const _AgencyBadge({required this.label, required this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      decoration: BoxDecoration(
+        color: color.withAlpha(35),
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: color.withAlpha(120)),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(
+          color: color,
+          fontSize: 12,
+          fontWeight: FontWeight.w900,
+        ),
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+      ),
+    );
+  }
+}
+
+class _RouteTitle extends StatelessWidget {
+  final String origin;
+  final String destination;
+  final bool isRtl;
+
+  const _RouteTitle({
+    required this.origin,
+    required this.destination,
+    required this.isRtl,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Align(
+      alignment: AlignmentDirectional.centerStart,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Flexible(
+            fit: FlexFit.loose,
+            child: Text(
+              origin,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 19,
+                fontWeight: FontWeight.w900,
               ),
-              children: item.passengers
-                  .map((p) => _buildPassengerRow(context, p))
-                  .toList(),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: Icon(
+              isRtl ? Icons.arrow_back : Icons.arrow_forward,
+              color: ColorsManager.accentCyan,
+              size: 18,
+            ),
+          ),
+          Flexible(
+            fit: FlexFit.loose,
+            child: Text(
+              destination,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 19,
+                fontWeight: FontWeight.w900,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
           ),
         ],
       ),
     );
   }
+}
 
-  Widget _buildTimeInfo(
-    BuildContext context, {
-    required IconData icon,
-    required String label,
-    DateTime? time,
-    String? text,
-    bool isWarning = false,
-  }) {
+class _PriceBadge extends StatelessWidget {
+  final double price;
+
+  const _PriceBadge({required this.price});
+
+  @override
+  Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    String display = (text != null && text.trim().isNotEmpty)
-        ? text
-        : l10n.unknown;
-    if (time != null) {
-      if (isWarning) {
-        final diff = time.difference(DateTime.now());
-        if (diff.isNegative) {
-          display = l10n.expired;
-        } else {
-          display = '${diff.inMinutes}m';
-        }
-      } else {
-        display = DateFormat(
-          'MMM dd, hh:mm a',
-          Localizations.localeOf(context).toString(),
-        ).format(time);
-      }
-    }
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+      decoration: BoxDecoration(
+        color: ColorsManager.accentCyan.withAlpha(22),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: ColorsManager.accentCyan.withAlpha(90)),
+      ),
+      child: Text(
+        '${price.toStringAsFixed(1)} ${l10n.egp}',
+        style: const TextStyle(
+          color: ColorsManager.accentCyan,
+          fontSize: 13,
+          fontWeight: FontWeight.w900,
+        ),
+      ),
+    );
+  }
+}
 
-    return Expanded(
+class _TripDetailTile extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final String value;
+  final bool isWarning;
+
+  const _TripDetailTile({
+    required this.icon,
+    required this.label,
+    required this.value,
+    this.isWarning = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final color = isWarning ? Colors.orangeAccent : ColorsManager.accentCyan;
+    return Container(
+      height: 108,
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+      decoration: BoxDecoration(
+        color: ColorsManager.surfaceDark,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: ColorsManager.borderDim),
+      ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Icon(
-            icon,
-            size: 20,
-            color: isWarning ? Colors.redAccent : ColorsManager.textMuted,
-          ),
-          const SizedBox(height: 6),
+          Icon(icon, color: color, size: 17),
+          const SizedBox(height: 8),
           Text(
             label,
             style: const TextStyle(
               color: ColorsManager.textMuted,
-              fontSize: 12,
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
             ),
             maxLines: 1,
+            textAlign: TextAlign.center,
             overflow: TextOverflow.ellipsis,
           ),
-          const SizedBox(height: 4),
-          Text(
-            display,
-            style: TextStyle(
-              color: isWarning ? Colors.redAccent : Colors.white,
-              fontWeight: FontWeight.bold,
-              fontSize: 13,
+          const SizedBox(height: 6),
+          Expanded(
+            child: Center(
+              child: Text(
+                value,
+                style: TextStyle(
+                  color: isWarning ? Colors.orangeAccent : Colors.white,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w800,
+                  height: 1.15,
+                ),
+                textAlign: TextAlign.center,
+                maxLines: 3,
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
-            textAlign: TextAlign.center,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
           ),
         ],
       ),
     );
   }
+}
 
-  Widget _buildPassengerRow(BuildContext context, CartPassengerEntity p) {
+class _PassengersStrip extends StatelessWidget {
+  final CartItemEntity item;
+
+  const _PassengersStrip({required this.item});
+
+  @override
+  Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-      child: Row(
-        children: [
-          CircleAvatar(
-            radius: 16,
-            backgroundColor: ColorsManager.seatContainerBg,
-            child: Text(
-              p.seatNumber.isNotEmpty ? p.seatNumber : '-',
-              style: const TextStyle(
-                color: ColorsManager.accentCyan,
-                fontSize: 12,
-                fontWeight: FontWeight.bold,
+    return Theme(
+      data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+      child: ExpansionTile(
+        tilePadding: const EdgeInsets.fromLTRB(16, 0, 10, 4),
+        childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 14),
+        iconColor: ColorsManager.accentCyan,
+        collapsedIconColor: ColorsManager.textMuted,
+        title: Row(
+          children: [
+            const Icon(
+              Icons.people_outline,
+              color: ColorsManager.textMuted,
+              size: 18,
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                l10n.passengersCount(item.seatsBooked.toString()),
+                style: const TextStyle(
+                  color: Colors.white70,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w800,
+                ),
               ),
             ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  p.name.isNotEmpty ? p.name : l10n.unknown,
-                  style: const TextStyle(color: Colors.white, fontSize: 14),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                Text(
-                  p.idNumber.isNotEmpty ? l10n.idNum(p.idNumber) : l10n.unknown,
-                  style: const TextStyle(
-                    color: ColorsManager.textMuted,
-                    fontSize: 12,
+            BlocBuilder<CartCubit, CartState>(
+              builder: (context, state) {
+                final isCancelling =
+                    state is CartItemCancelling &&
+                    state.bookingId == item.bookingId;
+                if (isCancelling) {
+                  return const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: Colors.redAccent,
+                    ),
+                  );
+                }
+                return IconButton(
+                  tooltip: l10n.cancelTripBtn,
+                  icon: const Icon(
+                    Icons.delete_outline,
+                    color: Colors.redAccent,
+                    size: 20,
                   ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ],
+                  onPressed: () => _confirmCancel(context, item.bookingId),
+                  constraints: const BoxConstraints(
+                    minWidth: 36,
+                    minHeight: 36,
+                  ),
+                  padding: EdgeInsets.zero,
+                );
+              },
             ),
-          ),
-        ],
+          ],
+        ),
+        children: item.passengers.map((p) => _PassengerRow(p: p)).toList(),
       ),
     );
   }
@@ -441,6 +478,70 @@ class CartItemCard extends StatelessWidget {
                 color: Colors.red,
                 fontWeight: FontWeight.bold,
               ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _PassengerRow extends StatelessWidget {
+  final CartPassengerEntity p;
+
+  const _PassengerRow({required this.p});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return Padding(
+      padding: const EdgeInsets.only(top: 10),
+      child: Row(
+        children: [
+          Container(
+            width: 34,
+            height: 34,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: ColorsManager.surfaceMid,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: ColorsManager.borderDim),
+            ),
+            child: Text(
+              p.seatNumber.isNotEmpty ? p.seatNumber : '-',
+              style: const TextStyle(
+                color: ColorsManager.accentCyan,
+                fontSize: 12,
+                fontWeight: FontWeight.w900,
+              ),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  p.name.isNotEmpty ? p.name : l10n.unknown,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  p.idNumber.isNotEmpty ? l10n.idNum(p.idNumber) : l10n.unknown,
+                  style: const TextStyle(
+                    color: ColorsManager.textMuted,
+                    fontSize: 12,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
             ),
           ),
         ],
