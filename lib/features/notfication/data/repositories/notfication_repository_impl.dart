@@ -35,6 +35,18 @@ class NotificationRepositoryImpl implements NotificationRepository {
   }
 
   @override
+  ResultFuture<void> deleteNotification(String id) async {
+    try {
+      await remoteDatasource.deleteNotification(id);
+      return const Right(null);
+    } on DioException catch (e) {
+      return Left(ServerFailure(message: _messageFromDio(e)));
+    } catch (_) {
+      return const Left(ServerFailure(message: 'Failed to delete notification'));
+    }
+  }
+
+  @override
   ResultFuture<void> markAllRead() async {
     try {
       await remoteDatasource.markAllRead();

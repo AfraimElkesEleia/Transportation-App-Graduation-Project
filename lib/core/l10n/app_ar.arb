@@ -815,5 +815,10 @@
   "selectCountryCode": "اختر رمز الدولة",
   "searchCountryOrCode": "البحث عن الدولة أو الرمز...",
   "selectDate": "اختر التاريخ",
+  "deleteNotification": "حذف",
+  "notificationDeleted": "تم حذف الإشعار.",
+  "notificationDeleteFailed": "تعذّر حذف الإشعار. يرجى المحاولة مرة أخرى.",
+  "notificationNotFound": "الإشعار غير موجود.",
+  "userNotAuthenticated": "يرجى تسجيل الدخول مرة أخرى.",
   "noInternetConnection": "لا يوجد اتصال بالإنترنت. يرجى التحقق من الاتصال والمحاولة مرة أخرى."
 }

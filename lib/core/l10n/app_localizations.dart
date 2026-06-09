@@ -3488,6 +3488,36 @@ abstract class AppLocalizations {
   /// **'Select date'**
   String get selectDate;
 
+  /// No description provided for @deleteNotification.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get deleteNotification;
+
+  /// No description provided for @notificationDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Notification deleted.'**
+  String get notificationDeleted;
+
+  /// No description provided for @notificationDeleteFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t delete notification. Please try again.'**
+  String get notificationDeleteFailed;
+
+  /// No description provided for @notificationNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Notification not found.'**
+  String get notificationNotFound;
+
+  /// No description provided for @userNotAuthenticated.
+  ///
+  /// In en, this message translates to:
+  /// **'Please sign in again.'**
+  String get userNotAuthenticated;
+
   /// No description provided for @noInternetConnection.
   ///
   /// In en, this message translates to:

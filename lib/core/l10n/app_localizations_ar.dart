@@ -1836,6 +1836,22 @@ class AppLocalizationsAr extends AppLocalizations {
   String get selectDate => 'اختر التاريخ';
 
   @override
+  String get deleteNotification => 'حذف';
+
+  @override
+  String get notificationDeleted => 'تم حذف الإشعار.';
+
+  @override
+  String get notificationDeleteFailed =>
+      'تعذّر حذف الإشعار. يرجى المحاولة مرة أخرى.';
+
+  @override
+  String get notificationNotFound => 'الإشعار غير موجود.';
+
+  @override
+  String get userNotAuthenticated => 'يرجى تسجيل الدخول مرة أخرى.';
+
+  @override
   String get noInternetConnection =>
       'لا يوجد اتصال بالإنترنت. يرجى التحقق من الاتصال والمحاولة مرة أخرى.';
 }

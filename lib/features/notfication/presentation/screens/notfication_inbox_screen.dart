@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:transportation_app/core/l10n/app_localizations.dart';
 import 'package:transportation_app/core/theming/colors.dart';
+import 'package:transportation_app/core/utils/error_localizer.dart';
 import 'package:transportation_app/core/widgets/basic_container.dart';
 import 'package:transportation_app/features/notfication/domain/entities/app_notfication.dart';
 import 'package:transportation_app/features/notfication/presentation/cubit/notfication_cubit.dart';
@@ -77,7 +78,34 @@ class _FilterSection extends StatelessWidget {
 class _NotificationList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<NotificationCubit, NotificationState>(
+    return BlocConsumer<NotificationCubit, NotificationState>(
+      listenWhen: (previous, current) {
+        if (current is! NotificationLoaded) return false;
+        final previousLoaded = previous is NotificationLoaded ? previous : null;
+        return (current.deleteErrorMessage != null &&
+                current.deleteErrorMessage !=
+                    previousLoaded?.deleteErrorMessage) ||
+            (current.deleteSucceeded && previousLoaded?.deleteSucceeded != true);
+      },
+      listener: (context, state) {
+        if (state is! NotificationLoaded) return;
+        final loc = AppLocalizations.of(context)!;
+        final message = state.deleteErrorMessage != null
+            ? ErrorLocalizer.localize(context, state.deleteErrorMessage!)
+            : loc.notificationDeleted;
+
+        ScaffoldMessenger.of(context)
+          ..hideCurrentSnackBar()
+          ..showSnackBar(
+            SnackBar(
+              content: Text(message),
+              behavior: SnackBarBehavior.floating,
+              backgroundColor: state.deleteErrorMessage != null
+                  ? ColorsManager.error
+                  : ColorsManager.cyanBlue,
+            ),
+          );
+      },
       builder: (context, state) {
         if (state is NotificationLoading || state is NotificationInitial) {
           return const _LoadingShimmer();
@@ -117,11 +145,24 @@ class _NotificationList extends StatelessWidget {
                     sliver: SliverList(
                       delegate: SliverChildBuilderDelegate((context, i) {
                         final notif = entry.value[i];
-                        return NotificationCard(
-                          notification: notif,
-                          onTap: notif.isRead
-                              ? null
-                              : () => _onTap(context, notif),
+                        return Dismissible(
+                          key: ValueKey('notification-${notif.id}'),
+                          direction: DismissDirection.horizontal,
+                          background: _DeleteBackground(
+                            alignment: Alignment.centerLeft,
+                          ),
+                          secondaryBackground: _DeleteBackground(
+                            alignment: Alignment.centerRight,
+                          ),
+                          onDismissed: (_) => context
+                              .read<NotificationCubit>()
+                              .deleteNotification(notif.id),
+                          child: NotificationCard(
+                            notification: notif,
+                            onTap: notif.isRead
+                                ? null
+                                : () => _onTap(context, notif),
+                          ),
                         );
                       }, childCount: entry.value.length),
                     ),
@@ -162,6 +203,50 @@ class _NotificationList extends StatelessWidget {
     if (label == 'Today') return loc.todayLabel;
     if (label == 'Yesterday') return loc.yesterdayLabel;
     return label;
+  }
+}
+
+class _DeleteBackground extends StatelessWidget {
+  final Alignment alignment;
+
+  const _DeleteBackground({required this.alignment});
+
+  @override
+  Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
+    final isStart = alignment == Alignment.centerLeft;
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 22),
+      decoration: BoxDecoration(
+        color: ColorsManager.error.withValues(alpha: 0.16),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: ColorsManager.error.withValues(alpha: 0.35)),
+      ),
+      child: Align(
+        alignment: alignment,
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          textDirection: isStart ? TextDirection.ltr : TextDirection.rtl,
+          children: [
+            const Icon(
+              Icons.delete_outline_rounded,
+              color: ColorsManager.error,
+              size: 22,
+            ),
+            const SizedBox(width: 8),
+            Text(
+              loc.deleteNotification,
+              style: const TextStyle(
+                color: ColorsManager.error,
+                fontWeight: FontWeight.w700,
+                fontSize: 13,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
 

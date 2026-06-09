@@ -32,6 +32,7 @@ class ApiConstants {
   static const String marketplaceCancel = '/Marketplace/cancel';
   static const String notifications = '/Notifications';
   static String readNotification(String id) => '/Notifications/$id/read';
+  static String deleteNotification(String id) => '/Notifications/$id';
   static const String readAllNotifications = '/Notifications/read-all';
   static const String changeLanguage = '/Users/language';
   static const String supportTickets = '/Support/tickets';

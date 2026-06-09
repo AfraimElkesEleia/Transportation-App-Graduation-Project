@@ -962,5 +962,10 @@
   "selectCountryCode": "Select Country Code",
   "searchCountryOrCode": "Search country or code...",
   "selectDate": "Select date",
+  "deleteNotification": "Delete",
+  "notificationDeleted": "Notification deleted.",
+  "notificationDeleteFailed": "Couldn't delete notification. Please try again.",
+  "notificationNotFound": "Notification not found.",
+  "userNotAuthenticated": "Please sign in again.",
   "noInternetConnection": "No internet connection. Please check your connection and try again."
 }

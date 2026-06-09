@@ -1845,6 +1845,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get selectDate => 'Select date';
 
   @override
+  String get deleteNotification => 'Delete';
+
+  @override
+  String get notificationDeleted => 'Notification deleted.';
+
+  @override
+  String get notificationDeleteFailed =>
+      'Couldn\'t delete notification. Please try again.';
+
+  @override
+  String get notificationNotFound => 'Notification not found.';
+
+  @override
+  String get userNotAuthenticated => 'Please sign in again.';
+
+  @override
   String get noInternetConnection =>
       'No internet connection. Please check your connection and try again.';
 }

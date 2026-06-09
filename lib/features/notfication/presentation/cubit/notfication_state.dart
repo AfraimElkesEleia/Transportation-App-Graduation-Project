@@ -19,10 +19,14 @@ class NotificationLoading extends NotificationState {
 class NotificationLoaded extends NotificationState {
   final List<AppNotification> notifications;
   final NotificationFilter activeFilter;
+  final String? deleteErrorMessage;
+  final bool deleteSucceeded;
 
   const NotificationLoaded({
     required this.notifications,
     this.activeFilter = NotificationFilter.all,
+    this.deleteErrorMessage,
+    this.deleteSucceeded = false,
   });
 
   int get unreadCount => notifications.where((n) => !n.isRead).length;
@@ -94,15 +98,27 @@ class NotificationLoaded extends NotificationState {
   ][m];
 
   @override
-  List<Object?> get props => [notifications, activeFilter];
+  List<Object?> get props => [
+    notifications,
+    activeFilter,
+    deleteErrorMessage,
+    deleteSucceeded,
+  ];
 
   NotificationLoaded copyWith({
     List<AppNotification>? notifications,
     NotificationFilter? activeFilter,
+    String? deleteErrorMessage,
+    bool clearDeleteError = false,
+    bool? deleteSucceeded,
   }) {
     return NotificationLoaded(
       notifications: notifications ?? this.notifications,
       activeFilter: activeFilter ?? this.activeFilter,
+      deleteErrorMessage: clearDeleteError
+          ? null
+          : deleteErrorMessage ?? this.deleteErrorMessage,
+      deleteSucceeded: deleteSucceeded ?? false,
     );
   }
 }

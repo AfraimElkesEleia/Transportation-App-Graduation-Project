@@ -19,6 +19,7 @@ abstract class ColorsManager {
   static const resellPrimaryBg = Color(0xFF0D1B4E);
   static const resellSurfaceTeal = Color(0xFF0D3E4F);
   static const successGreen = Color(0xFF00C853);
+  static const error = Color(0xFFE5484D);
   static const accentCyan = Color(0xFF00E5FF);
 
   // Navigation bar

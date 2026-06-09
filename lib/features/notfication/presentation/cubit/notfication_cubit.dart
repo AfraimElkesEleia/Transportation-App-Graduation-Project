@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:transportation_app/features/notfication/domain/usecases/delete_notification_usecase.dart';
 import 'package:transportation_app/features/notfication/domain/usecases/get_notifications_usecase.dart';
 import 'package:transportation_app/features/notfication/domain/usecases/mark_all_notifications_read_usecase.dart';
 import 'package:transportation_app/features/notfication/domain/usecases/mark_notification_read_usecase.dart';
@@ -8,11 +9,13 @@ class NotificationCubit extends Cubit<NotificationState> {
   final GetNotificationsUseCase getNotificationsUseCase;
   final MarkNotificationReadUseCase markNotificationReadUseCase;
   final MarkAllNotificationsReadUseCase markAllNotificationsReadUseCase;
+  final DeleteNotificationUseCase deleteNotificationUseCase;
 
   NotificationCubit({
     required this.getNotificationsUseCase,
     required this.markNotificationReadUseCase,
     required this.markAllNotificationsReadUseCase,
+    required this.deleteNotificationUseCase,
   }) : super(const NotificationInitial());
 
   // ── Load ───────────────────────────────────────────────────────────────────
@@ -72,6 +75,51 @@ class NotificationCubit extends Cubit<NotificationState> {
     } catch (_) {
       // Optimistic update stands.
     }
+  }
+
+  // ── Delete (optimistic + rollback on backend failure) ─────────────────────
+
+  Future<void> deleteNotification(String notificationId) async {
+    final current = state;
+    if (current is! NotificationLoaded) return;
+
+    final previousNotifications = current.notifications;
+    final updated = previousNotifications
+        .where((n) => n.id != notificationId)
+        .toList();
+
+    emit(
+      current.copyWith(
+        notifications: updated,
+        clearDeleteError: true,
+        deleteSucceeded: false,
+      ),
+    );
+
+    final result = await deleteNotificationUseCase(notificationId);
+    if (isClosed) return;
+
+    result.fold(
+      (failure) {
+        final latest = state;
+        final activeFilter = latest is NotificationLoaded
+            ? latest.activeFilter
+            : current.activeFilter;
+        emit(
+          NotificationLoaded(
+            notifications: previousNotifications,
+            activeFilter: activeFilter,
+            deleteErrorMessage: failure.message,
+          ),
+        );
+      },
+      (_) {
+        final latest = state;
+        if (latest is NotificationLoaded) {
+          emit(latest.copyWith(deleteSucceeded: true));
+        }
+      },
+    );
   }
 
   // ── Offer actions (informational only — no sub-type from backend) ──────────

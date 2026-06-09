@@ -24,6 +24,7 @@ import 'package:transportation_app/features/my_tickets/presentation/cubit/passen
 import 'package:transportation_app/features/notfication/data/datasources/notfication_remote_datasource.dart';
 import 'package:transportation_app/features/notfication/data/repositories/notfication_repository_impl.dart';
 import 'package:transportation_app/features/notfication/domain/repositories/notfication_repository.dart';
+import 'package:transportation_app/features/notfication/domain/usecases/delete_notification_usecase.dart';
 import 'package:transportation_app/features/notfication/domain/usecases/get_notifications_usecase.dart';
 import 'package:transportation_app/features/notfication/domain/usecases/mark_all_notifications_read_usecase.dart';
 import 'package:transportation_app/features/notfication/domain/usecases/mark_notification_read_usecase.dart';
@@ -294,11 +295,13 @@ Future<void> init() async {
   sl.registerLazySingleton(() => GetNotificationsUseCase(sl()));
   sl.registerLazySingleton(() => MarkNotificationReadUseCase(sl()));
   sl.registerLazySingleton(() => MarkAllNotificationsReadUseCase(sl()));
+  sl.registerLazySingleton(() => DeleteNotificationUseCase(sl()));
   sl.registerFactory(
     () => NotificationCubit(
       getNotificationsUseCase: sl(),
       markNotificationReadUseCase: sl(),
       markAllNotificationsReadUseCase: sl(),
+      deleteNotificationUseCase: sl(),
     ),
   );
   sl.registerLazySingleton<FcmTokenDatasource>(

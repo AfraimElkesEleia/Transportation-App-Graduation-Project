@@ -35,6 +35,18 @@ class ErrorLocalizer {
       return l10n.checkoutFailed;
     }
 
+    if (lowerMessage.contains("notification not found")) {
+      return l10n.notificationNotFound;
+    }
+
+    if (lowerMessage.contains("user is not authenticated")) {
+      return l10n.userNotAuthenticated;
+    }
+
+    if (lowerMessage.contains("failed to delete notification")) {
+      return l10n.notificationDeleteFailed;
+    }
+
     if (lowerMessage.contains("contactname") ||
         lowerMessage.contains("contact name") ||
         lowerMessage.contains("passengername") ||

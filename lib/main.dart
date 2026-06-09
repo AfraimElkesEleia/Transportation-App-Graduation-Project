@@ -59,6 +59,7 @@ class TransportationApp extends StatelessWidget {
     required this.initialRoute,
   });
 
+
   @override
   Widget build(BuildContext context) {
     return BlocProvider<LocaleCubit>(

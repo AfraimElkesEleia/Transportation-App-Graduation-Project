@@ -12,6 +12,9 @@ abstract class NotficationRemoteDatasource {
   /// Marks a single notification as read via PATCH /api/Notifications/{id}/read.
   Future<void> markRead(String id);
 
+  /// Deletes a single notification via DELETE /api/Notifications/{id}.
+  Future<void> deleteNotification(String id);
+
   /// Marks all notifications as read via PATCH /api/Notifications/read-all.
   Future<void> markAllRead();
 }
@@ -42,6 +45,11 @@ class NotficationRemoteDatasourceImpl implements NotficationRemoteDatasource {
   @override
   Future<void> markRead(String id) async {
     await dio.patch(ApiConstants.readNotification(id));
+  }
+
+  @override
+  Future<void> deleteNotification(String id) async {
+    await dio.delete(ApiConstants.deleteNotification(id));
   }
 
   @override
