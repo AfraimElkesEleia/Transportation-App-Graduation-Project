@@ -120,7 +120,15 @@ class _ResellTicketsScreenState extends State<ResellTicketsScreen> {
                         (t.refundStatus == null ||
                             t.refundStatus == 'Rejected'),
                   )
-                  .toList();
+                  .toList()
+                ..sort((a, b) {
+                  final boardingTimeCompare = a.boardingTime.compareTo(
+                    b.boardingTime,
+                  );
+                  if (boardingTimeCompare != 0) return boardingTimeCompare;
+
+                  return a.bookingId.compareTo(b.bookingId);
+                });
               debugPrint('Resellable count: ${resellableTickets.length}');
               for (final t in resellableTickets) {
                 debugPrint(
