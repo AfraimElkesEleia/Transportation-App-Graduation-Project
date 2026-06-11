@@ -47,12 +47,12 @@ Authentication covers registration, login, password recovery, secure session sto
       <b>Sign up</b>
     </td>
     <td align="center">
-      <img width="250" alt="Screenshot_1780268625-portrait" src="https://github.com/user-attachments/assets/6bcc268b-e0ce-43d1-bd0c-8bd2c0794e80" />
+      <img width="200" alt="Screenshot_1781184871-portrait" src="https://github.com/user-attachments/assets/aaf02b14-a5d4-4fcb-b378-1bb9d340dddd" />
       <br/>
       <b>Forgot password</b>
     </td>
     <td align="center">
-      <img width="250" alt="Screenshot_1780268641-portrait" src="https://github.com/user-attachments/assets/64160c47-6982-4467-9f78-4869e0913ea5" />
+      <img width="200" alt="Screenshot_1781184875-portrait" src="https://github.com/user-attachments/assets/b170931e-5560-4bef-9961-ad6eb3f375e8" />
       <br/>
       <b>Email Sent</b>
     </td>
@@ -74,10 +74,10 @@ Authentication covers registration, login, password recovery, secure session sto
 
 The home screen is the main entry point for planning a trip. It loads station data, displays popular routes, keeps recent searches, and lets the user prepare a one-way or round-trip search.
 
-**Screenshot placeholder**
-
-![Home and journey planning placeholder](docs/screenshots/home.png)
-
+<p align = "center">
+  <img width="200" alt="Screenshot_1781184271-portrait" src="https://github.com/user-attachments/assets/53393b19-c23a-4fda-ab9e-d56294d3a81d" />
+<p/>
+  
 **Feature details**
 
 - Bottom navigation with Home, Tickets, and Profile tabs.
@@ -92,13 +92,25 @@ The home screen is the main entry point for planning a trip. It loads station da
 
 The search feature displays available direct trips and can also search for indirect routes. Results support pagination, filters, and deduplication to keep the list stable while the user scrolls.
 
-**Screenshot placeholders**
-
-![Direct search results placeholder](docs/screenshots/search-results.png)
-
-![Search filters placeholder](docs/screenshots/search-filters.png)
-
-![Indirect search results placeholder](docs/screenshots/indirect-search-results.png)
+<table align="center">
+  <tr>
+    <td align="center">
+      <img width="200" alt="Screenshot_1781184312-portrait" src="https://github.com/user-attachments/assets/ed1ecc25-c38d-4aba-9d1f-cd7980170637" />
+      <br/>
+      <b>Direct Search Results</b>
+    </td>
+    <td align="center">
+      <img width="200" alt="Screenshot_1781184317-portrait" src="https://github.com/user-attachments/assets/4b5fd73e-66de-4a99-be2d-3d228241c845" />
+      <br/>
+      <b>Search Filters</b>
+    </td>
+    <td align="center">
+      <img width="200" alt="Screenshot_1781184380-portrait" src="https://github.com/user-attachments/assets/79dbbcea-472d-4466-a7ec-5f6e1bb0e62d" />
+      <br/>
+      <b>Indirect Search Results</b>
+    </td>
+  </tr>
+</table>
 
 **Feature details**
 
@@ -114,9 +126,9 @@ The search feature displays available direct trips and can also search for indir
 
 Seat selection shows the latest seat map for the chosen trip and class. The UI distinguishes available, pending, and booked seats so users understand what can still be selected.
 
-**Screenshot placeholder**
-
-![Seat selection placeholder](docs/screenshots/seat-selection.png)
+<p align="center">
+  <img width="200" alt="Screenshot_1781184437-portrait" src="https://github.com/user-attachments/assets/9c025c46-10ef-43c9-8bf4-fc68ae262135" />
+</p>
 
 **Feature details**
 
@@ -131,9 +143,9 @@ Seat selection shows the latest seat map for the chosen trip and class. The UI d
 
 Passenger forms collect the required traveler and contact data before a booking is added to the cart or purchased immediately. The app can autofill data from the authenticated user's profile.
 
-**Screenshot placeholder**
-
-![Passenger details placeholder](docs/screenshots/passenger-details.png)
+<p align = "center">
+<img width="200" alt="Screenshot_1781184463-portrait" src="https://github.com/user-attachments/assets/ce6e5265-22f2-4cf7-8f91-56ccfdc1ce98" />
+</p>
 
 **Feature details**
 
@@ -146,11 +158,10 @@ Passenger forms collect the required traveler and contact data before a booking 
 
 The cart holds pending bookings before checkout. Users can add trips to cart, buy immediately, cancel pending holds, redeem points, and complete checkout using wallet balance.
 
-**Screenshot placeholders**
-
-![Cart screen placeholder](docs/screenshots/cart.png)
-
-![Checkout summary placeholder](docs/screenshots/checkout.png)
+<p align="center">
+  <img width="200" alt="Screenshot_1781184485-portrait" src="https://github.com/user-attachments/assets/a04aa5ad-2019-4c34-80bc-2924ca3cbc6e" />
+  <img width="200" alt="Screenshot_1781184488-portrait" src="https://github.com/user-attachments/assets/2886bd26-bf1d-42c4-bce7-5db96d5a359d" />
+</p>
 
 **Feature details**
 
@@ -169,13 +180,11 @@ The cart holds pending bookings before checkout. Users can add trips to cart, bu
 
 Round-trip booking guides the user through selecting an outbound trip, automatically searching return trips in the opposite direction, selecting seats for both legs, and submitting both bookings together.
 
-**Screenshot placeholders**
-
-![Round-trip outbound placeholder](docs/screenshots/round-trip-outbound.png)
-
-![Round-trip return placeholder](docs/screenshots/round-trip-return.png)
-
-![Round-trip summary placeholder](docs/screenshots/round-trip-summary.png)
+<p align="center">
+<img width="200" alt="Screenshot_1781190489-portrait" src="https://github.com/user-attachments/assets/1144b303-c0e7-48b3-835d-7dfe3859b17a" />
+<img width="200" alt="Screenshot_1781190510-portrait" src="https://github.com/user-attachments/assets/ab6a4140-f032-4f04-8b30-e36daa59f8bf" />
+<img width="200" alt="Screenshot_1781190498-portrait" src="https://github.com/user-attachments/assets/f29815d2-e5e9-4491-a250-5131a0cde0f3" />
+</p>
 
 **Feature details**
 
@@ -236,9 +245,10 @@ The tickets area gives users access to their active and historical bookings. Use
 
 **Screenshot placeholders**
 
-![My tickets placeholder](docs/screenshots/my-tickets.png)
-
-![Ticket details placeholder](docs/screenshots/ticket-details.png)
+<p align="center">
+  <img width="200" alt="Screenshot_1780642109-portrait" src="https://github.com/user-attachments/assets/1c9aea1c-a3de-4ea7-9da6-c6ac55913c86" />
+  <img width="200" alt="Screenshot_1780642117-portrait" src="https://github.com/user-attachments/assets/715b5bea-4f67-4c81-85d0-0b7fcd3de5cd" />
+</p>
 
 **Feature details**
 
@@ -254,11 +264,10 @@ The tickets area gives users access to their active and historical bookings. Use
 
 Confirmed tickets can show a boarding pass with passenger and route details. The app retrieves a signed QR payload from the backend and can render or export the boarding pass.
 
-**Screenshot placeholders**
-
-![Boarding pass placeholder](docs/screenshots/boarding-pass.png)
-
-![Boarding pass PDF placeholder](docs/screenshots/boarding-pass-pdf.png)
+<p align="center">
+ <img width="200" alt="Screenshot_1780643509-portrait" src="https://github.com/user-attachments/assets/682427fa-e1be-493a-a5cd-71e7779869b5" />
+  <img width="200" alt="Screenshot_1780643650-portrait" src="https://github.com/user-attachments/assets/c18cc32f-a1a8-4573-924d-2adae61756dd" />
+</p>
 
 **Feature details**
 
@@ -273,13 +282,10 @@ Confirmed tickets can show a boarding pass with passenger and route details. The
 
 The marketplace allows users to resell eligible tickets and buy listed tickets from other users. The purchase flow collects new passenger data while preserving the original seat assignment.
 
-**Screenshot placeholders**
-
-![Marketplace placeholder](docs/screenshots/marketplace.png)
-
-![Resell tickets placeholder](docs/screenshots/resell-tickets.png)
-
-![Marketplace purchase placeholder](docs/screenshots/marketplace-purchase.png)
+<p align="center">
+  <img width="250" alt="Screenshot_1780642226-portrait" src="https://github.com/user-attachments/assets/98d0e849-4fbd-4380-836c-47211f8bb9b8" />
+<img width="250" alt="Screenshot_1780641611-portrait" src="https://github.com/user-attachments/assets/19f2aec4-f098-439a-8122-82a9edfb7733" />
+</p>
 
 **Feature details**
 
@@ -296,13 +302,10 @@ The marketplace allows users to resell eligible tickets and buy listed tickets f
 
 The wallet is used for deposits, ticket checkout, refunds, and transaction history. Wallet state is cached where needed so the UI remains readable during refreshes.
 
-**Screenshot placeholders**
-
-![Wallet section placeholder](docs/screenshots/wallet.png)
-
-![Wallet deposit placeholder](docs/screenshots/wallet-deposit.png)
-
-![Wallet history placeholder](docs/screenshots/wallet-history.png)
+<p align="center">
+  <img width="200" alt="Screenshot_1778312030-portrait" src="https://github.com/user-attachments/assets/9ca90e8e-c060-40aa-b945-794dd6ffa6af" />
+  <img width="200" alt="Screenshot_1781189088-portrait" src="https://github.com/user-attachments/assets/9daf12bb-4823-4d04-b1ff-ffe2c64efb1d" />
+</p>
 
 **Feature details**
 
@@ -317,11 +320,11 @@ The wallet is used for deposits, ticket checkout, refunds, and transaction histo
 
 The loyalty feature displays the user's points balance, point history, active challenges, and reward progress. Points can also be redeemed during checkout.
 
-**Screenshot placeholders**
-
-![Loyalty hub placeholder](docs/screenshots/loyalty-hub.png)
-
-![Loyalty history placeholder](docs/screenshots/loyalty-history.png)
+<p align="center">
+  <img width="200" alt="Screenshot_1778311001-portrait" src="https://github.com/user-attachments/assets/883ebf9e-69c6-4e06-81b8-e28019015898" />
+  <img width="200" alt="Screenshot_1778311004-portrait" src="https://github.com/user-attachments/assets/9a52693f-fd9b-4886-88e0-a5dc6261d230" />
+  <img width="200" alt="Screenshot_1778311005-portrait" src="https://github.com/user-attachments/assets/cca58d16-b86c-4686-8569-d4d2df8fc054" />
+</p>
 
 **Feature details**
 
@@ -337,11 +340,10 @@ The loyalty feature displays the user's points balance, point history, active ch
 
 The profile area centralizes account information, profile updates, picture upload, wallet access, language preference, and logout.
 
-**Screenshot placeholders**
-
-![Profile placeholder](docs/screenshots/profile.png)
-
-![Edit profile placeholder](docs/screenshots/edit-profile.png)
+<p align="center">
+  <img width="250" alt="Screenshot_1780664547-portrait" src="https://github.com/user-attachments/assets/59580667-0b7e-4139-a3e1-e137ff5d1589" />
+  <img width="250" alt="Screenshot_1780667789-portrait" src="https://github.com/user-attachments/assets/16ea7caf-93bb-4842-8829-52b351e7580b" />
+</p>
 
 **Feature details**
 
@@ -357,11 +359,11 @@ The profile area centralizes account information, profile updates, picture uploa
 
 Notifications combine an in-app inbox, real-time SignalR delivery, Firebase push notifications, and local device notifications. The backend can localize push notification content based on the user's selected language.
 
-**Screenshot placeholders**
-
-![Notifications inbox placeholder](docs/screenshots/notifications.png)
-
-![Notification permission placeholder](docs/screenshots/notification-permission.png)
+<p align="center">
+  <img width="200" alt="Screenshot_20260610_194512_One UI Home-portrait" src="https://github.com/user-attachments/assets/f281ca45-45f8-4750-a8a2-9fee1911fb52" />
+  <img width="200" alt="Screenshot_1780261989-portrait" src="https://github.com/user-attachments/assets/be1713df-6736-4c17-b1de-b2996eb24ea1" />
+  <img width="200" alt="Screenshot_1781189587-portrait" src="https://github.com/user-attachments/assets/4ed8cde9-bf89-4ba7-a811-8efc9b8fa01b" />
+</p>
 
 **Feature details**
 
@@ -380,11 +382,11 @@ Notifications combine an in-app inbox, real-time SignalR delivery, Firebase push
 
 Support screens let users submit issues and review previous tickets. This gives the app a direct feedback and assistance channel.
 
-**Screenshot placeholders**
 
-![Report issue placeholder](docs/screenshots/report-issue.png)
-
-![Support tickets placeholder](docs/screenshots/support-tickets.png)
+<p align="center">
+  <img width="200" alt="Screenshot_1781187151-portrait" src="https://github.com/user-attachments/assets/19b146d3-c22c-4297-936d-482af38d4760" />
+  <img width="200" alt="Screenshot_1781187149-portrait" src="https://github.com/user-attachments/assets/395aa79d-25fc-4179-93fc-0644fdcbe5aa" />
+</p>
 
 **Feature details**
 
@@ -398,11 +400,10 @@ Support screens let users submit issues and review previous tickets. This gives 
 
 The app supports English and Arabic through Flutter localization files and a shared locale cubit. The selected language can also be synchronized with the backend for localized notifications.
 
-**Screenshot placeholders**
-
-![English localization placeholder](docs/screenshots/localization-en.png)
-
-![Arabic localization placeholder](docs/screenshots/localization-ar.png)
+<p align="center">
+  <img width="200" alt="Screenshot_1780138639-portrait" src="https://github.com/user-attachments/assets/42be8f48-c253-43f0-9dbf-4357fabd8593" />
+  <img width="200" alt="Screenshot_1776575055-portrait" src="https://github.com/user-attachments/assets/fb97a01d-57e1-4aa5-970d-e1ef49dc9705" />
+</p>
 
 **Feature details**
 
@@ -411,25 +412,6 @@ The app supports English and Arabic through Flutter localization files and a sha
 - Saved locale preference using Hive.
 - Server-side language preference update for localized notifications.
 - Material localization delegates enabled.
-
-### 20. UI and UX
-
-The app uses shared themed widgets and a custom bottom navigation layout to keep the interface consistent across all flows.
-
-**Screenshot placeholders**
-
-![Navigation placeholder](docs/screenshots/navigation.png)
-
-![Reusable components placeholder](docs/screenshots/ui-components.png)
-
-**Feature details**
-
-- Custom bottom navigation.
-- Reusable themed widgets such as gradient buttons, text fields, containers, shimmer loading views, profile picture picker, and language toggle button.
-- Poppins font family.
-- Responsive font helper.
-- Consistent dark transportation-style theme.
-- Error localizer for user-facing API/network errors.
 
 ---
 
