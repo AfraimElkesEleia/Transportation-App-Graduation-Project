@@ -1,4 +1,4 @@
-﻿# Rehla API Specification
+# Rehla API Specification
 
 Frontend integration guide for Flutter and Angular teams.
 
@@ -10,7 +10,8 @@ Frontend integration guide for Flutter and Angular teams.
 - **Authentication Scheme:** `JWT Bearer`
 - **Primary Wrapper:** `ApiResponse<T>` / `ApiResponse`
 - **Validation:** FluentValidation + validation filter
-- **Unhandled exceptions:** `ApiResponse` error payload (with optional `errorCode`)
+- **Unhandled exceptions:** `ApiResponse` error payload with HTTP status chosen by the global exception handler
+- **Response timestamps:** `ApiResponse.timestamp` is generated with `AppTime.GetScheduleNow()` (schedule-local server time).
 
 ### Standard Success Wrapper
 
@@ -20,7 +21,8 @@ Frontend integration guide for Flutter and Angular teams.
   "message": "Operation successful",
   "data": {},
   "errors": null,
-  "timestamp": "2026-03-06T12:00:00Z"
+  "errorCode": null,
+  "timestamp": "2026-03-06T14:00:00"
 }
 ```
 
@@ -33,22 +35,74 @@ Frontend integration guide for Flutter and Angular teams.
   "data": null,
   "errors": ["Error message"],
   "errorCode": "VALIDATION_ERROR",
-  "timestamp": "2026-03-06T12:00:00Z"
+  "timestamp": "2026-03-06T14:00:00"
 }
 ```
 
 ### Error Code Contract
 
 - `errorCode` is an optional machine-readable token for client localization or branching.
-- Common codes currently used:
+- Successful responses normally serialize `errorCode` as `null`.
+- Common non-null codes currently used:
   - `VALIDATION_ERROR`
   - `INSUFFICIENT_WALLET_BALANCE`
   - `SEAT_ALREADY_BOOKED`
 
+### Current Error Response Contract
+
+All controller-generated errors use the same `ApiResponse` JSON shape:
+
+```json
+{
+  "success": false,
+  "message": "Invalid token",
+  "data": null,
+  "errors": null,
+  "errorCode": null,
+  "timestamp": "2026-03-06T14:00:00"
+}
+```
+
+Validation errors from FluentValidation return `400 Bad Request` with `message = "Validation failed"`, an `errors` array, and `errorCode = "VALIDATION_ERROR"`.
+
+```json
+{
+  "success": false,
+  "message": "Validation failed",
+  "data": null,
+  "errors": ["Email is required."],
+  "errorCode": "VALIDATION_ERROR",
+  "timestamp": "2026-03-06T14:00:00"
+}
+```
+
+Current status-code behavior:
+
+| Status | Source | Response shape |
+| ------ | ------ | -------------- |
+| 400 | FluentValidation, bad request payloads, business-rule failures | `ApiResponse` error; validation includes `errors[]` and `VALIDATION_ERROR` |
+| 401 | Controller-level invalid user claim checks and invalid scheduler secret | `ApiResponse` error |
+| 401 | Missing/expired/invalid Bearer token rejected by authentication middleware | Framework authentication challenge response |
+| 403 | Authorization policy failure (for example non-admin on admin endpoints) | Framework authorization response |
+| 404 | Missing users/bookings/tickets/notifications/occurrences/seed files | `ApiResponse` error |
+| 409 | Seat/cart concurrency and some admin delete conflicts | `ApiResponse` error; seat conflicts may include `SEAT_ALREADY_BOOKED` |
+| 500 | Explicit server-side failures or unhandled exceptions | `ApiResponse` error from controller/global exception handler |
+
+Global exception handler mapping:
+
+| Exception | Status | Message | `errorCode` |
+| --------- | ------ | ------- | ----------- |
+| `BadHttpRequestException` | 400 | Exception message | `null` |
+| `UnauthorizedAccessException` | 401 | `You are not authorized to access this resource` | `null` |
+| `CartValidationException` | 400 | Exception message | Exception `ErrorCode` |
+| `CartConcurrencyException` | 409 | Exception message | Exception `ErrorCode` |
+| Any other exception | 500 | Exception message | `null` |
+
 ### Date & Time Contract
 
+- **Wrapper timestamp:**
+  - `timestamp` is currently schedule-local server time (`AppTime.GetScheduleNow()`), not UTC.
 - **UTC timestamps (absolute instants, serialized with `Z`):**
-  - Wrapper `timestamp`
   - Booking/cart hold fields such as `holdExpiresAt`
   - Booking audit fields such as `bookingDate`
   - Occurrence seat snapshot field `generatedAtUtc`
@@ -66,7 +120,7 @@ Frontend integration guide for Flutter and Angular teams.
 - Use `AppTime.GetScheduleNow()` for schedule comparisons and lifecycle decisions tied to timetable values.
   - Examples: comparing with `departureDateTime`, `arrivalDateTime`, `UnlocksAt`, and travel-date boundaries.
 - Use `DateTime.UtcNow` only for absolute/audit instants that must be globally unambiguous.
-  - Examples: API wrapper `timestamp`, security token expiry, `createdAt`/`updatedAt` audit fields, and hold expiration fields serialized with `Z`.
+  - Examples: security token expiry and hold expiration fields serialized with `Z`.
 - Normalize DTO timestamp shape at the API boundary:
   - Use `AppTime.AsUtc(...)` for UTC fields returned with `Z`.
   - Use `AppTime.AsSchedule(...)` for schedule-local timetable values returned without timezone suffix.
@@ -145,7 +199,8 @@ Base route: `/api/Auth`
     }
   },
   "errors": null,
-  "timestamp": "2026-03-06T12:00:00Z"
+  "errorCode": null,
+  "timestamp": "2026-03-06T12:00:00"
 }
 ```
 
@@ -198,7 +253,8 @@ Base route: `/api/Auth`
     }
   },
   "errors": null,
-  "timestamp": "2026-03-06T12:00:00Z"
+  "errorCode": null,
+  "timestamp": "2026-03-06T12:00:00"
 }
 ```
 
@@ -235,7 +291,8 @@ Base route: `/api/Auth`
     "user": { "userId": 15, "email": "user@example.com", "fullName": "Ahmed Mohamed Hassan", "phoneNumber": "+201234567890", "gender": "Male", "countryCode": "EG", "countryName": "Egypt", "profilePictureUrl": null, "roles": [] }
   },
   "errors": null,
-  "timestamp": "2026-03-06T12:00:00Z"
+  "errorCode": null,
+  "timestamp": "2026-03-06T12:00:00"
 }
 ```
 
@@ -262,7 +319,7 @@ Base route: `/api/Auth`
 
 ### Response Example (200 OK)
 ```json
-{ "success": true, "message": "Token revoked successfully", "data": null, "errors": null, "timestamp": "2026-03-06T12:00:00Z" }
+{ "success": true, "message": "Token revoked successfully", "data": null, "errors": null, "errorCode": null, "timestamp": "2026-03-06T12:00:00" }
 ```
 
 ## 1.5 Revoke All User Tokens
@@ -281,7 +338,7 @@ No request body.
 
 ### Response Example (200 OK)
 ```json
-{ "success": true, "message": "Revoked 3 token(s)", "data": null, "errors": null, "timestamp": "2026-03-06T12:00:00Z" }
+{ "success": true, "message": "Revoked 3 token(s)", "data": null, "errors": null, "errorCode": null, "timestamp": "2026-03-06T12:00:00" }
 ```
 
 ## 1.6 Get Current Authenticated User
@@ -310,7 +367,8 @@ No request body.
     "claims": [{ "type": "domain_user_id", "value": "15" }]
   },
   "errors": null,
-  "timestamp": "2026-03-06T12:00:00Z"
+  "errorCode": null,
+  "timestamp": "2026-03-06T12:00:00"
 }
 ```
 
@@ -337,7 +395,7 @@ No request body.
 
 ### Response Example (200 OK)
 ```json
-{ "success": true, "message": "Verification email sent successfully", "data": null, "errors": null, "timestamp": "2026-03-06T12:00:00Z" }
+{ "success": true, "message": "Verification email sent successfully", "data": null, "errors": null, "errorCode": null, "timestamp": "2026-03-06T12:00:00" }
 ```
 
 ### Notes
@@ -367,7 +425,7 @@ No request body.
 
 ### Response Example (200 OK)
 ```json
-{ "success": true, "message": "Email verified successfully", "data": null, "errors": null, "timestamp": "2026-03-06T12:00:00Z" }
+{ "success": true, "message": "Email verified successfully", "data": null, "errors": null, "errorCode": null, "timestamp": "2026-03-06T12:00:00" }
 ```
 
 ### Notes
@@ -396,7 +454,7 @@ No request body.
 
 ### Response Example (200 OK)
 ```json
-{ "success": true, "message": "If your email is registered, you will receive a password reset link", "data": null, "errors": null, "timestamp": "2026-03-06T12:00:00Z" }
+{ "success": true, "message": "If your email is registered, you will receive a password reset link", "data": null, "errors": null, "errorCode": null, "timestamp": "2026-03-06T12:00:00" }
 ```
 
 ## 1.10 Reset Password
@@ -430,7 +488,7 @@ No request body.
 
 ### Response Example (200 OK)
 ```json
-{ "success": true, "message": "Password reset successfully", "data": null, "errors": null, "timestamp": "2026-03-06T12:00:00Z" }
+{ "success": true, "message": "Password reset successfully", "data": null, "errors": null, "errorCode": null, "timestamp": "2026-03-06T12:00:00" }
 ```
 
 ## 1.11 Change Password
@@ -462,7 +520,7 @@ No request body.
 
 ### Response Example (200 OK)
 ```json
-{ "success": true, "message": "Password changed successfully", "data": null, "errors": null, "timestamp": "2026-03-06T12:00:00Z" }
+{ "success": true, "message": "Password changed successfully", "data": null, "errors": null, "errorCode": null, "timestamp": "2026-03-06T12:00:00" }
 ```
 
 ---
@@ -494,7 +552,8 @@ No request body.
     { "countryCode": "EG", "countryName": "Egypt", "nationalityName": "Egyptian", "phoneCode": "+20", "allowsTrainBooking": true }
   ],
   "errors": null,
-  "timestamp": "2026-03-06T12:00:00Z"
+  "errorCode": null,
+  "timestamp": "2026-03-06T12:00:00"
 }
 ```
 
@@ -518,7 +577,7 @@ Admin authorization is currently disabled in controller code (the `[Authorize]` 
 No request body.
 ### Response Example (200 OK)
 ```json
-{ "success": true, "message": "Roles and Admin credentials seeded successfully!", "data": null, "errors": null, "timestamp": "2026-03-06T12:00:00Z" }
+{ "success": true, "message": "Roles and Admin credentials seeded successfully!", "data": null, "errors": null, "errorCode": null, "timestamp": "2026-03-06T12:00:00" }
 ```
 
 ## 3.2 Import Master Stations
@@ -533,7 +592,7 @@ No request body.
 No request body.
 ### Response Example (200 OK)
 ```json
-{ "success": true, "message": "Master Stations imported successfully!", "data": null, "errors": null, "timestamp": "2026-03-06T12:00:00Z" }
+{ "success": true, "message": "Master Stations imported successfully!", "data": null, "errors": null, "errorCode": null, "timestamp": "2026-03-06T12:00:00" }
 ```
 
 ## 3.3 Import Horus
@@ -548,7 +607,7 @@ No request body.
 No request body.
 ### Response Example (200 OK)
 ```json
-{ "success": true, "message": "Horus Trips imported successfully!", "data": null, "errors": null, "timestamp": "2026-03-06T12:00:00Z" }
+{ "success": true, "message": "Horus Trips imported successfully!", "data": null, "errors": null, "errorCode": null, "timestamp": "2026-03-06T12:00:00" }
 ```
 
 ## 3.4 Import BlueBus
@@ -563,7 +622,7 @@ No request body.
 No request body.
 ### Response Example (200 OK)
 ```json
-{ "success": true, "message": "Blue Bus Trips imported successfully!", "data": null, "errors": null, "timestamp": "2026-03-06T12:00:00Z" }
+{ "success": true, "message": "Blue Bus Trips imported successfully!", "data": null, "errors": null, "errorCode": null, "timestamp": "2026-03-06T12:00:00" }
 ```
 
 ## 3.5 Import GoBus
@@ -578,7 +637,7 @@ No request body.
 No request body.
 ### Response Example (200 OK)
 ```json
-{ "success": true, "message": "GoBus Trips imported successfully!", "data": null, "errors": null, "timestamp": "2026-03-06T12:00:00Z" }
+{ "success": true, "message": "GoBus Trips imported successfully!", "data": null, "errors": null, "errorCode": null, "timestamp": "2026-03-06T12:00:00" }
 ```
 
 ## 3.6 Import Trains
@@ -593,7 +652,7 @@ No request body.
 No request body.
 ### Response Example (200 OK)
 ```json
-{ "success": true, "message": "ENR Trains imported successfully!", "data": null, "errors": null, "timestamp": "2026-03-06T12:00:00Z" }
+{ "success": true, "message": "ENR Trains imported successfully!", "data": null, "errors": null, "errorCode": null, "timestamp": "2026-03-06T12:00:00" }
 ```
 
 ## 3.7 Generate Occurrences
@@ -608,7 +667,7 @@ No request body.
 No request body.
 ### Response Example (200 OK)
 ```json
-{ "success": true, "message": "60-Day Calendar generated successfully!", "data": null, "errors": null, "timestamp": "2026-03-06T12:00:00Z" }
+{ "success": true, "message": "60-Day Calendar generated successfully!", "data": null, "errors": null, "errorCode": null, "timestamp": "2026-03-06T12:00:00" }
 ```
 
 ---
@@ -638,7 +697,8 @@ No request body.
     { "userId": 15, "email": "user@example.com", "fullName": "Ahmed Mohamed Hassan", "phoneNumber": "+201234567890", "gender": "Male", "countryCode": "EG", "countryName": "Egypt", "profilePictureUrl": null, "roles": ["User"] }
   ],
   "errors": null,
-  "timestamp": "2026-03-06T12:00:00Z"
+  "errorCode": null,
+  "timestamp": "2026-03-06T12:00:00"
 }
 ```
 
@@ -674,7 +734,8 @@ No request body.
     "roles": ["User"]
   },
   "errors": null,
-  "timestamp": "2026-03-06T12:00:00Z"
+  "errorCode": null,
+  "timestamp": "2026-03-06T12:00:00"
 }
 ```
 
@@ -690,7 +751,7 @@ No request body.
 No request body.
 ### Response Example (200 OK)
 ```json
-{ "success": true, "message": "User disabled successfully.", "data": null, "errors": null, "timestamp": "2026-03-06T12:00:00Z" }
+{ "success": true, "message": "User disabled successfully.", "data": null, "errors": null, "errorCode": null, "timestamp": "2026-03-06T12:00:00" }
 ```
 
 ## 4.4 Assign Role
@@ -711,7 +772,7 @@ No request body.
 | role  | string | Yes      | Must exist in Identity roles |
 ### Response Example (200 OK)
 ```json
-{ "success": true, "message": "Role assigned successfully.", "data": null, "errors": null, "timestamp": "2026-03-06T12:00:00Z" }
+{ "success": true, "message": "Role assigned successfully.", "data": null, "errors": null, "errorCode": null, "timestamp": "2026-03-06T12:00:00" }
 ```
 
 ## 4.5 Delete User
@@ -726,7 +787,7 @@ No request body.
 No request body.
 ### Response Example (200 OK)
 ```json
-{ "success": true, "message": "User deleted successfully.", "data": null, "errors": null, "timestamp": "2026-03-06T12:00:00Z" }
+{ "success": true, "message": "User deleted successfully.", "data": null, "errors": null, "errorCode": null, "timestamp": "2026-03-06T12:00:00" }
 ```
 
 ## 4.6 Process Booking Refund Request
@@ -759,7 +820,7 @@ Base route: `/api/admin`
 
 ### Response Example (200 OK)
 ```json
-{ "success": true, "message": "Refund request approved.", "data": null, "errors": null, "timestamp": "2026-05-31T12:00:00Z" }
+{ "success": true, "message": "Refund request approved.", "data": null, "errors": null, "errorCode": null, "timestamp": "2026-05-31T12:00:00" }
 ```
 
 ## 4.7 Admin - List Refund Requests
@@ -796,7 +857,8 @@ Base route: `/api/admin`
     }
   ],
   "errors": null,
-  "timestamp": "2026-06-01T10:20:00Z"
+  "errorCode": null,
+  "timestamp": "2026-06-01T10:20:00"
 }
 ```
 
@@ -857,7 +919,8 @@ No request body.
     "walletBalance": 50.0
   },
   "errors": null,
-  "timestamp": "2026-03-10T00:00:00Z"
+  "errorCode": null,
+  "timestamp": "2026-03-10T00:00:00"
 }
 ```
 
@@ -893,7 +956,7 @@ No request body.
 | idNumber    | string | No       | First set only; rejected if identity details already exist   |
 ### Response Example (200 OK)
 ```json
-{ "success": true, "message": "Profile updated successfully.", "data": null, "errors": null, "timestamp": "2026-03-10T00:00:00Z" }
+{ "success": true, "message": "Profile updated successfully.", "data": null, "errors": null, "errorCode": null, "timestamp": "2026-03-10T00:00:00" }
 ```
 
 ### Notes
@@ -916,7 +979,8 @@ No request body.
   "message": "Profile picture uploaded successfully.",
   "data": { "profilePictureUrl": "images/profiles/abcd.jpg" },
   "errors": null,
-  "timestamp": "2026-03-10T00:00:00Z"
+  "errorCode": null,
+  "timestamp": "2026-03-10T00:00:00"
 }
 ```
 
@@ -942,7 +1006,7 @@ No request body.
 | deviceType | string | Yes      | Example: "Android", "iOS" |
 ### Response Example (200 OK)
 ```json
-{ "success": true, "message": "FCM token updated successfully.", "data": null, "errors": null, "timestamp": "2026-05-14T00:00:00Z" }
+{ "success": true, "message": "FCM token updated successfully.", "data": null, "errors": null, "errorCode": null, "timestamp": "2026-05-14T00:00:00" }
 ```
 
 ### Notes
@@ -967,7 +1031,7 @@ No request body.
 | language | string | Yes      | Use `ar` for Arabic; any other value uses `en` |
 ### Response Example (200 OK)
 ```json
-{ "success": true, "message": "Language updated successfully.", "data": null, "errors": null, "timestamp": "2026-05-31T00:00:00Z" }
+{ "success": true, "message": "Language updated successfully.", "data": null, "errors": null, "errorCode": null, "timestamp": "2026-05-31T00:00:00" }
 ```
 
 ---
@@ -1008,7 +1072,8 @@ No request body.
     }
   ],
   "errors": null,
-  "timestamp": "2026-03-06T12:00:00Z"
+  "errorCode": null,
+  "timestamp": "2026-03-06T12:00:00"
 }
 ```
 
@@ -1152,7 +1217,8 @@ Query string parameters:
     "pageSize": 10
   },
   "errors": null,
-  "timestamp": "2026-03-20T00:00:00Z"
+  "errorCode": null,
+  "timestamp": "2026-03-20T00:00:00"
 }
 ```
 
@@ -1232,7 +1298,8 @@ Query string parameters:
     { "originGovAr": "البحيرة", "originGovEn": "Beheira", "destinationGovAr": "الإسكندرية", "destinationGovEn": "Alexandria" }
   ],
   "errors": null,
-  "timestamp": "2026-05-07T10:30:00Z"
+  "errorCode": null,
+  "timestamp": "2026-05-07T10:30:00"
 }
 ```
 
@@ -1315,7 +1382,8 @@ Query string parameters:
     "pageSize": 10
   },
   "errors": null,
-  "timestamp": "2026-03-20T00:00:00Z"
+  "errorCode": null,
+  "timestamp": "2026-03-20T00:00:00"
 }
 ```
 
@@ -1385,7 +1453,8 @@ Base route: `/api/occurrences`
     ]
   },
   "errors": null,
-  "timestamp": "2026-04-18T12:35:00Z"
+  "errorCode": null,
+  "timestamp": "2026-04-18T12:35:00"
 }
 ```
 
@@ -1511,7 +1580,8 @@ Base route: `/api/Bookings`
     "grandTotal": 360.0
   },
   "errors": null,
-  "timestamp": "2026-03-20T00:10:00Z"
+  "errorCode": null,
+  "timestamp": "2026-03-20T00:10:00"
 }
 ```
 
@@ -1556,7 +1626,8 @@ Base route: `/api/Bookings`
   "message": "Checkout successful. 360.00 was deducted from your wallet for 2 trip(s).",
   "data": "Checkout successful. 360.00 was deducted from your wallet for 2 trip(s).",
   "errors": null,
-  "timestamp": "2026-03-31T00:10:00.000Z"
+  "errorCode": null,
+  "timestamp": "2026-03-31T00:10:00.000"
 }
 ```
 
@@ -1611,7 +1682,8 @@ No request body.
     "grandTotal": 360.0
   },
   "errors": null,
-  "timestamp": "2026-03-31T00:10:00Z"
+  "errorCode": null,
+  "timestamp": "2026-03-31T00:10:00"
 }
 ```
 
@@ -1622,7 +1694,8 @@ No request body.
   "message": "No active cart found.",
   "data": null,
   "errors": null,
-  "timestamp": "2026-03-31T00:10:00Z"
+  "errorCode": null,
+  "timestamp": "2026-03-31T00:10:00"
 }
 ```
 
@@ -1656,7 +1729,8 @@ No request body.
   "message": "Cart hold cancelled successfully.",
   "data": null,
   "errors": null,
-  "timestamp": "2026-05-07T10:30:00Z"
+  "errorCode": null,
+  "timestamp": "2026-05-07T10:30:00"
 }
 ```
 
@@ -1727,7 +1801,8 @@ No request body.
     }
   ],
   "errors": null,
-  "timestamp": "2026-03-31T00:10:00Z"
+  "errorCode": null,
+  "timestamp": "2026-03-31T00:10:00"
 }
 ```
 
@@ -1759,7 +1834,7 @@ No request body.
 
 ### Response Example (200 OK)
 ```json
-{ "success": true, "message": "Refund request submitted successfully.", "data": null, "errors": null, "timestamp": "2026-05-31T12:00:00Z" }
+{ "success": true, "message": "Refund request submitted successfully.", "data": null, "errors": null, "errorCode": null, "timestamp": "2026-05-31T12:00:00" }
 ```
 
 ## 9.7 Boarding Pass QR (Overview)
@@ -1808,7 +1883,8 @@ No request body.
   "message": "Boarding pass generated successfully.",
   "data": "GP|1024|5001|15|1713268800|QmFzZTY0U2lnbmF0dXJl...",
   "errors": null,
-  "timestamp": "2026-05-18T10:00:00Z"
+  "errorCode": null,
+  "timestamp": "2026-05-18T10:00:00"
 }
 ```
 
@@ -1841,7 +1917,8 @@ No request body.
     "seatNumber": "7"
   },
   "errors": null,
-  "timestamp": "2026-05-18T10:01:00Z"
+  "errorCode": null,
+  "timestamp": "2026-05-18T10:01:00"
 }
 ```
 
@@ -1895,7 +1972,8 @@ Base route: `/api/Wallet`
   "message": "Successfully deposited 500.00 EGP. Your new balance is 650.00 EGP.",
   "data": "Successfully deposited 500.00 EGP. Your new balance is 650.00 EGP.",
   "errors": null,
-  "timestamp": "2026-03-31T01:20:00.000Z"
+  "errorCode": null,
+  "timestamp": "2026-03-31T01:20:00.000"
 }
 ```
 
@@ -1938,7 +2016,8 @@ No request body.
     }
   ],
   "errors": null,
-  "timestamp": "2026-03-31T01:21:00Z"
+  "errorCode": null,
+  "timestamp": "2026-03-31T01:21:00"
 }
 ```
 
@@ -1995,7 +2074,8 @@ Base route: `/api/Loyalty`
     ]
   },
   "errors": null,
-  "timestamp": "2026-06-05T04:00:00Z"
+  "errorCode": null,
+  "timestamp": "2026-06-05T04:00:00"
 }
 ```
 
@@ -2056,7 +2136,8 @@ Base route: `/api/Loyalty`
     "currentPage": 1
   },
   "errors": null,
-  "timestamp": "2026-05-07T09:20:00Z"
+  "errorCode": null,
+  "timestamp": "2026-05-07T09:20:00"
 }
 ```
 
@@ -2072,6 +2153,21 @@ Authentication model:
 - JWT is not required.
 - A `secret` query parameter is required and must match server-side `JobSecretKey`.
 
+Common error responses:
+- `401 Unauthorized` when `secret` does not match: `ApiResponse.Fail("Invalid secret key.")`
+- `500 Internal Server Error` when `JobSecretKey` is missing: `ApiResponse.Fail("Job secret key is not configured.")`
+
+```json
+{
+  "success": false,
+  "message": "Invalid secret key.",
+  "data": null,
+  "errors": null,
+  "errorCode": null,
+  "timestamp": "2026-04-18T19:00:00"
+}
+```
+
 ## 12.1 Generate Occurrences (Scheduler)
 ### Endpoint Overview
 - **Method:** `POST`
@@ -2085,7 +2181,8 @@ Authentication model:
   "message": "Trip occurrences generated successfully.",
   "data": null,
   "errors": null,
-  "timestamp": "2026-04-18T17:00:00Z"
+  "errorCode": null,
+  "timestamp": "2026-04-18T17:00:00"
 }
 ```
 
@@ -2102,7 +2199,8 @@ Authentication model:
   "message": "Completed trips processed successfully.",
   "data": null,
   "errors": null,
-  "timestamp": "2026-04-18T17:00:00Z"
+  "errorCode": null,
+  "timestamp": "2026-04-18T17:00:00"
 }
 ```
 
@@ -2119,7 +2217,8 @@ Authentication model:
   "message": "Expired holds released and inventory restored.",
   "data": null,
   "errors": null,
-  "timestamp": "2026-04-18T17:00:00Z"
+  "errorCode": null,
+  "timestamp": "2026-04-18T17:00:00"
 }
 ```
 
@@ -2152,7 +2251,8 @@ Authentication model:
   "message": "Expired 0 point transaction(s).",
   "data": null,
   "errors": null,
-  "timestamp": "2026-04-18T17:00:00Z"
+  "errorCode": null,
+  "timestamp": "2026-04-18T17:00:00"
 }
 ```
 
@@ -2169,7 +2269,8 @@ Authentication model:
   "message": "Reset complete. Assigned 4 challenges to 120 users.",
   "data": null,
   "errors": null,
-  "timestamp": "2026-04-18T17:00:00Z"
+  "errorCode": null,
+  "timestamp": "2026-04-18T17:00:00"
 }
 ```
 
@@ -2186,7 +2287,8 @@ Authentication model:
   "message": "Challenges seeded successfully.",
   "data": null,
   "errors": null,
-  "timestamp": "2026-04-18T17:00:00Z"
+  "errorCode": null,
+  "timestamp": "2026-04-18T17:00:00"
 }
 ```
 
@@ -2229,7 +2331,7 @@ Base route: `/api/Marketplace`
 
 ### Response Example (200 OK)
 ```json
-{ "success": true, "message": "Ticket listed on marketplace successfully.", "data": null, "errors": null, "timestamp": "2026-03-06T12:00:00Z" }
+{ "success": true, "message": "Ticket listed on marketplace successfully.", "data": null, "errors": null, "errorCode": null, "timestamp": "2026-03-06T12:00:00" }
 ```
 
 ## 13.2 Buy Ticket
@@ -2286,7 +2388,7 @@ Base route: `/api/Marketplace`
 
 ### Response Example (200 OK)
 ```json
-{ "success": true, "message": "Ticket purchased successfully.", "data": null, "errors": null, "timestamp": "2026-03-06T12:00:00Z" }
+{ "success": true, "message": "Ticket purchased successfully.", "data": null, "errors": null, "errorCode": null, "timestamp": "2026-03-06T12:00:00" }
 ```
 
 ### Notification Side Effect
@@ -2353,14 +2455,17 @@ Query string parameters:
     "pageSize": 10
   },
   "errors": null,
-  "timestamp": "2026-04-02T00:00:00Z"
+  "errorCode": null,
+  "timestamp": "2026-04-02T00:00:00"
 }
 ```
 
 ### Notes
 - If no listings exist, the message is "No active marketplace listings found." and items list is empty.
 - `tripDetails.time` is a schedule-local timestamp without timezone suffix.
-- `tripDetails.originGov` and `tripDetails.destinationGov` come from the normalized station governorate data.
+- `tripDetails.originGovEn` and `tripDetails.destinationGovEn` are the English governorate display fields from the normalized station governorate data.
+- `tripDetails.originGovAr` and `tripDetails.destinationGovAr` are the Arabic governorate display fields from the normalized station governorate data.
+- Clients may tolerate legacy aliases `originGov` and `destinationGov` for older backend builds, but new integrations should prefer the `*GovEn` / `*GovAr` fields shown above.
 - `tripDetails.agencyNameAr` and `tripDetails.classNameAr` are optional Arabic display values.
 - `seatsCount` indicates the total number of seats included in the booking bundle offered for resale.
 - Filters are optional and combined with AND logic.
@@ -2388,7 +2493,7 @@ Query string parameters:
 
 ### Response Example (200 OK)
 ```json
-{ "success": true, "message": "Listing cancelled successfully.", "data": null, "errors": null, "timestamp": "2026-03-06T12:00:00Z" }
+{ "success": true, "message": "Listing cancelled successfully.", "data": null, "errors": null, "errorCode": null, "timestamp": "2026-03-06T12:00:00" }
 ```
 
 ---
@@ -2438,7 +2543,8 @@ All endpoints require authenticated JWT user context.
     }
   ],
   "errors": null,
-  "timestamp": "2026-05-09T19:30:10Z"
+  "errorCode": null,
+  "timestamp": "2026-05-09T19:30:10"
 }
 ```
 
@@ -2459,7 +2565,8 @@ All endpoints require authenticated JWT user context.
   "message": "Notification marked as read.",
   "data": null,
   "errors": null,
-  "timestamp": "2026-05-09T19:31:00Z"
+  "errorCode": null,
+  "timestamp": "2026-05-09T19:31:00"
 }
 ```
 
@@ -2476,7 +2583,8 @@ All endpoints require authenticated JWT user context.
   "message": "All notifications marked as read.",
   "data": null,
   "errors": null,
-  "timestamp": "2026-05-09T19:31:00Z"
+  "errorCode": null,
+  "timestamp": "2026-05-09T19:31:00"
 }
 ```
 ## 14.4 Delete Specific Notification
@@ -2499,12 +2607,17 @@ All endpoints require authenticated JWT user context.
 ```json
 {
   "success": true,
-  "message": "Notification deleted successfully.",
-  "data": null,
+  "message": "Operation successful",
+  "data": "Notification deleted successfully.",
   "errors": null,
-  "timestamp": "2026-06-09T10:00:00Z"
+  "errorCode": null,
+  "timestamp": "2026-06-09T10:00:00"
 }
 ```
+
+### Error Responses
+- `401 Unauthorized`: invalid/missing user context returns `message = "User is not authenticated."`
+- `404 Not Found`: notification does not exist or does not belong to the user returns `message = "Notification not found."`
 
 ---
 
@@ -2609,7 +2722,8 @@ Admin endpoints require Admin role.
     "updatedAt": null
   },
   "errors": null,
-  "timestamp": "2026-05-31T12:00:00Z"
+  "errorCode": null,
+  "timestamp": "2026-05-31T12:00:00"
 }
 ```
 
@@ -2644,7 +2758,8 @@ Admin endpoints require Admin role.
     }
   ],
   "errors": null,
-  "timestamp": "2026-05-31T12:00:00Z"
+  "errorCode": null,
+  "timestamp": "2026-05-31T12:00:00"
 }
 ```
 
@@ -2679,7 +2794,8 @@ Admin endpoints require Admin role.
     }
   ],
   "errors": null,
-  "timestamp": "2026-05-31T12:00:00Z"
+  "errorCode": null,
+  "timestamp": "2026-05-31T12:00:00"
 }
 ```
 
@@ -2724,7 +2840,8 @@ Admin endpoints require Admin role.
     "userPhone": "+201234567890"
   },
   "errors": null,
-  "timestamp": "2026-05-31T12:30:00Z"
+  "errorCode": null,
+  "timestamp": "2026-05-31T12:30:00"
 }
 ```
 
