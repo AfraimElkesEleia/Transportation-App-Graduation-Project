@@ -442,13 +442,7 @@ class _UrgencyBannerState extends State<_UrgencyBanner> {
   }
 
   String _fmt(Duration d) {
-    if (d.isNegative) return 'Boarding now';
-    if (d.inHours > 0) {
-      final h = d.inHours;
-      final m = d.inMinutes.remainder(60);
-      return 'Departing in ${h}h ${m}m';
-    }
-    return 'Departing in ${d.inMinutes}m';
+    return 'Boarding now';
   }
 
   @override
@@ -458,6 +452,7 @@ class _UrgencyBannerState extends State<_UrgencyBanner> {
       initialData: _remaining,
       builder: (context, snap) {
         final diff = snap.data ?? _remaining;
+        final text = _fmt(diff);
         final isUrgent = diff.inMinutes <= 60;
         final color = isUrgent ? Colors.orange : Colors.amber;
         return Container(
@@ -478,7 +473,7 @@ class _UrgencyBannerState extends State<_UrgencyBanner> {
               ),
               const SizedBox(width: 8),
               Text(
-                _fmt(diff),
+                text,
                 style: TextStyle(
                   color: color,
                   fontSize: 13,

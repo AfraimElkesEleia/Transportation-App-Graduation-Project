@@ -197,32 +197,18 @@ class _MyTicketsState extends State<MyTickets>
                       );
                       tabChildren = [errorView, errorView, errorView];
                     } else if (state is TicketsLoadedState) {
+                      final now = DateTime.now();
                       final upcoming = state.tickets
-                          .where(
-                            (t) =>
-                                t.isUpcoming &&
-                                t.refundStatus != 'Accepted' &&
-                                t.refundStatus != 'Approved',
-                          )
+                          .where((t) => t.isUpcomingTicket(now))
                           .toList()
                         ..sort(_sortByBoardingSoonest);
 
                       final activeNow = state.tickets
-                          .where(
-                            (t) =>
-                                t.isActiveNow &&
-                                t.refundStatus != 'Accepted' &&
-                                t.refundStatus != 'Approved',
-                          )
+                          .where((t) => t.isActiveTicket(now))
                           .toList()
                         ..sort(_sortByBoardingSoonest);
                       final past = state.tickets
-                          .where(
-                            (t) =>
-                                t.isPast ||
-                                t.refundStatus == 'Accepted' ||
-                                t.refundStatus == 'Approved',
-                          )
+                          .where((t) => t.isPastTicket(now))
                           .toList()
                         ..sort(_sortByDropoffMostRecent);
 

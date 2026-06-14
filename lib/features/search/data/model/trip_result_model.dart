@@ -44,8 +44,10 @@ class TripResultModel extends TripResultEntity {
       tripId: json['tripId'] as int,
       agencyName: json['agencyName'] as String? ?? '',
       agencyNameAr: json['agencyNameAr'] as String?,
+      // UI departure/arrival fields intentionally use passenger-segment
+      // timetable values from the API, not occurrence-level trip times.
       departureTime: DateTime.parse(json['boardingTime'] as String),
-      arrivalTime: json['arrivalTime'] != null
+      arrivalTime: json['dropoffTime'] != null
           ? DateTime.parse(json['dropoffTime'] as String)
           : null,
       totalDurationMinutes: json['totalDurationMinutes'] as int?,

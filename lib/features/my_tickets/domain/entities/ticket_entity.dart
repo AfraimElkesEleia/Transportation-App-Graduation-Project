@@ -74,16 +74,54 @@ class TicketEntity extends Equatable {
     this.refundStatus,
   });
 
-  bool get isUpcoming =>
-      boardingTime.isAfter(DateTime.now()) && status == 'Confirmed';
-  bool get isPast =>
-      dropoffTime.isBefore(DateTime.now()) && status == 'Completed';
-  bool get isActive => !isPast && status == 'Confirmed';
+  static const Duration activeBeforeBoardingWindow = Duration(hours: 5);
+  static const Duration boardingNowWindow = Duration(hours: 1);
+
+  String get _normalizedStatus => status.trim().toLowerCase();
+  String get _normalizedRefundStatus => refundStatus?.trim().toLowerCase() ?? '';
+
+  bool get isConfirmed => _normalizedStatus == 'confirmed';
+  bool get isCompleted => _normalizedStatus == 'completed';
+  bool get isCancelled => _normalizedStatus == 'cancelled';
+  bool get hasAcceptedRefund =>
+      _normalizedRefundStatus == 'accepted' ||
+      _normalizedRefundStatus == 'approved';
+
+  bool get isHiddenFromTicketTabs => isCancelled && !hasAcceptedRefund;
+
+  bool isUpcomingTicket(DateTime now) {
+    if (isHiddenFromTicketTabs || hasAcceptedRefund || !isConfirmed) {
+      return false;
+    }
+    return now.isBefore(boardingTime.subtract(activeBeforeBoardingWindow));
+  }
+
+  bool isActiveTicket(DateTime now) {
+    if (isHiddenFromTicketTabs || hasAcceptedRefund || !isConfirmed) {
+      return false;
+    }
+    return !now.isBefore(boardingTime.subtract(activeBeforeBoardingWindow));
+  }
+
+  bool isPastTicket(DateTime now) {
+    if (isHiddenFromTicketTabs) return false;
+    if (hasAcceptedRefund) return true;
+    return isCompleted && now.isAfter(boardingTime.add(boardingNowWindow));
+  }
+
+  bool isBoardingNow(DateTime now) {
+    if (!isActiveTicket(now)) return false;
+    return !now.isBefore(boardingTime) &&
+        !now.isAfter(boardingTime.add(boardingNowWindow));
+  }
+
+  bool get isUpcoming => isUpcomingTicket(DateTime.now());
+  bool get isPast => isPastTicket(DateTime.now());
+  bool get isActive => isActiveTicket(DateTime.now());
 
   bool get isActiveNow {
     final now = DateTime.now();
-    final diff = boardingTime.difference(now);
-    return diff.inSeconds >= 0 && diff.inHours < 5 && status == 'Confirmed';
+    return isActiveTicket(now);
   }
 
   /// Returns true when a refund has already been requested (status == 'Requested').
