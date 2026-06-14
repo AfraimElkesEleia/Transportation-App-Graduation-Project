@@ -258,17 +258,27 @@ class RoundTripBookingCubit extends Cubit<RoundTripBookingState> {
         selectedReturnTrip: trip,
         selectedReturnClass: coachClass,
         currentStep: RoundTripBookingStep.selectSeats,
+        currentSeatLegIndex: 0,
       ),
     );
   }
 
-  void saveUnifiedSeats(List<String> outboundSeats, List<String> returnSeats) {
-    // Each leg only needs at least one seat — counts can differ.
-    if (outboundSeats.isEmpty || returnSeats.isEmpty) return;
+  void saveSeatsForCurrentLeg(List<String> seats) {
+    if (seats.isEmpty) return;
+
+    if (state.currentSeatLegIndex == 0) {
+      emit(
+        state.copyWith(
+          selectedOutboundSeats: seats,
+          currentSeatLegIndex: 1,
+        ),
+      );
+      return;
+    }
+
     emit(
       state.copyWith(
-        selectedOutboundSeats: outboundSeats,
-        selectedReturnSeats: returnSeats,
+        selectedReturnSeats: seats,
         currentStep: RoundTripBookingStep.summary,
       ),
     );
@@ -439,6 +449,7 @@ class RoundTripBookingCubit extends Cubit<RoundTripBookingState> {
         clearReturnSelection: true,
         selectedOutboundSeats: const [],
         selectedReturnSeats: const [],
+        currentSeatLegIndex: 0,
       ),
     );
   }
@@ -450,11 +461,26 @@ class RoundTripBookingCubit extends Cubit<RoundTripBookingState> {
         clearReturnSelection: true,
         selectedOutboundSeats: const [],
         selectedReturnSeats: const [],
+        currentSeatLegIndex: 0,
       ),
     );
   }
 
   void goBackToSeats() {
-    emit(state.copyWith(currentStep: RoundTripBookingStep.selectSeats));
+    emit(
+      state.copyWith(
+        currentStep: RoundTripBookingStep.selectSeats,
+        currentSeatLegIndex: 1,
+      ),
+    );
+  }
+
+  void goBackWithinSeats() {
+    if (state.currentSeatLegIndex > 0) {
+      emit(state.copyWith(currentSeatLegIndex: state.currentSeatLegIndex - 1));
+      return;
+    }
+
+    goBackToReturn();
   }
 }

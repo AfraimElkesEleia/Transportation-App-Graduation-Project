@@ -33,6 +33,9 @@ class RoundTripBookingState extends Equatable {
   final CoachClassEntity? selectedReturnClass;
   final List<String> selectedReturnSeats;
 
+  // ── Seats Phase ──
+  final int currentSeatLegIndex;
+
   // ── Booking Status ──
   final bool isAddingToCart;
   final bool isBookingNow;
@@ -81,6 +84,7 @@ class RoundTripBookingState extends Equatable {
     this.selectedReturnTrip,
     this.selectedReturnClass,
     this.selectedReturnSeats = const [],
+    this.currentSeatLegIndex = 0,
 
     this.isAddingToCart = false,
     this.isBookingNow = false,
@@ -116,6 +120,7 @@ class RoundTripBookingState extends Equatable {
     TripResultEntity? selectedReturnTrip,
     CoachClassEntity? selectedReturnClass,
     List<String>? selectedReturnSeats,
+    int? currentSeatLegIndex,
 
     bool? isAddingToCart,
     bool? isBookingNow,
@@ -163,6 +168,7 @@ class RoundTripBookingState extends Equatable {
           ? null
           : (selectedReturnClass ?? this.selectedReturnClass),
       selectedReturnSeats: selectedReturnSeats ?? this.selectedReturnSeats,
+      currentSeatLegIndex: currentSeatLegIndex ?? this.currentSeatLegIndex,
 
       isAddingToCart: isAddingToCart ?? this.isAddingToCart,
       isBookingNow: isBookingNow ?? this.isBookingNow,
@@ -194,6 +200,7 @@ class RoundTripBookingState extends Equatable {
     selectedReturnTrip,
     selectedReturnClass,
     selectedReturnSeats,
+    currentSeatLegIndex,
     isAddingToCart,
     isBookingNow,
     cartError,

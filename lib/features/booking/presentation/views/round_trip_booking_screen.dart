@@ -55,7 +55,10 @@ class _RoundTripBookingScreenState extends State<RoundTripBookingScreen> {
               iconTheme: const IconThemeData(color: Colors.white),
               bottom: PreferredSize(
                 preferredSize: const Size.fromHeight(40),
-                child: _Stepper(currentStep: state.currentStep),
+                child: _Stepper(
+                  currentStep: state.currentStep,
+                  currentSeatLegIndex: state.currentSeatLegIndex,
+                ),
               ),
               leading: BackButton(onPressed: () => _handleBack(state)),
             ),
@@ -75,7 +78,7 @@ class _RoundTripBookingScreenState extends State<RoundTripBookingScreen> {
       case RoundTripBookingStep.searchReturn:
         cubit.goBackToOutbound();
       case RoundTripBookingStep.selectSeats:
-        cubit.goBackToReturn();
+        cubit.goBackWithinSeats();
       case RoundTripBookingStep.summary:
         cubit.goBackToSeats();
     }
@@ -441,22 +444,67 @@ class _RoundTripBookingScreenState extends State<RoundTripBookingScreen> {
     );
   }
 
-  // ── Stage 3: Unified Seat Selection ──
+  // ── Stage 3: Sequential Seat Selection ──
   Widget _buildSelectSeats(RoundTripBookingState state) {
-    return _UnifiedSeatSelectionLayer(
-      outboundTrip: state.selectedOutboundTrip!,
-      outboundClass: state.selectedOutboundClass!,
-      returnTrip: state.selectedReturnTrip!,
-      returnClass: state.selectedReturnClass!,
-      requiredSeats: state.requiredSeatCount,
-      initialOutboundSeats: state.selectedOutboundSeats,
-      initialReturnSeats: state.selectedReturnSeats,
-      onProceed: (outbound, returnSeats) {
-        context.read<RoundTripBookingCubit>().saveUnifiedSeats(
-          outbound,
-          returnSeats,
-        );
-      },
+    final isOutboundSeatStep = state.currentSeatLegIndex == 0;
+    final trip = isOutboundSeatStep
+        ? state.selectedOutboundTrip!
+        : state.selectedReturnTrip!;
+    final coachClass = isOutboundSeatStep
+        ? state.selectedOutboundClass!
+        : state.selectedReturnClass!;
+    final initialSeats = isOutboundSeatStep
+        ? state.selectedOutboundSeats
+        : state.selectedReturnSeats;
+    final title = isOutboundSeatStep
+        ? AppLocalizations.of(context)!.step1Seats
+        : AppLocalizations.of(context)!.step2Seats;
+
+    return CustomScrollView(
+      slivers: [
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Text(
+              title,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ),
+        SliverToBoxAdapter(
+          child: SizedBox(
+            height: MediaQuery.of(context).size.height * 0.75,
+            child: BlocProvider(
+              key: ValueKey(
+                '${isOutboundSeatStep ? 'outbound' : 'return'}_seat_${trip.tripOccurrenceId}',
+              ),
+              create: (_) =>
+                  sl<SeatMapCubit>()
+                    ..loadSeatMap(
+                      trip.tripOccurrenceId,
+                      coachClass.coachClassId,
+                    ),
+              child: EmbeddedSeatSelection(
+                trip: trip,
+                coachClass: coachClass,
+                enforcedSeatCount: null,
+                initialSeats: initialSeats,
+                onCancel: () =>
+                    context.read<RoundTripBookingCubit>().goBackWithinSeats(),
+                onProceed: (seats) {
+                  context
+                      .read<RoundTripBookingCubit>()
+                      .saveSeatsForCurrentLeg(seats);
+                },
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -597,197 +645,6 @@ class _RoundTripBookingScreenState extends State<RoundTripBookingScreen> {
   String _formatTime(DateTime? dt) {
     if (dt == null) return '--:--';
     return '${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
-  }
-}
-
-// ── Unified Seat Selection Layer (handles lazy loading) ──
-class _UnifiedSeatSelectionLayer extends StatefulWidget {
-  final TripResultEntity outboundTrip;
-  final CoachClassEntity outboundClass;
-  final TripResultEntity returnTrip;
-  final CoachClassEntity returnClass;
-  final int requiredSeats;
-  final List<String> initialOutboundSeats;
-  final List<String> initialReturnSeats;
-  final Function(List<String> outboundSeats, List<String> returnSeats)
-  onProceed;
-
-  const _UnifiedSeatSelectionLayer({
-    required this.outboundTrip,
-    required this.outboundClass,
-    required this.returnTrip,
-    required this.returnClass,
-    required this.requiredSeats,
-    required this.initialOutboundSeats,
-    required this.initialReturnSeats,
-    required this.onProceed,
-  });
-
-  @override
-  State<_UnifiedSeatSelectionLayer> createState() =>
-      _UnifiedSeatSelectionLayerState();
-}
-
-class _UnifiedSeatSelectionLayerState
-    extends State<_UnifiedSeatSelectionLayer> {
-  late List<String> _selectedOutbound;
-  late List<String> _selectedReturn;
-  bool _returnMapVisible = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _selectedOutbound = List.from(widget.initialOutboundSeats);
-    _selectedReturn = List.from(widget.initialReturnSeats);
-    if (_selectedOutbound.isNotEmpty) {
-      _returnMapVisible = true;
-    }
-  }
-
-  void _onOutboundSeatsChanged(List<String> seats) {
-    setState(() {
-      _selectedOutbound = seats;
-      if (_selectedOutbound.isNotEmpty) {
-        _returnMapVisible = true;
-      }
-    });
-  }
-
-  void _onReturnSeatsChanged(List<String> seats) {
-    setState(() {
-      _selectedReturn = seats;
-    });
-  }
-
-  @override
-  @override
-  Widget build(BuildContext context) {
-    // Seat maps need an explicit height — they use Expanded internally.
-    // MediaQuery gives us a reliable fraction of screen height.
-    final seatMapHeight = MediaQuery.of(context).size.height * 0.90;
-
-    return CustomScrollView(
-      slivers: [
-        // ── Step 1 header ──
-        SliverToBoxAdapter(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  AppLocalizations.of(context)!.step1Seats,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                TextButton.icon(
-                  onPressed: () =>
-                      context.read<RoundTripBookingCubit>().goBackToReturn(),
-                  icon: const Icon(
-                    Icons.arrow_back_ios,
-                    size: 14,
-                    color: ColorsManager.accentCyan,
-                  ),
-                  label: Text(
-                    AppLocalizations.of(context)!.previous,
-                    style: const TextStyle(color: ColorsManager.accentCyan),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-
-        // ── Outbound seat map (fixed height) ──
-        SliverToBoxAdapter(
-          child: SizedBox(
-            height: seatMapHeight,
-            child: BlocProvider(
-              key: ValueKey(
-                'outbound_seat_${widget.outboundTrip.tripOccurrenceId}',
-              ),
-              create: (_) =>
-                  sl<SeatMapCubit>()
-                    ..loadSeatMap(
-                      widget.outboundTrip.tripOccurrenceId,
-                      widget.outboundClass.coachClassId,
-                    ),
-              child: EmbeddedSeatSelection(
-                trip: widget.outboundTrip,
-                coachClass: widget.outboundClass,
-                enforcedSeatCount: null,
-                initialSeats: _selectedOutbound,
-                onCancel: () =>
-                    context.read<RoundTripBookingCubit>().goBackToReturn(),
-                onProceed: _onOutboundSeatsChanged,
-              ),
-            ),
-          ),
-        ),
-
-        // ── Divider + Step 2 (only when outbound seats chosen) ──
-        if (_returnMapVisible) ...[
-          const SliverToBoxAdapter(
-            child: Padding(
-              padding: EdgeInsets.symmetric(vertical: 8),
-              child: Icon(
-                Icons.link,
-                color: ColorsManager.accentCyan,
-                size: 32,
-              ),
-            ),
-          ),
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Text(
-                AppLocalizations.of(context)!.step2Seats,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          ),
-
-          // ── Return seat map (fixed height) ──
-          SliverToBoxAdapter(
-            child: SizedBox(
-              height: seatMapHeight,
-              child: BlocProvider(
-                key: ValueKey(
-                  'return_seat_${widget.returnTrip.tripOccurrenceId}',
-                ),
-                create: (_) =>
-                    sl<SeatMapCubit>()
-                      ..loadSeatMap(
-                        widget.returnTrip.tripOccurrenceId,
-                        widget.returnClass.coachClassId,
-                      ),
-                child: EmbeddedSeatSelection(
-                  trip: widget.returnTrip,
-                  coachClass: widget.returnClass,
-                  enforcedSeatCount: null, // ← no restriction
-                  initialSeats: _selectedReturn,
-                  onCancel: () => setState(() => _returnMapVisible = false),
-                  onProceed: (seats) {
-                    _onReturnSeatsChanged(seats);
-                    widget.onProceed(_selectedOutbound, seats);
-                  },
-                ),
-              ),
-            ),
-          ),
-        ],
-
-        // Bottom breathing room
-        const SliverToBoxAdapter(child: SizedBox(height: 24)),
-      ],
-    );
   }
 }
 
@@ -1185,16 +1042,33 @@ String _formatDuration(BuildContext context, Duration duration) {
 
 class _Stepper extends StatelessWidget {
   final RoundTripBookingStep currentStep;
+  final int currentSeatLegIndex;
 
-  const _Stepper({required this.currentStep});
+  const _Stepper({
+    required this.currentStep,
+    required this.currentSeatLegIndex,
+  });
+
+  int get _currentProgress {
+    switch (currentStep) {
+      case RoundTripBookingStep.searchOutbound:
+        return 0;
+      case RoundTripBookingStep.searchReturn:
+        return 1;
+      case RoundTripBookingStep.selectSeats:
+        return currentSeatLegIndex == 0 ? 2 : 3;
+      case RoundTripBookingStep.summary:
+        return 4;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    final cur = currentStep.index;
+    final cur = _currentProgress;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
       child: Row(
-        children: List.generate(4, (index) {
+        children: List.generate(5, (index) {
           final color = index <= cur
               ? ColorsManager.accentCyan
               : ColorsManager.borderSubtle;
