@@ -162,7 +162,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get myTickets => 'تذاكري';
 
   @override
-  String get digitalWallet => 'محفظة رحلاتك الرقمية';
+  String get digitalWallet => 'أدر تذاكرك بسهولة';
 
   @override
   String get tabUpcoming => 'القادمة';

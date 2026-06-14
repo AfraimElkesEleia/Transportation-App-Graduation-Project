@@ -162,7 +162,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get myTickets => 'My Tickets';
 
   @override
-  String get digitalWallet => 'Your digital travel wallet';
+  String get digitalWallet => 'Manage your tickets easily';
 
   @override
   String get tabUpcoming => 'Upcoming';

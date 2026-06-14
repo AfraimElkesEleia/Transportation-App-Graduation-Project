@@ -407,7 +407,7 @@ abstract class AppLocalizations {
   /// No description provided for @digitalWallet.
   ///
   /// In en, this message translates to:
-  /// **'Your digital travel wallet'**
+  /// **'Manage your tickets easily'**
   String get digitalWallet;
 
   /// No description provided for @tabUpcoming.
