@@ -11,7 +11,6 @@ class NotficationPermissionManager {
   static const _systemRequestAttemptedKey =
       'notification_permission_system_request_attempted';
   static bool _dialogVisible = false;
-  static bool _skipNextResumeCheck = false;
 
   static Future<void> requestIfNeeded(BuildContext context) async {
     if (!Platform.isAndroid || _dialogVisible) return;
@@ -92,15 +91,8 @@ class NotficationPermissionManager {
     _dialogVisible = false;
 
     if (allow == true) {
-      _skipNextResumeCheck = true;
       await AppSettings.openAppSettings(type: AppSettingsType.notification);
     }
-  }
-
-  static bool consumeSkipNextResumeCheck() {
-    if (!_skipNextResumeCheck) return false;
-    _skipNextResumeCheck = false;
-    return true;
   }
 
   // for cart expiry and 30min boarding reminders
@@ -127,25 +119,11 @@ class NotficationPermissionGate extends StatefulWidget {
 }
 
 class _NotficationPermissionGateState extends State<NotficationPermissionGate>
-    with WidgetsBindingObserver {
+{
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addObserver(this);
     WidgetsBinding.instance.addPostFrameCallback((_) => _checkPermission());
-  }
-
-  @override
-  void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
-    super.dispose();
-  }
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state != AppLifecycleState.resumed) return;
-    if (NotficationPermissionManager.consumeSkipNextResumeCheck()) return;
-    _checkPermission();
   }
 
   Future<void> _checkPermission() async {
