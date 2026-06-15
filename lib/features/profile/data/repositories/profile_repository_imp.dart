@@ -39,6 +39,7 @@ class ProfileRepositoryImp extends ProfileRepository {
             gender: cached.gender,
             countryCode: cached.countryCode,
             countryName: cached.countryName,
+            preferredLanguage: cached.preferredLanguage,
           ),
         );
       }

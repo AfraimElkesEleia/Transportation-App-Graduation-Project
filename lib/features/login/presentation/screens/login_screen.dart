@@ -56,13 +56,20 @@ class _LoginScreenState extends State<LoginScreen> {
 
     return AuthBackground(
       child: BlocConsumer<LoginCubit, LoginState>(
-        listener: (context, state) {
+        listener: (context, state) async {
           if (state is LoginSuccess) {
             SignalrService.connect(
               tokenFactory: () async =>
                   await sl<TokenManager>().getAccessToken() ?? '',
             );
-            context.read<LocaleCubit>().syncLanguageWithBackend();
+            final appliedProfileLanguage = await context
+                .read<LocaleCubit>()
+                .applyPreferredLanguageFromProfile();
+            if (!mounted) return;
+            if (!appliedProfileLanguage) {
+              await context.read<LocaleCubit>().syncLanguageWithBackend();
+            }
+            if (!mounted) return;
             context.pushNamedAndRemoveuntil(
               AppRoutes.homeScreen,
               predicate: (_) => false,

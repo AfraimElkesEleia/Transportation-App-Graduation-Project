@@ -47,6 +47,7 @@ class ProfileEntity extends Equatable {
   final String gender;
   final String countryCode;
   final String countryName;
+  final String? preferredLanguage;
   final String? profilePictureUrl;
   final int? totalTrips;
   final double? totalDistanceKm;
@@ -68,6 +69,7 @@ class ProfileEntity extends Equatable {
     required this.gender,
     required this.countryCode,
     required this.countryName,
+    this.preferredLanguage,
     this.profilePictureUrl,
     this.totalTrips,
     this.totalDistanceKm,
@@ -87,6 +89,7 @@ class ProfileEntity extends Equatable {
     String? familyName,
     String? email,
     String? phoneNumber,
+    String? preferredLanguage,
     String? profilePictureUrl,
     int? totalTrips,
     double? totalDistanceKm,
@@ -109,6 +112,7 @@ class ProfileEntity extends Equatable {
       gender: gender,
       countryCode: countryCode,
       countryName: countryName,
+      preferredLanguage: preferredLanguage ?? this.preferredLanguage,
       profilePictureUrl: profilePictureUrl ?? this.profilePictureUrl,
       totalTrips: totalTrips ?? this.totalTrips,
       totalDistanceKm: totalDistanceKm ?? this.totalDistanceKm,
@@ -134,7 +138,7 @@ class ProfileEntity extends Equatable {
   }
 
   @override
-  List<Object?> get props => [userId, email];
+  List<Object?> get props => [userId, email, preferredLanguage];
 }
 
 extension StringExtension on String {

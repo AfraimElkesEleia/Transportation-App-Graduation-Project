@@ -323,6 +323,7 @@ Future<void> init() async {
   sl.registerLazySingleton(
     () => LocaleCubit(
       tokenManager: sl<TokenManager>(),
+      getProfileUseCase: sl<GetProfileUseCase>(),
       updateLanguageUseCase: sl<UpdateLanguageUseCase>(),
     ),
   );
