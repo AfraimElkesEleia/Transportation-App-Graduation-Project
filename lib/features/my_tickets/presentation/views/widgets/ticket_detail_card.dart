@@ -5,8 +5,8 @@ import 'package:transportation_app/features/my_tickets/presentation/cubit/my_tic
 import 'package:transportation_app/features/my_tickets/domain/entities/ticket_entity.dart';
 import 'package:transportation_app/core/helper/extensions.dart';
 import 'package:transportation_app/core/routing/routes.dart';
-import 'package:intl/intl.dart';
 import 'package:transportation_app/core/l10n/app_localizations.dart';
+import 'package:transportation_app/core/utils/localized_time_formatter.dart';
 
 class TicketDetailCard extends StatelessWidget {
   final TicketEntity ticket;
@@ -68,10 +68,7 @@ class TicketDetailCard extends StatelessWidget {
   }
 
   String _fmtDate(BuildContext context, DateTime d) {
-    return DateFormat(
-      'dd MMM  HH:mm',
-      context.isArabic ? 'ar' : 'en',
-    ).format(d);
+    return formatTicketDateTime(context, d, datePattern: 'dd MMM');
   }
 
   @override

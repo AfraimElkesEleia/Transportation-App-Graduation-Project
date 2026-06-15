@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:transportation_app/core/l10n/app_localizations.dart';
 import 'package:transportation_app/core/routing/routes.dart';
 import 'package:transportation_app/core/theming/colors.dart';
+import 'package:transportation_app/core/utils/localized_time_formatter.dart';
 import 'package:transportation_app/features/my_tickets/presentation/cubit/marketplace_cubit.dart';
 import 'package:transportation_app/features/my_tickets/presentation/views/widgets/marketplace_listing_utils.dart';
 
@@ -73,7 +74,7 @@ void showMarketplaceBuyDialog(
                 style: const TextStyle(color: Colors.white70),
               ),
               Text(
-                '${l10n.timeLabel}: ${display.departureTime.hour.toString().padLeft(2, '0')}:${display.departureTime.minute.toString().padLeft(2, '0')}',
+                '${l10n.timeLabel}: ${formatTicketTime(ctx, display.departureTime)}',
                 style: const TextStyle(color: Colors.white70),
               ),
               const SizedBox(height: 8),

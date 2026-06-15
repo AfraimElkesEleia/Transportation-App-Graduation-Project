@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:transportation_app/core/l10n/app_localizations.dart';
 import 'package:transportation_app/core/theming/colors.dart';
+import 'package:transportation_app/core/utils/localized_time_formatter.dart';
 import 'package:transportation_app/features/my_tickets/domain/entities/ticket_entity.dart';
 
 /// A card summarising a [TicketEntity] for the resell screen.
@@ -32,8 +33,7 @@ class ResaleTicketCard extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     final dt = ticket.boardingTime;
     final daysLeft = dt.difference(DateTime.now()).inDays;
-    final timeStr =
-        '${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
+    final timeStr = formatTicketTime(context, dt);
     final dateStr = '${dt.day}/${dt.month}/${dt.year}';
     final fromTo =
         '${ticket.originStation.isNotEmpty ? ticket.originStation : ticket.originGovernorate}'

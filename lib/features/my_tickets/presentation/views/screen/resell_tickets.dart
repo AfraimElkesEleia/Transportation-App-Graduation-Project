@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:transportation_app/core/helper/extensions.dart';
 import 'package:transportation_app/core/l10n/app_localizations.dart';
 import 'package:transportation_app/core/theming/colors.dart';
+import 'package:transportation_app/core/utils/localized_time_formatter.dart';
 import 'package:transportation_app/features/my_tickets/presentation/cubit/marketplace_cubit.dart';
 import 'package:transportation_app/features/my_tickets/presentation/cubit/marketplace_states.dart';
 import 'package:transportation_app/features/my_tickets/presentation/cubit/my_tickets_cubit.dart';
@@ -519,7 +520,7 @@ class _ResellTicketCard extends StatelessWidget {
       'EEE, dd MMM yyyy',
       locale,
     ).format(ticket.boardingTime);
-    final time = DateFormat('HH:mm').format(ticket.boardingTime);
+    final time = formatTicketTime(context, ticket.boardingTime);
     final daysLeft = ticket.boardingTime.difference(DateTime.now()).inDays;
 
     return Container(

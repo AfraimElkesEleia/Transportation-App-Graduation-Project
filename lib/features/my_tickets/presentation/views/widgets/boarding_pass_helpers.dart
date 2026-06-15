@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:transportation_app/core/l10n/app_localizations.dart';
+import 'package:transportation_app/core/utils/localized_time_formatter.dart';
 
 String _localeName(BuildContext context) =>
     Localizations.localeOf(context).toLanguageTag();
 
 String formatBoardingPassTime(BuildContext context, DateTime dt) =>
-    DateFormat('hh:mm a', _localeName(context)).format(dt);
+    formatTicketTime(context, dt);
 
 String formatBoardingPassDate(BuildContext context, DateTime dt) =>
     DateFormat('dd MMM yyyy', _localeName(context)).format(dt);

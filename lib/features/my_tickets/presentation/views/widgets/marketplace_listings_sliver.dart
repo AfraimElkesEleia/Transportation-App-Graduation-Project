@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:transportation_app/core/l10n/app_localizations.dart';
 import 'package:transportation_app/core/theming/colors.dart';
+import 'package:transportation_app/core/utils/localized_time_formatter.dart';
 import 'package:transportation_app/features/my_tickets/presentation/cubit/marketplace_cubit.dart';
 import 'package:transportation_app/features/my_tickets/presentation/cubit/marketplace_states.dart';
 import 'package:transportation_app/features/my_tickets/presentation/views/widgets/marketplace_buy_dialog.dart';
@@ -107,8 +108,7 @@ class MarketplaceListingsSliver extends StatelessWidget {
               toLocation: display.toLocation,
               date:
                   '${display.departureTime.day}/${display.departureTime.month}/${display.departureTime.year}',
-              time:
-                  '${display.departureTime.hour.toString().padLeft(2, '0')}:${display.departureTime.minute.toString().padLeft(2, '0')}',
+              time: formatTicketTime(ctx, display.departureTime),
               className: display.className,
               sellerName: display.sellerName,
               agencyName: display.agencyName,

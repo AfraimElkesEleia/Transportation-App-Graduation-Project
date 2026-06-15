@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:intl/intl.dart';
 import 'package:transportation_app/core/theming/colors.dart';
+import 'package:transportation_app/core/utils/localized_time_formatter.dart';
 import 'package:transportation_app/features/my_tickets/presentation/cubit/my_tickets_cubit.dart';
 import 'package:transportation_app/features/my_tickets/presentation/cubit/my_tickets_states.dart';
 import 'package:transportation_app/features/my_tickets/presentation/views/widgets/boarding_pass_sheet.dart';
@@ -381,9 +381,11 @@ class _TicketDetailsScreenState extends State<TicketDetailsScreen> {
                       Padding(
                         padding: const EdgeInsets.only(left: 24),
                         child: Text(
-                          DateFormat(
-                            'yyyy-MM-dd hh:mm a',
-                          ).format(_ticket.boardingTime),
+                          formatTicketDateTime(
+                            context,
+                            _ticket.boardingTime,
+                            datePattern: 'yyyy-MM-dd',
+                          ),
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: 14,
@@ -412,9 +414,11 @@ class _TicketDetailsScreenState extends State<TicketDetailsScreen> {
                       Padding(
                         padding: const EdgeInsets.only(left: 24),
                         child: Text(
-                          DateFormat(
-                            'yyyy-MM-dd hh:mm a',
-                          ).format(_ticket.dropoffTime),
+                          formatTicketDateTime(
+                            context,
+                            _ticket.dropoffTime,
+                            datePattern: 'yyyy-MM-dd',
+                          ),
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: 14,
