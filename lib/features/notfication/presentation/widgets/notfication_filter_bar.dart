@@ -51,6 +51,12 @@ class NotificationFilterBar extends StatelessWidget {
           ),
           const SizedBox(width: 8),
           _Chip(
+            label: loc.filterRefunds,
+            isActive: active == NotificationFilter.refund,
+            onTap: () => onChanged(NotificationFilter.refund),
+          ),
+          const SizedBox(width: 8),
+          _Chip(
             label: loc.filterAll,
             isActive: active == NotificationFilter.all,
             onTap: () => onChanged(NotificationFilter.all),

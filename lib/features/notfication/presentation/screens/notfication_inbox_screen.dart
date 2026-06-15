@@ -193,6 +193,9 @@ class _NotificationList extends StatelessWidget {
       case NotificationType.gamification:
         // Navigator.of(context).pushNamed(AppRoutes.pr);
         break;
+      case NotificationType.refund:
+        // Navigator.of(context).pushNamed(AppRoutes.myTickets);
+        break;
       case NotificationType.general:
         break;
     }

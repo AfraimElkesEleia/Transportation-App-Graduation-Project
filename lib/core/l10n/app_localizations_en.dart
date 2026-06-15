@@ -1403,6 +1403,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get filterGamification => 'Gamification';
 
   @override
+  String get filterRefunds => 'Refunds';
+
+  @override
   String get dismiss => 'Dismiss';
 
   @override
@@ -1456,6 +1459,13 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get emptyGamificationSubtitle =>
       'Points and challenge notifications will appear here.';
+
+  @override
+  String get emptyRefundTitle => 'No refund updates';
+
+  @override
+  String get emptyRefundSubtitle =>
+      'Refund approvals and rejections will appear here.';
 
   @override
   String get emptyNotificationsTitle => 'No notifications yet';

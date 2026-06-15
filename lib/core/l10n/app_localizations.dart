@@ -2666,6 +2666,12 @@ abstract class AppLocalizations {
   /// **'Gamification'**
   String get filterGamification;
 
+  /// No description provided for @filterRefunds.
+  ///
+  /// In en, this message translates to:
+  /// **'Refunds'**
+  String get filterRefunds;
+
   /// No description provided for @dismiss.
   ///
   /// In en, this message translates to:
@@ -2761,6 +2767,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Points and challenge notifications will appear here.'**
   String get emptyGamificationSubtitle;
+
+  /// No description provided for @emptyRefundTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No refund updates'**
+  String get emptyRefundTitle;
+
+  /// No description provided for @emptyRefundSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Refund approvals and rejections will appear here.'**
+  String get emptyRefundSubtitle;
 
   /// No description provided for @emptyNotificationsTitle.
   ///

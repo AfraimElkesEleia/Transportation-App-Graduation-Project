@@ -1399,6 +1399,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get filterGamification => 'المكافآت';
 
   @override
+  String get filterRefunds => 'الاسترداد';
+
+  @override
   String get dismiss => 'إغلاق';
 
   @override
@@ -1449,6 +1452,13 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get emptyGamificationSubtitle => 'ستظهر إشعارات النقاط والتحديات هنا.';
+
+  @override
+  String get emptyRefundTitle => 'لا توجد تحديثات استرداد';
+
+  @override
+  String get emptyRefundSubtitle =>
+      'ستظهر هنا إشعارات قبول أو رفض طلبات الاسترداد.';
 
   @override
   String get emptyNotificationsTitle => 'لا توجد إشعارات بعد';

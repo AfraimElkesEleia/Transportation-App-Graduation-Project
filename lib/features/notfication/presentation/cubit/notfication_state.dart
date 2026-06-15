@@ -47,6 +47,10 @@ class NotificationLoaded extends NotificationState {
         return notifications
             .where((n) => n.type == NotificationType.gamification)
             .toList();
+      case NotificationFilter.refund:
+        return notifications
+            .where((n) => n.type == NotificationType.refund)
+            .toList();
       case NotificationFilter.unread:
         return notifications.where((n) => !n.isRead).toList();
     }
@@ -132,4 +136,11 @@ class NotificationError extends NotificationState {
   List<Object?> get props => [message];
 }
 
-enum NotificationFilter { all, marketplace, boarding, gamification, unread }
+enum NotificationFilter {
+  all,
+  marketplace,
+  boarding,
+  gamification,
+  refund,
+  unread,
+}

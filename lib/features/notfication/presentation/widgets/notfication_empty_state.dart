@@ -88,6 +88,12 @@ class NotificationEmptyState extends StatelessWidget {
           title: loc.emptyGamificationTitle,
           subtitle: loc.emptyGamificationSubtitle,
         );
+      case 'refund':
+        return _EmptyConfig(
+          icon: Icons.account_balance_wallet_rounded,
+          title: loc.emptyRefundTitle,
+          subtitle: loc.emptyRefundSubtitle,
+        );
       default:
         return _EmptyConfig(
           icon: Icons.notifications_off_rounded,

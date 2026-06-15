@@ -55,6 +55,9 @@ class NotficationModel {
       case 'BOARDING':
       case 'BOARDING_SOON':
         return NotificationType.boarding;
+      case 'REFUND_APPROVED':
+      case 'REFUND_REJECTED':
+        return NotificationType.refund;
       default:
         return NotificationType.general;
     }
