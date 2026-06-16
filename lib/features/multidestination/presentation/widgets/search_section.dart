@@ -354,7 +354,9 @@ class _SearchSectionState extends State<SearchSection> {
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          if (index == _legs.length - 1 && index > 0)
+                          if (_showAutoButtons &&
+                              index == _legs.length - 1 &&
+                              index > 0)
                             IconButton(
                               icon: const Icon(Icons.close, color: Colors.red),
                               onPressed: () => _removeLeg(index),
