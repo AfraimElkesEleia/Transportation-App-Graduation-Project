@@ -48,22 +48,43 @@ class _MultiDestinationPassengerFormScreenState
     return total;
   }
 
+  List<String> _passengerEntriesForLeg(
+    MultiDestinationBookingState state,
+    int legIndex,
+  ) {
+    final seats = state.selectedSeats[legIndex] ?? const <String>[];
+    if (_isTrainPerLeg[legIndex]) return seats;
+    return seats.where((seat) => seat.trim().isNotEmpty).toList();
+  }
+
+  int? _firstInvalidBusLeg(MultiDestinationBookingState state) {
+    for (int i = 0; i < _legCount; i++) {
+      if (_isTrainPerLeg[i]) continue;
+      final rawSeats = state.selectedSeats[i] ?? const <String>[];
+      final validSeats = _passengerEntriesForLeg(state, i);
+      if (rawSeats.isEmpty || rawSeats.length != validSeats.length) {
+        return i;
+      }
+    }
+    return null;
+  }
+
   @override
   void initState() {
     super.initState();
     final cubit = context.read<MultiDestinationBookingCubit>();
     _legCount = cubit.state.legSummaries.length;
 
-    // Build controllers per leg based on actual seat count for that leg
-    _seatCounts = List.generate(
-      _legCount,
-      (i) => cubit.state.selectedSeats[i]?.length ?? 0,
-    );
-
     _isTrainPerLeg = List.generate(_legCount, (i) {
       final trip = cubit.state.selectedTrips[i];
       return _isTrain(trip);
     });
+
+    // Build controllers per leg based on actual passenger/seat count for that leg
+    _seatCounts = List.generate(
+      _legCount,
+      (i) => _passengerEntriesForLeg(cubit.state, i).length,
+    );
 
     _controllers = List.generate(
       _legCount,
@@ -213,7 +234,7 @@ class _MultiDestinationPassengerFormScreenState
     Map<int, List<Map<String, dynamic>>> allLegPassengers = {};
 
     for (int legIndex = 0; legIndex < _legCount; legIndex++) {
-      final seats = cubit.state.selectedSeats[legIndex]!;
+      final seats = _passengerEntriesForLeg(cubit.state, legIndex);
       final count = _seatCounts[legIndex];
       List<Map<String, dynamic>> legPass = [];
 
@@ -344,6 +365,59 @@ class _MultiDestinationPassengerFormScreenState
                 final loyaltyBalance = profileState is ProfileLoaded
                     ? (profileState.profile.loyaltyPointsBalance ?? 0)
                     : 0;
+                final invalidBusLeg = _firstInvalidBusLeg(state);
+
+                if (invalidBusLeg != null) {
+                  return SafeArea(
+                    child: Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(24),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(
+                              Icons.event_seat_outlined,
+                              color: ColorsManager.accentCyan,
+                              size: 48,
+                            ),
+                            const SizedBox(height: 16),
+                            Text(
+                              AppLocalizations.of(
+                                context,
+                              )!.selectSeatsForLeg('${invalidBusLeg + 1}'),
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              AppLocalizations.of(context)!.pleaseSelectSeat,
+                              style: const TextStyle(
+                                color: ColorsManager.textMuted,
+                                fontSize: 13,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                            const SizedBox(height: 20),
+                            ElevatedButton(
+                              onPressed: () => Navigator.pop(context),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: ColorsManager.accentCyan,
+                              ),
+                              child: Text(
+                                AppLocalizations.of(context)!.previous,
+                                style: const TextStyle(color: Colors.white),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
+                }
 
                 return SafeArea(
                   child: Form(
@@ -378,11 +452,21 @@ class _MultiDestinationPassengerFormScreenState
                                 ) ...[
                                   PassengerCard(
                                     index: pIndex + 1,
-                                    seatLabel: AppLocalizations.of(context)!
-                                        .seatLabel(
-                                          state.selectedSeats[legIndex]![pIndex]
-                                              .toString(),
-                                        ),
+                                    label: _isTrainPerLeg[legIndex]
+                                        ? AppLocalizations.of(
+                                            context,
+                                          )!.passengerN('${pIndex + 1}')
+                                        : null,
+                                    seatLabel: _isTrainPerLeg[legIndex]
+                                        ? null
+                                        : AppLocalizations.of(
+                                            context,
+                                          )!.seatLabel(
+                                            _passengerEntriesForLeg(
+                                              state,
+                                              legIndex,
+                                            )[pIndex],
+                                          ),
                                     controllers: _controllers[legIndex][pIndex],
                                     isTrain: _isTrainPerLeg[legIndex],
                                   ),

@@ -139,20 +139,31 @@ class MultiDestinationBookingCubit extends Cubit<MultiDestinationBookingState> {
   }
 
   void selectTripForLeg(TripResultEntity trip, CoachClassEntity coachClass) {
+    final legIndex = state.currentSearchLegIndex;
     final updatedTrips = Map<int, TripResultEntity>.from(state.selectedTrips);
     final updatedClasses = Map<int, CoachClassEntity>.from(
       state.selectedClasses,
     );
+    final updatedSeats = Map<int, List<String>>.from(state.selectedSeats);
 
-    updatedTrips[state.currentSearchLegIndex] = trip;
-    updatedClasses[state.currentSearchLegIndex] = coachClass;
+    updatedTrips[legIndex] = trip;
+    updatedClasses[legIndex] = coachClass;
 
-    if (state.currentSearchLegIndex < state.legSummaries.length - 1) {
+    for (int i = legIndex + 1; i < state.legSummaries.length; i++) {
+      updatedTrips.remove(i);
+      updatedClasses.remove(i);
+    }
+    for (int i = legIndex; i < state.legSummaries.length; i++) {
+      updatedSeats.remove(i);
+    }
+
+    if (legIndex < state.legSummaries.length - 1) {
       emit(
         state.copyWith(
           selectedTrips: updatedTrips,
           selectedClasses: updatedClasses,
-          currentSearchLegIndex: state.currentSearchLegIndex + 1,
+          selectedSeats: updatedSeats,
+          currentSearchLegIndex: legIndex + 1,
         ),
       );
       _searchCurrentLeg();
@@ -161,6 +172,7 @@ class MultiDestinationBookingCubit extends Cubit<MultiDestinationBookingState> {
         state.copyWith(
           selectedTrips: updatedTrips,
           selectedClasses: updatedClasses,
+          selectedSeats: updatedSeats,
           currentStep: MultiDestinationBookingStep.selectSeats,
           currentSeatLegIndex: 0,
         ),
