@@ -298,7 +298,13 @@ class MultiDestinationBookingCubit extends Cubit<MultiDestinationBookingState> {
       final checkoutResult = await checkoutUseCase(pointsToRedeem: pointsToRedeem);
       if (isClosed) return;
       checkoutResult.fold(
-        (failure) => emit(state.copyWith(isBookingNow: false, cartError: failure.message)),
+        (failure) => emit(
+          state.copyWith(
+            isBookingNow: false,
+            cartSuccess: true,
+            cartError: failure.message,
+          ),
+        ),
         (_) => emit(state.copyWith(isBookingNow: false, checkoutSuccess: true)),
       );
     } catch (e) {

@@ -4,6 +4,7 @@ import 'package:transportation_app/core/helper/extensions.dart';
 import 'package:transportation_app/core/l10n/app_localizations.dart';
 import 'package:transportation_app/core/routing/routes.dart';
 import 'package:transportation_app/core/theming/colors.dart';
+import 'package:transportation_app/core/utils/error_localizer.dart';
 import 'package:transportation_app/features/multidestination/presentation/cubit/multi_destination_booking_cubit.dart';
 import 'package:transportation_app/features/multidestination/presentation/cubit/multi_destination_booking_state.dart';
 import 'package:transportation_app/features/multidestination/presentation/screens/multidestination_summary_screen.dart';
@@ -292,7 +293,26 @@ class _MultiDestinationPassengerFormScreenState
                   current.checkoutSuccess ||
                   current.cartError != null,
               listener: (context, state) {
-                if (state.checkoutSuccess || state.cartSuccess) {
+                if (state.cartError != null && state.cartSuccess) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        AppLocalizations.of(
+                          context,
+                        )!.ticketAddedButCheckoutFailed(
+                          ErrorLocalizer.localize(context, state.cartError!),
+                        ),
+                      ),
+                      backgroundColor: Colors.orange,
+                      duration: const Duration(seconds: 4),
+                    ),
+                  );
+                  Navigator.pushNamedAndRemoveUntil(
+                    context,
+                    AppRoutes.cartScreen,
+                    _keepHomeRoute,
+                  );
+                } else if (state.checkoutSuccess || state.cartSuccess) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text(
@@ -311,7 +331,9 @@ class _MultiDestinationPassengerFormScreenState
                 } else if (state.cartError != null) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text(state.cartError!),
+                      content: Text(
+                        ErrorLocalizer.localize(context, state.cartError!),
+                      ),
                       backgroundColor: Colors.red,
                     ),
                   );
