@@ -15,6 +15,7 @@ class MultiDestinationBookingState extends Equatable {
   final bool isSearching;
   final String? searchError;
   final List<TripResultEntity>? searchResults;
+  final List<TripResultEntity>? unfilteredSearchResults;
   final int currentPage;
   final int totalPages;
   final bool isFetchingMore;
@@ -42,6 +43,7 @@ class MultiDestinationBookingState extends Equatable {
     this.isSearching = false,
     this.searchError,
     this.searchResults,
+    this.unfilteredSearchResults,
     this.currentPage = 1,
     this.totalPages = 1,
     this.isFetchingMore = false,
@@ -69,6 +71,7 @@ class MultiDestinationBookingState extends Equatable {
     String? searchError,
     bool clearSearchError = false,
     List<TripResultEntity>? searchResults,
+    List<TripResultEntity>? unfilteredSearchResults,
     int? currentPage,
     int? totalPages,
     bool? isFetchingMore,
@@ -92,6 +95,8 @@ class MultiDestinationBookingState extends Equatable {
       isSearching: isSearching ?? this.isSearching,
       searchError: clearSearchError ? null : (searchError ?? this.searchError),
       searchResults: searchResults ?? this.searchResults,
+      unfilteredSearchResults:
+          unfilteredSearchResults ?? this.unfilteredSearchResults,
       currentPage: currentPage ?? this.currentPage,
       totalPages: totalPages ?? this.totalPages,
       isFetchingMore: isFetchingMore ?? this.isFetchingMore,
@@ -116,6 +121,7 @@ class MultiDestinationBookingState extends Equatable {
     isSearching,
     searchError,
     searchResults,
+    unfilteredSearchResults,
     currentPage,
     totalPages,
     isFetchingMore,

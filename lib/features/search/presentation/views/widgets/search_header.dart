@@ -7,12 +7,14 @@ class SearchHeader extends StatelessWidget {
   final SearchParams? params;
   final int filterCount;
   final VoidCallback? onFilter;
+  final bool showFilterButton;
 
   const SearchHeader({
     super.key,
     this.params,
     this.filterCount = 0,
     this.onFilter,
+    this.showFilterButton = true,
   });
 
   @override
@@ -101,7 +103,10 @@ class SearchHeader extends StatelessWidget {
           const SizedBox(width: 12),
 
           // Filter button with active badge
-          _FilterButton(filterCount: filterCount, onFilter: onFilter),
+          if (showFilterButton)
+            _FilterButton(filterCount: filterCount, onFilter: onFilter)
+          else
+            const SizedBox(width: 44, height: 44),
         ],
       ),
     );

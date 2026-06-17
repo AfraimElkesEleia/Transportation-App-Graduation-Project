@@ -16,23 +16,20 @@ class LocaleCubit extends Cubit<Locale> {
     required this.tokenManager,
     required this.getProfileUseCase,
     required this.updateLanguageUseCase,
-  }) : super(const Locale('ar'));
+  }) : super(Locale(_initialLanguageCode()));
 
-  /// Called at startup — reads Hive, falls back to device locale, and syncs
+  /// Called at startup — applies the local language first, then refreshes it
+  /// from the authenticated profile when available.
   Future<void> init() async {
-    if (await applyPreferredLanguageFromProfile()) return;
-
     final box = Hive.box(LocaleBox.boxName);
-    final saved = box.get(LocaleBox.localeKey) as String?;
-    if (saved != null) {
-      emit(Locale(saved));
-      return;
+    final localLanguage = _localLanguageCode(box);
+    await box.put(LocaleBox.localeKey, localLanguage);
+
+    if (state.languageCode != localLanguage) {
+      emit(Locale(localLanguage));
     }
-    // First launch → detect device locale
-    final deviceLang = WidgetsBinding.instance.platformDispatcher.locale.languageCode;
-    final lang = deviceLang == 'ar' ? 'ar' : 'en';
-    await box.put(LocaleBox.localeKey, lang);
-    emit(Locale(lang));
+
+    await applyPreferredLanguageFromProfile();
   }
 
   Future<void> setLocale(String code) async {
@@ -85,6 +82,32 @@ class LocaleCubit extends Cubit<Locale> {
   bool get isArabic => state.languageCode == 'ar';
 
   String? _normalizeLanguage(String? language) {
+    return _normalizeLanguageCode(language);
+  }
+
+  static String _initialLanguageCode() {
+    try {
+      if (Hive.isBoxOpen(LocaleBox.boxName)) {
+        return _localLanguageCode(Hive.box(LocaleBox.boxName));
+      }
+    } catch (_) {
+      // Fall through to device/default language.
+    }
+    return _deviceLanguageCode();
+  }
+
+  static String _localLanguageCode(Box<dynamic> box) {
+    final saved = _normalizeLanguageCode(box.get(LocaleBox.localeKey) as String?);
+    return saved ?? _deviceLanguageCode();
+  }
+
+  static String _deviceLanguageCode() {
+    final deviceLang =
+        WidgetsBinding.instance.platformDispatcher.locale.languageCode;
+    return deviceLang == 'ar' ? 'ar' : 'en';
+  }
+
+  static String? _normalizeLanguageCode(String? language) {
     final clean = language?.trim().toLowerCase();
     if (clean == null || clean.isEmpty) return null;
     return clean == 'ar' ? 'ar' : 'en';

@@ -15,6 +15,7 @@ import 'package:transportation_app/features/search/domain/entities/indirect_trip
 import 'package:transportation_app/features/home/domain/entities/search_params.dart';
 import 'package:transportation_app/features/search/presentation/views/widgets/search_error_view.dart';
 import 'package:transportation_app/features/search/presentation/views/widgets/trips_result_card.dart';
+import 'package:transportation_app/features/search/presentation/views/widgets/filter_bottom_sheet.dart';
 
 class IndirectBookingScreen extends StatefulWidget {
   final IndirectTripEntity indirectTrip;
@@ -119,6 +120,72 @@ class _IndirectBookingScreenState extends State<IndirectBookingScreen> {
     }
   }
 
+  void _openFilter(IndirectBookingState state, {required bool isLeg1}) {
+    final params = state.activeParams ?? widget.activeParams;
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => FilterBottomSheet(
+        activeParams: params,
+        onApply: (newParams) => isLeg1
+            ? _searchLeg1WithParams(newParams)
+            : _searchLeg2WithParams(state, newParams),
+        onReset: () {
+          final reset = params.copyWith(
+            transport: TransportType.all,
+            sortBy: SortBy.departureTime,
+            clearMaxPrice: true,
+            preferredAgencies: const [],
+            clearTimeFilters: true,
+            newPage: 1,
+          );
+          if (isLeg1) {
+            _searchLeg1WithParams(reset);
+          } else {
+            _searchLeg2WithParams(state, reset);
+          }
+        },
+      ),
+    );
+  }
+
+  void _searchLeg1WithParams(SearchParams params) {
+    context.read<IndirectBookingCubit>().searchLeg1(
+      fromStationId: widget.indirectTrip.firstLeg.originStationId,
+      toStationId: widget.indirectTrip.firstLeg.destinationStationId,
+      fromDisplayName: widget.indirectTrip.firstLeg.originStationName.isNotEmpty
+          ? widget.indirectTrip.firstLeg.originStationName
+          : widget.indirectTrip.firstLeg.originGovernorate,
+      toDisplayName:
+          widget.indirectTrip.firstLeg.destinationStationName.isNotEmpty
+          ? widget.indirectTrip.firstLeg.destinationStationName
+          : widget.indirectTrip.firstLeg.destinationGovernorate,
+      date: widget.dateLeg1,
+      activeParams: params,
+    );
+  }
+
+  void _searchLeg2WithParams(IndirectBookingState state, SearchParams params) {
+    final leg1ArrivalTime =
+        state.selectedTripLeg1?.arrivalTime ?? DateTime.now();
+    context.read<IndirectBookingCubit>().searchLeg2(
+      fromStationId: widget.indirectTrip.secondLeg.originStationId,
+      toStationId: widget.indirectTrip.secondLeg.destinationStationId,
+      fromDisplayName:
+          widget.indirectTrip.secondLeg.originStationName.isNotEmpty
+          ? widget.indirectTrip.secondLeg.originStationName
+          : widget.indirectTrip.secondLeg.originGovernorate,
+      toDisplayName:
+          widget.indirectTrip.secondLeg.destinationStationName.isNotEmpty
+          ? widget.indirectTrip.secondLeg.destinationStationName
+          : widget.indirectTrip.secondLeg.destinationGovernorate,
+      date: widget.dateLeg2,
+      leg1ArrivalTime: leg1ArrivalTime,
+      activeParams: params,
+    );
+  }
+
   Widget _buildStepContent(BuildContext context, IndirectBookingState state) {
     switch (state.currentStep) {
       case IndirectBookingStep.searchLeg1:
@@ -160,72 +227,114 @@ class _IndirectBookingScreenState extends State<IndirectBookingScreen> {
         ),
       );
     }
-    if (state.leg1Results == null || state.leg1Results!.isEmpty) {
-      return const Center(
-        child: Text(
-          'No trips available for Leg 1 on the selected date.',
-          style: TextStyle(color: Colors.white),
-        ),
-      );
-    }
-
-    return NotificationListener<ScrollNotification>(
-      onNotification: (scrollInfo) {
-        if (!state.isFetchingMoreLeg1 &&
-            state.hasMoreLeg1Pages &&
-            scrollInfo.metrics.pixels >=
-                scrollInfo.metrics.maxScrollExtent - 200) {
+    final hasResults =
+        state.leg1Results != null && state.leg1Results!.isNotEmpty;
+    if (!hasResults &&
+        state.hasMoreLeg1Pages &&
+        !state.isFetchingMoreLeg1) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
           context.read<IndirectBookingCubit>().loadMoreLeg1();
         }
-        return false;
-      },
-      child: ListView.builder(
-        padding: const EdgeInsets.all(16),
-        itemCount:
-            state.leg1Results!.length + (state.isFetchingMoreLeg1 ? 1 : 0),
-        itemBuilder: (context, index) {
-          if (index == state.leg1Results!.length) {
-            return const Padding(
-              padding: EdgeInsets.symmetric(vertical: 24),
-              child: Center(
-                child: CircularProgressIndicator(
-                  color: ColorsManager.accentCyan,
+      });
+    }
+
+    return Column(
+      children: [
+        _LegSearchHeader(
+          title: 'Select Leg 1 trip',
+          onFilter: () => _openFilter(state, isLeg1: true),
+        ),
+        Expanded(
+          child: !hasResults
+              ? Center(
+                  child: state.isFetchingMoreLeg1 || state.hasMoreLeg1Pages
+                      ? const CircularProgressIndicator(
+                          color: ColorsManager.accentCyan,
+                        )
+                      : const Text(
+                          'No trips available for Leg 1 on the selected date.',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                )
+              : NotificationListener<ScrollNotification>(
+                  onNotification: (scrollInfo) {
+                    if (!state.isFetchingMoreLeg1 &&
+                        state.hasMoreLeg1Pages &&
+                        scrollInfo.metrics.pixels >=
+                            scrollInfo.metrics.maxScrollExtent - 200) {
+                      context.read<IndirectBookingCubit>().loadMoreLeg1();
+                    }
+                    return false;
+                  },
+                  child: ListView.builder(
+                    padding: const EdgeInsets.all(16),
+                    itemCount:
+                        state.leg1Results!.length +
+                        (state.isFetchingMoreLeg1 ? 1 : 0),
+                    itemBuilder: (context, index) {
+                      if (index == state.leg1Results!.length) {
+                        return const Padding(
+                          padding: EdgeInsets.symmetric(vertical: 24),
+                          child: Center(
+                            child: CircularProgressIndicator(
+                              color: ColorsManager.accentCyan,
+                            ),
+                          ),
+                        );
+                      }
+                      final t = state.leg1Results![index];
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 16),
+                        child: TripResultCard(
+                          trip: t,
+                          onBookOverride: (trip, coachClass) {
+                            final cubit = context.read<IndirectBookingCubit>();
+                            cubit.selectTripLeg1(trip, coachClass);
+                            cubit.searchLeg2(
+                              fromStationId: widget
+                                  .indirectTrip
+                                  .secondLeg
+                                  .originStationId,
+                              toStationId: widget
+                                  .indirectTrip
+                                  .secondLeg
+                                  .destinationStationId,
+                              fromDisplayName: widget
+                                      .indirectTrip
+                                      .secondLeg
+                                      .originStationName
+                                      .isNotEmpty
+                                  ? widget.indirectTrip.secondLeg.originStationName
+                                  : widget
+                                      .indirectTrip
+                                      .secondLeg
+                                      .originGovernorate,
+                              toDisplayName: widget
+                                      .indirectTrip
+                                      .secondLeg
+                                      .destinationStationName
+                                      .isNotEmpty
+                                  ? widget
+                                      .indirectTrip
+                                      .secondLeg
+                                      .destinationStationName
+                                  : widget
+                                      .indirectTrip
+                                      .secondLeg
+                                      .destinationGovernorate,
+                              date: widget.dateLeg2,
+                              leg1ArrivalTime:
+                                  trip.arrivalTime ?? DateTime.now(),
+                            );
+                          },
+                        ),
+                      );
+                    },
+                  ),
                 ),
-              ),
-            );
-          }
-          final t = state.leg1Results![index];
-          return Padding(
-            padding: const EdgeInsets.only(bottom: 16),
-            child: TripResultCard(
-              trip: t,
-              onBookOverride: (trip, coachClass) {
-                final cubit = context.read<IndirectBookingCubit>();
-                cubit.selectTripLeg1(trip, coachClass);
-                cubit.searchLeg2(
-                  fromStationId: widget.indirectTrip.secondLeg.originStationId,
-                  toStationId:
-                      widget.indirectTrip.secondLeg.destinationStationId,
-                  fromDisplayName:
-                      widget.indirectTrip.secondLeg.originStationName.isNotEmpty
-                      ? widget.indirectTrip.secondLeg.originStationName
-                      : widget.indirectTrip.secondLeg.originGovernorate,
-                  toDisplayName:
-                      widget
-                          .indirectTrip
-                          .secondLeg
-                          .destinationStationName
-                          .isNotEmpty
-                      ? widget.indirectTrip.secondLeg.destinationStationName
-                      : widget.indirectTrip.secondLeg.destinationGovernorate,
-                  date: widget.dateLeg2,
-                  leg1ArrivalTime: trip.arrivalTime ?? DateTime.now(),
-                );
-              },
-            ),
-          );
-        },
-      ),
+        ),
+      ],
     );
   }
 
@@ -278,130 +387,137 @@ class _IndirectBookingScreenState extends State<IndirectBookingScreen> {
         ),
       );
     }
-    if (state.leg2Results == null || state.leg2Results!.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(
-              Icons.departure_board,
-              color: ColorsManager.textMuted,
-              size: 60,
-            ),
-            const SizedBox(height: 16),
-            const Text(
-              'No connecting trips found.',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 8),
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 40),
-              child: Text(
-                'There are no valid trips leaving at least 1 hour after your Leg 1 arrival on this date.',
-                textAlign: TextAlign.center,
-                style: TextStyle(color: ColorsManager.textMuted, fontSize: 14),
-              ),
-            ),
-            const SizedBox(height: 24),
-            ElevatedButton.icon(
-              onPressed: () {
-                Navigator.pop(
-                  context,
-                ); // Jump out of builder entirely to modify dates on the Card.
-              },
-              icon: const Icon(Icons.edit_calendar),
-              label: const Text('Change Travel Dates'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: ColorsManager.seatContainerBg,
-                foregroundColor: Colors.white,
-              ),
-            ),
-            TextButton(
-              onPressed: () =>
-                  context.read<IndirectBookingCubit>().goBackToLeg1Search(),
-              child: const Text(
-                'Back to Leg 1 Trip',
-                style: TextStyle(color: ColorsManager.accentCyan),
-              ),
-            ),
-          ],
-        ),
-      );
+    final hasResults =
+        state.leg2Results != null && state.leg2Results!.isNotEmpty;
+    if (!hasResults &&
+        state.hasMoreLeg2Pages &&
+        !state.isFetchingMoreLeg2) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          final leg1Arr = state.selectedTripLeg1!.arrivalTime ?? DateTime.now();
+          context.read<IndirectBookingCubit>().loadMoreLeg2(leg1Arr);
+        }
+      });
     }
 
     return Column(
       children: [
-        Container(
-          width: double.infinity,
-          color: ColorsManager.surfaceChip,
-          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-          child: Row(
-            children: [
-              IconButton(
-                icon: const Icon(Icons.arrow_back, color: Colors.white),
-                onPressed: () =>
-                    context.read<IndirectBookingCubit>().goBackToLeg1Search(),
-              ),
-              const Expanded(
-                child: Text(
-                  'Select connection (at least 1h layover)',
-                  style: TextStyle(color: Colors.white70, fontSize: 13),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-              const SizedBox(width: 48),
-            ],
-          ),
+        _LegSearchHeader(
+          title: 'Select connection (at least 1h layover)',
+          onBack: () =>
+              context.read<IndirectBookingCubit>().goBackToLeg1Search(),
+          onFilter: () => _openFilter(state, isLeg1: false),
         ),
         Expanded(
-          child: NotificationListener<ScrollNotification>(
-            onNotification: (scrollInfo) {
-              if (!state.isFetchingMoreLeg2 &&
-                  state.hasMoreLeg2Pages &&
-                  scrollInfo.metrics.pixels >=
-                      scrollInfo.metrics.maxScrollExtent - 200) {
-                final leg1Arr =
-                    state.selectedTripLeg1!.arrivalTime ?? DateTime.now();
-                context.read<IndirectBookingCubit>().loadMoreLeg2(leg1Arr);
-              }
-              return false;
-            },
-            child: ListView.builder(
-              padding: const EdgeInsets.all(16),
-              itemCount:
-                  state.leg2Results!.length +
-                  (state.isFetchingMoreLeg2 ? 1 : 0),
-              itemBuilder: (context, index) {
-                if (index == state.leg2Results!.length) {
-                  return const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 24),
-                    child: Center(
-                      child: CircularProgressIndicator(
-                        color: ColorsManager.accentCyan,
-                      ),
-                    ),
-                  );
-                }
-                final t = state.leg2Results![index];
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 16),
-                  child: TripResultCard(
-                    trip: t,
-                    onBookOverride: (trip, coachClass) {
-                      context.read<IndirectBookingCubit>().selectTripLeg2(
-                        trip,
-                        coachClass,
+          child: !hasResults
+              ? Center(
+                  child: state.isFetchingMoreLeg2 || state.hasMoreLeg2Pages
+                      ? const CircularProgressIndicator(
+                          color: ColorsManager.accentCyan,
+                        )
+                      : Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(
+                              Icons.departure_board,
+                              color: ColorsManager.textMuted,
+                              size: 60,
+                            ),
+                            const SizedBox(height: 16),
+                            const Text(
+                              'No connecting trips found.',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            const Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 40),
+                              child: Text(
+                                'There are no valid trips leaving at least 1 hour after your Leg 1 arrival on this date.',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  color: ColorsManager.textMuted,
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 24),
+                            ElevatedButton.icon(
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                              icon: const Icon(Icons.edit_calendar),
+                              label: const Text('Change Travel Dates'),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor:
+                                    ColorsManager.seatContainerBg,
+                                foregroundColor: Colors.white,
+                              ),
+                            ),
+                            TextButton(
+                              onPressed: () => context
+                                  .read<IndirectBookingCubit>()
+                                  .goBackToLeg1Search(),
+                              child: const Text(
+                                'Back to Leg 1 Trip',
+                                style: TextStyle(
+                                  color: ColorsManager.accentCyan,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                )
+              : NotificationListener<ScrollNotification>(
+                  onNotification: (scrollInfo) {
+                    if (!state.isFetchingMoreLeg2 &&
+                        state.hasMoreLeg2Pages &&
+                        scrollInfo.metrics.pixels >=
+                            scrollInfo.metrics.maxScrollExtent - 200) {
+                      final leg1Arr =
+                          state.selectedTripLeg1!.arrivalTime ??
+                          DateTime.now();
+                      context.read<IndirectBookingCubit>().loadMoreLeg2(
+                        leg1Arr,
+                      );
+                    }
+                    return false;
+                  },
+                  child: ListView.builder(
+                    padding: const EdgeInsets.all(16),
+                    itemCount:
+                        state.leg2Results!.length +
+                        (state.isFetchingMoreLeg2 ? 1 : 0),
+                    itemBuilder: (context, index) {
+                      if (index == state.leg2Results!.length) {
+                        return const Padding(
+                          padding: EdgeInsets.symmetric(vertical: 24),
+                          child: Center(
+                            child: CircularProgressIndicator(
+                              color: ColorsManager.accentCyan,
+                            ),
+                          ),
+                        );
+                      }
+                      final t = state.leg2Results![index];
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 16),
+                        child: TripResultCard(
+                          trip: t,
+                          onBookOverride: (trip, coachClass) {
+                            context.read<IndirectBookingCubit>().selectTripLeg2(
+                              trip,
+                              coachClass,
+                            );
+                          },
+                        ),
                       );
                     },
                   ),
-                );
-              },
-            ),
-          ),
+                ),
         ),
       ],
     );
@@ -948,6 +1064,49 @@ class _Stepper extends StatelessWidget {
             ),
           );
         }),
+      ),
+    );
+  }
+}
+
+class _LegSearchHeader extends StatelessWidget {
+  final String title;
+  final VoidCallback? onBack;
+  final VoidCallback onFilter;
+
+  const _LegSearchHeader({
+    required this.title,
+    required this.onFilter,
+    this.onBack,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      color: ColorsManager.surfaceChip,
+      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+      child: Row(
+        children: [
+          if (onBack == null)
+            const SizedBox(width: 48)
+          else
+            IconButton(
+              icon: const Icon(Icons.arrow_back, color: Colors.white),
+              onPressed: onBack,
+            ),
+          Expanded(
+            child: Text(
+              title,
+              style: const TextStyle(color: Colors.white70, fontSize: 13),
+              textAlign: TextAlign.center,
+            ),
+          ),
+          IconButton(
+            icon: const Icon(Icons.tune, color: Colors.white, size: 20),
+            onPressed: onFilter,
+          ),
+        ],
       ),
     );
   }

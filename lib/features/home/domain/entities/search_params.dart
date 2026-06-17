@@ -1,6 +1,8 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 
+const Object _unset = Object();
+
 enum TransportType { all, bus, train }
 
 extension TransportTypeExt on TransportType {
@@ -139,10 +141,10 @@ class SearchParams extends Equatable {
     double? maxPrice,
     bool clearMaxPrice = false,
     List<String>? preferredAgencies,
-    TimeOfDay? departureFrom,
-    TimeOfDay? departureTo,
-    TimeOfDay? arrivalFrom,
-    TimeOfDay? arrivalTo,
+    Object? departureFrom = _unset,
+    Object? departureTo = _unset,
+    Object? arrivalFrom = _unset,
+    Object? arrivalTo = _unset,
     bool clearTimeFilters = false,
     int? newPage,
   }) {
@@ -165,10 +167,24 @@ class SearchParams extends Equatable {
       preferredAgencies: preferredAgencies ?? this.preferredAgencies,
       departureFrom: clearTimeFilters
           ? null
-          : departureFrom ?? this.departureFrom,
-      departureTo: clearTimeFilters ? null : departureTo ?? this.departureTo,
-      arrivalFrom: clearTimeFilters ? null : arrivalFrom ?? this.arrivalFrom,
-      arrivalTo: clearTimeFilters ? null : arrivalTo ?? this.arrivalTo,
+          : departureFrom == _unset
+              ? this.departureFrom
+              : departureFrom as TimeOfDay?,
+      departureTo: clearTimeFilters
+          ? null
+          : departureTo == _unset
+              ? this.departureTo
+              : departureTo as TimeOfDay?,
+      arrivalFrom: clearTimeFilters
+          ? null
+          : arrivalFrom == _unset
+              ? this.arrivalFrom
+              : arrivalFrom as TimeOfDay?,
+      arrivalTo: clearTimeFilters
+          ? null
+          : arrivalTo == _unset
+              ? this.arrivalTo
+              : arrivalTo as TimeOfDay?,
       pageNumber: newPage ?? pageNumber, 
       pageSize: pageSize,
     );

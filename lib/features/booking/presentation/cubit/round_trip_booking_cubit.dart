@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:transportation_app/features/booking/domain/usecases/add_to_cart_usecase.dart';
 import 'package:transportation_app/features/booking/domain/usecases/checkout_usecase.dart';
@@ -30,6 +31,7 @@ class RoundTripBookingCubit extends Cubit<RoundTripBookingState> {
         isLoadingOutbound: true,
         clearOutboundError: true,
         outboundResults: [],
+        unfilteredOutboundResults: [],
       ),
     );
 
@@ -46,7 +48,8 @@ class RoundTripBookingCubit extends Cubit<RoundTripBookingState> {
       (paged) => emit(
         state.copyWith(
           isLoadingOutbound: false,
-          outboundResults: paged.items,
+          outboundResults: _applyTimeFilters(paged.items, params),
+          unfilteredOutboundResults: paged.items,
           outboundCurrentPage: paged.currentPage,
           outboundTotalPages: paged.totalPages,
         ),
@@ -73,17 +76,23 @@ class RoundTripBookingCubit extends Cubit<RoundTripBookingState> {
     result.fold(
       (failure) => emit(state.copyWith(isFetchingMoreOutbound: false)),
       (paged) {
-        final existingIds = state.outboundResults!
+        final unfiltered = state.unfilteredOutboundResults ?? const [];
+        final existingIds = unfiltered
             .map((t) => t.tripOccurrenceId)
             .toSet();
         final newItems = paged.items
             .where((t) => !existingIds.contains(t.tripOccurrenceId))
             .toList();
+        final unfilteredCombined = [...unfiltered, ...newItems];
 
         emit(
           state.copyWith(
             isFetchingMoreOutbound: false,
-            outboundResults: [...state.outboundResults!, ...newItems],
+            outboundResults: _applyTimeFilters(
+              unfilteredCombined,
+              state.activeParams!,
+            ),
+            unfilteredOutboundResults: unfilteredCombined,
             outboundCurrentPage: paged.currentPage,
             outboundTotalPages: paged.totalPages,
           ),
@@ -142,6 +151,7 @@ class RoundTripBookingCubit extends Cubit<RoundTripBookingState> {
         isLoadingReturn: true,
         clearReturnError: true,
         returnResults: [],
+        unfilteredReturnResults: [],
       ),
     );
 
@@ -181,7 +191,8 @@ class RoundTripBookingCubit extends Cubit<RoundTripBookingState> {
         emit(
           state.copyWith(
             isLoadingReturn: false,
-            returnResults: paged.items,
+            returnResults: _applyTimeFilters(paged.items, returnParams),
+            unfilteredReturnResults: paged.items,
             returnCurrentPage: paged.currentPage,
             returnTotalPages: paged.totalPages,
           ),
@@ -232,18 +243,21 @@ class RoundTripBookingCubit extends Cubit<RoundTripBookingState> {
     result.fold(
       (failure) => emit(state.copyWith(isFetchingMoreReturn: false)),
       (paged) {
-        final existingIds = state.returnResults!
+        final unfiltered = state.unfilteredReturnResults ?? const [];
+        final existingIds = unfiltered
             .map((t) => t.tripOccurrenceId)
             .toSet();
         final newItems = paged.items.where((t) {
           if (existingIds.contains(t.tripOccurrenceId)) return false;
           return true;
         }).toList();
+        final unfilteredCombined = [...unfiltered, ...newItems];
 
         emit(
           state.copyWith(
             isFetchingMoreReturn: false,
-            returnResults: [...state.returnResults!, ...newItems],
+            returnResults: _applyTimeFilters(unfilteredCombined, returnParams),
+            unfilteredReturnResults: unfilteredCombined,
             returnCurrentPage: paged.currentPage,
             returnTotalPages: paged.totalPages,
           ),
@@ -483,4 +497,40 @@ class RoundTripBookingCubit extends Cubit<RoundTripBookingState> {
 
     goBackToReturn();
   }
+
+  List<TripResultEntity> _applyTimeFilters(
+    List<TripResultEntity> trips,
+    SearchParams params,
+  ) {
+    if (!params.hasTimeFilters) return trips;
+
+    return trips.where((t) {
+      if (params.departureFrom != null || params.departureTo != null) {
+        final depMins = _minsFromDateTime(t.departureTime);
+        if (params.departureFrom != null &&
+            depMins < _mins(params.departureFrom!)) {
+          return false;
+        }
+        if (params.departureTo != null &&
+            depMins > _mins(params.departureTo!)) {
+          return false;
+        }
+      }
+      if (params.arrivalFrom != null || params.arrivalTo != null) {
+        if (t.arrivalTime == null) return false;
+        final arrMins = _minsFromDateTime(t.arrivalTime!);
+        if (params.arrivalFrom != null &&
+            arrMins < _mins(params.arrivalFrom!)) {
+          return false;
+        }
+        if (params.arrivalTo != null && arrMins > _mins(params.arrivalTo!)) {
+          return false;
+        }
+      }
+      return true;
+    }).toList();
+  }
+
+  int _mins(TimeOfDay t) => t.hour * 60 + t.minute;
+  int _minsFromDateTime(DateTime t) => t.hour * 60 + t.minute;
 }

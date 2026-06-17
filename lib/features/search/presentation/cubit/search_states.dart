@@ -15,6 +15,7 @@ class SearchLoading extends SearchState {}
 
 class SearchLoaded extends SearchState {
   final List<TripResultEntity> directItems;
+  final List<TripResultEntity> unfilteredDirectItems;
   final int directCurrentPage;
   final int directTotalPages;
   final bool isFetchingMoreDirect;
@@ -28,6 +29,7 @@ class SearchLoaded extends SearchState {
   final SearchParams activeParams;
   const SearchLoaded({
     required this.directItems,
+    List<TripResultEntity>? unfilteredDirectItems,
     required this.directCurrentPage,
     required this.directTotalPages,
     this.isFetchingMoreDirect = false,
@@ -39,13 +41,14 @@ class SearchLoaded extends SearchState {
     this.indirectLoading = false,
     this.indirectError,
     required this.activeParams,
-  });
+  }) : unfilteredDirectItems = unfilteredDirectItems ?? directItems;
 
   bool get hasDirectTrips => directItems.isNotEmpty;
   bool get hasMoreDirectPages => directCurrentPage < directTotalPages;
   bool get hasMoreIndirectPages => indirectCurrentPage < indirectTotalPages;
   SearchLoaded copyWith({
     List<TripResultEntity>? directItems,
+    List<TripResultEntity>? unfilteredDirectItems,
     int? directCurrentPage,
     int? directTotalPages,
     bool? isFetchingMoreDirect,
@@ -61,6 +64,8 @@ class SearchLoaded extends SearchState {
   }) {
     return SearchLoaded(
       directItems: directItems ?? this.directItems,
+      unfilteredDirectItems:
+          unfilteredDirectItems ?? this.unfilteredDirectItems,
       directCurrentPage: directCurrentPage ?? this.directCurrentPage,
       directTotalPages: directTotalPages ?? this.directTotalPages,
       isFetchingMoreDirect: isFetchingMoreDirect ?? this.isFetchingMoreDirect,
@@ -81,6 +86,7 @@ class SearchLoaded extends SearchState {
   @override
   List<Object?> get props => [
     directItems,
+    unfilteredDirectItems,
     directCurrentPage,
     directTotalPages,
     isFetchingMoreDirect,

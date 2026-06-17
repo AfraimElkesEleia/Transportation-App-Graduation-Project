@@ -13,6 +13,7 @@ class RoundTripBookingState extends Equatable {
   final bool isLoadingOutbound;
   final String? outboundError;
   final List<TripResultEntity>? outboundResults;
+  final List<TripResultEntity>? unfilteredOutboundResults;
   final int outboundCurrentPage;
   final int outboundTotalPages;
   final bool isFetchingMoreOutbound;
@@ -25,6 +26,7 @@ class RoundTripBookingState extends Equatable {
   final bool isLoadingReturn;
   final String? returnError;
   final List<TripResultEntity>? returnResults;
+  final List<TripResultEntity>? unfilteredReturnResults;
   final int returnCurrentPage;
   final int returnTotalPages;
   final bool isFetchingMoreReturn;
@@ -66,6 +68,7 @@ class RoundTripBookingState extends Equatable {
     this.isLoadingOutbound = false,
     this.outboundError,
     this.outboundResults,
+    this.unfilteredOutboundResults,
     this.outboundCurrentPage = 1,
     this.outboundTotalPages = 1,
     this.isFetchingMoreOutbound = false,
@@ -77,6 +80,7 @@ class RoundTripBookingState extends Equatable {
     this.isLoadingReturn = false,
     this.returnError,
     this.returnResults,
+    this.unfilteredReturnResults,
     this.returnCurrentPage = 1,
     this.returnTotalPages = 1,
     this.isFetchingMoreReturn = false,
@@ -101,6 +105,7 @@ class RoundTripBookingState extends Equatable {
     String? outboundError,
     bool clearOutboundError = false,
     List<TripResultEntity>? outboundResults,
+    List<TripResultEntity>? unfilteredOutboundResults,
     int? outboundCurrentPage,
     int? outboundTotalPages,
     bool? isFetchingMoreOutbound,
@@ -113,6 +118,7 @@ class RoundTripBookingState extends Equatable {
     String? returnError,
     bool clearReturnError = false,
     List<TripResultEntity>? returnResults,
+    List<TripResultEntity>? unfilteredReturnResults,
     int? returnCurrentPage,
     int? returnTotalPages,
     bool? isFetchingMoreReturn,
@@ -140,6 +146,8 @@ class RoundTripBookingState extends Equatable {
           ? null
           : outboundError ?? this.outboundError,
       outboundResults: outboundResults ?? this.outboundResults,
+      unfilteredOutboundResults:
+          unfilteredOutboundResults ?? this.unfilteredOutboundResults,
       outboundCurrentPage: outboundCurrentPage ?? this.outboundCurrentPage,
       outboundTotalPages: outboundTotalPages ?? this.outboundTotalPages,
       isFetchingMoreOutbound:
@@ -157,6 +165,8 @@ class RoundTripBookingState extends Equatable {
       isLoadingReturn: isLoadingReturn ?? this.isLoadingReturn,
       returnError: clearReturnError ? null : returnError ?? this.returnError,
       returnResults: returnResults ?? this.returnResults,
+      unfilteredReturnResults:
+          unfilteredReturnResults ?? this.unfilteredReturnResults,
       returnCurrentPage: returnCurrentPage ?? this.returnCurrentPage,
       returnTotalPages: returnTotalPages ?? this.returnTotalPages,
       isFetchingMoreReturn: isFetchingMoreReturn ?? this.isFetchingMoreReturn,
@@ -185,6 +195,7 @@ class RoundTripBookingState extends Equatable {
     isLoadingOutbound,
     outboundError,
     outboundResults,
+    unfilteredOutboundResults,
     outboundCurrentPage,
     outboundTotalPages,
     isFetchingMoreOutbound,
@@ -194,6 +205,7 @@ class RoundTripBookingState extends Equatable {
     isLoadingReturn,
     returnError,
     returnResults,
+    unfilteredReturnResults,
     returnCurrentPage,
     returnTotalPages,
     isFetchingMoreReturn,

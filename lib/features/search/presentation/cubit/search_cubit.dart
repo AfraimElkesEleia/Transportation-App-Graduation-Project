@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:transportation_app/features/home/domain/entities/search_params.dart';
@@ -35,11 +36,12 @@ class SearchCubit extends Cubit<SearchState> {
 
     result.fold((failure) => emit(SearchError(failure.message)), (paged) {
       // Apply client-side time filters
-      final filtered = _applyTimeFilters(paged.items, params);
+      final filtered = _applyTimeFilters(paged.items, firstPageParams);
 
       emit(
         SearchLoaded(
           directItems: filtered,
+          unfilteredDirectItems: paged.items,
           directCurrentPage: paged.currentPage,
           directTotalPages: paged.totalPages,
           activeParams: firstPageParams,
@@ -60,6 +62,14 @@ class SearchCubit extends Cubit<SearchState> {
 
     final nextPage = current.directCurrentPage + 1;
     final nextParams = current.activeParams.copyWith(newPage: nextPage);
+    if (kDebugMode) {
+      debugPrint(
+        '[SearchCubit] loadMoreDirect current=${current.directCurrentPage} '
+        'next=$nextPage total=${current.directTotalPages} '
+        'visible=${current.directItems.length} '
+        'loaded=${current.unfilteredDirectItems.length}',
+      );
+    }
     final result = await searchTripsUseCase(nextParams);
     if (isClosed) return;
 
@@ -69,21 +79,34 @@ class SearchCubit extends Cubit<SearchState> {
         emit(current.copyWith(isFetchingMoreDirect: false));
       },
       (paged) {
+        if (kDebugMode) {
+          debugPrint(
+            '[SearchCubit] loaded direct page=${paged.currentPage}/'
+            '${paged.totalPages} totalCount=${paged.totalCount} '
+            'pageSize=${paged.pageSize} items=${paged.items.length}',
+          );
+        }
         // Deduplicate by tripOccurrenceId before appending
-        final existingIds = current.directItems
+        final existingIds = current.unfilteredDirectItems
             .map((t) => t.tripOccurrenceId)
             .toSet();
         final newItems = paged.items
             .where((t) => !existingIds.contains(t.tripOccurrenceId))
             .toList();
 
-        // Apply time filters to new items only, then combine
-        final filteredNew = _applyTimeFilters(newItems, current.activeParams);
-        final combined = [...current.directItems, ...filteredNew];
+        final unfilteredCombined = [
+          ...current.unfilteredDirectItems,
+          ...newItems,
+        ];
+        final visibleCombined = _applyTimeFilters(
+          unfilteredCombined,
+          current.activeParams,
+        );
 
         emit(
           current.copyWith(
-            directItems: combined,
+            directItems: visibleCombined,
+            unfilteredDirectItems: unfilteredCombined,
             directCurrentPage: paged.currentPage,
             directTotalPages: paged.totalPages,
             isFetchingMoreDirect: false,
@@ -185,7 +208,10 @@ class SearchCubit extends Cubit<SearchState> {
         newParams.sortBy != current.activeParams.sortBy ||
         newParams.transport != current.activeParams.transport ||
         newParams.maxPrice != current.activeParams.maxPrice ||
-        newParams.preferredAgencies != current.activeParams.preferredAgencies;
+        !_sameAgencies(
+          newParams.preferredAgencies,
+          current.activeParams.preferredAgencies,
+        );
 
     if (serverParamsChanged) {
       // ── Full reset — new server query from page 1 ──────────
@@ -196,9 +222,12 @@ class SearchCubit extends Cubit<SearchState> {
       await search(newParams.copyWith(newPage: 1));
     } else {
       // ── Time filter only — filter current in-memory list ───
-      final filtered = _applyTimeFilters(current.directItems, newParams);
+      final filtered = _applyTimeFilters(
+        current.unfilteredDirectItems,
+        newParams,
+      );
       emit(current.copyWith(directItems: filtered, activeParams: newParams));
-      // Note: we filter the already-accumulated directItems.
+      // Note: we filter the already-accumulated unfilteredDirectItems.
       // When user loads more pages, new items also get filtered via loadMore.
     }
   }
@@ -239,6 +268,14 @@ class SearchCubit extends Cubit<SearchState> {
   }
 
   int _mins(TimeOfDay t) => t.hour * 60 + t.minute;
+
+  bool _sameAgencies(List<String> a, List<String> b) {
+    if (a.length != b.length) return false;
+    for (var i = 0; i < a.length; i++) {
+      if (a[i] != b[i]) return false;
+    }
+    return true;
+  }
 
   Future<void> _saveToRecentSearches(SearchParams params) async {
     try {

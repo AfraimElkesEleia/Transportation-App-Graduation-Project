@@ -30,6 +30,8 @@ class IndirectBookingState extends Equatable {
   final bool isFetchingMoreLeg2;
 
   final SearchParams? activeParams;
+  final SearchParams? leg1SearchParams;
+  final SearchParams? leg2SearchParams;
 
   // Selections
   final TripResultEntity? selectedTripLeg1;
@@ -57,6 +59,8 @@ class IndirectBookingState extends Equatable {
     this.leg2TotalPages = 1,
     this.isFetchingMoreLeg2 = false,
     this.activeParams,
+    this.leg1SearchParams,
+    this.leg2SearchParams,
     this.selectedTripLeg1,
     this.selectedClassLeg1,
     this.selectedSeatsLeg1 = const [],
@@ -84,6 +88,8 @@ class IndirectBookingState extends Equatable {
     int? leg2TotalPages,
     bool? isFetchingMoreLeg2,
     SearchParams? activeParams,
+    SearchParams? leg1SearchParams,
+    SearchParams? leg2SearchParams,
     TripResultEntity? selectedTripLeg1,
     CoachClassEntity? selectedClassLeg1,
     List<String>? selectedSeatsLeg1,
@@ -110,6 +116,8 @@ class IndirectBookingState extends Equatable {
       leg2TotalPages: leg2TotalPages ?? this.leg2TotalPages,
       isFetchingMoreLeg2: isFetchingMoreLeg2 ?? this.isFetchingMoreLeg2,
       activeParams: activeParams ?? this.activeParams,
+      leg1SearchParams: leg1SearchParams ?? this.leg1SearchParams,
+      leg2SearchParams: leg2SearchParams ?? this.leg2SearchParams,
       selectedTripLeg1: selectedTripLeg1 ?? this.selectedTripLeg1,
       selectedClassLeg1: selectedClassLeg1 ?? this.selectedClassLeg1,
       selectedSeatsLeg1: selectedSeatsLeg1 ?? this.selectedSeatsLeg1,
@@ -140,6 +148,8 @@ class IndirectBookingState extends Equatable {
         leg2TotalPages,
         isFetchingMoreLeg2,
         activeParams,
+        leg1SearchParams,
+        leg2SearchParams,
         selectedTripLeg1,
         selectedClassLeg1,
         selectedSeatsLeg1,

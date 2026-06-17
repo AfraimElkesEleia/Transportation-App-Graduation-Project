@@ -151,13 +151,16 @@ class _RoundTripBookingScreenState extends State<RoundTripBookingScreen> {
         ),
       );
     }
-    if (state.outboundResults == null || state.outboundResults!.isEmpty) {
-      return Center(
-        child: Text(
-          AppLocalizations.of(context)!.noOutbound,
-          style: const TextStyle(color: Colors.white),
-        ),
-      );
+    final hasResults =
+        state.outboundResults != null && state.outboundResults!.isNotEmpty;
+    if (!hasResults &&
+        state.hasMoreOutboundPages &&
+        !state.isFetchingMoreOutbound) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          context.read<RoundTripBookingCubit>().loadMoreOutbound();
+        }
+      });
     }
 
     return NotificationListener<ScrollNotification>(
@@ -208,39 +211,56 @@ class _RoundTripBookingScreenState extends State<RoundTripBookingScreen> {
             ),
           ),
 
-          // ── Trip list ──
-          SliverPadding(
-            padding: const EdgeInsets.all(16),
-            sliver: SliverList(
-              delegate: SliverChildBuilderDelegate((context, index) {
-                if (index == state.outboundResults!.length) {
-                  return state.isFetchingMoreOutbound
-                      ? const Padding(
-                          padding: EdgeInsets.symmetric(vertical: 24),
-                          child: Center(
-                            child: CircularProgressIndicator(
-                              color: ColorsManager.accentCyan,
+          if (!hasResults)
+            SliverFillRemaining(
+              hasScrollBody: false,
+              child: Center(
+                child: state.isFetchingMoreOutbound ||
+                        state.hasMoreOutboundPages
+                    ? const CircularProgressIndicator(
+                        color: ColorsManager.accentCyan,
+                      )
+                    : Text(
+                        AppLocalizations.of(context)!.noOutbound,
+                        style: const TextStyle(color: Colors.white),
+                      ),
+              ),
+            )
+          else
+            SliverPadding(
+              padding: const EdgeInsets.all(16),
+              sliver: SliverList(
+                delegate: SliverChildBuilderDelegate((context, index) {
+                  if (index == state.outboundResults!.length) {
+                    return state.isFetchingMoreOutbound
+                        ? const Padding(
+                            padding: EdgeInsets.symmetric(vertical: 24),
+                            child: Center(
+                              child: CircularProgressIndicator(
+                                color: ColorsManager.accentCyan,
+                              ),
                             ),
-                          ),
-                        )
-                      : const SizedBox.shrink();
-                }
-                final t = state.outboundResults![index];
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 16),
-                  child: TripResultCard(
-                    trip: t,
-                    onBookOverride: (trip, coachClass) {
-                      context.read<RoundTripBookingCubit>().selectOutboundTrip(
-                        trip,
-                        coachClass,
-                      );
-                    },
-                  ),
-                );
-              }, childCount: state.outboundResults!.length + 1),
+                          )
+                        : const SizedBox.shrink();
+                  }
+                  final t = state.outboundResults![index];
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 16),
+                    child: TripResultCard(
+                      trip: t,
+                      onBookOverride: (trip, coachClass) {
+                        context
+                            .read<RoundTripBookingCubit>()
+                            .selectOutboundTrip(
+                              trip,
+                              coachClass,
+                            );
+                      },
+                    ),
+                  );
+                }, childCount: state.outboundResults!.length + 1),
+              ),
             ),
-          ),
         ],
       ),
     );
@@ -248,6 +268,20 @@ class _RoundTripBookingScreenState extends State<RoundTripBookingScreen> {
 
   // ── Stage 2: Return Selection ──
   Widget _buildSearchReturn(RoundTripBookingState state) {
+    final hasReturnResults =
+        state.returnResults != null && state.returnResults!.isNotEmpty;
+    if (!hasReturnResults &&
+        state.hasMoreReturnPages &&
+        !state.isFetchingMoreReturn &&
+        !state.isLoadingReturn &&
+        state.returnError == null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          context.read<RoundTripBookingCubit>().loadMoreReturn();
+        }
+      });
+    }
+
     return CustomScrollView(
       slivers: [
         SliverAppBar(
@@ -395,13 +429,17 @@ class _RoundTripBookingScreenState extends State<RoundTripBookingScreen> {
                   ),
             ),
           )
-        else if (state.returnResults == null || state.returnResults!.isEmpty)
+        else if (!hasReturnResults)
           SliverFillRemaining(
             child: Center(
-              child: Text(
-                AppLocalizations.of(context)!.noReturn,
-                style: const TextStyle(color: Colors.white),
-              ),
+              child: state.isFetchingMoreReturn || state.hasMoreReturnPages
+                  ? const CircularProgressIndicator(
+                      color: ColorsManager.accentCyan,
+                    )
+                  : Text(
+                      AppLocalizations.of(context)!.noReturn,
+                      style: const TextStyle(color: Colors.white),
+                    ),
             ),
           )
         else

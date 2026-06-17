@@ -97,6 +97,10 @@ class _TransportSearchScreenState extends State<TransportSearchScreen> {
                 SearchHeader(
                   params: widget.searchParams,
                   filterCount: filterCount,
+                  showFilterButton:
+                      state is! SearchLoaded ||
+                      !state.indirectSearched ||
+                      filterCount > 0,
                   onFilter: state is SearchLoaded
                       ? () => _openFilter(context, state)
                       : null,
@@ -131,6 +135,8 @@ class _TransportSearchScreenState extends State<TransportSearchScreen> {
         state: state,
         scrollController: _scrollController,
         onSearchIndirect: () => context.read<SearchCubit>().searchIndirect(),
+        onLoadMoreDirect: () =>
+            context.read<SearchCubit>().loadMoreDirectTrips(),
       );
     }
 

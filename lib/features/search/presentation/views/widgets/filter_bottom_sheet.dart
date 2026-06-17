@@ -27,10 +27,6 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
   late SortBy _sortBy;
   late double _maxPriceSlider;
   late double? _maxPrice;
-  late TimeOfDay? _departureFrom;
-  late TimeOfDay? _departureTo;
-  late TimeOfDay? _arrivalFrom;
-  late TimeOfDay? _arrivalTo;
   late Set<String> _selectedAgencies;
 
   @override
@@ -40,10 +36,6 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
     _sortBy = widget.activeParams.sortBy;
     _maxPrice = widget.activeParams.maxPrice;
     _maxPriceSlider = widget.activeParams.maxPrice ?? 1000;
-    _departureFrom = widget.activeParams.departureFrom;
-    _departureTo = widget.activeParams.departureTo;
-    _arrivalFrom = widget.activeParams.arrivalFrom;
-    _arrivalTo = widget.activeParams.arrivalTo;
     _selectedAgencies = Set<String>.from(widget.activeParams.preferredAgencies);
   }
 
@@ -52,10 +44,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
       transport: _transport,
       sortBy: _sortBy,
       maxPrice: _maxPrice,
-      departureFrom: _departureFrom,
-      departureTo: _departureTo,
-      arrivalFrom: _arrivalFrom,
-      arrivalTo: _arrivalTo,
+      clearTimeFilters: true,
       // Only send agencies when Bus is selected and specific ones chosen
       preferredAgencies: (_transport == TransportType.bus && _selectedAgencies.isNotEmpty)
           ? _selectedAgencies.toList()
@@ -69,32 +58,6 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
   void _reset() {
     widget.onReset();
     Navigator.pop(context);
-  }
-
-  Future<void> _pickTime(
-    TimeOfDay? current,
-    void Function(TimeOfDay) onPicked,
-  ) async {
-    final picked = await showTimePicker(
-      context: context,
-      initialTime: current ?? TimeOfDay.now(),
-      builder: (context, child) => Theme(
-        data: Theme.of(context).copyWith(
-          colorScheme: const ColorScheme.dark(
-            primary: ColorsManager.accentCyan,
-            surface: ColorsManager.surfaceDark,
-            onSurface: Colors.white,
-          ),
-        ),
-        child: child!,
-      ),
-    );
-    if (picked != null) setState(() => onPicked(picked));
-  }
-
-  String _fmtTime(TimeOfDay? t) {
-    if (t == null) return AppLocalizations.of(context)!.any;
-    return '${t.hour.toString().padLeft(2, '0')}:${t.minute.toString().padLeft(2, '0')}';
   }
 
   @override
@@ -300,74 +263,6 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
               ],
             ),
             const SizedBox(height: 28),
-
-            // ── Departure Time
-            _SectionLabel(label: l10n.departureTime),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                Expanded(
-                  child: _TimePickerTile(
-                    label: l10n.from,
-                    value: _fmtTime(_departureFrom),
-                    isSet: _departureFrom != null,
-                    onTap: () =>
-                        _pickTime(_departureFrom, (t) => _departureFrom = t),
-                    onClear: _departureFrom != null
-                        ? () => setState(() => _departureFrom = null)
-                        : null,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: _TimePickerTile(
-                    label: l10n.to,
-                    value: _fmtTime(_departureTo),
-                    isSet: _departureTo != null,
-                    onTap: () =>
-                        _pickTime(_departureTo, (t) => _departureTo = t),
-                    onClear: _departureTo != null
-                        ? () => setState(() => _departureTo = null)
-                        : null,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 20),
-
-            // ── Arrival Time
-            _SectionLabel(label: l10n.arrivalTime),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                Expanded(
-                  child: _TimePickerTile(
-                    label: l10n.from,
-                    value: _fmtTime(_arrivalFrom),
-                    isSet: _arrivalFrom != null,
-                    onTap: () =>
-                        _pickTime(_arrivalFrom, (t) => _arrivalFrom = t),
-                    onClear: _arrivalFrom != null
-                        ? () => setState(() => _arrivalFrom = null)
-                        : null,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: _TimePickerTile(
-                    label: l10n.to,
-                    value: _fmtTime(_arrivalTo),
-                    isSet: _arrivalTo != null,
-                    onTap: () =>
-                        _pickTime(_arrivalTo, (t) => _arrivalTo = t),
-                    onClear: _arrivalTo != null
-                        ? () => setState(() => _arrivalTo = null)
-                        : null,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 32),
 
             // ── Apply button
             SizedBox(
@@ -643,79 +538,6 @@ class _TransportTile extends StatelessWidget {
                 fontWeight: selected ? FontWeight.w600 : FontWeight.normal,
               ),
             ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-// ── Time picker tile ───────────────────────────────────────────
-class _TimePickerTile extends StatelessWidget {
-  final String label;
-  final String value;
-  final bool isSet;
-  final VoidCallback onTap;
-  final VoidCallback? onClear;
-
-  const _TimePickerTile({
-    required this.label,
-    required this.value,
-    required this.isSet,
-    required this.onTap,
-    this.onClear,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 150),
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-        decoration: BoxDecoration(
-          color: isSet
-              ? ColorsManager.accentCyan.withValues(alpha: 0.08)
-              : ColorsManager.surfaceMid,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: isSet
-                ? ColorsManager.accentCyan
-                : ColorsManager.borderSubtle,
-          ),
-        ),
-        child: Row(
-          children: [
-            Icon(
-              Icons.access_time,
-              color: isSet ? ColorsManager.accentCyan : Colors.white38,
-              size: 16,
-            ),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    label,
-                    style: const TextStyle(color: Colors.white38, fontSize: 11),
-                  ),
-                  Text(
-                    value,
-                    style: TextStyle(
-                      color: isSet ? ColorsManager.accentCyan : Colors.white,
-                      fontWeight: FontWeight.w600,
-                      fontSize: 14,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            if (onClear != null)
-              GestureDetector(
-                onTap: onClear,
-                child: const Icon(Icons.close, color: Colors.white38, size: 16),
-              ),
           ],
         ),
       ),

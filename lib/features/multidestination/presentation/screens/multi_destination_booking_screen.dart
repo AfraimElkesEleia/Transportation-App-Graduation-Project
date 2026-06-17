@@ -161,6 +161,15 @@ class _MultiDestinationBookingScreenState
     final leg = state.legSummaries[state.currentSearchLegIndex];
     final hasResults =
         state.searchResults != null && state.searchResults!.isNotEmpty;
+    if (!hasResults &&
+        state.currentPage < state.totalPages &&
+        !state.isFetchingMore) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          context.read<MultiDestinationBookingCubit>().loadMore();
+        }
+      });
+    }
 
     return NotificationListener<ScrollNotification>(
       onNotification: (scrollInfo) {
@@ -332,33 +341,37 @@ class _MultiDestinationBookingScreenState
             SliverFillRemaining(
               hasScrollBody: false,
               child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(
-                      Icons.search_off_rounded,
-                      color: Colors.white24,
-                      size: 64,
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      AppLocalizations.of(context)!.noTripsFoundForLeg,
-                      style: const TextStyle(
-                        color: Colors.white54,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
+                child: state.isFetchingMore || state.currentPage < state.totalPages
+                    ? const CircularProgressIndicator(
+                        color: ColorsManager.accentCyan,
+                      )
+                    : Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(
+                            Icons.search_off_rounded,
+                            color: Colors.white24,
+                            size: 64,
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            AppLocalizations.of(context)!.noTripsFoundForLeg,
+                            style: const TextStyle(
+                              color: Colors.white54,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            AppLocalizations.of(context)!.tryAdjustingFilters,
+                            style: const TextStyle(
+                              color: Colors.white30,
+                              fontSize: 13,
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      AppLocalizations.of(context)!.tryAdjustingFilters,
-                      style: const TextStyle(
-                        color: Colors.white30,
-                        fontSize: 13,
-                      ),
-                    ),
-                  ],
-                ),
               ),
             )
           else

@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:transportation_app/features/booking/domain/usecases/add_to_cart_usecase.dart';
 import 'package:transportation_app/features/booking/domain/usecases/checkout_usecase.dart';
@@ -53,6 +54,7 @@ class MultiDestinationBookingCubit extends Cubit<MultiDestinationBookingState> {
         isSearching: true,
         clearSearchError: true,
         searchResults: [],
+        unfilteredSearchResults: [],
         currentActiveParams: params,
       ),
     );
@@ -67,7 +69,8 @@ class MultiDestinationBookingCubit extends Cubit<MultiDestinationBookingState> {
       (paged) => emit(
         state.copyWith(
           isSearching: false,
-          searchResults: paged.items,
+          searchResults: _applyTimeFilters(paged.items, params),
+          unfilteredSearchResults: paged.items,
           currentPage: paged.currentPage,
           totalPages: paged.totalPages,
         ),
@@ -90,17 +93,23 @@ class MultiDestinationBookingCubit extends Cubit<MultiDestinationBookingState> {
     if (isClosed) return;
 
     result.fold((f) => emit(state.copyWith(isFetchingMore: false)), (paged) {
-      final existingIds = state.searchResults!
+      final unfiltered = state.unfilteredSearchResults ?? const [];
+      final existingIds = unfiltered
           .map((t) => t.tripOccurrenceId)
           .toSet();
       final newItems = paged.items
           .where((t) => !existingIds.contains(t.tripOccurrenceId))
           .toList();
+      final unfilteredCombined = [...unfiltered, ...newItems];
 
       emit(
         state.copyWith(
           isFetchingMore: false,
-          searchResults: [...state.searchResults!, ...newItems],
+          searchResults: _applyTimeFilters(
+            unfilteredCombined,
+            state.currentActiveParams!,
+          ),
+          unfilteredSearchResults: unfilteredCombined,
           currentPage: paged.currentPage,
           totalPages: paged.totalPages,
         ),
@@ -321,4 +330,40 @@ class MultiDestinationBookingCubit extends Cubit<MultiDestinationBookingState> {
       };
     });
   }
+
+  List<TripResultEntity> _applyTimeFilters(
+    List<TripResultEntity> trips,
+    SearchParams params,
+  ) {
+    if (!params.hasTimeFilters) return trips;
+
+    return trips.where((t) {
+      if (params.departureFrom != null || params.departureTo != null) {
+        final depMins = _minsFromDateTime(t.departureTime);
+        if (params.departureFrom != null &&
+            depMins < _mins(params.departureFrom!)) {
+          return false;
+        }
+        if (params.departureTo != null &&
+            depMins > _mins(params.departureTo!)) {
+          return false;
+        }
+      }
+      if (params.arrivalFrom != null || params.arrivalTo != null) {
+        if (t.arrivalTime == null) return false;
+        final arrMins = _minsFromDateTime(t.arrivalTime!);
+        if (params.arrivalFrom != null &&
+            arrMins < _mins(params.arrivalFrom!)) {
+          return false;
+        }
+        if (params.arrivalTo != null && arrMins > _mins(params.arrivalTo!)) {
+          return false;
+        }
+      }
+      return true;
+    }).toList();
+  }
+
+  int _mins(TimeOfDay t) => t.hour * 60 + t.minute;
+  int _minsFromDateTime(DateTime t) => t.hour * 60 + t.minute;
 }
