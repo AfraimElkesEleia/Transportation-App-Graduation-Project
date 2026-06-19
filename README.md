@@ -1,6 +1,6 @@
-# Rehla Transportation App - Features Documentation
+# Rihla Transportation App - Features Documentation
 
-Rehla is a Flutter mobile application for planning trips, booking seats, managing tickets, using wallet payments, receiving real-time travel alerts, and reselling eligible tickets through a marketplace.
+Rihla is a Flutter mobile application for planning trips, booking seats, managing tickets, using wallet payments, receiving real-time travel alerts, and reselling eligible tickets through a marketplace.
 
 <p align="center">
   <img width="180" alt="Travel Smart Logo" src="https://github.com/user-attachments/assets/09be3720-4e44-40b3-9187-6ede0e1428fc" />
@@ -202,11 +202,11 @@ Round-trip booking guides the user through selecting an outbound trip, automatic
 
 Indirect booking supports routes that cannot be completed with a single direct trip. The app lets users choose a composed route and continue through passenger details and checkout using the same booking infrastructure.
 
-**Screenshot placeholders**
+<p align="center">
+<img width="200" alt="Screenshot_1780648769-portrait" src="https://github.com/user-attachments/assets/273214ee-f76b-430f-aa56-85c633cdb012" />
+<img width="200" alt="Screenshot_1780648808-portrait" src="https://github.com/user-attachments/assets/4b8c040a-90d6-462b-ab0c-ad9a984bad07" />
 
-![Indirect booking placeholder](docs/screenshots/indirect-booking.png)
-
-![Indirect passenger form placeholder](docs/screenshots/indirect-passenger-form.png)
+</p>
 
 **Feature details**
 
@@ -220,13 +220,10 @@ Indirect booking supports routes that cannot be completed with a single direct t
 
 Multi-destination booking lets users build a trip made of multiple legs. Each leg is searched, selected, seated, and submitted as part of one flow.
 
-**Screenshot placeholders**
-
-![Multi-destination builder placeholder](docs/screenshots/multi-destination-builder.png)
-
-![Multi-destination summary placeholder](docs/screenshots/multi-destination-summary.png)
-
-![Multi-destination booking placeholder](docs/screenshots/multi-destination-booking.png)
+<p align="center">
+<img width="200" alt="Screenshot_1780607150-portrait" src="https://github.com/user-attachments/assets/eb725ed2-1e15-4f0e-a5af-a2e6d0933c9b" />
+<img width="200"  alt="Screenshot_1780643347-portrait" src="https://github.com/user-attachments/assets/85cbd042-5f4f-4f6e-9a69-7b4e5fedc831" />
+</p>
 
 **Feature details**
 
@@ -562,3 +559,112 @@ The ticket and wallet cubits keep cached copies of the last successful data. The
 - intl
 - shimmer
 - fl_chart
+
+---
+
+## Future Work
+
+Although Rihla currently provides a complete prototype for journey planning, booking, wallet checkout, ticket management, notifications, support, and ticket resale, several future improvements can make the platform more production-ready and scalable.
+
+### 1. Official Provider Integration and Fraud Prevention
+
+The current version works as a prototype where booking and ticketing are managed inside Rihla's own system. In a real production environment, Rihla should be officially integrated with transportation providers such as train and bus companies.
+
+With official contracts or provider API integration, every booking made through Rihla would also be registered in the provider's official database. This would help prevent fraud cases such as fake tickets, duplicated seats, or tickets that are valid inside Rihla but not recognized by the real transport operator.
+
+**Future goal:** move from prototype-controlled booking to provider-authorized booking.
+
+**Possible improvements:**
+
+- Official contracts with transportation providers.
+- Direct integration with provider booking APIs.
+- Synchronization between Rihla bookings and provider databases.
+- Provider-side ticket confirmation.
+- Stronger fraud prevention for fake, duplicated, cancelled, or resold tickets.
+- Official seat ownership validation before boarding.
+
+### 2. Real Payment Gateway Integration
+
+The current wallet and deposit flow can be extended with real payment gateway support. In production, Rihla should integrate with trusted payment providers to support real financial transactions.
+
+**Possible improvements:**
+
+- Integrate with Paymob, Fawry, Stripe, or similar payment gateways.
+- Support Egyptian wallet payment methods such as Vodafone Cash, Orange Money, and Etisalat Cash.
+- Confirm deposits and payments using secure webhook callbacks.
+- Credit the user's wallet only after successful payment confirmation.
+- Improve transaction auditing and financial reliability.
+
+### 3. Marketplace Price Negotiation
+
+The current marketplace allows eligible tickets to be listed and purchased. A future improvement is to support price negotiation between buyers and sellers instead of only fixed-price resale.
+
+**Possible improvements:**
+
+- Buyers can send price offers for listed tickets.
+- Sellers can accept, reject, or counter the offer.
+- Wallet escrow can temporarily reserve the buyer's offered amount.
+- SignalR and Firebase notifications can update both users instantly.
+- Ticket ownership transfers only after payment confirmation.
+- Reserved wallet amounts are released automatically if the offer is rejected or expires.
+
+### 4. Advanced Admin and Operator Dashboard
+
+The system can be expanded with a more powerful dashboard for administrators and transport operators. This would help monitor bookings, users, refunds, support tickets, marketplace activity, and operational statistics.
+
+**Possible improvements:**
+
+- Advanced analytics for bookings, revenue, and popular routes.
+- Operator-specific dashboards for provider staff.
+- Refund and support performance tracking.
+- User activity monitoring.
+- Marketplace monitoring and dispute handling.
+- Trip occupancy and demand reports.
+
+### 5. Phone Number Verification and Two-Factor Authentication
+
+To improve account security, Rihla can add phone number verification and two-factor authentication.
+
+**Possible improvements:**
+
+- OTP verification during registration.
+- OTP verification for sensitive actions such as password reset or wallet operations.
+- Two-factor authentication for login.
+- Stronger protection against fake accounts and unauthorized access.
+
+### 6. Smarter Fraud Detection and Risk Monitoring
+
+After official provider integration is added, Rihla can also include fraud detection logic to monitor suspicious behavior.
+
+**Possible improvements:**
+
+- Detect repeated failed payment attempts.
+- Detect unusual ticket resale patterns.
+- Detect suspicious refund behavior.
+- Flag duplicated passenger identity usage.
+- Monitor abnormal booking activity.
+- Notify admins about risky transactions.
+
+### 7. Enhanced Real-Time Travel Updates
+
+The notification system can be improved with live operational updates from providers.
+
+**Possible improvements:**
+
+- Real-time trip delay notifications.
+- Gate or platform change alerts.
+- Boarding countdown reminders.
+- Provider-side cancellation alerts.
+- Personalized travel updates based on the user's active tickets.
+
+### 8. Improved Route Recommendation
+
+The search engine can be extended to recommend the best trip based on multiple factors instead of only listing available results.
+
+**Possible improvements:**
+
+- Rank trips by price, duration, departure time, comfort, and transfer waiting time.
+- Recommend best value, fastest route, and cheapest route.
+- Improve indirect route suggestions.
+- Add smarter multi-destination optimization.
+- Learn from user preferences and recent searches.
