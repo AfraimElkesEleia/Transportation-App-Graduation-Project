@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:transportation_app/core/l10n/app_localizations.dart';
 import 'package:transportation_app/core/theming/colors.dart';
 import 'package:transportation_app/features/my_tickets/presentation/cubit/marketplace_cubit.dart';
 
@@ -27,18 +28,44 @@ class _MarketplaceFilterSheetState extends State<MarketplaceFilterSheet> {
   DateTime? _travelDate;
 
   static const _egyptGovernorates = [
-    'Cairo', 'Alexandria', 'Giza', 'Aswan', 'Assiut', 'Luxor', 'Sohag',
-    'Qena', 'Beni Suef', 'Fayoum', 'Minya', 'Port Said', 'Suez', 'Ismailia',
-    'Damietta', 'Dakahlia', 'Sharqia', 'Kafr El Sheikh', 'Gharbia',
-    'Monufia', 'Beheira', 'Qalyubia', 'North Sinai', 'South Sinai',
-    'Red Sea', 'New Valley', 'Matrouh',
+    'Cairo',
+    'Alexandria',
+    'Giza',
+    'Aswan',
+    'Assiut',
+    'Luxor',
+    'Sohag',
+    'Qena',
+    'Beni Suef',
+    'Fayoum',
+    'Minya',
+    'Port Said',
+    'Suez',
+    'Ismailia',
+    'Damietta',
+    'Dakahlia',
+    'Sharqia',
+    'Kafr El Sheikh',
+    'Gharbia',
+    'Monufia',
+    'Beheira',
+    'Qalyubia',
+    'North Sinai',
+    'South Sinai',
+    'Red Sea',
+    'New Valley',
+    'Matrouh',
   ];
 
   @override
   void initState() {
     super.initState();
-    _originCtrl = TextEditingController(text: widget.currentFilter.originGovernorate ?? '');
-    _destinationCtrl = TextEditingController(text: widget.currentFilter.destinationGovernorate ?? '');
+    _originCtrl = TextEditingController(
+      text: widget.currentFilter.originGovernorate ?? '',
+    );
+    _destinationCtrl = TextEditingController(
+      text: widget.currentFilter.destinationGovernorate ?? '',
+    );
     _travelDate = widget.currentFilter.travelDate;
   }
 
@@ -51,8 +78,12 @@ class _MarketplaceFilterSheetState extends State<MarketplaceFilterSheet> {
 
   void _apply() {
     final filter = MarketplaceFilter(
-      originGovernorate: _originCtrl.text.trim().isEmpty ? null : _originCtrl.text.trim(),
-      destinationGovernorate: _destinationCtrl.text.trim().isEmpty ? null : _destinationCtrl.text.trim(),
+      originGovernorate: _originCtrl.text.trim().isEmpty
+          ? null
+          : _originCtrl.text.trim(),
+      destinationGovernorate: _destinationCtrl.text.trim().isEmpty
+          ? null
+          : _destinationCtrl.text.trim(),
       travelDate: _travelDate,
     );
     widget.onApply(filter);
@@ -84,14 +115,28 @@ class _MarketplaceFilterSheetState extends State<MarketplaceFilterSheet> {
     if (picked != null) setState(() => _travelDate = picked);
   }
 
-  String _fmtDate(DateTime? d) {
-    if (d == null) return 'Any date';
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  String _fmtDate(DateTime? d, AppLocalizations l10n) {
+    if (d == null) return l10n.anyDate;
+    const months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
     return '${d.day} ${months[d.month - 1]} ${d.year}';
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       decoration: const BoxDecoration(
         color: ColorsManager.surfaceDarker,
@@ -113,7 +158,10 @@ class _MarketplaceFilterSheetState extends State<MarketplaceFilterSheet> {
               child: Container(
                 width: 40,
                 height: 4,
-                decoration: BoxDecoration(color: Colors.white24, borderRadius: BorderRadius.circular(2)),
+                decoration: BoxDecoration(
+                  color: Colors.white24,
+                  borderRadius: BorderRadius.circular(2),
+                ),
               ),
             ),
             const SizedBox(height: 20),
@@ -122,71 +170,96 @@ class _MarketplaceFilterSheetState extends State<MarketplaceFilterSheet> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
-                  'Filter Listings',
-                  style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+                Text(
+                  l10n.filterListings,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 TextButton(
                   onPressed: _reset,
-                  child: const Text('Reset All', style: TextStyle(color: ColorsManager.accentCyan, fontSize: 14)),
+                  child: Text(
+                    l10n.resetAll,
+                    style: const TextStyle(
+                      color: ColorsManager.accentCyan,
+                      fontSize: 14,
+                    ),
+                  ),
                 ),
               ],
             ),
             const SizedBox(height: 24),
 
             // Origin Governorate
-            _SectionLabel(label: 'Origin Governorate'),
+            _SectionLabel(label: l10n.originGovernorate),
             const SizedBox(height: 10),
             _GovernorateField(
               controller: _originCtrl,
-              hint: 'e.g. Cairo',
+              hint: l10n.hintCairo,
               governorates: _egyptGovernorates,
-              onClear: _originCtrl.text.isNotEmpty ? () => setState(() => _originCtrl.clear()) : null,
+              onClear: _originCtrl.text.isNotEmpty
+                  ? () => setState(() => _originCtrl.clear())
+                  : null,
             ),
             const SizedBox(height: 20),
 
             // Destination Governorate
-            _SectionLabel(label: 'Destination Governorate'),
+            _SectionLabel(label: l10n.destinationGovernorate),
             const SizedBox(height: 10),
             _GovernorateField(
               controller: _destinationCtrl,
-              hint: 'e.g. Alexandria',
+              hint: l10n.hintAlexandria,
               governorates: _egyptGovernorates,
-              onClear: _destinationCtrl.text.isNotEmpty ? () => setState(() => _destinationCtrl.clear()) : null,
+              onClear: _destinationCtrl.text.isNotEmpty
+                  ? () => setState(() => _destinationCtrl.clear())
+                  : null,
             ),
             const SizedBox(height: 20),
 
             // Travel Date
-            _SectionLabel(label: 'Travel Date'),
+            _SectionLabel(label: l10n.travelDateFilter),
             const SizedBox(height: 10),
             GestureDetector(
               onTap: _pickDate,
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 150),
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 14,
+                ),
                 decoration: BoxDecoration(
                   color: _travelDate != null
-                      ? ColorsManager.accentCyan.withOpacity(0.08)
+                      ? ColorsManager.accentCyan.withValues(alpha: 0.08)
                       : ColorsManager.surfaceMid,
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: _travelDate != null ? ColorsManager.accentCyan : ColorsManager.borderSubtle,
+                    color: _travelDate != null
+                        ? ColorsManager.accentCyan
+                        : ColorsManager.borderSubtle,
                   ),
                 ),
                 child: Row(
                   children: [
                     Icon(
                       Icons.calendar_today_outlined,
-                      color: _travelDate != null ? ColorsManager.accentCyan : Colors.white38,
+                      color: _travelDate != null
+                          ? ColorsManager.accentCyan
+                          : Colors.white38,
                       size: 18,
                     ),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(
-                        _fmtDate(_travelDate),
+                        _fmtDate(_travelDate, l10n),
                         style: TextStyle(
-                          color: _travelDate != null ? ColorsManager.accentCyan : Colors.white54,
-                          fontWeight: _travelDate != null ? FontWeight.w600 : FontWeight.normal,
+                          color: _travelDate != null
+                              ? ColorsManager.accentCyan
+                              : Colors.white54,
+                          fontWeight: _travelDate != null
+                              ? FontWeight.w600
+                              : FontWeight.normal,
                           fontSize: 14,
                         ),
                       ),
@@ -194,7 +267,11 @@ class _MarketplaceFilterSheetState extends State<MarketplaceFilterSheet> {
                     if (_travelDate != null)
                       GestureDetector(
                         onTap: () => setState(() => _travelDate = null),
-                        child: const Icon(Icons.close, color: Colors.white38, size: 16),
+                        child: const Icon(
+                          Icons.close,
+                          color: Colors.white38,
+                          size: 16,
+                        ),
                       ),
                   ],
                 ),
@@ -210,12 +287,18 @@ class _MarketplaceFilterSheetState extends State<MarketplaceFilterSheet> {
                 onPressed: _apply,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: ColorsManager.cyanBlue,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
                   elevation: 0,
                 ),
-                child: const Text(
-                  'Apply Filters',
-                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
+                child: Text(
+                  l10n.applyFilters,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
                 ),
               ),
             ),
@@ -235,7 +318,11 @@ class _SectionLabel extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       label,
-      style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w600),
+      style: const TextStyle(
+        color: Colors.white,
+        fontSize: 15,
+        fontWeight: FontWeight.w600,
+      ),
     );
   }
 }
@@ -259,14 +346,18 @@ class _GovernorateField extends StatelessWidget {
     return Autocomplete<String>(
       optionsBuilder: (textEditingValue) {
         if (textEditingValue.text.isEmpty) return const Iterable.empty();
-        return governorates.where((g) =>
-            g.toLowerCase().startsWith(textEditingValue.text.toLowerCase()));
+        return governorates.where(
+          (g) =>
+              g.toLowerCase().startsWith(textEditingValue.text.toLowerCase()),
+        );
       },
       onSelected: (selection) => controller.text = selection,
       fieldViewBuilder: (ctx, fieldController, focusNode, onFieldSubmitted) {
         // Sync the autocomplete's internal controller with ours on init.
         fieldController.text = controller.text;
-        fieldController.addListener(() => controller.text = fieldController.text);
+        fieldController.addListener(
+          () => controller.text = fieldController.text,
+        );
         return TextField(
           controller: fieldController,
           focusNode: focusNode,
@@ -274,16 +365,27 @@ class _GovernorateField extends StatelessWidget {
           decoration: InputDecoration(
             hintText: hint,
             hintStyle: const TextStyle(color: Colors.white38, fontSize: 14),
-            prefixIcon: const Icon(Icons.location_city_outlined, color: Colors.white38, size: 18),
+            prefixIcon: const Icon(
+              Icons.location_city_outlined,
+              color: Colors.white38,
+              size: 18,
+            ),
             suffixIcon: controller.text.isNotEmpty
                 ? IconButton(
-                    icon: const Icon(Icons.close, color: Colors.white38, size: 16),
+                    icon: const Icon(
+                      Icons.close,
+                      color: Colors.white38,
+                      size: 16,
+                    ),
                     onPressed: onClear,
                   )
                 : null,
             filled: true,
             fillColor: ColorsManager.surfaceMid,
-            contentPadding: const EdgeInsets.symmetric(vertical: 14, horizontal: 14),
+            contentPadding: const EdgeInsets.symmetric(
+              vertical: 14,
+              horizontal: 14,
+            ),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: const BorderSide(color: ColorsManager.borderSubtle),
@@ -294,7 +396,10 @@ class _GovernorateField extends StatelessWidget {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: ColorsManager.accentCyan, width: 1.5),
+              borderSide: const BorderSide(
+                color: ColorsManager.accentCyan,
+                width: 1.5,
+              ),
             ),
           ),
         );
@@ -317,8 +422,17 @@ class _GovernorateField extends StatelessWidget {
                   return InkWell(
                     onTap: () => onSelected(option),
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                      child: Text(option, style: const TextStyle(color: Colors.white, fontSize: 14)),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 12,
+                      ),
+                      child: Text(
+                        option,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 14,
+                        ),
+                      ),
                     ),
                   );
                 },

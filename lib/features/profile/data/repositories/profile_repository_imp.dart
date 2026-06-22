@@ -5,13 +5,12 @@ import 'package:transportation_app/core/utils/token_manager.dart';
 import 'package:transportation_app/core/utils/typedef.dart';
 import 'package:transportation_app/features/profile/data/datasources/profile_remote_datasource.dart';
 import 'package:transportation_app/features/profile/domain/entities/profile_entity.dart';
-import 'package:transportation_app/features/profile/domain/entities/ticket_entity.dart';
 import 'package:transportation_app/features/profile/domain/entities/wallet_transaction_entity.dart';
 import 'package:transportation_app/features/profile/domain/repositories/profile_repository.dart';
 
 class ProfileRepositoryImp extends ProfileRepository {
   final ProfileRemoteDatasource remoteDataSource;
-  final TokenManager            tokenManager;
+  final TokenManager tokenManager;
 
   ProfileRepositoryImp({
     required this.remoteDataSource,
@@ -29,17 +28,20 @@ class ProfileRepositoryImp extends ProfileRepository {
     } on ServerException catch (e) {
       final cached = await tokenManager.getUser();
       if (cached != null) {
-        return Right(ProfileEntity(
-          userId:      cached.userId,
-          firstName:   cached.firstName,
-          lastName:    cached.lastName,
-          familyName:  cached.familyName,
-          email:       cached.email,
-          phoneNumber: cached.phoneNumber,
-          gender:      cached.gender,
-          countryCode: cached.countryCode,
-          countryName: cached.countryName,
-        ));
+        return Right(
+          ProfileEntity(
+            userId: cached.userId,
+            firstName: cached.firstName,
+            lastName: cached.lastName,
+            familyName: cached.familyName,
+            email: cached.email,
+            phoneNumber: cached.phoneNumber,
+            gender: cached.gender,
+            countryCode: cached.countryCode,
+            countryName: cached.countryName,
+            preferredLanguage: cached.preferredLanguage,
+          ),
+        );
       }
       return Left(ServerFailure(message: e.message));
     } on NetworkException {
@@ -56,14 +58,18 @@ class ProfileRepositoryImp extends ProfileRepository {
     required String familyName,
     required String email,
     required String phoneNumber,
+    int? idType,
+    String? idNumber,
   }) async {
     try {
       final model = await remoteDataSource.updateProfile(
-        firstName:   firstName,
-        lastName:    lastName,
-        familyName:  familyName,
-        email:       email,
+        firstName: firstName,
+        lastName: lastName,
+        familyName: familyName,
+        email: email,
         phoneNumber: phoneNumber,
+        idType: idType,
+        idNumber: idNumber,
       );
       await tokenManager.saveUser(model);
       return Right(model);
@@ -75,10 +81,13 @@ class ProfileRepositoryImp extends ProfileRepository {
       return Left(const NetworkFailure());
     }
   }
+
   @override
   ResultFuture<String> uploadProfilePicture({required String filePath}) async {
     try {
-      final url = await remoteDataSource.uploadProfilePicture(filePath: filePath);
+      final url = await remoteDataSource.uploadProfilePicture(
+        filePath: filePath,
+      );
       return Right(url);
     } on ServerException catch (e) {
       return Left(ServerFailure(message: e.message));
@@ -86,6 +95,7 @@ class ProfileRepositoryImp extends ProfileRepository {
       return Left(const NetworkFailure());
     }
   }
+
   @override
   ResultVoid logout() async {
     try {
@@ -103,6 +113,7 @@ class ProfileRepositoryImp extends ProfileRepository {
       return Left(ServerFailure(message: e.message));
     }
   }
+
   @override
   ResultVoid depositToWallet({
     required double amount,
@@ -119,19 +130,7 @@ class ProfileRepositoryImp extends ProfileRepository {
       );
       return const Right(null);
     } on ServerException catch (e) {
-      return Left(ServerFailure(message: e.message));
-    } on NetworkException {
-      return Left(const NetworkFailure());
-    }
-  }
-
-  @override
-  ResultFuture<List<TicketEntity>> getMyTickets() async {
-    try {
-      final tickets = await remoteDataSource.getMyTickets();
-      return Right(tickets);
-    } on ServerException catch (e) {
-      return Left(ServerFailure(message: e.message));
+      return Left(ServerFailure(message: e.message, errors: e.errors));
     } on NetworkException {
       return Left(const NetworkFailure());
     }
@@ -144,6 +143,20 @@ class ProfileRepositoryImp extends ProfileRepository {
       return Right(history);
     } on ServerException catch (e) {
       return Left(ServerFailure(message: e.message));
+    } on NetworkException {
+      return Left(const NetworkFailure());
+    }
+  }
+
+  @override
+  ResultVoid updateLanguage({required String languageCode}) async {
+    try {
+      await remoteDataSource.updateLanguage(languageCode: languageCode);
+      return const Right(null);
+    } on UnauthorizedException catch (e) {
+      return Left(UnauthorizedFailure(message: e.message));
+    } on ServerException catch (e) {
+      return Left(ServerFailure(message: e.message, errors: e.errors));
     } on NetworkException {
       return Left(const NetworkFailure());
     }

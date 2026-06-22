@@ -4,7 +4,9 @@ class ChallengeHistoryModel extends ChallengeHistory {
   const ChallengeHistoryModel({
     required super.challengeId,
     required super.title,
+    super.titleAr,
     required super.description,
+    super.descriptionAr,
     required super.type,
     required super.frequency,
     required super.currentProgress,
@@ -17,7 +19,9 @@ class ChallengeHistoryModel extends ChallengeHistory {
     return ChallengeHistoryModel(
       challengeId: json['challengeId'] ?? 0,
       title: json['title'] ?? '',
+      titleAr: json['titleAr'],
       description: json['description'] ?? '',
+      descriptionAr: json['descriptionAr'],
       type: json['type'] ?? '',
       frequency: json['frequency'] ?? 'OneTime',
       currentProgress: json['currentProgress'] ?? 0,

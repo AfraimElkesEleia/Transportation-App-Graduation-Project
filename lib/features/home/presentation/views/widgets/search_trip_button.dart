@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:transportation_app/core/helper/spacing.dart';
+import 'package:transportation_app/core/l10n/app_localizations.dart';
 
 class SearchTripButton extends StatelessWidget {
   final VoidCallback onPressed;
@@ -29,8 +30,8 @@ class SearchTripButton extends StatelessWidget {
           Icon(Icons.search, color: Colors.white, size: 30),
           horizontalSpace(space: 6),
           Text(
-            label ?? "Search Trip",
-            style: TextStyle(color: Colors.white, fontSize: 18),
+            label ?? AppLocalizations.of(context)!.searchTrip,
+            style: const TextStyle(color: Colors.white, fontSize: 18),
           ),
         ],
       ),

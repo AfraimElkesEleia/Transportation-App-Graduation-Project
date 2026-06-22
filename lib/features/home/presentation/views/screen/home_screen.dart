@@ -5,14 +5,15 @@ import 'package:transportation_app/core/di/injection_container.dart';
 import 'package:transportation_app/core/helper/spacing.dart';
 import 'package:transportation_app/core/theming/colors.dart';
 import 'package:transportation_app/core/theming/styles.dart';
+import 'package:transportation_app/core/utils/error_localizer.dart';
 import 'package:transportation_app/core/widgets/app_shimmer.dart';
 import 'package:transportation_app/core/widgets/block_container.dart';
 import 'package:transportation_app/features/home/domain/usecases/get_stations_use_case.dart';
 import 'package:transportation_app/features/home/presentation/cubit/stations_cubit.dart';
 import 'package:transportation_app/features/home/presentation/cubit/stations_state.dart';
 import 'package:transportation_app/features/home/presentation/cubit/popular_routes_cubit.dart';
+import 'package:transportation_app/features/notfication/presentation/cubit/notfication_cubit.dart';
 import 'package:transportation_app/features/home/presentation/views/widgets/app_bar_in_home_screen.dart';
-import 'package:transportation_app/features/home/presentation/views/widgets/latest_news_block.dart';
 import 'package:transportation_app/features/home/presentation/views/widgets/plan_your_journey_block.dart';
 import 'package:transportation_app/features/home/presentation/views/widgets/recent_searches_block.dart';
 import 'package:transportation_app/features/home/presentation/views/widgets/popular_routes_section.dart';
@@ -20,18 +21,18 @@ import 'package:transportation_app/core/l10n/app_localizations.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
-
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
         BlocProvider(
-          create: (_) => StationsCubit(
-            getStationsUseCase: sl<GetStationsUseCase>(),
-          )..loadStations(),
+          create: (_) =>
+              StationsCubit(getStationsUseCase: sl<GetStationsUseCase>())
+                ..loadStations(),
         ),
+        BlocProvider(create: (_) => sl<PopularRoutesCubit>()..load()),
         BlocProvider(
-          create: (_) => sl<PopularRoutesCubit>()..load(),
+          create: (_) => sl<NotificationCubit>()..loadNotifications(),
         ),
       ],
       child: const _HomeContent(),
@@ -54,7 +55,9 @@ class _HomeContent extends StatelessWidget {
 
         // ── Error state → show retry screen ──────────────────────────────
         if (state is StationsError) {
-          return _HomeErrorView(message: state.message);
+          return _HomeErrorView(
+            message: ErrorLocalizer.localize(context, state.message),
+          );
         }
 
         // ── Loaded state → show full home content ─────────────────────────
@@ -76,7 +79,7 @@ class _HomeContent extends StatelessWidget {
                     children: [
                       Row(
                         children: [
-                          Icon(
+                          FaIcon(
                             FontAwesomeIcons.timeline,
                             color: ColorsManager.cyanBlue,
                           ),
@@ -93,7 +96,6 @@ class _HomeContent extends StatelessWidget {
                   ),
                 ),
               ),
-              SliverToBoxAdapter(child: LatestNewsBlock()),
             ],
           ),
         );
@@ -131,7 +133,9 @@ class _HomeErrorView extends StatelessWidget {
               style: ElevatedButton.styleFrom(
                 backgroundColor: ColorsManager.accentCyan,
                 foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
               ),
             ),
           ],

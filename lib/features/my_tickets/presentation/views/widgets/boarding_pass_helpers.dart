@@ -1,0 +1,100 @@
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:transportation_app/core/l10n/app_localizations.dart';
+import 'package:transportation_app/core/utils/localized_time_formatter.dart';
+
+String _localeName(BuildContext context) =>
+    Localizations.localeOf(context).toLanguageTag();
+
+String formatBoardingPassTime(BuildContext context, DateTime dt) =>
+    formatTicketTime(context, dt);
+
+String formatBoardingPassDate(BuildContext context, DateTime dt) =>
+    DateFormat('dd MMM yyyy', _localeName(context)).format(dt);
+
+String boardingPassLocationCode(String city) {
+  if (city.length < 3) return city.toUpperCase();
+  return city.substring(0, 3).toUpperCase();
+}
+
+String boardingPassDuration(BuildContext context, DateTime from, DateTime to) {
+  final diff = to.difference(from);
+  final h = diff.inHours;
+  final m = diff.inMinutes % 60;
+  return AppLocalizations.of(
+    context,
+  )!.durationHoursMinutes(h.toString(), m.toString());
+}
+
+class BoardingPassDashedDivider extends StatelessWidget {
+  const BoardingPassDashedDivider({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (_, constraints) {
+        const dashWidth = 6.0;
+        const dashSpace = 4.0;
+        final count = (constraints.maxWidth / (dashWidth + dashSpace)).floor();
+
+        return Row(
+          children: List.generate(
+            count,
+            (_) => Container(
+              width: dashWidth,
+              height: 1,
+              margin: const EdgeInsets.only(right: dashSpace),
+              color: Colors.white12,
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+class BoardingPassInfoChip extends StatelessWidget {
+  final String label;
+  final String value;
+  final Color valueColor;
+  final int valueMaxLines;
+  final TextOverflow valueOverflow;
+
+  const BoardingPassInfoChip({
+    super.key,
+    required this.label,
+    required this.value,
+    required this.valueColor,
+    this.valueMaxLines = 1,
+    this.valueOverflow = TextOverflow.ellipsis,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(
+            color: Colors.white38,
+            fontSize: 9,
+            letterSpacing: 1.5,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        const SizedBox(height: 2),
+        Text(
+          value,
+          style: TextStyle(
+            color: valueColor,
+            fontSize: 13,
+            fontWeight: FontWeight.bold,
+          ),
+          maxLines: valueMaxLines,
+          overflow: valueOverflow,
+        ),
+      ],
+    );
+  }
+}

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:transportation_app/core/l10n/app_localizations.dart';
+
 
 /// One entry in the country-code list
 class PhoneCountry {
@@ -110,7 +112,7 @@ class _AppPhoneFieldState extends State<AppPhoneField> {
           style: const TextStyle(color: Colors.white),
           validator: widget.validator,
           decoration: InputDecoration(
-            hintText:     'Enter phone number',
+            hintText:     AppLocalizations.of(context)!.enterPhoneNumber,
             hintStyle:    const TextStyle(color: Colors.white38),
             filled:       true,
             fillColor:    const Color(0xFF1A2A3A),
@@ -231,9 +233,9 @@ class _CountryCodeSheetState extends State<_CountryCodeSheet> {
           const SizedBox(height: 16),
 
           // ── Title ───────────────────────────────────────────
-          const Text(
-            'Select Country Code',
-            style: TextStyle(
+          Text(
+            AppLocalizations.of(context)!.selectCountryCode,
+            style: const TextStyle(
               color:      Colors.white,
               fontSize:   18,
               fontWeight: FontWeight.bold,
@@ -249,7 +251,7 @@ class _CountryCodeSheetState extends State<_CountryCodeSheet> {
               onChanged:  _filter,
               style:      const TextStyle(color: Colors.white),
               decoration: InputDecoration(
-                hintText:      'Search country or code...',
+                hintText:      AppLocalizations.of(context)!.searchCountryOrCode,
                 hintStyle:     const TextStyle(color: Colors.white38),
                 prefixIcon:    const Icon(Icons.search, color: Colors.white38),
                 filled:        true,

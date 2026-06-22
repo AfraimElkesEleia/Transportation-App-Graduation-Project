@@ -50,15 +50,21 @@ class SeatGrid extends StatelessWidget {
   }
 
   @override
-  @override
   Widget build(BuildContext context) {
     final cols = _columns;
     final totalCols = cols.left + cols.right;
     final seatMap = {for (final s in classMap.seats) s.seatNumber: s};
+    final countedSeats =
+        classMap.availableCount + classMap.pendingCount + classMap.bookedCount;
+    final seatCount = classMap.totalSeats > 0
+        ? classMap.totalSeats
+        : classMap.seats.isNotEmpty
+        ? classMap.seats.length
+        : countedSeats > 0
+        ? countedSeats
+        : classMap.remainingSeats;
 
-    final rows = classMap.seats.isEmpty
-        ? (classMap.remainingSeats / totalCols).ceil()
-        : (classMap.seats.length / totalCols).ceil();
+    final rows = (seatCount / totalCols).ceil();
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 24),
@@ -88,6 +94,9 @@ class SeatGrid extends StatelessWidget {
                     children: labels.map((label) {
                       if (label == null) {
                         return const SizedBox(width: 24);
+                      }
+                      if ((int.tryParse(label) ?? 0) > seatCount) {
+                        return const SizedBox(width: 52, height: 52);
                       }
                       return _buildSeat(
                         label: label,
@@ -132,80 +141,16 @@ class SeatGrid extends StatelessWidget {
     }
 
     final isSelected = selectedSeats.contains(label);
-    final displayStatus = isSelected ? SeatStatus.pending : status;
-    final canTap =
-        status == SeatStatus.available || status == SeatStatus.pending;
+    final displayStatus = isSelected && status == SeatStatus.available
+        ? SeatStatus.pending
+        : status == SeatStatus.pending
+        ? SeatStatus.booked
+        : status;
+    final canTap = status == SeatStatus.available;
 
     return GestureDetector(
       onTap: canTap ? () => onSeatToggle(label) : null,
       child: SeatCircle(status: displayStatus, label: label, showLabel: true),
-    );
-  }
-}
-
-// ─────────────────────────────────────────────────────────────────
-// _BusHeader — bus icon row at the top of the grid container
-// ─────────────────────────────────────────────────────────────────
-class _BusHeader extends StatelessWidget {
-  const _BusHeader();
-
-  @override
-  Widget build(BuildContext context) {
-    return const Padding(
-      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Icon(Icons.directions_bus_outlined, color: Colors.white24, size: 26),
-          Icon(Icons.navigation, color: Colors.white24, size: 22),
-        ],
-      ),
-    );
-  }
-}
-
-// ─────────────────────────────────────────────────────────────────
-// _ColumnLetterHeaders — A B · C D  (or A · B C for 1x2)
-// ─────────────────────────────────────────────────────────────────
-class _ColumnLetterHeaders extends StatelessWidget {
-  final int leftCols;
-  final int rightCols;
-
-  const _ColumnLetterHeaders({required this.leftCols, required this.rightCols});
-
-  @override
-  Widget build(BuildContext context) {
-    final children = <Widget>[];
-
-    for (int i = 0; i < leftCols; i++) {
-      children.add(_LetterLabel(String.fromCharCode(65 + i)));
-    }
-    children.add(const SizedBox(width: 24)); // aisle
-    for (int i = 0; i < rightCols; i++) {
-      children.add(_LetterLabel(String.fromCharCode(65 + leftCols + i)));
-    }
-
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: children,
-    );
-  }
-}
-
-class _LetterLabel extends StatelessWidget {
-  final String letter;
-  const _LetterLabel(this.letter);
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: 52,
-      child: Center(
-        child: Text(
-          letter,
-          style: const TextStyle(color: Colors.white38, fontSize: 12),
-        ),
-      ),
     );
   }
 }

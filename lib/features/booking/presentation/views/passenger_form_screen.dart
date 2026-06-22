@@ -1,14 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:transportation_app/core/l10n/app_localizations.dart';
 import 'package:transportation_app/core/routing/routes.dart';
 import 'package:transportation_app/core/theming/colors.dart';
+import 'package:transportation_app/core/utils/error_localizer.dart';
 import 'package:transportation_app/features/booking/presentation/cubit/seat_map_cubit.dart';
 import 'package:transportation_app/features/booking/presentation/cubit/seat_map_state.dart';
+import 'package:transportation_app/features/profile/domain/entities/profile_entity.dart';
 import 'package:transportation_app/features/profile/presentation/cubit/profile_cubit/profile_cubit.dart';
 import 'package:transportation_app/features/profile/presentation/cubit/profile_cubit/profile_states.dart';
 import 'package:transportation_app/features/search/domain/entities/coach_class_entity.dart';
 import 'package:transportation_app/features/search/domain/entities/trip_result_entity.dart';
 import 'package:transportation_app/features/booking/presentation/views/widgets/points_redemption_widget.dart';
+import 'package:transportation_app/features/booking/presentation/views/widgets/passenger_form/passenger_autofill_banner.dart';
+import 'package:transportation_app/features/booking/presentation/views/widgets/passenger_form/passenger_card.dart';
+import 'package:transportation_app/features/booking/presentation/views/widgets/passenger_form/passenger_form_app_bar.dart';
+import 'package:transportation_app/features/booking/presentation/views/widgets/passenger_form/passenger_form_controllers.dart';
+
+bool _keepHomeRoute(Route<dynamic> route) =>
+    route.settings.name == AppRoutes.homeScreen || route.isFirst;
 
 class PassengerFormScreen extends StatefulWidget {
   final TripResultEntity trip;
@@ -32,7 +42,7 @@ class _PassengerFormScreenState extends State<PassengerFormScreen> {
   final _formKey = GlobalKey<FormState>();
 
   // One controller set per passenger
-  late final List<_PassengerControllers> _controllers;
+  late final List<PassengerFormControllers> _controllers;
 
   // Loyalty points for "Book Now"
   int _selectedPoints = 0;
@@ -45,11 +55,49 @@ class _PassengerFormScreenState extends State<PassengerFormScreen> {
     super.initState();
     _controllers = List.generate(
       widget.selectedSeats.length,
-      (_) => _PassengerControllers(),
+      (_) => PassengerFormControllers(),
     );
     // Listen on first passenger fields to reset _autofilled badge when user edits
     _controllers.first.nameController.addListener(_onFirstChanged);
     _controllers.first.phoneController.addListener(_onFirstChanged);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        final profileState = context.read<ProfileCubit>().state;
+        if (profileState is ProfileLoaded) {
+          _prefillFromProfile(profileState.profile);
+        }
+      }
+    });
+  }
+
+  void _prefillFromProfile(ProfileEntity profile) {
+    if (_controllers.isNotEmpty) {
+      final first = _controllers.first;
+      if (first.nameController.text.trim().isEmpty) {
+        first.nameController.text = profile.fullName;
+      }
+      if (first.phoneController.text.trim().isEmpty) {
+        first.phoneController.text = profile.phoneNumber;
+      }
+      if (first.emailController.text.trim().isEmpty) {
+        first.emailController.text = profile.email;
+      }
+      if (widget.isTrain) {
+        if (profile.idNumber != null && profile.idNumber!.isNotEmpty) {
+          if (first.idController.text.trim().isEmpty) {
+            first.idController.text = profile.idNumber!;
+          }
+          if (profile.idType != null) {
+            setState(() {
+              first.selectedIdType = profile.idType == 2
+                  ? 'Passport'
+                  : 'NationalId';
+            });
+          }
+        }
+      }
+    }
   }
 
   void _onFirstChanged() {
@@ -76,13 +124,15 @@ class _PassengerFormScreenState extends State<PassengerFormScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Row(
-            children: const [
-              Icon(Icons.warning_amber_rounded, color: Colors.white, size: 18),
-              SizedBox(width: 8),
+            children: [
+              const Icon(
+                Icons.warning_amber_rounded,
+                color: Colors.white,
+                size: 18,
+              ),
+              const SizedBox(width: 8),
               Expanded(
-                child: Text(
-                  'Please fill in Name and Phone for the first passenger first.',
-                ),
+                child: Text(AppLocalizations.of(context)!.fillNamePhoneFirst),
               ),
             ],
           ),
@@ -107,7 +157,9 @@ class _PassengerFormScreenState extends State<PassengerFormScreen> {
             const SizedBox(width: 8),
             Expanded(
               child: Text(
-                'Filled ${_controllers.length - 1} seat(s) with "$srcName"',
+                AppLocalizations.of(
+                  context,
+                )!.filledNSeats('${_controllers.length - 1}', srcName),
               ),
             ),
           ],
@@ -127,8 +179,7 @@ class _PassengerFormScreenState extends State<PassengerFormScreen> {
         // ENR (train): name + ID required, seat is auto-assigned
         payload['passengerName'] = c.nameController.text.trim();
         payload['idNumber'] = c.idController.text.trim();
-        payload['idType'] = 'NationalId';
-        payload['seatNumber'] = 'T-${i + 1}'; // auto placeholder
+        payload['idType'] = c.selectedIdType; // 'NationalId' or 'Passport'
       } else {
         // Non-ENR (bus): only seat number is required per passenger
         payload['passengerName'] = c.nameController.text.trim();
@@ -188,50 +239,66 @@ class _PassengerFormScreenState extends State<PassengerFormScreen> {
     return Scaffold(
       backgroundColor: ColorsManager.seatBg,
       body: SafeArea(
-        child: BlocListener<SeatMapCubit, SeatMapState>(
-          listener: (context, state) {
-            if (state is CartSuccess) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Success!'),
-                  backgroundColor: Colors.green,
-                ),
-              );
-              Navigator.pushNamedAndRemoveUntil(
-                context,
-                AppRoutes.cartScreen,
-                (route) => route.isFirst,
-              );
-            }
-            if (state is CartError) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(state.message),
-                  backgroundColor: Colors.red,
-                ),
-              );
-            }
-            if (state is CartAddedButCheckoutFailed) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(
-                    'Ticket added to cart, but checkout failed: ${state.message}',
-                  ),
-                  backgroundColor: Colors.orange,
-                  duration: const Duration(seconds: 4),
-                ),
-              );
-              Navigator.pushNamedAndRemoveUntil(
-                context,
-                AppRoutes.cartScreen,
-                (route) => route.isFirst,
-              );
-            }
-          },
+        child: MultiBlocListener(
+          listeners: [
+            BlocListener<SeatMapCubit, SeatMapState>(
+              listener: (context, state) {
+                final l10n = AppLocalizations.of(context)!;
+                if (state is CartSuccess) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(l10n.journeyAddedToCart),
+                      backgroundColor: Colors.green,
+                    ),
+                  );
+                  Navigator.pushNamedAndRemoveUntil(
+                    context,
+                    AppRoutes.cartScreen,
+                    _keepHomeRoute,
+                  );
+                }
+                if (state is CartError) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        ErrorLocalizer.localize(context, state.message),
+                      ),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
+                if (state is CartAddedButCheckoutFailed) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        l10n.ticketAddedButCheckoutFailed(
+                          ErrorLocalizer.localize(context, state.message),
+                        ),
+                      ),
+                      backgroundColor: Colors.orange,
+                      duration: const Duration(seconds: 4),
+                    ),
+                  );
+                  Navigator.pushNamedAndRemoveUntil(
+                    context,
+                    AppRoutes.cartScreen,
+                    _keepHomeRoute,
+                  );
+                }
+              },
+            ),
+            BlocListener<ProfileCubit, ProfileState>(
+              listener: (context, state) {
+                if (state is ProfileLoaded) {
+                  _prefillFromProfile(state.profile);
+                }
+              },
+            ),
+          ],
           child: Column(
             children: [
               // ── App bar ──
-              _FormAppBar(trip: widget.trip),
+              const PassengerFormAppBar(),
 
               // ── Form ──
               Expanded(
@@ -252,10 +319,14 @@ class _PassengerFormScreenState extends State<PassengerFormScreen> {
                           index++
                         ) {
                           final seatLabel = widget.isTrain
-                              ? 'Passenger ${index + 1}'
-                              : 'Seat ${widget.selectedSeats[index]}';
+                              ? AppLocalizations.of(
+                                  context,
+                                )!.passengerN('${index + 1}')
+                              : AppLocalizations.of(
+                                  context,
+                                )!.seatLabel(widget.selectedSeats[index]);
                           widgets.add(
-                            _PassengerCard(
+                            PassengerCard(
                               label: seatLabel,
                               controllers: _controllers[index],
                               isTrain: widget.isTrain,
@@ -268,7 +339,7 @@ class _PassengerFormScreenState extends State<PassengerFormScreen> {
                               !widget.isTrain &&
                               widget.selectedSeats.length > 1) {
                             widgets.add(
-                              _AutofillBanner(
+                              PassengerAutofillBanner(
                                 autofilled: _autofilled,
                                 onAutofill: _autofill,
                               ),
@@ -300,252 +371,6 @@ class _PassengerFormScreenState extends State<PassengerFormScreen> {
               ),
             ],
           ),
-        ),
-      ),
-    );
-  }
-}
-
-// ─────────────────────────────────────────────────────────────────
-// _PassengerControllers — holds text controllers per passenger
-// ─────────────────────────────────────────────────────────────────
-class _PassengerControllers {
-  final nameController = TextEditingController();
-  final idController = TextEditingController();
-  final phoneController = TextEditingController();
-  final emailController = TextEditingController();
-  String gender = 'Male';
-
-  void dispose() {
-    nameController.dispose();
-    idController.dispose();
-    phoneController.dispose();
-    emailController.dispose();
-  }
-}
-
-// ─────────────────────────────────────────────────────────────────
-// _FormAppBar
-// ─────────────────────────────────────────────────────────────────
-class _FormAppBar extends StatelessWidget {
-  final TripResultEntity trip;
-
-  const _FormAppBar({required this.trip});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      child: Row(
-        children: [
-          GestureDetector(
-            onTap: () => Navigator.pop(context),
-            child: Container(
-              width: 42,
-              height: 42,
-              decoration: BoxDecoration(
-                color: ColorsManager.seatContainerBg,
-                borderRadius: BorderRadius.circular(21),
-              ),
-              child: const Icon(
-                Icons.arrow_back,
-                color: Colors.white,
-                size: 20,
-              ),
-            ),
-          ),
-          const Expanded(
-            child: Text(
-              'Passenger Details',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 17,
-                fontWeight: FontWeight.bold,
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ),
-          const SizedBox(width: 42),
-        ],
-      ),
-    );
-  }
-}
-
-// ─────────────────────────────────────────────────────────────────
-// _PassengerCard — one card per passenger
-//   - Bus: Name + Phone + Email (no National ID)
-//   - Train (ENR): Name + National ID + Phone + Email
-// ─────────────────────────────────────────────────────────────────
-class _PassengerCard extends StatefulWidget {
-  final String label;
-  final _PassengerControllers controllers;
-  final bool isTrain;
-
-  const _PassengerCard({
-    required this.label,
-    required this.controllers,
-    required this.isTrain,
-  });
-
-  @override
-  State<_PassengerCard> createState() => _PassengerCardState();
-}
-
-class _PassengerCardState extends State<_PassengerCard> {
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: ColorsManager.surfaceDark,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: ColorsManager.borderDim, width: 1),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // ── Seat / passenger label ──
-          Text(
-            widget.label,
-            style: const TextStyle(
-              color: ColorsManager.accentCyan,
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 12),
-
-          // ── Full Name (required for all) ──
-          _buildTextField(
-            controller: widget.controllers.nameController,
-            label: 'Full Name',
-            icon: Icons.person_outline,
-            validator: (v) =>
-                (v == null || v.trim().isEmpty) ? 'Required' : null,
-          ),
-          const SizedBox(height: 12),
-
-          // ── National ID — ONLY for train (ENR) ──
-          if (widget.isTrain) ...[
-            _buildTextField(
-              controller: widget.controllers.idController,
-              label: 'National ID',
-              icon: Icons.badge_outlined,
-              keyboardType: TextInputType.number,
-              validator: (v) =>
-                  (v == null || v.trim().isEmpty) ? 'Required' : null,
-            ),
-            const SizedBox(height: 12),
-          ],
-
-          // ── Phone ──
-          _buildTextField(
-            controller: widget.controllers.phoneController,
-            label: 'Phone Number',
-            icon: Icons.phone_outlined,
-            keyboardType: TextInputType.phone,
-            validator: (v) =>
-                (v == null || v.trim().isEmpty) ? 'Required' : null,
-          ),
-          const SizedBox(height: 12),
-
-          // ── Email ──
-          _buildTextField(
-            controller: widget.controllers.emailController,
-            label: 'Email Address (Optional)',
-            icon: Icons.email_outlined,
-            keyboardType: TextInputType.emailAddress,
-          ),
-          const SizedBox(height: 12),
-
-          // ── Gender (bus only) ──
-          if (!widget.isTrain) _buildGenderDropdown(),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildTextField({
-    required TextEditingController controller,
-    required String label,
-    required IconData icon,
-    TextInputType keyboardType = TextInputType.text,
-    String? Function(String?)? validator,
-  }) {
-    return TextFormField(
-      controller: controller,
-      keyboardType: keyboardType,
-      validator: validator,
-      style: const TextStyle(color: Colors.white, fontSize: 14),
-      decoration: InputDecoration(
-        labelText: label,
-        labelStyle: const TextStyle(
-          color: ColorsManager.textMuted,
-          fontSize: 13,
-        ),
-        prefixIcon: Icon(icon, color: ColorsManager.textMuted, size: 20),
-        filled: true,
-        fillColor: ColorsManager.seatContainerBg,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide.none,
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: ColorsManager.accentCyan),
-        ),
-        errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Colors.redAccent),
-        ),
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 16,
-          vertical: 14,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildGenderDropdown() {
-    return DropdownButtonFormField<String>(
-      initialValue: widget.controllers.gender,
-      onChanged: (val) {
-        if (val != null) {
-          setState(() => widget.controllers.gender = val);
-        }
-      },
-      items: const [
-        DropdownMenuItem(value: 'Male', child: Text('Male')),
-        DropdownMenuItem(value: 'Female', child: Text('Female')),
-      ],
-      dropdownColor: ColorsManager.seatContainerBg,
-      style: const TextStyle(color: Colors.white, fontSize: 14),
-      decoration: InputDecoration(
-        labelText: 'Gender',
-        labelStyle: const TextStyle(
-          color: ColorsManager.textMuted,
-          fontSize: 13,
-        ),
-        prefixIcon: const Icon(
-          Icons.wc_outlined,
-          color: ColorsManager.textMuted,
-          size: 20,
-        ),
-        filled: true,
-        fillColor: ColorsManager.seatContainerBg,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide.none,
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: ColorsManager.accentCyan),
-        ),
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 16,
-          vertical: 14,
         ),
       ),
     );
@@ -622,9 +447,9 @@ class _FormBottomButtonsState extends State<_FormBottomButtons> {
                                   color: ColorsManager.accentCyan,
                                 ),
                               )
-                            : const Text(
-                                'Add to Cart',
-                                style: TextStyle(
+                            : Text(
+                                AppLocalizations.of(context)!.addToCart,
+                                style: const TextStyle(
                                   color: ColorsManager.accentCyan,
                                   fontWeight: FontWeight.bold,
                                   fontSize: 15,
@@ -661,9 +486,9 @@ class _FormBottomButtonsState extends State<_FormBottomButtons> {
                                   color: Colors.white,
                                 ),
                               )
-                            : const Text(
-                                'Book Now',
-                                style: TextStyle(
+                            : Text(
+                                AppLocalizations.of(context)!.bookNow,
+                                style: const TextStyle(
                                   color: Colors.white,
                                   fontWeight: FontWeight.bold,
                                   fontSize: 15,
@@ -678,98 +503,6 @@ class _FormBottomButtonsState extends State<_FormBottomButtons> {
           ],
         );
       },
-    );
-  }
-}
-
-// -----------------------------------------------------------------
-// _AutofillBanner - shown between seat 0 and seat 1 for bus legs
-// -----------------------------------------------------------------
-class _AutofillBanner extends StatelessWidget {
-  final bool autofilled;
-  final VoidCallback onAutofill;
-
-  const _AutofillBanner({required this.autofilled, required this.onAutofill});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-      decoration: BoxDecoration(
-        color: ColorsManager.surfaceDark,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: ColorsManager.accentCyan.withAlpha(80),
-          width: 1.2,
-        ),
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: ColorsManager.accentCyan.withAlpha(25),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: const Icon(
-              Icons.family_restroom_rounded,
-              color: ColorsManager.accentCyan,
-              size: 22,
-            ),
-          ),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  autofilled ? 'Auto-filled \u2714' : 'Travelling with family?',
-                  style: TextStyle(
-                    color: autofilled
-                        ? ColorsManager.successGreen
-                        : Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 13,
-                  ),
-                ),
-                const SizedBox(height: 3),
-                const Text(
-                  'Fill seat 1, then copy name & phone to all other seats.',
-                  style: TextStyle(color: Colors.white54, fontSize: 11),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(width: 8),
-          OutlinedButton(
-            onPressed: onAutofill,
-            style: OutlinedButton.styleFrom(
-              side: BorderSide(
-                color: autofilled
-                    ? ColorsManager.successGreen
-                    : ColorsManager.accentCyan,
-              ),
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              minimumSize: Size.zero,
-              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-            ),
-            child: Text(
-              autofilled ? 'Re-fill' : 'Auto-fill',
-              style: TextStyle(
-                color: autofilled
-                    ? ColorsManager.successGreen
-                    : ColorsManager.accentCyan,
-                fontWeight: FontWeight.bold,
-                fontSize: 12,
-              ),
-            ),
-          ),
-        ],
-      ),
     );
   }
 }

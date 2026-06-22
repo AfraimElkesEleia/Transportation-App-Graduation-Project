@@ -4,17 +4,21 @@ import 'package:transportation_app/core/routing/routes.dart';
 import 'package:transportation_app/core/theming/colors.dart';
 import 'package:transportation_app/core/theming/styles.dart';
 import 'package:transportation_app/features/home/domain/entities/search_params.dart';
-import 'package:transportation_app/features/search/data/models/recent_search_model.dart';
-import 'package:transportation_app/features/search/data/datasources/recent_search_local_data_source.dart';
+import 'package:transportation_app/features/search/domain/entities/recent_search_entity.dart';
+import 'package:transportation_app/features/search/domain/usecases/get_recent_searches_usecase.dart';
 import 'package:transportation_app/core/di/injection_container.dart';
+import 'package:transportation_app/core/l10n/app_localizations.dart';
+import 'package:transportation_app/core/helper/extensions.dart';
 
 class RecentSearchesList extends StatelessWidget {
   const RecentSearchesList({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<List<RecentSearchModel>>(
-      future: sl<RecentSearchLocalDataSource>().getRecentSearches(),
+    return FutureBuilder<List<RecentSearchEntity>>(
+      future: sl<GetRecentSearchesUseCase>()().then(
+        (result) => result.fold((_) => <RecentSearchEntity>[], (searches) => searches),
+      ),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
@@ -23,7 +27,7 @@ class RecentSearchesList extends StatelessWidget {
           return Padding(
             padding: const EdgeInsets.symmetric(vertical: 16),
             child: Text(
-              "No recent searches",
+              AppLocalizations.of(context)!.noRecentSearches,
               style: AppStyles.regular15White(
                 context,
               ).copyWith(color: Colors.white70),
@@ -43,7 +47,7 @@ class RecentSearchesList extends StatelessWidget {
 }
 
 class RecentSearchItem extends StatelessWidget {
-  final RecentSearchModel search;
+  final RecentSearchEntity search;
   const RecentSearchItem({super.key, required this.search});
 
   @override
@@ -98,22 +102,29 @@ class RecentSearchItem extends StatelessWidget {
   }
 
   ListTile recentSearchesItem(BuildContext context) {
-    final routeText = search.isRoundTrip
-        ? "${search.fromDisplayName} <-> ${search.toDisplayName}"
-        : "${search.fromDisplayName} -> ${search.toDisplayName}";
+    final l10n = AppLocalizations.of(context)!;
+    final from = search.fromDisplayName
+        .toLocalizedGov(context)
+        .toLocalizedStation(context);
+    final to = search.toDisplayName
+        .toLocalizedGov(context)
+        .toLocalizedStation(context);
+    final routeText = search.isRoundTrip ? "$from <-> $to" : "$from -> $to";
 
     final dateText = search.isRoundTrip && search.returnDate != null
-        ? "${search.travelDate} to ${search.returnDate}"
+        ? "${search.travelDate} ${l10n.to} ${search.returnDate}"
         : search.travelDate;
 
     return ListTile(
-      leading: Icon(
+      leading: FaIcon(
         FontAwesomeIcons.clockRotateLeft,
         color: ColorsManager.cyanBlue,
       ),
       title: Text(
         routeText,
         style: AppStyles.bold18DarkBlue(context).copyWith(color: Colors.white),
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
       ),
       subtitle: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -122,10 +133,12 @@ class RecentSearchItem extends StatelessWidget {
           Text(
             dateText,
             style: AppStyles.regular15White(context).copyWith(fontSize: 14),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
         ],
       ),
-      trailing: Icon(
+      trailing: FaIcon(
         FontAwesomeIcons.chevronRight,
         color: ColorsManager.cyanBlue,
         size: 16,

@@ -20,7 +20,8 @@ class RegisterUseCase extends Usecase<AuthResponseEntity, RegisterParams> {
       gender: params.gender,
       dateOfBirth: params.dateOfBirth,
       countryCode: params.countryCode,
-      nationalIdNumber: params.nationalIdNumber,
+      idType: params.idType,
+      idNumber: params.idNumber,
     );
   }
 }
@@ -36,7 +37,8 @@ class RegisterParams extends Equatable {
   final int gender;
   final String dateOfBirth;
   final String countryCode;
-  final String? nationalIdNumber;
+  final int? idType;
+  final String? idNumber;
 
   const RegisterParams({
     required this.email,
@@ -49,7 +51,8 @@ class RegisterParams extends Equatable {
     required this.gender,
     required this.dateOfBirth,
     required this.countryCode,
-    this.nationalIdNumber,
+    this.idType,
+    this.idNumber,
   });
 
   @override

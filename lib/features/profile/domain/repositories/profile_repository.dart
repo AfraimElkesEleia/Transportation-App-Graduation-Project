@@ -1,6 +1,5 @@
 import 'package:transportation_app/core/utils/typedef.dart';
 import 'package:transportation_app/features/profile/domain/entities/profile_entity.dart';
-import 'package:transportation_app/features/profile/domain/entities/ticket_entity.dart';
 import 'package:transportation_app/features/profile/domain/entities/wallet_transaction_entity.dart';
 
 abstract class ProfileRepository {
@@ -11,6 +10,8 @@ abstract class ProfileRepository {
     required String familyName,
     required String email,
     required String phoneNumber,
+    int? idType,
+    String? idNumber,
   });
   ResultFuture<String> uploadProfilePicture({required String filePath});
   ResultVoid depositToWallet({
@@ -19,7 +20,7 @@ abstract class ProfileRepository {
     required String expiryDate,
     required String cvv,
   });
-  ResultFuture<List<TicketEntity>> getMyTickets();
   ResultFuture<List<WalletTransactionEntity>> getWalletHistory();
   ResultVoid logout();
+  ResultVoid updateLanguage({required String languageCode});
 }

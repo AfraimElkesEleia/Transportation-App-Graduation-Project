@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:transportation_app/core/l10n/app_localizations.dart';
 import 'package:transportation_app/core/helper/spacing.dart';
 import 'package:transportation_app/core/theming/styles.dart';
 
@@ -14,6 +15,7 @@ class NextButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return ElevatedButton(
       onPressed: onPressed,
       style: ElevatedButton.styleFrom(
@@ -29,7 +31,7 @@ class NextButton extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Text(
-            isLastPage ? "Get Start" : "Continue",
+            isLastPage ? l10n.getStarted : l10n.continueBtn,
             style: AppStyles.bold18DarkBlue(context),
           ),
           horizontalSpace(space: 16),

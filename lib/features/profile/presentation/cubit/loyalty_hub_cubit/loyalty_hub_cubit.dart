@@ -9,12 +9,12 @@ class LoyaltyHubCubit extends Cubit<LoyaltyHubState> {
   final GetPointHistoryUsecase _pointUsecase;
   final GetChallengeHistoryUsecase _challengeUsecase;
 
-  List<ChallengeHistory> _challenges = [];
+  final List<ChallengeHistory> _challenges = [];
   bool _showCompleted = false;
   int _challengePage = 1;
   bool _hasMoreChallenges = true;
 
-  List<PointTransaction> _points = [];
+  final List<PointTransaction> _points = [];
   int _pointsPage = 1;
   bool _hasMorePoints = true;
 
@@ -26,11 +26,13 @@ class LoyaltyHubCubit extends Cubit<LoyaltyHubState> {
   Future<void> init() async {
     emit(LoyaltyHubLoading());
     await _loadChallengesInternal(reset: true);
+    if (isClosed) return;
     if (state is LoyaltyHubError) {
       _isInitialLoad = false;
       return;
     }
     await _loadPointHistoryInternal(reset: true);
+    if (isClosed) return;
     _isInitialLoad = false;
     if (state is! LoyaltyHubError) {
       _emitLoaded();
@@ -45,6 +47,7 @@ class LoyaltyHubCubit extends Cubit<LoyaltyHubState> {
       emit((state as LoyaltyHubLoaded).copyWith(isLoadingMoreChallenges: true));
     }
     await _loadChallengesInternal(reset: reset);
+    if (isClosed) return;
     _emitLoaded();
   }
 
@@ -62,6 +65,7 @@ class LoyaltyHubCubit extends Cubit<LoyaltyHubState> {
       pageNumber: _challengePage,
       pageSize: 10,
     );
+    if (isClosed) return;
 
     result.fold(
       (f) {
@@ -84,6 +88,7 @@ class LoyaltyHubCubit extends Cubit<LoyaltyHubState> {
       emit((state as LoyaltyHubLoaded).copyWith(isLoadingMorePoints: true));
     }
     await _loadPointHistoryInternal(reset: reset);
+    if (isClosed) return;
     _emitLoaded();
   }
 
@@ -95,6 +100,7 @@ class LoyaltyHubCubit extends Cubit<LoyaltyHubState> {
     }
 
     final result = await _pointUsecase(pageNumber: _pointsPage, pageSize: 10);
+    if (isClosed) return;
 
     result.fold(
       (f) {

@@ -1,23 +1,10 @@
-import 'package:dartz/dartz.dart';
-import 'package:transportation_app/core/error/exceptions.dart';
-import 'package:transportation_app/core/error/failures.dart';
-import 'package:transportation_app/features/booking/data/datasources/booking_remote_datasource.dart';
+import 'package:transportation_app/core/utils/typedef.dart';
+import 'package:transportation_app/features/booking/domain/repositories/booking_repository.dart';
 
 class CancelCartItemUsecase {
-  final BookingRemoteDatasource _datasource;
+  final BookingRepository repository;
 
-  CancelCartItemUsecase(this._datasource);
+  CancelCartItemUsecase(this.repository);
 
-  Future<Either<Failure, void>> call(int bookingId) async {
-    try {
-      await _datasource.cancelCartItem(bookingId);
-      return const Right(null);
-    } on ServerException catch (e) {
-      return Left(ServerFailure(message: e.message));
-    } on NetworkException {
-      return const Left(NetworkFailure(message: 'No internet connection'));
-    } catch (e) {
-      return const Left(ServerFailure(message: 'An unexpected error occurred'));
-    }
-  }
+  ResultFuture<void> call(int bookingId) => repository.cancelCartItem(bookingId);
 }

@@ -4,11 +4,7 @@ import 'package:transportation_app/features/multidestination/presentation/screen
 import 'package:transportation_app/features/search/domain/entities/coach_class_entity.dart';
 import 'package:transportation_app/features/search/domain/entities/trip_result_entity.dart';
 
-enum MultiDestinationBookingStep {
-  searchLegs,
-  selectSeats,
-  summary,
-}
+enum MultiDestinationBookingStep { searchLegs, selectSeats, summary }
 
 class MultiDestinationBookingState extends Equatable {
   final List<MultiDestinationLegSummary> legSummaries;
@@ -19,6 +15,7 @@ class MultiDestinationBookingState extends Equatable {
   final bool isSearching;
   final String? searchError;
   final List<TripResultEntity>? searchResults;
+  final List<TripResultEntity>? unfilteredSearchResults;
   final int currentPage;
   final int totalPages;
   final bool isFetchingMore;
@@ -34,7 +31,9 @@ class MultiDestinationBookingState extends Equatable {
 
   // Checkout
   final bool isAddingToCart;
+  final bool isBookingNow;
   final bool cartSuccess;
+  final bool checkoutSuccess;
   final String? cartError;
 
   const MultiDestinationBookingState({
@@ -44,6 +43,7 @@ class MultiDestinationBookingState extends Equatable {
     this.isSearching = false,
     this.searchError,
     this.searchResults,
+    this.unfilteredSearchResults,
     this.currentPage = 1,
     this.totalPages = 1,
     this.isFetchingMore = false,
@@ -53,7 +53,9 @@ class MultiDestinationBookingState extends Equatable {
     this.currentSeatLegIndex = 0,
     this.selectedSeats = const {},
     this.isAddingToCart = false,
+    this.isBookingNow = false,
     this.cartSuccess = false,
+    this.checkoutSuccess = false,
     this.cartError,
   });
 
@@ -69,6 +71,7 @@ class MultiDestinationBookingState extends Equatable {
     String? searchError,
     bool clearSearchError = false,
     List<TripResultEntity>? searchResults,
+    List<TripResultEntity>? unfilteredSearchResults,
     int? currentPage,
     int? totalPages,
     bool? isFetchingMore,
@@ -78,17 +81,22 @@ class MultiDestinationBookingState extends Equatable {
     int? currentSeatLegIndex,
     Map<int, List<String>>? selectedSeats,
     bool? isAddingToCart,
+    bool? isBookingNow,
     bool? cartSuccess,
+    bool? checkoutSuccess,
     String? cartError,
     bool clearCartError = false,
   }) {
     return MultiDestinationBookingState(
       legSummaries: legSummaries,
       currentStep: currentStep ?? this.currentStep,
-      currentSearchLegIndex: currentSearchLegIndex ?? this.currentSearchLegIndex,
+      currentSearchLegIndex:
+          currentSearchLegIndex ?? this.currentSearchLegIndex,
       isSearching: isSearching ?? this.isSearching,
       searchError: clearSearchError ? null : (searchError ?? this.searchError),
       searchResults: searchResults ?? this.searchResults,
+      unfilteredSearchResults:
+          unfilteredSearchResults ?? this.unfilteredSearchResults,
       currentPage: currentPage ?? this.currentPage,
       totalPages: totalPages ?? this.totalPages,
       isFetchingMore: isFetchingMore ?? this.isFetchingMore,
@@ -98,29 +106,34 @@ class MultiDestinationBookingState extends Equatable {
       currentSeatLegIndex: currentSeatLegIndex ?? this.currentSeatLegIndex,
       selectedSeats: selectedSeats ?? this.selectedSeats,
       isAddingToCart: isAddingToCart ?? this.isAddingToCart,
+      isBookingNow: isBookingNow ?? this.isBookingNow,
       cartSuccess: cartSuccess ?? this.cartSuccess,
+      checkoutSuccess: checkoutSuccess ?? this.checkoutSuccess,
       cartError: clearCartError ? null : (cartError ?? this.cartError),
     );
   }
 
   @override
   List<Object?> get props => [
-        legSummaries,
-        currentStep,
-        currentSearchLegIndex,
-        isSearching,
-        searchError,
-        searchResults,
-        currentPage,
-        totalPages,
-        isFetchingMore,
-        currentActiveParams,
-        selectedTrips,
-        selectedClasses,
-        currentSeatLegIndex,
-        selectedSeats,
-        isAddingToCart,
-        cartSuccess,
-        cartError,
-      ];
+    legSummaries,
+    currentStep,
+    currentSearchLegIndex,
+    isSearching,
+    searchError,
+    searchResults,
+    unfilteredSearchResults,
+    currentPage,
+    totalPages,
+    isFetchingMore,
+    currentActiveParams,
+    selectedTrips,
+    selectedClasses,
+    currentSeatLegIndex,
+    selectedSeats,
+    isAddingToCart,
+    isBookingNow,
+    cartSuccess,
+    checkoutSuccess,
+    cartError,
+  ];
 }

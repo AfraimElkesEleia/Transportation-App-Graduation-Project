@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:transportation_app/core/helper/extensions.dart';
+import 'package:transportation_app/core/l10n/app_localizations.dart';
 import 'package:transportation_app/core/routing/routes.dart';
 import 'package:transportation_app/core/theming/colors.dart';
 import 'package:transportation_app/features/search/domain/entities/indirect_trips_enitity.dart';
@@ -39,13 +41,15 @@ class _IndirectTripCardState extends State<IndirectTripCard> {
   Future<void> _pickDate(int leg) async {
     final initialDate = leg == 1 ? _dateLeg1 : _dateLeg2;
     // Leg 2 minimum date is Leg 1's date
-    final firstDate = leg == 1 ? DateTime.now() : _dateLeg1;
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final firstDate = leg == 1 ? today : _dateLeg1;
 
     final picked = await showDatePicker(
       context: context,
       initialDate: initialDate.isBefore(firstDate) ? firstDate : initialDate,
       firstDate: firstDate,
-      lastDate: DateTime.now().add(const Duration(days: 90)),
+      lastDate: today.add(const Duration(days: 60)),
       builder: (context, child) {
         return Theme(
           data: ThemeData.dark().copyWith(
@@ -109,7 +113,7 @@ class _IndirectTripCardState extends State<IndirectTripCard> {
 
           // ── Leg 1
           _LegConfigRow(
-            label: 'LEG 1',
+            label: AppLocalizations.of(context)!.legN('1'),
             originGov: widget.trip.firstLeg.originGovernorate,
             originSub: widget.trip.firstLeg.originStationName,
             destGov: widget.trip.firstLeg.destinationGovernorate,
@@ -123,7 +127,7 @@ class _IndirectTripCardState extends State<IndirectTripCard> {
 
           // ── Leg 2
           _LegConfigRow(
-            label: 'LEG 2',
+            label: AppLocalizations.of(context)!.legN('2'),
             originGov: widget.trip.secondLeg.originGovernorate,
             originSub: widget.trip.secondLeg.originStationName,
             destGov: widget.trip.secondLeg.destinationGovernorate,
@@ -141,9 +145,9 @@ class _IndirectTripCardState extends State<IndirectTripCard> {
               child: ElevatedButton.icon(
                 onPressed: _onBuildJourney,
                 icon: const Icon(Icons.build, size: 18),
-                label: const Text(
-                  'Build Journey',
-                  style: TextStyle(
+                label: Text(
+                  AppLocalizations.of(context)!.buildJourney,
+                  style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 15,
                     color: Colors.white,
@@ -244,8 +248,8 @@ class _TripSummaryHeader extends StatelessWidget {
                   crossAxisAlignment: WrapCrossAlignment.center,
                   children: [
                     ..._buildGovSubList(
-                      t1.originGovernorate,
-                      t1.originStationName,
+                      t1.originGovernorate.toLocalizedGov(context),
+                      t1.originStationName.toLocalizedStation(context),
                     ),
                     const Text(
                       ' ➔ ',
@@ -256,8 +260,8 @@ class _TripSummaryHeader extends StatelessWidget {
                       ),
                     ),
                     ..._buildGovSubList(
-                      t1.destinationGovernorate,
-                      t1.destinationStationName,
+                      t1.destinationGovernorate.toLocalizedGov(context),
+                      t1.destinationStationName.toLocalizedStation(context),
                     ),
                     const Text(
                       ' ➔ ',
@@ -268,8 +272,8 @@ class _TripSummaryHeader extends StatelessWidget {
                       ),
                     ),
                     ..._buildGovSubList(
-                      t2.destinationGovernorate,
-                      t2.destinationStationName,
+                      t2.destinationGovernorate.toLocalizedGov(context),
+                      t2.destinationStationName.toLocalizedStation(context),
                     ),
                   ],
                 ),
@@ -310,12 +314,12 @@ class _TransferBadge extends StatelessWidget {
               size: 16,
             ),
             const SizedBox(width: 6),
-            const Text(
-              'Transfer at ',
-              style: TextStyle(color: ColorsManager.textMuted, fontSize: 13),
+            Text(
+              '${AppLocalizations.of(context)!.transferAt} ',
+              style: const TextStyle(color: ColorsManager.textMuted, fontSize: 13),
             ),
             Text(
-              transGov,
+              transGov.toLocalizedGov(context),
               style: const TextStyle(
                 color: ColorsManager.textMuted,
                 fontSize: 13,
@@ -327,7 +331,7 @@ class _TransferBadge extends StatelessWidget {
                 style: TextStyle(color: ColorsManager.textMuted, fontSize: 13),
               ),
               Text(
-                transSub,
+                transSub.toLocalizedStation(context),
                 style: const TextStyle(
                   color: ColorsManager.textMuted,
                   fontSize: 13,
@@ -431,7 +435,10 @@ class _LegConfigRow extends StatelessWidget {
                 child: Wrap(
                   crossAxisAlignment: WrapCrossAlignment.center,
                   children: [
-                    ..._buildGovSubList(originGov, originSub),
+                    ..._buildGovSubList(
+                      originGov.toLocalizedGov(context),
+                      originSub.toLocalizedStation(context),
+                    ),
                     const Text(
                       ' ➔ ',
                       style: TextStyle(
@@ -440,7 +447,10 @@ class _LegConfigRow extends StatelessWidget {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    ..._buildGovSubList(destGov, destSub),
+                    ..._buildGovSubList(
+                      destGov.toLocalizedGov(context),
+                      destSub.toLocalizedStation(context),
+                    ),
                   ],
                 ),
               ),

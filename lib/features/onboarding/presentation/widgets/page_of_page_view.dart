@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:transportation_app/core/helper/spacing.dart';
 import 'package:transportation_app/core/theming/styles.dart';
-import 'package:transportation_app/features/onboarding/data/page_view_model.dart';
+import 'package:transportation_app/features/onboarding/domain/entities/page_view_entity.dart';
 import 'package:transportation_app/features/onboarding/presentation/widgets/icon_container_widget.dart';
 
 class PageOfPageView extends StatefulWidget {
-  final PageViewModel pageViewModel;
+  final PageViewEntity pageViewModel;
   final bool isOut;
   const PageOfPageView({
     super.key,

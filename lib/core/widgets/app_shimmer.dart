@@ -21,8 +21,8 @@ class AppShimmer extends StatelessWidget {
     return Padding(
       padding: margin ?? EdgeInsets.zero,
       child: Shimmer.fromColors(
-        baseColor: Colors.white.withOpacity(0.05),
-        highlightColor: Colors.white.withOpacity(0.15),
+        baseColor: Colors.white.withValues(alpha: 0.05),
+        highlightColor: Colors.white.withValues(alpha: 0.15),
         child: Container(
           width: width,
           height: height,

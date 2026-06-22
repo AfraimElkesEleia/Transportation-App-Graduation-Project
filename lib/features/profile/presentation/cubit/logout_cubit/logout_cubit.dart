@@ -12,6 +12,7 @@ class LogoutCubit extends Cubit<LogoutState> {
     emit(LogoutLoading());
 
     final result = await logoutUseCase(NoParams());
+    if (isClosed) return;
 
     result.fold(
       (failure) {

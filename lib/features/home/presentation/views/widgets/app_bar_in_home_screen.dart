@@ -5,6 +5,11 @@ import 'package:transportation_app/core/l10n/app_localizations.dart';
 import 'package:transportation_app/core/routing/routes.dart';
 import 'package:transportation_app/core/theming/styles.dart';
 
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:transportation_app/core/theming/colors.dart';
+import 'package:transportation_app/features/notfication/presentation/cubit/notfication_cubit.dart';
+import 'package:transportation_app/features/notfication/presentation/cubit/notfication_state.dart';
+
 class AppBarInHomeScreen extends StatelessWidget {
   const AppBarInHomeScreen({super.key});
 
@@ -23,11 +28,59 @@ class AppBarInHomeScreen extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             WelcomeSentenceAppBar(),
-            IconButton(
-              onPressed: () {
-                context.pushNamed(AppRoutes.cartScreen);
-              },
-              icon: Icon(FontAwesomeIcons.cartShopping, color: Colors.white),
+            Row(
+              children: [
+                BlocBuilder<NotificationCubit, NotificationState>(
+                  builder: (context, state) {
+                    final unread = state is NotificationLoaded
+                        ? state.unreadCount
+                        : 0;
+                    return Stack(
+                      children: [
+                        IconButton(
+                          icon: Icon(
+                            Icons.notifications_outlined,
+                            color: Colors.white,
+                          ),
+                          onPressed: () =>
+                              context.pushNamed(AppRoutes.notificationsScreen),
+                        ),
+                        if (unread > 0)
+                          Positioned(
+                            right: 6,
+                            top: 6,
+                            child: Container(
+                              width: 16,
+                              height: 16,
+                              decoration: BoxDecoration(
+                                color: ColorsManager.accentCyan,
+                                shape: BoxShape.circle,
+                              ),
+                              child: Text(
+                                unread > 9 ? '9+' : '$unread',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 9,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                          ),
+                      ],
+                    );
+                  },
+                ),
+                IconButton(
+                  onPressed: () {
+                    context.pushNamed(AppRoutes.cartScreen);
+                  },
+                  icon: FaIcon(
+                    FontAwesomeIcons.cartShopping,
+                    color: Colors.white,
+                  ),
+                ),
+              ],
             ),
           ],
         ),

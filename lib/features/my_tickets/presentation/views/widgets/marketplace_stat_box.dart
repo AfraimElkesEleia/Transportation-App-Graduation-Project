@@ -33,7 +33,7 @@ class MarketplaceStatBox extends StatelessWidget {
         width: 105,
         padding: const EdgeInsets.symmetric(vertical: 16),
         decoration: BoxDecoration(
-          color: ColorsManager.marketplaceCardBg.withOpacity(0.5),
+          color: ColorsManager.marketplaceCardBg.withValues(alpha: 0.5),
           borderRadius: BorderRadius.circular(20),
           border: Border.all(color: Colors.white10),
         ),

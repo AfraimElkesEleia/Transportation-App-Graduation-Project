@@ -1,11 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:transportation_app/core/l10n/app_localizations.dart';
 import 'package:transportation_app/core/routing/routes.dart';
 import 'package:transportation_app/core/theming/colors.dart';
+import 'package:transportation_app/core/utils/error_localizer.dart';
 import 'package:transportation_app/features/booking/presentation/cubit/indirect_booking_state.dart';
 import 'package:transportation_app/features/booking/presentation/cubit/seat_map_cubit.dart';
 import 'package:transportation_app/features/booking/presentation/cubit/seat_map_state.dart';
+import 'package:transportation_app/features/profile/domain/entities/profile_entity.dart';
+import 'package:transportation_app/features/profile/presentation/cubit/profile_cubit/profile_cubit.dart';
+import 'package:transportation_app/features/profile/presentation/cubit/profile_cubit/profile_states.dart';
 import 'package:transportation_app/features/search/domain/entities/trip_result_entity.dart';
+import 'package:transportation_app/features/booking/presentation/views/widgets/points_redemption_widget.dart';
+import 'package:transportation_app/features/booking/presentation/views/widgets/passenger_form/passenger_autofill_banner.dart';
+import 'package:transportation_app/features/booking/presentation/views/widgets/passenger_form/passenger_card.dart';
+import 'package:transportation_app/features/booking/presentation/views/widgets/passenger_form/passenger_form_controllers.dart';
+
+bool _keepHomeRoute(Route<dynamic> route) =>
+    route.settings.name == AppRoutes.homeScreen || route.isFirst;
 
 class IndirectPassengerFormScreen extends StatefulWidget {
   final IndirectBookingState bookingState;
@@ -20,19 +32,140 @@ class IndirectPassengerFormScreen extends StatefulWidget {
 class _IndirectPassengerFormScreenState
     extends State<IndirectPassengerFormScreen> {
   final _formKey = GlobalKey<FormState>();
-  late final List<_PassengerControllers> _controllers;
+  late final List<PassengerFormControllers> _controllers;
+  bool _autofilled = false;
+  int _selectedPoints = 0;
+
+  int get _passengerCount => widget.bookingState.selectedSeatsLeg1.length;
+  double get _journeyTotal {
+    final leg1Total =
+        widget.bookingState.selectedSeatsLeg1.length *
+        widget.bookingState.selectedClassLeg1!.price;
+    final leg2Total =
+        widget.bookingState.selectedSeatsLeg2.length *
+        widget.bookingState.selectedClassLeg2!.price;
+    return leg1Total + leg2Total;
+  }
 
   @override
   void initState() {
     super.initState();
     _controllers = List.generate(
-      widget.bookingState.requiredSeatCount,
-      (_) => _PassengerControllers(),
+      _passengerCount,
+      (_) => PassengerFormControllers(),
+    );
+
+    if (_controllers.isNotEmpty) {
+      _controllers.first.nameController.addListener(_onFirstChanged);
+      _controllers.first.phoneController.addListener(_onFirstChanged);
+    }
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        final profileState = context.read<ProfileCubit>().state;
+        if (profileState is ProfileLoaded) {
+          _prefillFromProfile(profileState.profile);
+        }
+      }
+    });
+  }
+
+  void _prefillFromProfile(ProfileEntity profile) {
+    if (_controllers.isNotEmpty) {
+      final first = _controllers.first;
+      if (first.nameController.text.trim().isEmpty) {
+        first.nameController.text = profile.fullName;
+      }
+      if (first.phoneController.text.trim().isEmpty) {
+        first.phoneController.text = profile.phoneNumber;
+      }
+      if (first.emailController.text.trim().isEmpty) {
+        first.emailController.text = profile.email;
+      }
+      final hasTrain =
+          _isTrain(widget.bookingState.selectedTripLeg1!) ||
+          _isTrain(widget.bookingState.selectedTripLeg2!);
+      if (hasTrain) {
+        if (profile.idNumber != null && profile.idNumber!.isNotEmpty) {
+          if (first.idController.text.trim().isEmpty) {
+            first.idController.text = profile.idNumber!;
+          }
+          if (profile.idType != null) {
+            setState(() {
+              first.selectedIdType = profile.idType == 2
+                  ? 'Passport'
+                  : 'NationalId';
+            });
+          }
+        }
+      }
+    }
+  }
+
+  void _onFirstChanged() {
+    if (_autofilled) setState(() => _autofilled = false);
+  }
+
+  void _autofill() {
+    final srcName = _controllers.first.nameController.text.trim();
+    final srcPhone = _controllers.first.phoneController.text.trim();
+
+    if (srcName.isEmpty || srcPhone.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Row(
+            children: [
+              const Icon(
+                Icons.warning_amber_rounded,
+                color: Colors.white,
+                size: 18,
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(AppLocalizations.of(context)!.fillNamePhoneFirst),
+              ),
+            ],
+          ),
+          backgroundColor: Colors.orange.shade700,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      return;
+    }
+
+    for (int i = 1; i < _controllers.length; i++) {
+      _controllers[i].nameController.text = srcName;
+      _controllers[i].phoneController.text = srcPhone;
+    }
+    setState(() => _autofilled = true);
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            const Icon(Icons.check_circle, color: Colors.white, size: 18),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                AppLocalizations.of(
+                  context,
+                )!.filledNSeats('${_controllers.length - 1}', srcName),
+              ),
+            ),
+          ],
+        ),
+        backgroundColor: Colors.green.shade700,
+        behavior: SnackBarBehavior.floating,
+      ),
     );
   }
 
   @override
   void dispose() {
+    if (_controllers.isNotEmpty) {
+      _controllers.first.nameController.removeListener(_onFirstChanged);
+      _controllers.first.phoneController.removeListener(_onFirstChanged);
+    }
     for (final c in _controllers) {
       c.dispose();
     }
@@ -54,20 +187,15 @@ class _IndirectPassengerFormScreenState
   ) {
     final isTrain = _isTrain(trip);
 
-    final passengers = List.generate(widget.bookingState.requiredSeatCount, (
-      i,
-    ) {
+    final passengers = List.generate(_passengerCount, (i) {
       final c = _controllers[i];
       final Map<String, dynamic> p = {
         'passengerName': c.nameController.text.trim(),
-        'idNumber': c.idController.text.trim().isEmpty
-            ? 'N/A'
-            : c.idController.text.trim(),
-        'idType': 'NationalId',
       };
 
       if (isTrain) {
-        p['seatNumber'] = '${i + 1}';
+        p['idType'] = c.selectedIdType;
+        p['idNumber'] = c.idController.text.trim();
       } else {
         p['seatNumber'] = selectedSeats[i];
       }
@@ -90,7 +218,7 @@ class _IndirectPassengerFormScreenState
     };
   }
 
-  void _submit() {
+  void _submit({required bool bookNow}) {
     if (!_formKey.currentState!.validate()) return;
 
     final leg1Payload = _buildPayloadForLeg(
@@ -105,9 +233,16 @@ class _IndirectPassengerFormScreenState
       widget.bookingState.selectedSeatsLeg2,
     );
 
-    context.read<SeatMapCubit>().addMultipleToCart(
-      payloads: [leg1Payload, leg2Payload],
-    );
+    final cubit = context.read<SeatMapCubit>();
+    final payloads = [leg1Payload, leg2Payload];
+    if (bookNow) {
+      cubit.bookMultipleNow(
+        payloads: payloads,
+        pointsToRedeem: _selectedPoints,
+      );
+    } else {
+      cubit.addMultipleToCart(payloads: payloads);
+    }
   }
 
   @override
@@ -115,102 +250,125 @@ class _IndirectPassengerFormScreenState
     final hasTrain =
         _isTrain(widget.bookingState.selectedTripLeg1!) ||
         _isTrain(widget.bookingState.selectedTripLeg2!);
+    int loyaltyBalance = 0;
+    final profileState = context.watch<ProfileCubit>().state;
+    if (profileState is ProfileLoaded) {
+      loyaltyBalance = profileState.profile.loyaltyPointsBalance ?? 0;
+    }
 
     return Scaffold(
       backgroundColor: ColorsManager.seatBg,
       appBar: AppBar(
-        title: const Text(
-          'Passenger Details',
-          style: TextStyle(color: Colors.white, fontSize: 17),
+        title: Text(
+          AppLocalizations.of(context)!.passengerDetails,
+          style: const TextStyle(color: Colors.white, fontSize: 17),
         ),
         backgroundColor: ColorsManager.seatContainerBg,
         iconTheme: const IconThemeData(color: Colors.white),
       ),
-      body: BlocListener<SeatMapCubit, SeatMapState>(
-        listener: (context, state) {
-          if (state is CartSuccess) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Indirect Trip successfully added to Cart!'),
-                backgroundColor: Colors.green,
-              ),
-            );
-            Navigator.pushNamedAndRemoveUntil(
-              context,
-              AppRoutes.cartScreen,
-              (route) => route.isFirst,
-            );
-          }
-          if (state is CartError) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.message),
-                backgroundColor: Colors.red,
-              ),
-            );
-          }
-        },
+      body: MultiBlocListener(
+        listeners: [
+          BlocListener<SeatMapCubit, SeatMapState>(
+            listener: (context, state) {
+              final l10n = AppLocalizations.of(context)!;
+              if (state is CartSuccess) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(l10n.indirectTripAddedToCart),
+                    backgroundColor: Colors.green,
+                  ),
+                );
+                Navigator.pushNamedAndRemoveUntil(
+                  context,
+                  AppRoutes.cartScreen,
+                  _keepHomeRoute,
+                );
+              }
+              if (state is CartError) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      ErrorLocalizer.localize(context, state.message),
+                    ),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+              }
+              if (state is CartAddedButCheckoutFailed) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      l10n.ticketAddedButCheckoutFailed(
+                        ErrorLocalizer.localize(context, state.message),
+                      ),
+                    ),
+                    backgroundColor: Colors.orange,
+                    duration: const Duration(seconds: 4),
+                  ),
+                );
+                Navigator.pushNamedAndRemoveUntil(
+                  context,
+                  AppRoutes.cartScreen,
+                  _keepHomeRoute,
+                );
+              }
+            },
+          ),
+          BlocListener<ProfileCubit, ProfileState>(
+            listener: (context, state) {
+              if (state is ProfileLoaded) {
+                _prefillFromProfile(state.profile);
+              }
+            },
+          ),
+        ],
         child: Column(
           children: [
             Expanded(
               child: Form(
                 key: _formKey,
-                child: ListView.builder(
+                child: ListView(
                   padding: const EdgeInsets.all(16),
-                  itemCount: widget.bookingState.requiredSeatCount,
-                  itemBuilder: (_, index) {
-                    return _PassengerCard(
-                      label: 'Passenger ${index + 1}',
-                      controllers: _controllers[index],
-                      hasTrainAnywhere: hasTrain,
-                    );
-                  },
-                ),
-              ),
-            ),
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: const BoxDecoration(
-                color: ColorsManager.seatContainerBg,
-                borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-              ),
-              child: SafeArea(
-                child: SizedBox(
-                  width: double.infinity,
-                  height: 52,
-                  child: ElevatedButton(
-                    onPressed: _submit,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: ColorsManager.accentCyan,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(26),
-                      ),
-                    ),
-                    child: BlocBuilder<SeatMapCubit, SeatMapState>(
-                      builder: (context, state) {
-                        if (state is SeatMapLoading) {
-                          return const SizedBox(
-                            width: 24,
-                            height: 24,
-                            child: CircularProgressIndicator(
-                              color: Colors.white,
-                              strokeWidth: 2,
+                  children: [
+                    ...() {
+                      final widgets = <Widget>[];
+                      for (int index = 0; index < _passengerCount; index++) {
+                        widgets.add(
+                          PassengerCard(
+                            label: AppLocalizations.of(
+                              context,
+                            )!.passengerN('${index + 1}'),
+                            controllers: _controllers[index],
+                            isTrain: hasTrain,
+                          ),
+                        );
+
+                        // Show autofill banner after the FIRST card for bus only with 2+ seats
+                        if (index == 0 && !hasTrain && _passengerCount > 1) {
+                          widgets.add(
+                            PassengerAutofillBanner(
+                              autofilled: _autofilled,
+                              onAutofill: _autofill,
                             ),
                           );
                         }
-                        return const Text(
-                          'Add Entire Journey to Cart',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        );
-                      },
+                      }
+                      return widgets;
+                    }(),
+                    PointsRedemptionWidget(
+                      cartTotal: _journeyTotal,
+                      walletPoints: loyaltyBalance,
+                      onPointsChanged: (pts) =>
+                          setState(() => _selectedPoints = pts),
                     ),
-                  ),
+                    const SizedBox(height: 8),
+                  ],
                 ),
               ),
+            ),
+            _IndirectFormBottomButtons(
+              onAddToCart: () => _submit(bookNow: false),
+              onBookNow: () => _submit(bookNow: true),
             ),
           ],
         ),
@@ -219,124 +377,131 @@ class _IndirectPassengerFormScreenState
   }
 }
 
-class _PassengerControllers {
-  final nameController = TextEditingController();
-  final idController = TextEditingController();
-  final phoneController = TextEditingController();
-  final emailController = TextEditingController();
-  String gender = 'Male';
+class _IndirectFormBottomButtons extends StatefulWidget {
+  final VoidCallback onAddToCart;
+  final VoidCallback onBookNow;
 
-  void dispose() {
-    nameController.dispose();
-    idController.dispose();
-    phoneController.dispose();
-    emailController.dispose();
-  }
-}
-
-class _PassengerCard extends StatelessWidget {
-  final String label;
-  final _PassengerControllers controllers;
-  final bool hasTrainAnywhere;
-
-  const _PassengerCard({
-    required this.label,
-    required this.controllers,
-    required this.hasTrainAnywhere,
+  const _IndirectFormBottomButtons({
+    required this.onAddToCart,
+    required this.onBookNow,
   });
 
   @override
+  State<_IndirectFormBottomButtons> createState() =>
+      _IndirectFormBottomButtonsState();
+}
+
+class _IndirectFormBottomButtonsState
+    extends State<_IndirectFormBottomButtons> {
+  int _lastClicked = 0;
+
+  @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: ColorsManager.surfaceDark,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: ColorsManager.borderDim),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            label,
-            style: const TextStyle(
-              color: ColorsManager.accentCyan,
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
-            ),
+    return BlocConsumer<SeatMapCubit, SeatMapState>(
+      listener: (context, state) {
+        if (state is CartSuccess ||
+            state is CartError ||
+            state is CartAddedButCheckoutFailed) {
+          setState(() => _lastClicked = 0);
+        }
+      },
+      builder: (context, state) {
+        final isLoading = state is CartAdding || state is SeatMapLoading;
+
+        return Container(
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+          decoration: const BoxDecoration(
+            color: ColorsManager.seatContainerBg,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
           ),
-          const SizedBox(height: 12),
-          TextFormField(
-            controller: controllers.nameController,
-            style: const TextStyle(color: Colors.white),
-            decoration: const InputDecoration(
-              labelText: 'Full Name',
-              labelStyle: TextStyle(color: ColorsManager.textMuted),
-            ),
-            validator: (v) =>
-                (v == null || v.trim().isEmpty) ? 'Required' : null,
-          ),
-          const SizedBox(height: 12),
-          if (hasTrainAnywhere) ...[
-            TextFormField(
-              controller: controllers.idController,
-              keyboardType: TextInputType.number,
-              style: const TextStyle(color: Colors.white),
-              decoration: const InputDecoration(
-                labelText: 'National ID',
-                labelStyle: TextStyle(color: ColorsManager.textMuted),
-              ),
-              validator: (v) =>
-                  (v == null || v.trim().isEmpty) ? 'Required' : null,
-            ),
-            const SizedBox(height: 12),
-          ],
-          TextFormField(
-            controller: controllers.phoneController,
-            keyboardType: TextInputType.phone,
-            style: const TextStyle(color: Colors.white),
-            decoration: const InputDecoration(
-              labelText: 'Phone Number',
-              labelStyle: TextStyle(color: ColorsManager.textMuted),
-            ),
-            validator: (v) =>
-                (v == null || v.trim().isEmpty) ? 'Required' : null,
-          ),
-          const SizedBox(height: 12),
-          TextFormField(
-            controller: controllers.emailController,
-            keyboardType: TextInputType.emailAddress,
-            style: const TextStyle(color: Colors.white),
-            decoration: const InputDecoration(
-              labelText: 'Email Address (Optional)',
-              labelStyle: TextStyle(color: ColorsManager.textMuted),
-            ),
-          ),
-          const SizedBox(height: 12),
-          if (!hasTrainAnywhere) ...[
-            DropdownButtonFormField<String>(
-              initialValue: controllers.gender,
-              dropdownColor: ColorsManager.surfaceDark,
-              items: const [
-                DropdownMenuItem(
-                  value: 'Male',
-                  child: Text('Male', style: TextStyle(color: Colors.white)),
+          child: SafeArea(
+            child: Row(
+              children: [
+                Expanded(
+                  child: SizedBox(
+                    height: 50,
+                    child: OutlinedButton(
+                      onPressed: isLoading
+                          ? null
+                          : () {
+                              setState(() => _lastClicked = 1);
+                              widget.onAddToCart();
+                            },
+                      style: OutlinedButton.styleFrom(
+                        side: const BorderSide(color: ColorsManager.accentCyan),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(25),
+                        ),
+                      ),
+                      child: isLoading && _lastClicked == 1
+                          ? const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: ColorsManager.accentCyan,
+                              ),
+                            )
+                          : Text(
+                              AppLocalizations.of(
+                                context,
+                              )!.addEntireJourneyToCart,
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(
+                                color: ColorsManager.accentCyan,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 13,
+                              ),
+                            ),
+                    ),
+                  ),
                 ),
-                DropdownMenuItem(
-                  value: 'Female',
-                  child: Text('Female', style: TextStyle(color: Colors.white)),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: SizedBox(
+                    height: 50,
+                    child: ElevatedButton(
+                      onPressed: isLoading
+                          ? null
+                          : () {
+                              setState(() => _lastClicked = 2);
+                              widget.onBookNow();
+                            },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: ColorsManager.accentCyan,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(25),
+                        ),
+                        elevation: 0,
+                      ),
+                      child: isLoading && _lastClicked == 2
+                          ? const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Colors.white,
+                              ),
+                            )
+                          : Text(
+                              AppLocalizations.of(
+                                context,
+                              )!.bookEntireJourneyNow,
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 13,
+                              ),
+                            ),
+                    ),
+                  ),
                 ),
               ],
-              onChanged: (v) => controllers.gender = v!,
-              decoration: const InputDecoration(
-                labelText: 'Gender',
-                labelStyle: TextStyle(color: ColorsManager.textMuted),
-              ),
             ),
-          ],
-        ],
-      ),
+          ),
+        );
+      },
     );
   }
 }

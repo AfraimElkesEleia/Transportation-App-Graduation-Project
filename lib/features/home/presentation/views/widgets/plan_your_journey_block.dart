@@ -5,6 +5,7 @@ import 'package:transportation_app/core/helper/extensions.dart';
 import 'package:transportation_app/core/helper/spacing.dart';
 import 'package:transportation_app/core/l10n/app_localizations.dart';
 import 'package:transportation_app/core/routing/routes.dart';
+import 'package:transportation_app/core/utils/error_localizer.dart';
 import 'package:transportation_app/core/widgets/block_container.dart';
 import 'package:transportation_app/features/home/domain/entities/search_params.dart';
 import 'package:transportation_app/features/home/domain/entities/station_entity.dart';
@@ -215,6 +216,12 @@ class _PlanYourJourneyBlockState extends State<PlanYourJourneyBlock>
     final toDisplay =
         _selectedToStation?.englishName ?? _selectedToGroup!.governorate;
 
+    // Arabic display names — used when app is in Arabic mode
+    final fromDisplayAr =
+        _selectedFromStation?.arabicName ?? _selectedFromGroup!.governorateAr;
+    final toDisplayAr =
+        _selectedToStation?.arabicName ?? _selectedToGroup!.governorateAr;
+
     return SearchParams(
       isRoundTrip: _isRoundTrip,
       travelDate: _formatDateForApi(dateController.text),
@@ -225,6 +232,8 @@ class _PlanYourJourneyBlockState extends State<PlanYourJourneyBlock>
       transport: _apiTransportValue,
       fromDisplayName: fromDisplay,
       toDisplayName: toDisplay,
+      fromDisplayNameAr: fromDisplayAr,
+      toDisplayNameAr: toDisplayAr,
       fromStationId: _selectedFromStation?.id,
       fromGovernorate: _selectedFromStation == null
           ? _selectedFromGroup!.governorate
@@ -298,7 +307,7 @@ class _PlanYourJourneyBlockState extends State<PlanYourJourneyBlock>
                   const Icon(Icons.wifi_off, color: Colors.red, size: 40),
                   const SizedBox(height: 12),
                   Text(
-                    state.message,
+                    ErrorLocalizer.localize(context, state.message),
                     style: const TextStyle(color: Colors.white54),
                     textAlign: TextAlign.center,
                   ),
@@ -381,7 +390,7 @@ class _PlanYourJourneyBlockState extends State<PlanYourJourneyBlock>
                 onPressed: () {
                   context.pushNamed(AppRoutes.multidestinationScreen);
                 },
-                label: "Multi-Destination",
+                label: l10n.multiDestination,
                 backgroundColor: Colors.blueAccent,
               ),
             ],

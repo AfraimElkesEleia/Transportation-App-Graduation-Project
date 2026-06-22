@@ -1,52 +1,66 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:transportation_app/core/error/exceptions.dart';
-import 'package:transportation_app/features/booking/data/datasources/booking_remote_datasource.dart';
+import 'package:transportation_app/core/notfications/local_alarm_scheduler.dart';
+import 'package:transportation_app/features/booking/domain/usecases/cancel_cart_item_usecase.dart';
+import 'package:transportation_app/features/booking/domain/usecases/checkout_usecase.dart';
+import 'package:transportation_app/features/booking/domain/usecases/get_cart_usecase.dart';
 import 'package:transportation_app/features/booking/presentation/cubit/cart_state.dart';
 
 class CartCubit extends Cubit<CartState> {
-  final BookingRemoteDatasource datasource;
+  final GetCartUseCase getCartUseCase;
+  final CheckoutUseCase checkoutUseCase;
+  final CancelCartItemUsecase cancelCartItemUsecase;
 
-  CartCubit({required this.datasource}) : super(CartInitial());
+  CartCubit({
+    required this.getCartUseCase,
+    required this.checkoutUseCase,
+    required this.cancelCartItemUsecase,
+  }) : super(CartInitial());
 
   Future<void> fetchCart() async {
     emit(CartLoading());
-    try {
-      final cart = await datasource.getCart();
+    final result = await getCartUseCase();
+    if (isClosed) return;
+    await result.fold((failure) async {
+      emit(CartError(failure.message));
+    }, (cart) async {
       if (cart == null || cart.items.isEmpty) {
         emit(CartEmpty());
       } else {
+        for (final item in cart.items) {
+          if (item.holdExpiresAt != null) {
+            await LocalAlarmScheduler.scheduleCartExpiry(
+              holdExpiresAt: item.holdExpiresAt!,
+            );
+            if (isClosed) return;
+          }
+        }
         emit(CartLoaded(cart));
       }
-    } on ServerException catch (e) {
-      emit(CartError(e.message));
-    } catch (_) {
-      emit(const CartError('An unexpected error occurred while fetching cart.'));
-    }
+    });
   }
 
   Future<void> checkout({int pointsToRedeem = 0}) async {
     emit(CheckoutLoading());
-    try {
-      await datasource.checkout(pointsToRedeem: pointsToRedeem);
+    final result = await checkoutUseCase(pointsToRedeem: pointsToRedeem);
+    if (isClosed) return;
+    await result.fold((failure) async {
+      emit(CheckoutError(failure.message));
+    }, (_) async {
+      await LocalAlarmScheduler.cancelCartExpiry();
+      if (isClosed) return;
       emit(CheckoutSuccess());
-    } on ServerException catch (e) {
-      emit(CheckoutError(e.message));
-    } catch (_) {
-      emit(const CheckoutError('An unexpected error occurred during checkout.'));
-    }
+    });
   }
 
   Future<void> cancelItem(int bookingId) async {
     emit(CartItemCancelling(bookingId));
-    try {
-      await datasource.cancelCartItem(bookingId);
+    final result = await cancelCartItemUsecase(bookingId);
+    if (isClosed) return;
+    await result.fold((failure) async {
+      emit(CartItemCancelError(failure.message));
       await fetchCart();
-    } on ServerException catch (e) {
-      emit(CartItemCancelError(e.message));
+    }, (_) async {
       await fetchCart();
-    } catch (_) {
-      emit(const CartItemCancelError('An unexpected error occurred while cancelling.'));
-      await fetchCart();
-    }
+    });
   }
 }

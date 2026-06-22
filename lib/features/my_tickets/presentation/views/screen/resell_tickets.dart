@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:transportation_app/core/helper/extensions.dart';
 import 'package:transportation_app/core/l10n/app_localizations.dart';
-import 'dart:ui' as ui;
 import 'package:transportation_app/core/theming/colors.dart';
+import 'package:transportation_app/core/utils/localized_time_formatter.dart';
 import 'package:transportation_app/features/my_tickets/presentation/cubit/marketplace_cubit.dart';
 import 'package:transportation_app/features/my_tickets/presentation/cubit/marketplace_states.dart';
 import 'package:transportation_app/features/my_tickets/presentation/cubit/my_tickets_cubit.dart';
 import 'package:transportation_app/features/my_tickets/presentation/cubit/my_tickets_states.dart';
-import 'package:transportation_app/features/profile/domain/entities/ticket_entity.dart';
+import 'package:transportation_app/features/my_tickets/domain/entities/ticket_entity.dart';
 
 class ResellTicketsScreen extends StatefulWidget {
   const ResellTicketsScreen({super.key});
@@ -110,14 +111,25 @@ class _ResellTicketsScreenState extends State<ResellTicketsScreen> {
                 );
               }
               // Only upcoming + confirmed + NOT a marketplace purchase
+              // + refund must NOT be in progress or accepted
               final resellableTickets = allTickets
                   .where(
                     (t) =>
                         t.isUpcoming &&
                         !t.isMarketplacePurchase &&
-                        t.status == 'Confirmed',
+                        t.status == 'Confirmed' &&
+                        (t.refundStatus == null ||
+                            t.refundStatus == 'Rejected'),
                   )
-                  .toList();
+                  .toList()
+                ..sort((a, b) {
+                  final boardingTimeCompare = a.boardingTime.compareTo(
+                    b.boardingTime,
+                  );
+                  if (boardingTimeCompare != 0) return boardingTimeCompare;
+
+                  return a.bookingId.compareTo(b.bookingId);
+                });
               debugPrint('Resellable count: ${resellableTickets.length}');
               for (final t in resellableTickets) {
                 debugPrint(
@@ -200,7 +212,8 @@ class _ResellTicketsScreenState extends State<ResellTicketsScreen> {
     TicketEntity ticket,
     String ticketKey,
   ) {
-    final maxAskingPrice = ticket.totalPrice;
+    final l10n = AppLocalizations.of(context)!;
+    final display = _localizedTicketValues(ticket, context.isArabic);
     final priceCtrl = TextEditingController(
       text: ticket.totalPrice.round().toString(),
     );
@@ -239,53 +252,26 @@ class _ResellTicketsScreenState extends State<ResellTicketsScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Wrap(
-                      crossAxisAlignment: WrapCrossAlignment.center,
-                      children: [
-                        Text(
-                          ticket.originGovernorate,
-                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-                        ),
-                        if (ticket.originStation.isNotEmpty && ticket.originStation != ticket.originGovernorate) ...[
-                          const Text(
-                            ' - ',
-                            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-                          ),
-                          Text(
-                            ticket.originStation,
-                            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-                          ),
-                        ],
-                        const Text(
-                          ' → ',
-                          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-                        ),
-                        Text(
-                          ticket.destinationGovernorate,
-                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-                        ),
-                        if (ticket.destinationStation.isNotEmpty && ticket.destinationStation != ticket.destinationGovernorate) ...[
-                          const Text(
-                            ' - ',
-                            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-                          ),
-                          Text(
-                            ticket.destinationStation,
-                            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-                          ),
-                        ],
-                      ],
+                    _RouteSummary(
+                      originGovernorate: display.originGovernorate,
+                      destinationGovernorate: display.destinationGovernorate,
+                      originStation: display.originStation,
+                      destinationStation: display.destinationStation,
+                      compact: true,
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      '${ticket.seatsBooked} seat${ticket.seatsBooked > 1 ? 's' : ''} · ${ticket.agencyName}',
+                      '${l10n.seatsCount(ticket.seatsBooked.toString())} · ${display.agencyName}',
                       style: const TextStyle(
                         color: Colors.white54,
                         fontSize: 12,
                       ),
                     ),
                     Text(
-                      'Original price: ${ticket.totalPrice.round()} EGP',
+                      l10n.originalPrice(
+                        ticket.totalPrice.round().toString(),
+                        l10n.egp,
+                      ),
                       style: const TextStyle(
                         color: ColorsManager.accentCyan,
                         fontSize: 12,
@@ -296,7 +282,7 @@ class _ResellTicketsScreenState extends State<ResellTicketsScreen> {
               ),
               const SizedBox(height: 16),
               Text(
-                '${AppLocalizations.of(context)!.askingPrice} (${maxAskingPrice.round()} EGP)',
+                AppLocalizations.of(context)!.askingPrice,
                 style: const TextStyle(color: Colors.white70, fontSize: 13),
               ),
               const SizedBox(height: 8),
@@ -309,7 +295,7 @@ class _ResellTicketsScreenState extends State<ResellTicketsScreen> {
                 decoration: InputDecoration(
                   filled: true,
                   fillColor: Colors.white10,
-                  suffixText: 'EGP',
+                  suffixText: l10n.egp,
                   suffixStyle: const TextStyle(color: Colors.white54),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
@@ -341,19 +327,6 @@ class _ResellTicketsScreenState extends State<ResellTicketsScreen> {
           ElevatedButton(
             onPressed: () {
               final price = double.tryParse(priceCtrl.text.trim()) ?? 0.0;
-              if (price <= 0 || price > maxAskingPrice) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      price <= 0
-                          ? 'Price must be greater than 0.'
-                          : 'Max price is ${maxAskingPrice.round()} EGP.',
-                    ),
-                    backgroundColor: Colors.orange,
-                  ),
-                );
-                return;
-              }
               Navigator.pop(ctx);
               setState(() => _pendingTicketKey = ticketKey);
               context.read<MarketplaceCubit>().listTicket(
@@ -393,9 +366,16 @@ class _ResellTicketsScreenState extends State<ResellTicketsScreen> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Row(
           children: [
-            const Icon(Icons.warning_amber_rounded, color: Colors.orange, size: 24),
+            const Icon(
+              Icons.warning_amber_rounded,
+              color: Colors.orange,
+              size: 24,
+            ),
             const SizedBox(width: 8),
-            Text(AppLocalizations.of(context)!.cancelListing, style: const TextStyle(color: Colors.white)),
+            Text(
+              AppLocalizations.of(context)!.cancelListing,
+              style: const TextStyle(color: Colors.white),
+            ),
           ],
         ),
         content: Text(
@@ -405,7 +385,10 @@ class _ResellTicketsScreenState extends State<ResellTicketsScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: Text(AppLocalizations.of(context)!.no, style: const TextStyle(color: Colors.white54)),
+            child: Text(
+              AppLocalizations.of(context)!.no,
+              style: const TextStyle(color: Colors.white54),
+            ),
           ),
           ElevatedButton(
             onPressed: () {
@@ -461,7 +444,7 @@ class _StatsRow extends StatelessWidget {
           child: _StatCard(
             icon: Icons.trending_up,
             label: AppLocalizations.of(context)!.estValue,
-            value: '${totalValue.round()} EGP',
+            value: '${totalValue.round()} ${AppLocalizations.of(context)!.egp}',
             color: ColorsManager.successGreen,
           ),
         ),
@@ -529,9 +512,15 @@ class _ResellTicketCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final isListed = ticket.isOfferedForResale;
-    final date = DateFormat('EEE, dd MMM yyyy').format(ticket.boardingTime);
-    final time = DateFormat('HH:mm').format(ticket.boardingTime);
+    final display = _localizedTicketValues(ticket, context.isArabic);
+    final locale = Localizations.localeOf(context).languageCode;
+    final date = DateFormat(
+      'EEE, dd MMM yyyy',
+      locale,
+    ).format(ticket.boardingTime);
+    final time = formatTicketTime(context, ticket.boardingTime);
     final daysLeft = ticket.boardingTime.difference(DateTime.now()).inDays;
 
     return Container(
@@ -570,7 +559,9 @@ class _ResellTicketCard extends StatelessWidget {
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    isListed ? AppLocalizations.of(context)!.listedOnMarketplace : AppLocalizations.of(context)!.availableForSale,
+                    isListed
+                        ? AppLocalizations.of(context)!.listedOnMarketplace
+                        : AppLocalizations.of(context)!.availableForSale,
                     style: TextStyle(
                       color: isListed
                           ? Colors.orange
@@ -593,7 +584,7 @@ class _ResellTicketCard extends StatelessWidget {
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
-                    '$daysLeft day${daysLeft != 1 ? 's' : ''} left',
+                    l10n.daysLeft(daysLeft.toString()),
                     style: TextStyle(
                       color: daysLeft < 3 ? Colors.redAccent : Colors.white54,
                       fontSize: 11,
@@ -611,99 +602,11 @@ class _ResellTicketCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Route
-                Row(
-                  children: [
-                    Expanded(
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Flexible(
-                            child: Text(
-                              ticket.originGovernorate,
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 15,
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                          if (ticket.originStation.isNotEmpty && ticket.originStation != ticket.originGovernorate) ...[
-                            const Text(
-                              ' - ',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 15,
-                              ),
-                            ),
-                            Flexible(
-                              child: Text(
-                                ticket.originStation,
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 15,
-                                ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                          ],
-                        ],
-                      ),
-                    ),
-                    const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 8),
-                      child: Icon(
-                        Icons.arrow_forward,
-                        color: ColorsManager.accentCyan,
-                        size: 16,
-                      ),
-                    ),
-                    Expanded(
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Flexible(
-                            child: Text(
-                              ticket.destinationGovernorate,
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 15,
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                          if (ticket.destinationStation.isNotEmpty && ticket.destinationStation != ticket.destinationGovernorate) ...[
-                            const Text(
-                              ' - ',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 15,
-                              ),
-                            ),
-                            Flexible(
-                              child: Text(
-                                ticket.destinationStation,
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 15,
-                                ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                          ],
-                        ],
-                      ),
-                    ),
-                  ],
+                _RouteSummary(
+                  originGovernorate: display.originGovernorate,
+                  destinationGovernorate: display.destinationGovernorate,
+                  originStation: display.originStation,
+                  destinationStation: display.destinationStation,
                 ),
                 const SizedBox(height: 8),
 
@@ -716,12 +619,15 @@ class _ResellTicketCard extends StatelessWidget {
                     _MetaChip(icon: Icons.access_time, label: time),
                     _MetaChip(
                       icon: Icons.event_seat,
-                      label:
-                          '${ticket.seatsBooked} seat${ticket.seatsBooked > 1 ? 's' : ''}',
+                      label: l10n.seatsCount(ticket.seatsBooked.toString()),
                     ),
                     _MetaChip(
                       icon: Icons.directions_bus,
-                      label: ticket.agencyName,
+                      label: display.agencyName,
+                    ),
+                    _MetaChip(
+                      icon: Icons.airline_seat_recline_normal_outlined,
+                      label: display.className,
                     ),
                   ],
                 ),
@@ -732,10 +638,14 @@ class _ResellTicketCard extends StatelessWidget {
                   children: [
                     Text(
                       AppLocalizations.of(context)!.totalPrice,
-                      style: const TextStyle(color: Colors.white54, fontSize: 13),
+                      style: const TextStyle(
+                        color: Colors.white54,
+                        fontSize: 13,
+                      ),
                     ),
+                    const SizedBox(width: 6),
                     Text(
-                      '${ticket.totalPrice.round()} EGP',
+                      '${ticket.totalPrice.round()} ${l10n.egp}',
                       style: const TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
@@ -759,7 +669,11 @@ class _ResellTicketCard extends StatelessWidget {
                               isListed ? Icons.cancel_outlined : Icons.sell,
                               size: 16,
                             ),
-                            label: Text(isListed ? AppLocalizations.of(context)!.cancel : AppLocalizations.of(context)!.sell),
+                            label: Text(
+                              isListed
+                                  ? AppLocalizations.of(context)!.cancel
+                                  : AppLocalizations.of(context)!.sell,
+                            ),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: isListed
                                   ? Colors.redAccent
@@ -787,6 +701,165 @@ class _ResellTicketCard extends StatelessWidget {
       ),
     );
   }
+}
+
+class _RouteSummary extends StatelessWidget {
+  final String originGovernorate;
+  final String destinationGovernorate;
+  final String originStation;
+  final String destinationStation;
+  final bool compact;
+
+  const _RouteSummary({
+    required this.originGovernorate,
+    required this.destinationGovernorate,
+    required this.originStation,
+    required this.destinationStation,
+    this.compact = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final showOriginStation = _isDifferent(originStation, originGovernorate);
+    final showDestinationStation = _isDifferent(
+      destinationStation,
+      destinationGovernorate,
+    );
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Expanded(
+              child: Text(
+                originGovernorate,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: compact ? 14 : 16,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 8),
+              child: Icon(
+                Icons.arrow_forward,
+                color: ColorsManager.accentCyan,
+                size: 16,
+              ),
+            ),
+            Expanded(
+              child: Text(
+                destinationGovernorate,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: compact ? 14 : 16,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.end,
+              ),
+            ),
+          ],
+        ),
+        if (showOriginStation || showDestinationStation) ...[
+          SizedBox(height: compact ? 4 : 6),
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  showOriginStation ? originStation : '',
+                  style: TextStyle(
+                    color: Colors.white.withValues(alpha: 0.58),
+                    fontSize: compact ? 11 : 12,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 8),
+                child: Icon(Icons.more_horiz, color: Colors.white30, size: 16),
+              ),
+              Expanded(
+                child: Text(
+                  showDestinationStation ? destinationStation : '',
+                  style: TextStyle(
+                    color: Colors.white.withValues(alpha: 0.58),
+                    fontSize: compact ? 11 : 12,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.end,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ],
+    );
+  }
+
+  bool _isDifferent(String value, String comparison) {
+    return value.trim().isNotEmpty &&
+        value.trim().toLowerCase() != comparison.trim().toLowerCase();
+  }
+}
+
+class _LocalizedTicketValues {
+  final String agencyName;
+  final String className;
+  final String originGovernorate;
+  final String originStation;
+  final String destinationGovernorate;
+  final String destinationStation;
+
+  const _LocalizedTicketValues({
+    required this.agencyName,
+    required this.className,
+    required this.originGovernorate,
+    required this.originStation,
+    required this.destinationGovernorate,
+    required this.destinationStation,
+  });
+}
+
+_LocalizedTicketValues _localizedTicketValues(TicketEntity ticket, bool isAr) {
+  return _LocalizedTicketValues(
+    agencyName: _localizedValue(ticket.agencyName, ticket.agencyNameAr, isAr),
+    className: _localizedValue(ticket.className, ticket.classNameAr, isAr),
+    originGovernorate: _localizedValue(
+      ticket.originGovernorate,
+      ticket.originGovernorateAr,
+      isAr,
+    ),
+    originStation: _localizedValue(
+      ticket.originStation,
+      ticket.originStationNameAr,
+      isAr,
+    ),
+    destinationGovernorate: _localizedValue(
+      ticket.destinationGovernorate,
+      ticket.destinationGovernorateAr,
+      isAr,
+    ),
+    destinationStation: _localizedValue(
+      ticket.destinationStation,
+      ticket.destinationStationNameAr,
+      isAr,
+    ),
+  );
+}
+
+String _localizedValue(String original, String? localized, bool useLocalized) {
+  if (useLocalized && localized != null && localized.trim().isNotEmpty) {
+    return localized.trim();
+  }
+  return original.trim();
 }
 
 // ── Meta chip ──────────────────────────────────────────────────────────────────
@@ -828,15 +901,15 @@ class _EmptyState extends StatelessWidget {
               color: Colors.white.withValues(alpha: 0.1),
             ),
             const SizedBox(height: 16),
-            const Text(
-              'No upcoming tickets available for resale.',
-              style: TextStyle(color: Colors.white54, fontSize: 14),
+            Text(
+              AppLocalizations.of(context)!.noResellable,
+              style: const TextStyle(color: Colors.white54, fontSize: 14),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 8),
-            const Text(
-              'Only confirmed, upcoming tickets that weren\'t\npurchased from the marketplace can be resold.',
-              style: TextStyle(color: Colors.white30, fontSize: 12),
+            Text(
+              AppLocalizations.of(context)!.resellRules,
+              style: const TextStyle(color: Colors.white30, fontSize: 12),
               textAlign: TextAlign.center,
             ),
           ],
@@ -878,9 +951,9 @@ class _ErrorBanner extends StatelessWidget {
           ),
           TextButton(
             onPressed: onRetry,
-            child: const Text(
-              'Retry',
-              style: TextStyle(color: ColorsManager.accentCyan),
+            child: Text(
+              AppLocalizations.of(context)!.retry,
+              style: const TextStyle(color: ColorsManager.accentCyan),
             ),
           ),
         ],

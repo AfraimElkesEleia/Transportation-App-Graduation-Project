@@ -1,5 +1,6 @@
 // lib/features/search/data/datasources/search_remote_datasource.dart
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:transportation_app/core/constants/api_constants.dart';
 import 'package:transportation_app/core/error/exceptions.dart';
 import 'package:transportation_app/features/home/domain/entities/search_params.dart';
@@ -27,6 +28,11 @@ class SearchRemoteDatasourceImpl implements SearchRemoteDatasource {
   }) async {
     try {
       final queryParams = params.toQueryParams();
+      if (kDebugMode) {
+        debugPrint(
+          '[SearchTrips] GET ${ApiConstants.search} query=$queryParams',
+        );
+      }
       final res = await dio.get(
         ApiConstants.search,
         queryParameters: queryParams,
@@ -47,13 +53,21 @@ class SearchRemoteDatasourceImpl implements SearchRemoteDatasource {
           .map((t) => TripResultModel.fromJson(t as Map<String, dynamic>))
           .toList();
 
-      return PageResultModel<TripResultModel>(
+      final page = PageResultModel<TripResultModel>(
         items: items,
         totalCount: dataObj['totalCount'] as int? ?? 0,
         totalPages: dataObj['totalPages'] as int? ?? 0,
         currentPage: dataObj['currentPage'] as int? ?? 1,
         pageSize: dataObj['pageSize'] as int? ?? 10,
       );
+      if (kDebugMode) {
+        debugPrint(
+          '[SearchTrips] page=${page.currentPage}/${page.totalPages} '
+          'totalCount=${page.totalCount} pageSize=${page.pageSize} '
+          'items=${page.items.length}',
+        );
+      }
+      return page;
     } on DioException catch (e) {
       _handleDio(e);
     }

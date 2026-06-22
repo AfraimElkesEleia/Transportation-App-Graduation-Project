@@ -39,6 +39,8 @@ class ProfileCubit extends Cubit<ProfileState> {
     required String familyName,
     required String email,
     required String phoneNumber,
+    int? idType,
+    String? idNumber,
   }) async {
     if (isClosed) return;
     emit(ProfileUpdating());
@@ -49,6 +51,8 @@ class ProfileCubit extends Cubit<ProfileState> {
         familyName: familyName,
         email: email,
         phoneNumber: phoneNumber,
+        idType: idType,
+        idNumber: idNumber,
       ),
     );
     if (isClosed) return;
@@ -88,20 +92,17 @@ class ProfileCubit extends Cubit<ProfileState> {
       ),
     );
     if (isClosed) return;
-    result.fold((failure) => emit(WalletDepositFailure(failure.message)), (_) {
-      emit(WalletDepositSuccess());
-      loadProfile();
-    });
-  }
-
-  Future<void> loadMyTickets() async {
-    if (isClosed) return;
-    emit(TicketsLoading());
-    final result = await profileRepository.getMyTickets();
-    if (isClosed) return;
     result.fold(
-      (failure) => emit(TicketsError(failure.message)),
-      (tickets) => emit(TicketsLoaded(tickets)),
+      (failure) {
+        final message = failure.errors.isNotEmpty
+            ? failure.errors.join('\n')
+            : failure.message;
+        emit(WalletDepositFailure(message));
+      },
+      (_) {
+        emit(WalletDepositSuccess());
+        loadProfile();
+      },
     );
   }
 

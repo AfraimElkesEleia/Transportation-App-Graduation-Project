@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:transportation_app/core/constants/api_constants.dart';
+import 'package:transportation_app/core/l10n/app_localizations.dart';
 import 'package:transportation_app/core/theming/app_decorations.dart';
 import 'package:transportation_app/core/theming/colors.dart';
 import 'package:transportation_app/core/widgets/basic_container.dart';
@@ -9,6 +10,7 @@ import 'package:transportation_app/features/profile/domain/entities/profile_enti
 import 'package:transportation_app/features/profile/presentation/cubit/profile_cubit/profile_cubit.dart';
 import 'package:transportation_app/features/profile/presentation/cubit/profile_cubit/profile_states.dart';
 import 'package:transportation_app/features/profile/presentation/views/widgets/profile_section_container.dart';
+import 'package:transportation_app/core/validators/app_validators.dart';
 
 class EditProfileScreen extends StatefulWidget {
   final ProfileEntity profile;
@@ -30,6 +32,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   String? _newImagePath;
   String? _uploadedImageUrl;
 
+  int? _idType; // null = None, 1 = National ID, 2 = Passport
+  late final TextEditingController _idNumberController;
+
   @override
   void initState() {
     super.initState();
@@ -42,6 +47,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     );
     _emailController = TextEditingController(text: widget.profile.email);
     _phoneController = TextEditingController(text: widget.profile.phoneNumber);
+    _idType = widget.profile.idType;
+    _idNumberController = TextEditingController(text: widget.profile.idNumber);
   }
 
   @override
@@ -51,6 +58,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     _familyNameController.dispose();
     _emailController.dispose();
     _phoneController.dispose();
+    _idNumberController.dispose();
     super.dispose();
   }
 
@@ -74,38 +82,32 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       familyName: _familyNameController.text.trim(),
       email: _emailController.text.trim(),
       phoneNumber: _phoneController.text.trim(),
+      idType: widget.profile.hasSetIdentityDetails ? null : _idType,
+      idNumber: widget.profile.hasSetIdentityDetails
+          ? null
+          : (_idType == null ? null : _idNumberController.text.trim()),
     );
-  }
-
-  String get _initials {
-    final first = widget.profile.firstName;
-    final last = widget.profile.lastName;
-    if (first.isNotEmpty && last.isNotEmpty) {
-      return '${first[0]}${last[0]}'.toUpperCase();
-    }
-    return first.isNotEmpty ? first[0].toUpperCase() : '?';
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       body: BasicContainer(
         child: BlocConsumer<ProfileCubit, ProfileState>(
           listener: (context, state) {
             if (state is ProfilePictureUploadSuccess) {
-              setState(
-                () => _uploadedImageUrl = ApiConstants.mediaUrl(state.newUrl),
-              );
+              setState(() => _uploadedImageUrl = state.newUrl);
               _updateProfile();
             }
 
             if (state is ProfilePictureUploadFailure) {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: Text('Photo upload failed: ${state.message}'),
+                  content: Text(l10n.photoUploadFailed(state.message)),
                   backgroundColor: Colors.orange,
                   action: SnackBarAction(
-                    label: 'Skip & Save',
+                    label: l10n.skipAndSave,
                     textColor: Colors.white,
                     onPressed: _updateProfile, // save without photo
                   ),
@@ -117,8 +119,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             if (state is ProfileUpdateSuccess) {
               Navigator.pop(context);
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Profile updated successfully'),
+                SnackBar(
+                  content: Text(l10n.profileUpdatedSuccessfully),
                   backgroundColor: Colors.green,
                 ),
               );
@@ -158,9 +160,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                             color: Colors.white,
                           ),
                         ),
-                        const Expanded(
+                        Expanded(
                           child: Text(
-                            'Edit Profile',
+                            l10n.editProfile,
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               color: Colors.white,
@@ -183,12 +185,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           children: [
                             // ── Profile picture picker ───────
                             ProfilePicturePicker(
-                              currentImageUrl:
-                                  ApiConstants.mediaUrl(_uploadedImageUrl) ??
-                                  ApiConstants.mediaUrl(
+                              currentImageUrl: ApiConstants.mediaUrl(
+                                _uploadedImageUrl ??
                                     widget.profile.profilePictureUrl,
-                                  ),
-                              initials: _initials,
+                              ),
+                              initials: widget.profile.initials,
                               onImagePicked: (path) {
                                 setState(() => _newImagePath = path);
                               },
@@ -196,7 +197,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
                             if (isUploadingPicture) ...[
                               const SizedBox(height: 12),
-                              const Row(
+                              Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   SizedBox(
@@ -209,8 +210,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                   ),
                                   SizedBox(width: 8),
                                   Text(
-                                    'Uploading photo...',
-                                    style: TextStyle(
+                                    l10n.uploadingPhoto,
+                                    style: const TextStyle(
                                       color: Colors.cyan,
                                       fontSize: 13,
                                     ),
@@ -221,7 +222,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
                             if (_uploadedImageUrl != null) ...[
                               const SizedBox(height: 8),
-                              const Row(
+                              Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Icon(
@@ -231,8 +232,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                   ),
                                   SizedBox(width: 6),
                                   Text(
-                                    'Photo uploaded',
-                                    style: TextStyle(
+                                    l10n.photoUploaded,
+                                    style: const TextStyle(
                                       color: Colors.green,
                                       fontSize: 13,
                                     ),
@@ -245,125 +246,166 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
                             // ── Editable fields ──────────────
                             ProfileSectionContainer(
-                              title: 'Personal Information',
+                              title: l10n.sectionPersonal,
                               icon: Icons.person_outline,
                               children: [
                                 _buildField(
-                                  label: 'First Name',
+                                  label: l10n.firstName,
                                   controller: _firstNameController,
                                   validator: (v) =>
                                       v == null || v.trim().isEmpty
-                                      ? 'First name is required'
+                                      ? l10n.firstNameRequired
                                       : null,
                                 ),
                                 _buildField(
-                                  label: 'Last Name',
+                                  label: l10n.lastName,
                                   controller: _lastNameController,
                                   validator: (v) =>
                                       v == null || v.trim().isEmpty
-                                      ? 'Last name is required'
+                                      ? l10n.lastNameRequired
                                       : null,
                                 ),
                                 _buildField(
-                                  label: 'Family Name',
+                                  label: l10n.familyName,
                                   controller: _familyNameController,
                                 ),
                                 _buildField(
-                                  label: 'Email',
+                                  label: l10n.emailLabel,
                                   controller: _emailController,
                                   keyboardType: TextInputType.emailAddress,
                                   validator: (v) =>
                                       v == null || !v.contains('@')
-                                      ? 'Enter a valid email'
+                                      ? l10n.emailAddressValid
                                       : null,
                                 ),
                                 _buildField(
-                                  label: 'Phone Number',
+                                  label: l10n.phoneNumberLabel,
                                   controller: _phoneController,
                                   keyboardType: TextInputType.phone,
                                   validator: (v) =>
                                       v == null || v.trim().isEmpty
-                                      ? 'Phone is required'
+                                      ? l10n.phoneNumberRequired
                                       : null,
                                 ),
                               ],
                             ),
                             const SizedBox(height: 20),
-
-                            // ── Points Section ─────────────────
-                            ProfileSectionContainer(
-                              title: 'Loyalty Points',
-                              icon: Icons.stars_rounded,
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.all(16),
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xFF1A2A3A),
-                                    borderRadius: BorderRadius.circular(12),
+                            // ── Fixed Details Section ──────────
+                            _FixedDetailsSection(profile: widget.profile),
+                            if (!widget.profile.hasSetIdentityDetails) ...[
+                              const SizedBox(height: 20),
+                              ProfileSectionContainer(
+                                title: l10n.identityDetails,
+                                icon: Icons.badge_outlined,
+                                children: [
+                                  Text(
+                                    l10n.idTypeLabel,
+                                    style: const TextStyle(
+                                      color: Colors.white70,
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w500,
+                                    ),
                                   ),
-                                  child: const Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                  const SizedBox(height: 10),
+                                  Row(
                                     children: [
-                                      Text(
-                                        'Earned points are pending until departure and expire 4 months after departure.',
-                                        style: TextStyle(
-                                          color: Colors.white70,
-                                          fontSize: 14,
+                                      _buildIdChip(
+                                        label: l10n.idTypeNone,
+                                        selected: _idType == null,
+                                        onTap: () {
+                                          setState(() {
+                                            _idType = null;
+                                            _idNumberController.clear();
+                                          });
+                                        },
+                                      ),
+                                      const SizedBox(width: 8),
+                                      _buildIdChip(
+                                        label: l10n.idTypeNationalId,
+                                        selected: _idType == 1,
+                                        onTap: () {
+                                          setState(() {
+                                            _idType = 1;
+                                          });
+                                        },
+                                      ),
+                                      const SizedBox(width: 8),
+                                      _buildIdChip(
+                                        label: l10n.idTypePassport,
+                                        selected: _idType == 2,
+                                        onTap: () {
+                                          setState(() {
+                                            _idType = 2;
+                                          });
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                  if (_idType != null) ...[
+                                    const SizedBox(height: 16),
+                                    TextFormField(
+                                      controller: _idNumberController,
+                                      style: const TextStyle(color: Colors.white),
+                                      keyboardType: TextInputType.text,
+                                      validator: (v) {
+                                        if (_idType != null) {
+                                          if (v == null || v.trim().isEmpty) {
+                                            return _idType == 1
+                                                ? l10n.nationalIdRequired
+                                                : l10n.passportNumberRequired;
+                                          }
+                                          return _idType == 1
+                                              ? AppValidators.nationalId(v)
+                                              : AppValidators.passportNumber(v);
+                                        }
+                                        return null;
+                                      },
+                                      decoration: AppDecorations.profileInput(
+                                        _idType == 1
+                                            ? l10n.idTypeNationalId
+                                            : l10n.idTypePassport,
+                                      ).copyWith(
+                                        filled: true,
+                                        fillColor: const Color(0xFF1A2A3A),
+                                        hintText: _idType == 1
+                                            ? l10n.nationalIdHint
+                                            : l10n.passportNumberHint,
+                                        hintStyle: const TextStyle(
+                                          color: Colors.white24,
+                                        ),
+                                        prefixIcon: Icon(
+                                          _idType == 1
+                                              ? Icons.badge_outlined
+                                              : Icons.airplane_ticket_outlined,
+                                          color: Colors.white54,
                                         ),
                                       ),
-                                      SizedBox(height: 12),
-                                      Text(
-                                        'Points Balance: 480',
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold,
-                                        ),
+                                    ),
+                                  ],
+                                  const SizedBox(height: 12),
+                                  Row(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      const Icon(
+                                        Icons.warning_amber_rounded,
+                                        color: Colors.orange,
+                                        size: 16,
                                       ),
-                                      SizedBox(height: 4),
-                                      Text(
-                                        'Expiring Soon: 120 pts (May 31, 2026)',
-                                        style: TextStyle(
-                                          color: Colors.orangeAccent,
-                                          fontSize: 14,
+                                      const SizedBox(width: 6),
+                                      Expanded(
+                                        child: Text(
+                                          l10n.identityDetailsWarning,
+                                          style: const TextStyle(
+                                            color: Colors.orange,
+                                            fontSize: 12,
+                                          ),
                                         ),
                                       ),
                                     ],
                                   ),
-                                ),
-                              ],
-                            ),
-
-                            const SizedBox(height: 20),
-                            ProfileSectionContainer(
-                              title: 'Fixed Details',
-                              icon: Icons.lock_outline,
-                              children: [
-                                _buildReadOnly(
-                                  'Country',
-                                  widget.profile.countryName,
-                                ),
-                                const SizedBox(height: 4),
-                                const Row(
-                                  children: [
-                                    Icon(
-                                      Icons.info_outline,
-                                      color: Colors.white38,
-                                      size: 14,
-                                    ),
-                                    SizedBox(width: 6),
-                                    Text(
-                                      'Country cannot be changed.',
-                                      style: TextStyle(
-                                        color: Colors.white38,
-                                        fontSize: 12,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
+                                ],
+                              ),
+                            ],
                             const SizedBox(height: 32),
 
                             // ── Save button ──────────────────
@@ -394,8 +436,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                           const SizedBox(width: 12),
                                           Text(
                                             isUploadingPicture
-                                                ? 'Uploading photo...'
-                                                : 'Saving...',
+                                                ? l10n.uploadingPhoto
+                                                : l10n.saving,
                                             style: const TextStyle(
                                               color: Colors.white,
                                               fontSize: 16,
@@ -403,9 +445,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                           ),
                                         ],
                                       )
-                                    : const Text(
-                                        'Save Changes',
-                                        style: TextStyle(
+                                    : Text(
+                                        l10n.saveChanges,
+                                        style: const TextStyle(
                                           color: Colors.white,
                                           fontSize: 18,
                                           fontWeight: FontWeight.bold,
@@ -445,6 +487,91 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           label,
         ).copyWith(filled: true, fillColor: const Color(0xFF1A2A3A)),
       ),
+    );
+  }
+
+  Widget _buildIdChip({
+    required String label,
+    required bool selected,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+        decoration: BoxDecoration(
+          color: selected
+              ? ColorsManager.accentCyan.withValues(alpha: 0.15)
+              : Colors.white.withValues(alpha: 0.05),
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(
+            color: selected ? ColorsManager.accentCyan : Colors.white24,
+            width: selected ? 1.5 : 1,
+          ),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            color: selected ? ColorsManager.accentCyan : Colors.white54,
+            fontSize: 13,
+            fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _FixedDetailsSection extends StatelessWidget {
+  final ProfileEntity profile;
+
+  const _FixedDetailsSection({required this.profile});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
+    // Resolve id type label
+    String? idTypeLabel;
+    if (profile.hasSetIdentityDetails) {
+      if (profile.idType == 1) {
+        idTypeLabel = l10n.idTypeNationalId;
+      } else if (profile.idType == 2) {
+        idTypeLabel = l10n.idTypePassport;
+      }
+    }
+
+    return ProfileSectionContainer(
+      title: l10n.fixedDetails,
+      icon: Icons.lock_outline,
+      children: [
+        _buildReadOnly(l10n.countryLabel, profile.countryName),
+        if (idTypeLabel != null) ...[
+          const SizedBox(height: 4),
+          _buildReadOnly(l10n.idTypeLabel, idTypeLabel),
+        ],
+        if (profile.hasSetIdentityDetails &&
+            profile.idNumber != null &&
+            profile.idNumber!.isNotEmpty) ...[
+          const SizedBox(height: 4),
+          _buildReadOnly(
+            profile.idType == 2 ? l10n.passportNumberLabel : l10n.idNumberLabel,
+            profile.idNumber!,
+          ),
+        ],
+        const SizedBox(height: 4),
+        Row(
+          children: [
+            const Icon(Icons.info_outline, color: Colors.white38, size: 14),
+            const SizedBox(width: 6),
+            Text(
+              l10n.countryCannotBeChanged,
+              style: const TextStyle(color: Colors.white38, fontSize: 12),
+            ),
+          ],
+        ),
+      ],
     );
   }
 

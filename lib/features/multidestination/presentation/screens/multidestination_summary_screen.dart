@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:transportation_app/core/helper/extensions.dart';
 import 'package:transportation_app/core/helper/spacing.dart';
+import 'package:transportation_app/core/l10n/app_localizations.dart';
 import 'package:transportation_app/core/widgets/basic_container.dart';
 import 'package:transportation_app/core/widgets/block_container.dart';
 import 'package:transportation_app/features/home/presentation/views/widgets/search_trip_button.dart';
@@ -34,11 +36,13 @@ class MultidestinationSummaryScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'Journey Summary',
-          style: TextStyle(color: Colors.white),
+        title: Text(
+          loc.journeySummary,
+          style: const TextStyle(color: Colors.white),
         ),
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -66,7 +70,7 @@ class MultidestinationSummaryScreen extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Trip ${index + 1}',
+                              loc.legN('${index + 1}'),
                               style: const TextStyle(
                                 color: Colors.blueAccent,
                                 fontSize: 18,
@@ -87,37 +91,24 @@ class MultidestinationSummaryScreen extends StatelessWidget {
                                     crossAxisAlignment:
                                         WrapCrossAlignment.center,
                                     children: [
-                                      const Text(
-                                        'From: ',
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 16,
-                                        ),
-                                      ),
                                       Text(
-                                        leg.fromGov,
+                                        '${loc.from}: ',
                                         style: const TextStyle(
                                           color: Colors.white,
                                           fontSize: 16,
                                         ),
                                       ),
-                                      if (leg.fromSub != null &&
-                                          leg.fromSub!.isNotEmpty) ...[
-                                        const Text(
-                                          ' - ',
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 16,
-                                          ),
+                                      Text(
+                                        _locationLabel(
+                                          context,
+                                          leg.fromGov,
+                                          leg.fromSub,
                                         ),
-                                        Text(
-                                          leg.fromSub!,
-                                          style: const TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 16,
-                                          ),
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 16,
                                         ),
-                                      ],
+                                      ),
                                     ],
                                   ),
                                 ),
@@ -137,37 +128,24 @@ class MultidestinationSummaryScreen extends StatelessWidget {
                                     crossAxisAlignment:
                                         WrapCrossAlignment.center,
                                     children: [
-                                      const Text(
-                                        'To: ',
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 16,
-                                        ),
-                                      ),
                                       Text(
-                                        leg.toGov,
+                                        '${loc.to}: ',
                                         style: const TextStyle(
                                           color: Colors.white,
                                           fontSize: 16,
                                         ),
                                       ),
-                                      if (leg.toSub != null &&
-                                          leg.toSub!.isNotEmpty) ...[
-                                        const Text(
-                                          ' - ',
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 16,
-                                          ),
+                                      Text(
+                                        _locationLabel(
+                                          context,
+                                          leg.toGov,
+                                          leg.toSub,
                                         ),
-                                        Text(
-                                          leg.toSub!,
-                                          style: const TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 16,
-                                          ),
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 16,
                                         ),
-                                      ],
+                                      ),
                                     ],
                                   ),
                                 ),
@@ -185,7 +163,7 @@ class MultidestinationSummaryScreen extends StatelessWidget {
                                 ),
                                 horizontalSpace(space: 8),
                                 Text(
-                                  'Departure: ${leg.date}',
+                                  '${loc.departure}: ${leg.date}',
                                   style: const TextStyle(
                                     color: Colors.white70,
                                     fontSize: 14,
@@ -212,7 +190,7 @@ class MultidestinationSummaryScreen extends StatelessWidget {
                         arguments: legs,
                       );
                     },
-                    label: "Start Search",
+                    label: loc.searchTrip,
                   ),
                 ),
               ),
@@ -222,4 +200,11 @@ class MultidestinationSummaryScreen extends StatelessWidget {
       ),
     );
   }
+}
+
+String _locationLabel(BuildContext context, String governorate, String? sub) {
+  final gov = governorate.toLocalizedGov(context);
+  if (sub?.trim().isNotEmpty != true) return gov;
+
+  return '$gov - ${sub!.toLocalizedStation(context)}';
 }

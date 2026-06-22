@@ -3,6 +3,9 @@ import 'package:equatable/equatable.dart';
 class ChallengeEntity extends Equatable {
   final int challengeId;
   final String title;
+  final String? titleAr;
+  final String? description;
+  final String? descriptionAr;
   final int type;
   final int currentProgress;
   final int goalValue;
@@ -11,6 +14,9 @@ class ChallengeEntity extends Equatable {
   const ChallengeEntity({
     required this.challengeId,
     required this.title,
+    this.titleAr,
+    this.description,
+    this.descriptionAr,
     required this.type,
     required this.currentProgress,
     required this.goalValue,
@@ -21,6 +27,9 @@ class ChallengeEntity extends Equatable {
   List<Object?> get props => [
     challengeId,
     title,
+    titleAr,
+    description,
+    descriptionAr,
     type,
     currentProgress,
     goalValue,
@@ -38,6 +47,7 @@ class ProfileEntity extends Equatable {
   final String gender;
   final String countryCode;
   final String countryName;
+  final String? preferredLanguage;
   final String? profilePictureUrl;
   final int? totalTrips;
   final double? totalDistanceKm;
@@ -46,6 +56,9 @@ class ProfileEntity extends Equatable {
   final int? expiringPointsAmount;
   final String? nextExpiryDate;
   final List<ChallengeEntity>? activeChallenges;
+  final int? idType;      // 1 = National ID, 2 = Passport
+  final String? idNumber;
+  final bool hasSetIdentityDetails;
   const ProfileEntity({
     required this.userId,
     required this.firstName,
@@ -56,6 +69,7 @@ class ProfileEntity extends Equatable {
     required this.gender,
     required this.countryCode,
     required this.countryName,
+    this.preferredLanguage,
     this.profilePictureUrl,
     this.totalTrips,
     this.totalDistanceKm,
@@ -64,6 +78,9 @@ class ProfileEntity extends Equatable {
     this.expiringPointsAmount,
     this.nextExpiryDate,
     this.activeChallenges,
+    this.idType,
+    this.idNumber,
+    this.hasSetIdentityDetails = false,
   });
 
   ProfileEntity copyWith({
@@ -72,6 +89,7 @@ class ProfileEntity extends Equatable {
     String? familyName,
     String? email,
     String? phoneNumber,
+    String? preferredLanguage,
     String? profilePictureUrl,
     int? totalTrips,
     double? totalDistanceKm,
@@ -80,6 +98,9 @@ class ProfileEntity extends Equatable {
     int? expiringPointsAmount,
     String? nextExpiryDate,
     List<ChallengeEntity>? activeChallenges,
+    int? idType,
+    String? idNumber,
+    bool? hasSetIdentityDetails,
   }) {
     return ProfileEntity(
       userId: userId,
@@ -91,6 +112,7 @@ class ProfileEntity extends Equatable {
       gender: gender,
       countryCode: countryCode,
       countryName: countryName,
+      preferredLanguage: preferredLanguage ?? this.preferredLanguage,
       profilePictureUrl: profilePictureUrl ?? this.profilePictureUrl,
       totalTrips: totalTrips ?? this.totalTrips,
       totalDistanceKm: totalDistanceKm ?? this.totalDistanceKm,
@@ -99,19 +121,29 @@ class ProfileEntity extends Equatable {
       expiringPointsAmount: expiringPointsAmount ?? this.expiringPointsAmount,
       nextExpiryDate: nextExpiryDate ?? this.nextExpiryDate,
       activeChallenges: activeChallenges ?? this.activeChallenges,
+      idType: idType ?? this.idType,
+      idNumber: idNumber ?? this.idNumber,
+      hasSetIdentityDetails: hasSetIdentityDetails ?? this.hasSetIdentityDetails,
     );
   }
 
   String get fullName =>
-      '$firstName $familyName $lastName'.replaceAll(RegExp(r'\s+'), ' ').trim();
+      '$firstName $lastName $familyName'.replaceAll(RegExp(r'\s+'), ' ').trim();
+
+  String get initials {
+    if (firstName.isNotEmpty && lastName.isNotEmpty) {
+      return '${firstName[0]}${lastName[0]}'.toUpperCase();
+    }
+    return firstName.isNotEmpty ? firstName[0].toUpperCase() : '?';
+  }
 
   @override
-  List<Object?> get props => [userId, email];
+  List<Object?> get props => [userId, email, preferredLanguage];
 }
 
 extension StringExtension on String {
   String capitalize() {
-    if (this.isEmpty) return this;
+    if (isEmpty) return this;
     return '${this[0].toUpperCase()}${substring(1).toLowerCase()}';
   }
 }

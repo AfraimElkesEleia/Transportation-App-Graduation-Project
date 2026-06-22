@@ -28,7 +28,10 @@ class SearchErrorView extends StatelessWidget {
             ElevatedButton.icon(
               onPressed: onRetry,
               icon: const Icon(Icons.refresh, color: Colors.white),
-              label: Text(l10n.retry, style: const TextStyle(color: Colors.white)),
+              label: Text(
+                l10n.retry,
+                style: const TextStyle(color: Colors.white),
+              ),
               style: ElevatedButton.styleFrom(
                 backgroundColor: ColorsManager.surfaceMid,
               ),

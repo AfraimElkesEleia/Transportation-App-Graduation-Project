@@ -1,8 +1,8 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:transportation_app/core/constants/api_constants.dart';
 import 'package:transportation_app/core/error/exceptions.dart';
 import 'package:transportation_app/features/profile/data/models/profile_model.dart';
-import 'package:transportation_app/features/profile/domain/entities/ticket_entity.dart';
 import 'package:transportation_app/features/profile/domain/entities/wallet_transaction_entity.dart';
 
 abstract class ProfileRemoteDatasource {
@@ -13,6 +13,8 @@ abstract class ProfileRemoteDatasource {
     required String familyName,
     required String email,
     required String phoneNumber,
+    int? idType,
+    String? idNumber,
   });
   Future<String> uploadProfilePicture({required String filePath});
   Future<void> revokeToken({required String refreshToken});
@@ -22,8 +24,8 @@ abstract class ProfileRemoteDatasource {
     required String expiryDate,
     required String cvv,
   });
-  Future<List<TicketEntity>> getMyTickets();
   Future<List<WalletTransactionEntity>> getWalletHistory();
+  Future<void> updateLanguage({required String languageCode});
 }
 
 class ProfileRemoteDatasourceImpl implements ProfileRemoteDatasource {
@@ -34,7 +36,7 @@ class ProfileRemoteDatasourceImpl implements ProfileRemoteDatasource {
     try {
       final res = await dio.get(ApiConstants.userMe);
       final body = res.data as Map<String, dynamic>;
-      print('📦 [Profile] raw data: ${body['data']}');
+      debugPrint('📦 [Profile] raw data: ${body['data']}');
       if (body['success'] != true) {
         throw ServerException(
           message: body['message'] ?? 'Failed to load profile',
@@ -53,27 +55,29 @@ class ProfileRemoteDatasourceImpl implements ProfileRemoteDatasource {
     required String familyName,
     required String email,
     required String phoneNumber,
+    int? idType,
+    String? idNumber,
   }) async {
     try {
-      final res = await dio.put(
-        ApiConstants.userMe,
-        data: {
-          'firstName': firstName,
-          'lastName': lastName,
-          'familyName': familyName,
-          'email': email,
-          'phoneNumber': phoneNumber,
-        },
-      );
-      final body = res.data as Map<String, dynamic>;
-      if (body['success'] != true) {
+      final body = <String, dynamic>{
+        'firstName': firstName,
+        'lastName': lastName,
+        'familyName': familyName,
+        'email': email,
+        'phoneNumber': phoneNumber,
+      };
+      if (idType != null) body['idType'] = idType;
+      if (idNumber != null && idNumber.isNotEmpty) body['idNumber'] = idNumber;
+      final res = await dio.put(ApiConstants.userMe, data: body);
+      final bodyRes = res.data as Map<String, dynamic>;
+      if (bodyRes['success'] != true) {
         final errors =
-            (body['errors'] as List<dynamic>?)
+            (bodyRes['errors'] as List<dynamic>?)
                 ?.map((e) => e.toString())
                 .toList() ??
             [];
         throw ServerException(
-          message: body['message'] ?? 'Update failed',
+          message: bodyRes['message'] ?? 'Update failed',
           errors: errors,
         );
       }
@@ -105,10 +109,7 @@ class ProfileRemoteDatasourceImpl implements ProfileRemoteDatasource {
 
       final data = body['data'] as Map<String, dynamic>;
       final rawUrl = data['profilePictureUrl'] as String;
-      final fullUrl = rawUrl.startsWith('http')
-          ? rawUrl
-          : 'http://rehlabussines-001-site1.anytempurl.com/$rawUrl';
-      return fullUrl;
+      return ApiConstants.mediaUrl(rawUrl)!;
     } on DioException catch (e) {
       _handleDio(e);
     }
@@ -119,8 +120,9 @@ class ProfileRemoteDatasourceImpl implements ProfileRemoteDatasource {
     try {
       await dio.post(ApiConstants.revoke, data: {'refreshToken': refreshToken});
     } on DioException catch (e) {
-      if (e.response?.statusCode == 400 || e.response?.statusCode == 401)
+      if (e.response?.statusCode == 400 || e.response?.statusCode == 401) {
         return;
+      }
       _handleDio(e);
     }
   }
@@ -152,57 +154,14 @@ class ProfileRemoteDatasourceImpl implements ProfileRemoteDatasource {
   }
 
   @override
-  Future<List<TicketEntity>> getMyTickets() async {
-    try {
-      final res = await dio.get(ApiConstants.myTickets);
-      final body = res.data as Map<String, dynamic>;
-      if (body['success'] != true) {
-        throw ServerException(message: body['message'] ?? 'Failed to load tickets');
-      }
-      final list = (body['data'] as List<dynamic>? ?? []);
-      return list.map((e) => _parseTicket(e as Map<String, dynamic>)).toList();
-    } on DioException catch (e) {
-      _handleDio(e);
-    }
-  }
-
-  TicketEntity _parseTicket(Map<String, dynamic> json) {
-    final passengers = (json['passengers'] as List<dynamic>? ?? [])
-        .map((p) => TicketPassengerEntity(
-              passengerId: p['passengerId'] as int? ?? p['id'] as int? ?? 0,
-              name: p['name'] as String? ?? p['passengerName'] as String? ?? 'Unknown',
-              idNumber: p['idNumber'] as String? ?? 'N/A',
-              seatNumber: p['seatNumber']?.toString() ?? 'N/A',
-            ))
-        .toList();
-    return TicketEntity(
-      bookingId: json['bookingId'] as int,
-      userId: json['userId'] as int? ?? 0,
-      status: json['status'] as String? ?? '',
-      paymentStatus: json['paymentStatus'] as String? ?? '',
-      totalPrice: (json['totalPrice'] as num).toDouble(),
-      seatsBooked: json['seatsBooked'] as int? ?? 1,
-      bookingDate: DateTime.tryParse(json['bookingDate'] as String? ?? '') ?? DateTime.now(),
-      agencyName: json['agencyName'] as String? ?? '',
-      className: json['className'] as String? ?? '',
-      isMarketplacePurchase: json['isMarketplacePurchase'] as bool? ?? false,
-      originGovernorate: json['originGovernorate'] as String? ?? 'Cairo',
-      originStation: json['originStation'] as String? ?? '',
-      destinationGovernorate: json['destinationGovernorate'] as String? ?? 'Alexandria',
-      destinationStation: json['destinationStation'] as String? ?? '',
-      boardingTime: DateTime.tryParse(json['boardingTime'] as String? ?? '') ?? DateTime.now(),
-      dropoffTime: DateTime.tryParse(json['dropoffTime'] as String? ?? '') ?? DateTime.now(),
-      passengers: passengers,
-    );
-  }
-
-  @override
   Future<List<WalletTransactionEntity>> getWalletHistory() async {
     try {
       final res = await dio.get('/Wallet/history');
       final body = res.data as Map<String, dynamic>;
       if (body['success'] != true) {
-        throw ServerException(message: body['message'] ?? 'Failed to load history');
+        throw ServerException(
+          message: body['message'] ?? 'Failed to load history',
+        );
       }
       final list = (body['data'] as List<dynamic>? ?? []);
       return list.map((e) {
@@ -212,10 +171,31 @@ class ProfileRemoteDatasourceImpl implements ProfileRemoteDatasource {
           amount: (json['amount'] as num).toDouble(),
           type: json['type'] as String? ?? '',
           description: json['description'] as String? ?? '',
+          descriptionAr: json['descriptionAr'] as String?,
           bookingId: json['bookingId'] as int?,
-          createdAt: DateTime.tryParse(json['createdAt'] as String? ?? '') ?? DateTime.now(),
+          createdAt:
+              DateTime.tryParse(json['createdAt'] as String? ?? '') ??
+              DateTime.now(),
         );
       }).toList();
+    } on DioException catch (e) {
+      _handleDio(e);
+    }
+  }
+
+  @override
+  Future<void> updateLanguage({required String languageCode}) async {
+    try {
+      final res = await dio.put(
+        ApiConstants.changeLanguage,
+        data: {'language': languageCode},
+      );
+      final body = res.data as Map<String, dynamic>;
+      if (body['success'] != true) {
+        throw ServerException(
+          message: body['message'] ?? 'Failed to update language',
+        );
+      }
     } on DioException catch (e) {
       _handleDio(e);
     }

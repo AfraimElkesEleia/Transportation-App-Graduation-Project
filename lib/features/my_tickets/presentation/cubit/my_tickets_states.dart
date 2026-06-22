@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:transportation_app/features/profile/domain/entities/ticket_entity.dart';
+import 'package:transportation_app/features/my_tickets/domain/entities/ticket_entity.dart';
 import 'package:transportation_app/features/profile/domain/entities/wallet_transaction_entity.dart';
 
 abstract class MyTicketsState extends Equatable {
@@ -74,6 +74,18 @@ class WalletDepositedState extends MyTicketsState {
 class WalletDepositErrorState extends MyTicketsState {
   final String message;
   const WalletDepositErrorState(this.message);
+  @override
+  List<Object?> get props => [message];
+}
+
+// ── Refund states ─────────────────────────────────────────────────────
+class RefundRequestingState extends MyTicketsState {}
+
+class RefundRequestedState extends MyTicketsState {}
+
+class RefundRequestErrorState extends MyTicketsState {
+  final String message;
+  const RefundRequestErrorState(this.message);
   @override
   List<Object?> get props => [message];
 }

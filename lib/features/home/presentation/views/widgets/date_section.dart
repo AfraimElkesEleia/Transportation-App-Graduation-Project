@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:transportation_app/core/theming/colors.dart';
 import 'package:transportation_app/features/home/presentation/views/widgets/date_time_field.dart';
+import 'package:transportation_app/core/l10n/app_localizations.dart';
 
 class DateSection extends StatefulWidget {
   final bool isRoundTrip;
@@ -52,7 +53,7 @@ class _DateSectionState extends State<DateSection> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _dateSectionLabel(
-          widget.isRoundTrip ? 'Departure date' : 'Travel date',
+          widget.isRoundTrip ? AppLocalizations.of(context)!.departureDate : AppLocalizations.of(context)!.travelDate,
           Icons.flight_takeoff_rounded,
         ),
         DateTimeField(
@@ -88,7 +89,7 @@ class _DateSectionState extends State<DateSection> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const SizedBox(height: 12),
-                    _dateSectionLabel('Return date', Icons.flight_land_rounded),
+                    _dateSectionLabel(AppLocalizations.of(context)!.returnDate, Icons.flight_land_rounded),
                     DateTimeField(
                       key: _returnDateKey,
                       controller: widget.returnDateController,

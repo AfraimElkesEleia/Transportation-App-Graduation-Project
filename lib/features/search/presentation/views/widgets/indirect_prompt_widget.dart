@@ -12,7 +12,7 @@ class IndirectPromptWidget extends StatelessWidget {
       decoration: BoxDecoration(
         color: const Color(0xFF112240),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFF00E5FF).withAlpha(76)), // .withOpacity(0.3) -> 255 * 0.3 ~= 76
+        border: Border.all(color: const Color(0xFF00E5FF).withAlpha(76)),
       ),
       child: Column(
         children: [

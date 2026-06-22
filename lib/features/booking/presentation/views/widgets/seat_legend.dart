@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:transportation_app/core/l10n/app_localizations.dart';
 import 'package:transportation_app/features/booking/domain/entities/seat_map.dart';
 import 'package:transportation_app/features/booking/presentation/views/widgets/seat_circle.dart';
 
@@ -8,14 +9,15 @@ class SeatLegend extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Row(
+    final l10n = AppLocalizations.of(context)!;
+    return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        _LegendItem(status: SeatStatus.available, label: 'Available'),
-        SizedBox(width: 20),
-        _LegendItem(status: SeatStatus.pending, label: 'Selected'),
-        SizedBox(width: 20),
-        _LegendItem(status: SeatStatus.booked, label: 'Taken'),
+        _LegendItem(status: SeatStatus.available, label: l10n.seatLegendAvailable),
+        const SizedBox(width: 20),
+        _LegendItem(status: SeatStatus.pending, label: l10n.seatLegendSelected),
+        const SizedBox(width: 20),
+        _LegendItem(status: SeatStatus.booked, label: l10n.seatLegendTaken),
       ],
     );
   }

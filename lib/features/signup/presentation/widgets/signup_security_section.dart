@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:transportation_app/core/l10n/app_localizations.dart';
 import 'package:transportation_app/core/validators/app_validators.dart';
 import 'package:transportation_app/core/widgets/app_text_form_field.dart';
 import 'package:transportation_app/features/signup/presentation/widgets/password_strength_bar.dart';
@@ -19,12 +20,13 @@ class SignupSecuritySection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Column(
       children: [
         // Password + strength bar
         AppTextFormField(
-          label: 'Password',
-          hint: 'Create a strong password',
+          label: l10n.passwordLabel,
+          hint: l10n.createPasswordHint,
           prefixIcon: Icons.lock_outline,
           obscureText: true,
           controller: passwordController,
@@ -38,8 +40,8 @@ class SignupSecuritySection extends StatelessWidget {
 
         // Confirm Password
         AppTextFormField(
-          label: 'Confirm Password',
-          hint: 'Re-enter your password',
+          label: l10n.confirmPasswordLabel,
+          hint: l10n.confirmPasswordHint,
           prefixIcon: Icons.lock_outline,
           obscureText: true,
           controller: confirmPasswordController,

@@ -4,7 +4,7 @@ import 'package:transportation_app/core/error/failures.dart';
 import 'package:transportation_app/core/utils/typedef.dart';
 import 'package:transportation_app/features/my_tickets/data/datasources/my_tickets_remote_datasource.dart';
 import 'package:transportation_app/features/my_tickets/domain/repositories/my_tickets_repository.dart';
-import 'package:transportation_app/features/profile/domain/entities/ticket_entity.dart';
+import 'package:transportation_app/features/my_tickets/domain/entities/ticket_entity.dart';
 import 'package:transportation_app/features/profile/domain/entities/wallet_transaction_entity.dart';
 
 class MyTicketsRepositoryImpl implements MyTicketsRepository {
@@ -75,6 +75,27 @@ class MyTicketsRepositoryImpl implements MyTicketsRepository {
   }
 
   @override
+  ResultFuture<String> getQrPayload({
+    required int bookingId,
+    required int passengerId,
+  }) async {
+    try {
+      return Right(
+        await remoteDatasource.getQrPayload(
+          bookingId: bookingId,
+          passengerId: passengerId,
+        ),
+      );
+    } on ServerException catch (e) {
+      return Left(ServerFailure(message: e.message));
+    } on NetworkException {
+      return Left(const NetworkFailure());
+    } on UnauthorizedException catch (e) {
+      return Left(UnauthorizedFailure(message: e.message));
+    }
+  }
+
+  @override
   ResultFuture<Map<String, dynamic>> getActiveListings({
     int pageNumber = 1,
     int pageSize = 10,
@@ -83,13 +104,15 @@ class MyTicketsRepositoryImpl implements MyTicketsRepository {
     String? travelDate,
   }) async {
     try {
-      return Right(await remoteDatasource.getActiveListings(
-        pageNumber: pageNumber,
-        pageSize: pageSize,
-        originGovernorate: originGovernorate,
-        destinationGovernorate: destinationGovernorate,
-        travelDate: travelDate,
-      ));
+      return Right(
+        await remoteDatasource.getActiveListings(
+          pageNumber: pageNumber,
+          pageSize: pageSize,
+          originGovernorate: originGovernorate,
+          destinationGovernorate: destinationGovernorate,
+          travelDate: travelDate,
+        ),
+      );
     } on ServerException catch (e) {
       return Left(ServerFailure(message: e.message));
     } on NetworkException {
@@ -120,9 +143,15 @@ class MyTicketsRepositoryImpl implements MyTicketsRepository {
   }
 
   @override
-  ResultVoid buyTicket({required int listingId}) async {
+  ResultVoid buyTicket({
+    required int listingId,
+    required List<Map<String, dynamic>> passengers,
+  }) async {
     try {
-      await remoteDatasource.buyTicket(listingId: listingId);
+      await remoteDatasource.buyTicket(
+        listingId: listingId,
+        passengers: passengers,
+      );
       return const Right(null);
     } on ServerException catch (e) {
       return Left(ServerFailure(message: e.message));
@@ -137,6 +166,20 @@ class MyTicketsRepositoryImpl implements MyTicketsRepository {
   ResultVoid cancelListing({required int listingId}) async {
     try {
       await remoteDatasource.cancelListing(listingId: listingId);
+      return const Right(null);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(message: e.message));
+    } on NetworkException {
+      return Left(const NetworkFailure());
+    } on UnauthorizedException catch (e) {
+      return Left(UnauthorizedFailure(message: e.message));
+    }
+  }
+
+  @override
+  ResultVoid requestRefund({required int bookingId}) async {
+    try {
+      await remoteDatasource.requestRefund(bookingId: bookingId);
       return const Right(null);
     } on ServerException catch (e) {
       return Left(ServerFailure(message: e.message));

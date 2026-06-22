@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
-import 'package:transportation_app/features/search/data/model/route_stops_model.dart';
 import 'package:transportation_app/features/search/domain/entities/floor_group.dart';
+import 'package:transportation_app/features/search/domain/entities/route_stop_entity.dart';
 import 'coach_class_entity.dart';
 import 'package:intl/intl.dart';
 
@@ -8,31 +8,41 @@ class TripResultEntity extends Equatable {
   final int tripOccurrenceId;
   final int tripId;
   final String agencyName;
+  final String? agencyNameAr;
   final DateTime departureTime;
   final DateTime? arrivalTime;
   final int? totalDurationMinutes;
   final int originStationId;
   final String originStationName;
+  final String? originStationNameAr;
   final String originGovernorate;
+  final String? originGovernorateAr;
   final int destinationStationId;
   final String destinationStationName;
+  final String? destinationStationNameAr;
   final String destinationGovernorate;
+  final String? destinationGovernorateAr;
   final List<CoachClassEntity> availableClasses;
-  final List<RouteStopsModel>? routeStops;
+  final List<RouteStopEntity>? routeStops;
 
   const TripResultEntity({
     required this.tripOccurrenceId,
     required this.tripId,
     required this.agencyName,
+    this.agencyNameAr,
     required this.departureTime,
     required this.arrivalTime,
     required this.totalDurationMinutes,
     required this.originStationId,
     required this.originStationName,
+    this.originStationNameAr,
     required this.originGovernorate,
+    this.originGovernorateAr,
     required this.destinationStationId,
     required this.destinationStationName,
+    this.destinationStationNameAr,
     required this.destinationGovernorate,
+    this.destinationGovernorateAr,
     required this.availableClasses,
     this.routeStops,
   });
@@ -57,7 +67,7 @@ class TripResultEntity extends Equatable {
     return h > 0 ? '${h}h ${m}m' : '${m}m';
   }
 
-  List<RouteStopsModel> get safeRouteStops => routeStops ?? const [];
+  List<RouteStopEntity> get safeRouteStops => routeStops ?? const [];
   List<FloorGroup> get floorGroups {
     final Map<int?, List<CoachClassEntity>> bucket = {};
 

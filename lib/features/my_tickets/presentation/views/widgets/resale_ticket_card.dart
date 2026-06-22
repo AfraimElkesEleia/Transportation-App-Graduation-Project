@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:transportation_app/core/l10n/app_localizations.dart';
 import 'package:transportation_app/core/theming/colors.dart';
-import 'package:transportation_app/features/profile/domain/entities/ticket_entity.dart';
+import 'package:transportation_app/core/utils/localized_time_formatter.dart';
+import 'package:transportation_app/features/my_tickets/domain/entities/ticket_entity.dart';
 
 /// A card summarising a [TicketEntity] for the resell screen.
 ///
@@ -8,10 +10,13 @@ import 'package:transportation_app/features/profile/domain/entities/ticket_entit
 /// Sell / Cancel action button driven by [ticket.isOfferedForResale].
 class ResaleTicketCard extends StatelessWidget {
   final TicketEntity ticket;
+
   /// Called when the user taps "Sell" (ticket is not yet listed).
   final VoidCallback? onSell;
+
   /// Called when the user taps "Cancel" (ticket is already listed).
   final VoidCallback? onCancel;
+
   /// When true, replaces the action button with a small spinner.
   final bool isPending;
 
@@ -25,10 +30,10 @@ class ResaleTicketCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final dt = ticket.boardingTime;
     final daysLeft = dt.difference(DateTime.now()).inDays;
-    final timeStr =
-        '${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
+    final timeStr = formatTicketTime(context, dt);
     final dateStr = '${dt.day}/${dt.month}/${dt.year}';
     final fromTo =
         '${ticket.originStation.isNotEmpty ? ticket.originStation : ticket.originGovernorate}'
@@ -76,8 +81,7 @@ class ResaleTicketCard extends StatelessWidget {
               ),
               const SizedBox(width: 8),
               Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
                   color: daysLeft < 3
                       ? Colors.redAccent.withValues(alpha: 0.15)
@@ -90,7 +94,7 @@ class ResaleTicketCard extends StatelessWidget {
                   ),
                 ),
                 child: Text(
-                  '$daysLeft day${daysLeft != 1 ? 's' : ''} left',
+                  l10n.daysLeft(daysLeft.toString()),
                   style: TextStyle(
                     color: daysLeft < 3
                         ? Colors.redAccent
@@ -139,21 +143,19 @@ class ResaleTicketCard extends StatelessWidget {
           if (isListed)
             Container(
               margin: const EdgeInsets.only(bottom: 10),
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
               decoration: BoxDecoration(
                 color: Colors.orange.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(10),
-                border:
-                    Border.all(color: Colors.orange.withValues(alpha: 0.3)),
+                border: Border.all(color: Colors.orange.withValues(alpha: 0.3)),
               ),
-              child: const Row(
+              child: Row(
                 children: [
-                  Icon(Icons.storefront, color: Colors.amber, size: 14),
-                  SizedBox(width: 6),
+                  const Icon(Icons.storefront, color: Colors.amber, size: 14),
+                  const SizedBox(width: 6),
                   Text(
-                    'This booking is listed on the Marketplace',
-                    style: TextStyle(color: Colors.amber, fontSize: 12),
+                    l10n.listedOnMarketplace,
+                    style: const TextStyle(color: Colors.amber, fontSize: 12),
                   ),
                 ],
               ),
@@ -163,8 +165,7 @@ class ResaleTicketCard extends StatelessWidget {
           ...ticket.passengers.map((p) {
             return Container(
               margin: const EdgeInsets.only(bottom: 8),
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
               decoration: BoxDecoration(
                 color: Colors.white.withValues(alpha: 0.05),
                 borderRadius: BorderRadius.circular(10),
@@ -179,11 +180,8 @@ class ResaleTicketCard extends StatelessWidget {
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      'Seat: ${p.seatNumber}  ·  ${p.name}',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 13,
-                      ),
+                      '${l10n.seat} ${p.seatNumber}  ·  ${p.name}',
+                      style: const TextStyle(color: Colors.white, fontSize: 13),
                     ),
                   ),
                 ],
@@ -202,7 +200,7 @@ class ResaleTicketCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Total: ${totalPrice.round()} EGP',
+                      '${l10n.totalPrice} ${totalPrice.round()} ${l10n.egp}',
                       style: const TextStyle(
                         color: Colors.white38,
                         fontSize: 12,
@@ -227,13 +225,14 @@ class ResaleTicketCard extends StatelessWidget {
                             vertical: 2,
                           ),
                           decoration: BoxDecoration(
-                            color: ColorsManager.successGreen
-                                .withValues(alpha: 0.12),
+                            color: ColorsManager.successGreen.withValues(
+                              alpha: 0.12,
+                            ),
                             borderRadius: BorderRadius.circular(6),
                           ),
-                          child: const Text(
-                            'Est. Value',
-                            style: TextStyle(
+                          child: Text(
+                            l10n.estValue,
+                            style: const TextStyle(
                               color: ColorsManager.successGreen,
                               fontSize: 10,
                               fontWeight: FontWeight.w600,
@@ -260,9 +259,9 @@ class ResaleTicketCard extends StatelessWidget {
                 ElevatedButton.icon(
                   onPressed: onCancel,
                   icon: const Icon(Icons.cancel_outlined, size: 15),
-                  label: const Text(
-                    'Cancel',
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                  label: Text(
+                    l10n.cancel,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.redAccent,
@@ -281,9 +280,9 @@ class ResaleTicketCard extends StatelessWidget {
                 ElevatedButton.icon(
                   onPressed: onSell,
                   icon: const Icon(Icons.sell_outlined, size: 15),
-                  label: const Text(
-                    'Sell',
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                  label: Text(
+                    l10n.sell,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: onSell != null

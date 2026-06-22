@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:transportation_app/core/l10n/app_localizations.dart';
 import 'package:transportation_app/core/widgets/auth_background.dart';
 
 class SignupHeader extends StatelessWidget {
@@ -7,6 +8,7 @@ class SignupHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -16,10 +18,10 @@ class SignupHeader extends StatelessWidget {
           child: const Icon(Icons.arrow_back_ios, color: Colors.white),
         ),
         const SizedBox(height: 16),
-        const AuthAccentBar(), 
+        const AuthAccentBar(),
         const SizedBox(height: 10),
         Text(
-          'Create\nAccount.',
+          l10n.signupTitle,
           style: TextStyle(
             color: Colors.white,
             fontSize: 42,
@@ -30,7 +32,7 @@ class SignupHeader extends StatelessWidget {
         ),
         const SizedBox(height: 6),
         Text(
-          'Join the future of travel',
+          l10n.joinFutureOfTravel,
           style: TextStyle(
             color: Colors.white,
             fontSize: 16,

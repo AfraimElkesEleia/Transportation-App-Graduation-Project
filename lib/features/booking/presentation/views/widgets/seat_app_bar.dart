@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:transportation_app/core/helper/extensions.dart';
 import 'package:transportation_app/core/theming/colors.dart';
 import 'package:transportation_app/features/search/domain/entities/coach_class_entity.dart';
 import 'package:transportation_app/features/search/domain/entities/trip_result_entity.dart';
@@ -11,11 +12,37 @@ class SeatAppBar extends StatelessWidget {
   final CoachClassEntity coachClass;
 
   const SeatAppBar({super.key, required this.trip, required this.coachClass});
+  String _routeLabel(BuildContext context) {
+    final isAr = context.isArabic;
 
-  String get _routeLabel {
-    final from = trip.originGovernorate;
-    final to = trip.destinationGovernorate;
-    return '$from → $to';
+    // ── Origin ──────────────────────────────────────────────────────────────
+    final originStation = isAr
+        ? (trip.originStationNameAr ?? trip.originStationName)
+        : trip.originStationName;
+    final originGov = isAr
+        ? (trip.originGovernorateAr ?? trip.originGovernorate)
+        : trip.originGovernorate;
+
+    // Use station when it is meaningfully different from the governorate.
+    final fromLabel = originStation.isNotEmpty &&
+            originStation.toLowerCase() != originGov.toLowerCase()
+        ? originStation.toLocalizedStation(context)
+        : originGov.toLocalizedGov(context);
+
+    // ── Destination ─────────────────────────────────────────────────────────
+    final destStation = isAr
+        ? (trip.destinationStationNameAr ?? trip.destinationStationName)
+        : trip.destinationStationName;
+    final destGov = isAr
+        ? (trip.destinationGovernorateAr ?? trip.destinationGovernorate)
+        : trip.destinationGovernorate;
+
+    final toLabel = destStation.isNotEmpty &&
+            destStation.toLowerCase() != destGov.toLowerCase()
+        ? destStation.toLocalizedStation(context)
+        : destGov.toLocalizedGov(context);
+
+    return '$fromLabel → $toLabel';
   }
 
   @override
@@ -47,7 +74,7 @@ class SeatAppBar extends StatelessWidget {
             child: Column(
               children: [
                 Text(
-                  _routeLabel,
+                  _routeLabel(context),
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 15,

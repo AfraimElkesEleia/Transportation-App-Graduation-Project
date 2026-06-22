@@ -7,6 +7,7 @@ import 'package:transportation_app/core/routing/routes.dart';
 import 'package:transportation_app/core/validators/app_validators.dart';
 import 'package:transportation_app/core/widgets/app_gradient_button.dart';
 import 'package:transportation_app/core/widgets/auth_background.dart';
+import 'package:transportation_app/core/widgets/language_toggle_button.dart';
 import 'package:transportation_app/core/widgets/profile_picture_picker.dart';
 import 'package:transportation_app/features/signup/presentation/cubit/signup_cubit.dart';
 import 'package:transportation_app/features/signup/presentation/cubit/signup_state.dart';
@@ -16,6 +17,7 @@ import 'package:transportation_app/features/signup/presentation/widgets/signup_c
 import 'package:transportation_app/features/signup/presentation/widgets/signup_header.dart';
 import 'package:transportation_app/features/signup/presentation/widgets/signup_personal_section.dart';
 import 'package:transportation_app/features/signup/presentation/widgets/signup_security_section.dart';
+import 'package:transportation_app/core/l10n/locale_cubit.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -36,7 +38,7 @@ class _SignupScreenState extends State<SignupScreen> {
   final _phoneController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
-  final _nationalIdController = TextEditingController();
+  final _idNumberController = TextEditingController();
 
   // ── Non-text fields ───────────────────────────────────
   Gender? _gender;
@@ -44,7 +46,7 @@ class _SignupScreenState extends State<SignupScreen> {
   String? _countryCode;
   String? _countryName;
   String? _dialCode = '+20';
-  String? _dialCountry = 'EG';
+  int? _idType; // null = no ID, 1 = National ID, 2 = Passport
 
   // ── UI state ──────────────────────────────────────────
   PasswordStrength _strength = PasswordStrength.none;
@@ -63,7 +65,7 @@ class _SignupScreenState extends State<SignupScreen> {
     _phoneController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
-    _nationalIdController.dispose();
+    _idNumberController.dispose();
     super.dispose();
   }
 
@@ -75,9 +77,7 @@ class _SignupScreenState extends State<SignupScreen> {
 
     final genderErr = _gender == null ? l10n.genderError : null;
     final dobErr = AppValidators.dateOfBirth(_dateOfBirth);
-    final countryErr = _countryCode == null
-        ? l10n.countryError
-        : null;
+    final countryErr = _countryCode == null ? l10n.countryError : null;
     setState(() {
       _genderError = genderErr;
       _dobError = dobErr;
@@ -107,9 +107,10 @@ class _SignupScreenState extends State<SignupScreen> {
       gender: _gender == Gender.male ? 1 : 2,
       dateOfBirth: dob,
       countryCode: _countryCode!,
-      nationalIdNumber: _nationalIdController.text.isEmpty
+      idType: _idType,
+      idNumber: _idNumberController.text.isEmpty
           ? null
-          : _nationalIdController.text,
+          : _idNumberController.text.trim(),
       imagePath: _imagePath,
     );
   }
@@ -128,13 +129,14 @@ class _SignupScreenState extends State<SignupScreen> {
     return AuthBackground(
       child: BlocConsumer<SignupCubit, SignupState>(
         listener: (context, state) {
-          print('👁 [Screen] state changed to: $state');
+          debugPrint('👁 [Screen] state changed to: $state');
           if (state is SignupSuccess) {
+            context.read<LocaleCubit>().syncLanguageWithBackend();
             Navigator.of(
               context,
             ).pushNamedAndRemoveUntil(AppRoutes.homeScreen, (route) => false);
           } else if (state is SignupFailure) {
-            print('👁 [Screen] showing snackbar: ${state.message}');
+            debugPrint('👁 [Screen] showing snackbar: ${state.message}');
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(state.message),
@@ -150,6 +152,11 @@ class _SignupScreenState extends State<SignupScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(height: 20),
+                Align(
+                  alignment: AlignmentDirectional.centerEnd,
+                  child: const LanguageToggleButton(),
+                ),
+                const SizedBox(height: 8),
                 SignupHeader(),
                 Center(
                   child: ProfilePicturePicker(
@@ -166,7 +173,12 @@ class _SignupScreenState extends State<SignupScreen> {
                   firstNameController: _firstNameController,
                   lastNameController: _lastNameController,
                   familyNameController: _familyNameController,
-                  nationalIdController: _nationalIdController,
+                  idNumberController: _idNumberController,
+                  idType: _idType,
+                  onIdTypeChanged: (type) => setState(() {
+                    _idType = type;
+                    _idNumberController.clear();
+                  }),
                   onGenderChanged: (g) => setState(() {
                     _gender = g;
                     _genderError = null;
@@ -195,7 +207,6 @@ class _SignupScreenState extends State<SignupScreen> {
                   }),
                   onDialCodeChanged: (dialCode, countryCode) => setState(() {
                     _dialCode = dialCode;
-                    _dialCountry = countryCode;
                   }),
                   emailController: _emailController,
                   phoneController: _phoneController,

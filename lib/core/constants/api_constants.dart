@@ -30,9 +30,17 @@ class ApiConstants {
   static const String marketplaceBuy = '/Marketplace/buy';
   static const String marketplaceActive = '/Marketplace/active';
   static const String marketplaceCancel = '/Marketplace/cancel';
+  static const String notifications = '/Notifications';
+  static String readNotification(String id) => '/Notifications/$id/read';
+  static String deleteNotification(String id) => '/Notifications/$id';
+  static const String readAllNotifications = '/Notifications/read-all';
+  static const String changeLanguage = '/Users/language';
+  static const String supportTickets = '/Support/tickets';
+  static const String fcmToken = '/Users/fcm-token';
   static String? mediaUrl(String? path) {
     if (path == null || path.isEmpty) return null;
-    if (path.startsWith('http')) return path;
-    return '$mediaBase/$path';
+    if (path.toLowerCase().startsWith('http')) return path;
+    final cleanPath = path.startsWith('/') ? path.substring(1) : path;
+    return '$mediaBase/$cleanPath';
   }
 }

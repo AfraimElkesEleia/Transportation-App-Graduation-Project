@@ -44,10 +44,14 @@ class TokenManager {
       'gender': user.gender,
       'countryCode': user.countryCode,
       'countryName': user.countryName,
+      'preferredLanguage': user.preferredLanguage,
       'profilePictureUrl': user.profilePictureUrl,
       'totalTrips': user.totalTrips,
       'totalDistanceKm': user.totalDistanceKm,
       'walletBalance': user.walletBalance,
+      'loyaltyPointsBalance': user.loyaltyPointsBalance,
+      'expiringPointsAmount': user.expiringPointsAmount,
+      'nextExpiryDate': user.nextExpiryDate,
     };
     await _storage.write(key: _cachedUserKey, value: jsonEncode(map));
   }
@@ -67,10 +71,14 @@ class TokenManager {
       gender: map['gender'] as String? ?? '',
       countryCode: map['countryCode'] as String? ?? '',
       countryName: map['countryName'] as String? ?? '',
+      preferredLanguage: map['preferredLanguage'] as String?,
       profilePictureUrl: map['profilePictureUrl'] as String?,
       totalTrips: map['totalTrips'] as int?,
       totalDistanceKm: (map['totalDistanceKm'] as num?)?.toDouble(),
       walletBalance: (map['walletBalance'] as num?)?.toDouble(),
+      loyaltyPointsBalance: map['loyaltyPointsBalance'] as int?,
+      expiringPointsAmount: map['expiringPointsAmount'] as int?,
+      nextExpiryDate: map['nextExpiryDate'] as String?,
     );
   }
 

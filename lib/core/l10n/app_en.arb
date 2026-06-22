@@ -11,6 +11,7 @@
   "loading": "Loading...",
   "error": "Error",
   "noData": "No data available",
+  "unknown": "Unknown",
   "no": "No",
   "onboardingSubtitle1": "TRAVEL SMART",
   "onboardingTitle1": "Discover Egypt",
@@ -21,6 +22,7 @@
   "onboardingSubtitle3": "TRAVEL CONFIDENT",
   "onboardingTitle3": "Secure & Reliable",
   "onboardingDesc3": "Book with confidence...",
+  "getStarted": "Get Started",
   "loginTitle": "Welcome \nBack.",
   "loginSubtitle": "Enter the future of travel",
   "emailLabel": "Email Address",
@@ -46,8 +48,9 @@
   "signOutBtn": "Sign Out",
   "language": "Language",
   "recentSearches": "Recent Searches",
+  "noRecentSearches": "No recent searches",
   "myTickets": "My Tickets",
-  "digitalWallet": "Your digital travel wallet",
+  "digitalWallet": "Manage your tickets easily",
   "tabUpcoming": "Upcoming",
   "tabActive": "Active",
   "tabPast": "Past",
@@ -76,14 +79,7 @@
   "totalPrice": "Total price:",
   "sell": "Sell",
   "listForSale": "List Ticket for Sale",
-  "askingPrice": "Asking price (max {n} EGP)",
-  "@askingPrice": {
-    "placeholders": {
-      "n": {
-        "type": "String"
-      }
-    }
-  },
+  "askingPrice": "Asking price",
   "listTicketBtn": "List Ticket",
   "cancelListing": "Cancel Listing",
   "cancelListingMsg": "This booking is currently listed...",
@@ -194,6 +190,11 @@
   "txTicketPurchase": "Ticket Purchase",
   "txRedemption": "Redemption",
   "txReward": "Reward",
+  "txChallengeReward": "Challenge Reward",
+  "txBookingEarned": "Booking Reward",
+  "txStatusAvailable": "Available",
+  "txStatusSpent": "Spent",
+  "txStatusExpired": "Expired",
   "welcome": "Welcome!",
   "whereToGoToday": "Where would you like to go today?",
   "searchTrip": "Search Trip",
@@ -218,6 +219,14 @@
   "marketplace": "Marketplace",
   "quickActions": "Quick Actions",
   "editProfile": "Edit Profile",
+  "profileTripsCount": "{count} trips",
+  "@profileTripsCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
   "loyaltyHub": "Loyalty Hub",
   "signOut": "Sign Out",
   "signOutConfirm": "Sign Out?",
@@ -229,10 +238,100 @@
   "enterValidAmount": "Enter a valid amount",
   "amountMustBeRange": "Amount must be 10–10,000 EGP",
   "cardNumber": "Card Number",
+  "cvvLabel": "CVV",
   "mustBe16Digits": "Must be 16 digits",
   "expiry": "Expiry",
   "formatMmYy": "Format: MM/YY",
   "threeDigitsRequired": "3 digits required",
+  "loyaltyPoints": "Loyalty Points",
+  "pts": "pts",
+  "noExpiringPoints": "No expiring points right now",
+  "ptsExpired": "{n} pts have expired",
+  "@ptsExpired": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "ptsExpireTomorrow": "{n} pts expire tomorrow",
+  "@ptsExpireTomorrow": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "ptsExpireInDays": "{n} pts expire in {d} days",
+  "@ptsExpireInDays": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      },
+      "d": {
+        "type": "String"
+      }
+    }
+  },
+  "ptsExpireInMonthsDays": "{n} pts expire in {m} and {d}",
+  "@ptsExpireInMonthsDays": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      },
+      "m": {
+        "type": "String"
+      },
+      "d": {
+        "type": "String"
+      }
+    }
+  },
+  "ptsExpireInMonths": "{n} pts expire in {m}",
+  "@ptsExpireInMonths": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      },
+      "m": {
+        "type": "String"
+      }
+    }
+  },
+  "oneMonth": "1 month",
+  "monthsPlural": "{m} months",
+  "@monthsPlural": {
+    "placeholders": {
+      "m": {
+        "type": "String"
+      }
+    }
+  },
+  "oneDay": "1 day",
+  "daysPlural": "{d} days",
+  "@daysPlural": {
+    "placeholders": {
+      "d": {
+        "type": "String"
+      }
+    }
+  },
+  "pointsPending": "Points are pending until departure and expire 4 months after departure.",
+  "profile": "Profile",
+  "manageAccount": "Manage your account",
+  "planYourJourney": "Plan Your Journey",
+  "departureDate": "Departure date",
+  "subCityOptional": "Sub-city (optional — any station)",
+  "govHint": "{title} (e.g. Cairo, Luxor)",
+  "@govHint": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "popularRoutes": "Popular Routes",
+  "latestNews": "Latest News",
   "gov_Cairo": "Cairo",
   "gov_Alexandria": "Alexandria",
   "gov_Giza": "Giza",
@@ -253,6 +352,623 @@
   "gov_Qalyubia": "Qalyubia",
   "gov_Ismailia": "Ismailia",
   "gov_Suez": "Suez",
+  "gov_Damietta": "Damietta",
+  "gov_Matrouh": "Matrouh",
   "gov_PortSaid": "Port Said",
-  "gov_Damietta": "Damietta"
+  "challenges": "Challenges",
+  "pointsHistory": "Points History",
+  "noChallengesFound": "No challenges found.",
+  "noPointHistory": "No point history.",
+  "activeChallenges": "Active",
+  "completedChallenges": "Completed",
+  "uploadingPhoto": "Uploading photo...",
+  "photoUploaded": "Photo uploaded",
+  "photoUploadFailed": "Photo upload failed: {msg}",
+  "@photoUploadFailed": {
+    "placeholders": {
+      "msg": {
+        "type": "String"
+      }
+    }
+  },
+  "skipAndSave": "Skip & Save",
+  "profileUpdatedSuccessfully": "Profile updated successfully",
+  "firstName": "First Name",
+  "firstNameHint": "Enter your first name",
+  "firstNameRequired": "First name is required",
+  "lastName": "Last Name",
+  "lastNameHint": "Enter your last name",
+  "lastNameRequired": "Last name is required",
+  "familyName": "Family Name",
+  "familyNameHint": "Enter your family / tribal name",
+  "emailAddressValid": "Enter a valid email",
+  "phoneNumberRequired": "Phone is required",
+  "phoneNumberLabel": "Phone Number",
+  "fixedDetails": "Fixed Details",
+  "countryLabel": "Country",
+  "countryCannotBeChanged": "Country cannot be changed.",
+  "saveChanges": "Save Changes",
+  "saving": "Saving...",
+  "pointsBalanceIs": "Points Balance: {n}",
+  "@pointsBalanceIs": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "expiringSoonCard": "Expiring Soon: {n} pts ({date})",
+  "@expiringSoonCard": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "earnedPointsPending": "Earned points are pending until departure and expire 4 months after departure.",
+  "myCart": "My Cart",
+  "yourCartIsEmpty": "Your cart is empty",
+  "addTripsToCart": "Add trips to your cart to checkout later.",
+  "checkoutWallet": "Checkout (Wallet)",
+  "checkoutSuccess": "Checkout successful!\nYour wallet has been deducted.",
+  "backToHome": "Back to Home",
+  "nationalIdOptional": "National ID Number  (optional)",
+  "nationalIdHint": "e.g. 29901011234567",
+  "dateOfBirthLabel": "Date of Birth",
+  "createPasswordHint": "Create a strong password",
+  "confirmPasswordLabel": "Confirm Password",
+  "confirmPasswordHint": "Re-enter your password",
+  "directTrip": "Direct",
+  "stopsCount": "{count} Stops",
+  "@stopsCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "hideStops": "Hide Stops",
+  "showStops": "Show Stops",
+  "routeStops": "Route Stops",
+  "howManyPassengers": "How many passengers?",
+  "perSeat": "per seat",
+  "seatsAvailable": "{n} seats available",
+  "@seatsAvailable": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "continueWithNPassengers": "Continue with {n} Passenger(s)",
+  "@continueWithNPassengers": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "checkoutAction": "Checkout",
+  "ticketPrice": "Ticket price",
+  "pointsDiscount": "Points discount",
+  "useLoyaltyPointsTitle": "Use Loyalty Points",
+  "youHavePoints": "You have {points} pts",
+  "@youHavePoints": {
+    "placeholders": {
+      "points": {
+        "type": "String"
+      }
+    }
+  },
+  "pointsConversionHint": "20 pts = 1.00 EGP",
+  "useLoyaltyPoints": "💎 Use Loyalty Points",
+  "noPointsYet": "You don't have any points yet. Complete trips to earn points!",
+  "pointsCantBeApplied": "Points can't be applied — cart total is too low (10 EGP minimum final price).",
+  "needMorePoints": "You need at least 20 pts to redeem (= 1.00 EGP off). You currently have {points} pts. Keep booking to earn more!",
+  "@needMorePoints": {
+    "placeholders": {
+      "points": {
+        "type": "String"
+      }
+    }
+  },
+  "ptsLabel": "pts",
+  "pointsInfo": "ℹ️ 20 pts = 1.00 EGP",
+  "pointsUsed": "Points used",
+  "discount": "Discount",
+  "remainingAfter": "Remaining after",
+  "finalTotal": "Final total",
+  "ptsValue": "{n} pts",
+  "@ptsValue": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "from": "From",
+  "book": "Book",
+  "fullSeats": "Full",
+  "skip": "Skip",
+  "ticketDetails": "Ticket Details",
+  "downloadPdf": "Download PDF",
+  "boardingPassTitle": "Boarding Pass",
+  "boardingPassPassengerLabel": "Passenger",
+  "boardingPassSeatLabel": "Seat",
+  "boardingPassClassLabel": "Class",
+  "boardingPassDateLabel": "Date",
+  "ticketClass": "{className} Class",
+  "@ticketClass": {"placeholders": {"className": {"type": "String"}}},
+  "to": "To",
+  "departure": "Departure",
+  "arrival": "Arrival",
+  "bookingRef": "Booking Ref",
+  "passengersAndSeats": "Passengers & Seats",
+  "tapPassengerInfo": "Tap on a passenger to view their boarding pass",
+  "idNum": "ID: {id}",
+  "@idNum": {"placeholders": {"id": {"type": "String"}}},
+  "seatNum": "Seat {seat}",
+  "@seatNum": {"placeholders": {"seat": {"type": "String"}}},
+  "seat": "seat(s)",
+  "pax": "pax",
+  "passengerDetails": "Passenger Details",
+  "fullName": "Full Name",
+  "nationalId": "National ID",
+  "emailOptional": "Email Address (Optional)",
+  "requiredField": "Required",
+  "addToCart": "Add to Cart",
+  "bookNow": "Book Now",
+  "passengerN": "Passenger {n}",
+  "@passengerN": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "seatLabel": "Seat: {n}",
+  "@seatLabel": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "passengersCount": "{n} Passenger(s)",
+  "@passengersCount": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "selectSeats": "Select Seats",
+  "selectedSeatsLabel": "Selected: ",
+  "seatsCount": "{n} seats",
+  "@seatsCount": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "totalLabel": "Total",
+  "continueBtn": "Continue",
+  "noSeatsSelected": "No seats selected",
+  "travellingWithFamily": "Travelling with family?",
+  "autoFill": "Auto-fill",
+  "autoFilled": "Auto-filled ✔",
+  "reFill": "Re-fill",
+  "fillSeat1Info": "Fill seat 1, then copy name & phone to all other seats.",
+  "addEntireJourneyToCart": "Add Entire Journey to Cart",
+  "bookEntireJourneyNow": "Book Entire Journey Now",
+  "buildJourney": "Build Journey",
+  "multiDestination": "Multi-Destination",
+  "selectTripForLeg": "Select Trip for Leg {n}",
+  "@selectTripForLeg": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "selectSeatsForLeg": "Select Seats for Leg {n}",
+  "@selectSeatsForLeg": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "reviewCheckout": "Review & Checkout",
+  "noTripsFoundForLeg": "No trips found for this leg.",
+  "tryAdjustingFilters": "Try adjusting the filters above.",
+  "suggestedTransferRoute": "Suggested Transfer Route",
+  "transferAt": "Transfer at",
+  "journeySummary": "Journey Summary",
+  "journeyOverview": "Journey Overview",
+  "connectionLayover": "Connection layover",
+  "totalJourneyDuration": "Total journey duration",
+  "routeLabel": "Route",
+  "durationLabel": "Duration",
+  "pricePerSeat": "Price per seat",
+  "legTotal": "Leg total",
+  "selectedSeats": "Selected seats",
+  "noArrivalTime": "Arrival time unavailable",
+  "durationHoursMinutes": "{hours}h {minutes}m",
+  "@durationHoursMinutes": {
+    "placeholders": {
+      "hours": {
+        "type": "String"
+      },
+      "minutes": {
+        "type": "String"
+      }
+    }
+  },
+  "durationMinutes": "{minutes}m",
+  "@durationMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "String"
+      }
+    }
+  },
+  "legsCount": "{n} legs",
+  "@legsCount": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "legN": "Leg {n}",
+  "@legN": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "journeyAddedToCart": "Journey added to cart successfully!",
+  "bookingSuccessful": "Booking successful!",
+  "indirectTripAddedToCart": "Indirect Trip successfully added to Cart!",
+  "pleaseSelectSeat": "Please select a seat",
+  "selectExactlyNSeats": "Please pick exactly {n} seats",
+  "@selectExactlyNSeats": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "canOnlySelectNSeats": "You can only select {n} seats for this leg.",
+  "@canOnlySelectNSeats": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "pleaseSelectNPassengers": "Please select exactly {n} passengers",
+  "@pleaseSelectNPassengers": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "fillNamePhoneFirst": "Please fill in Name and Phone for the first passenger first.",
+  "filledNSeats": "Filled {n} seat(s) with \"{name}\"",
+  "@filledNSeats": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      },
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "requiredCountSeats": "Required: {n} seats. Selected: {m}",
+  "@requiredCountSeats": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      },
+      "m": {
+        "type": "String"
+      }
+    }
+  },
+  "idTypeLabel": "ID Type",
+  "idTypeNationalId": "National ID",
+  "idTypePassport": "Passport",
+  "idNumberLabel": "ID Number",
+  "passportNumberLabel": "Passport Number",
+  "activeChallengesTitle": "Active Challenges",
+  "challengeProgressLabel": "{current} / {goal} trips",
+  "@challengeProgressLabel": {
+    "placeholders": {
+      "current": {
+        "type": "String"
+      },
+      "goal": {
+        "type": "String"
+      }
+    }
+  },
+  "challengeRewardLabel": "Reward: {points} points",
+  "@challengeRewardLabel": {
+    "placeholders": {
+      "points": {
+        "type": "String"
+      }
+    }
+  },
+  "challengeMonthly": "Monthly",
+  "challengeOneTime": "One-Time",
+  "challengePts": "+{pts} pts",
+  "@challengePts": {
+    "placeholders": {
+      "pts": {
+        "type": "String"
+      }
+    }
+  },
+  "challengeProgress": "{current} / {goal}",
+  "@challengeProgress": {
+    "placeholders": {
+      "current": {
+        "type": "String"
+      },
+      "goal": {
+        "type": "String"
+      }
+    }
+  },
+  "amLabel": "AM",
+  "pmLabel": "PM",
+  "floorLabel": "Floor {n}",
+  "@floorLabel": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "standardClass": "Standard",
+  "popularRoutes": "🔥 Popular Routes",
+  "dateCannotBeToday": "Travel date cannot be today. Please select a future date.",
+  "selectTravelDate": "Select Travel Date",
+  "search": "Search",
+  "notifications": "Notifications",
+  "notificationPermissionTitle": "Stay in the loop",
+  "notificationPermissionBody": "Enable notifications to receive ticket offers, boarding reminders, cart expiry warnings, and important trip updates.",
+  "notificationPermissionNotNow": "Not now",
+  "notificationPermissionOpenSettings": "Open settings",
+  "markAllRead": "Mark all read",
+  "filterAll": "All",
+  "filterUnread": "Unread",
+  "filterMarketplace": "Marketplace",
+  "filterBoarding": "Boarding",
+  "filterGamification": "Gamification",
+  "filterRefunds": "Refunds",
+  "dismiss": "Dismiss",
+  "tryAgain": "Try again",
+  "todayLabel": "Today",
+  "yesterdayLabel": "Yesterday",
+  "justNow": "Just now",
+  "minutesAgo": "{count} min ago",
+  "@minutesAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "hoursAgo": "{count} hr ago",
+  "@hoursAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "notificationGeneral": "General",
+  "emptyMarketplaceTitle": "No marketplace activity yet",
+  "emptyMarketplaceSubtitle": "Offers and sales notifications will appear here.",
+  "emptyUnreadTitle": "You're all caught up!",
+  "emptyUnreadSubtitle": "No unread notifications at the moment.",
+  "emptyBoardingTitle": "No boarding alerts",
+  "emptyBoardingSubtitle": "Upcoming trip reminders will appear here.",
+  "emptyGamificationTitle": "No rewards activity",
+  "emptyGamificationSubtitle": "Points and challenge notifications will appear here.",
+  "emptyRefundTitle": "No refund updates",
+  "emptyRefundSubtitle": "Refund approvals and rejections will appear here.",
+  "emptyNotificationsTitle": "No notifications yet",
+  "emptyNotificationsSubtitle": "Important updates about your trips and marketplace activity will show here.",
+  "seatLegendAvailable": "Available",
+  "seatLegendSelected": "Selected",
+  "seatLegendTaken": "Taken",
+  "idTypeNone": "None",
+  "passportNumberHint": "e.g. A12345678",
+  "signupTitle": "Create\nAccount.",
+  "joinFutureOfTravel": "Join the future of travel",
+  "ticketMarketplace": "Ticket Marketplace",
+  "findDealsFromTravelers": "Find great deals from other travelers",
+  "filtersActive": "Filters (active)",
+  "avgDiscount": "Avg. Discount",
+  "totalListings": "Total Listings",
+  "noListingsFound": "No listings found.",
+  "tryRemovingFilters": "Try removing some filters.",
+  "clearFilters": "Clear Filters",
+  "buyTicket": "Buy Ticket",
+  "buyNow": "Buy Now",
+  "trainBooking": "Train Booking",
+  "busBooking": "Bus Booking",
+  "trainPassengerRequirements": "Name, ID type & number required for each passenger",
+  "busPassengerRequirements": "Name & phone number required for each passenger",
+  "agencyLabel": "Agency",
+  "originLabel": "Origin",
+  "destinationLabel": "Destination",
+  "dateLabel": "Date",
+  "timeLabel": "Time",
+  "classLabel": "Class",
+  "sellerLabel": "Seller",
+  "priceLabel": "Price",
+  "areYouSureBuyTicket": "Are you sure you want to buy this ticket?",
+  "ticketPurchasedSuccessfully": "Ticket purchased successfully!",
+  "listingCancelledSuccessfully": "Listing cancelled successfully!",
+  "filterFrom": "From: {gov}",
+  "@filterFrom": {
+    "placeholders": {
+      "gov": {
+        "type": "String"
+      }
+    }
+  },
+  "filterTo": "To: {gov}",
+  "@filterTo": {
+    "placeholders": {
+      "gov": {
+        "type": "String"
+      }
+    }
+  },
+  "filterDate": "Date: {date}",
+  "@filterDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "filterListings": "Filter Listings",
+  "resetAll": "Reset All",
+  "originGovernorate": "Origin Governorate",
+  "destinationGovernorate": "Destination Governorate",
+  "travelDateFilter": "Travel Date",
+  "anyDate": "Any date",
+  "applyFilters": "Apply Filters",
+  "hintCairo": "e.g. Cairo",
+  "hintAlexandria": "e.g. Alexandria",
+  "forgotPasswordSubtitle": "Enter your email and we'll send you a reset link",
+  "sendResetLink": "Send Reset Link",
+  "emailSentTitle": "Check your inbox!",
+  "emailSentMessage": "If your email is registered, you will receive a password reset link shortly. Check your spam folder if you don't see it.",
+  "emailSendError": "Could not send email",
+  "backToLogin": "Back to Login",
+  "idTypeLabel": "ID Type",
+  "idTypeNationalId": "National ID",
+  "idTypePassport": "Passport",
+  "idNumberLabel": "National ID Number",
+  "passportNumberLabel": "Passport Number",
+  "supportTickets": "Support Tickets",
+  "noSupportTickets": "No support tickets yet",
+  "supportTicketsEmptyBody": "Submitted issues will appear here.",
+  "supportCategoryPayment": "Payment",
+  "supportCategoryTripExperience": "Trip Experience",
+  "supportCategoryAppBug": "App Bug",
+  "supportCategoryAccountIssue": "Account Issue",
+  "supportCategoryOther": "Other",
+  "supportStatusOpen": "Open",
+  "supportStatusInProgress": "In Progress",
+  "supportStatusResolved": "Resolved",
+  "supportStatusClosed": "Closed",
+  "untitledTicket": "Untitled ticket",
+  "noDescriptionProvided": "No description provided.",
+  "reportIssue": "Report an Issue",
+  "reportIssueTitle": "Report an Issue",
+  "reportIssueHeaderTitle": "We're here to help",
+  "reportIssueHeaderSubtitle": "Describe your issue and our team will get back to you.",
+  "issueCategoryLabel": "Issue Category",
+  "issueCategoryPayment": "Payment",
+  "issueCategoryTrip": "Trip Experience",
+  "issueCategoryAppBug": "App Bug",
+  "issueCategoryAccount": "Account Issue",
+  "issueCategoryOther": "Other",
+  "issueTitleLabel": "Title",
+  "issueTitleHint": "Brief summary of your issue",
+  "issueTitleRequired": "Title is required",
+  "issueDescriptionLabel": "Description",
+  "issueDescriptionHint": "Please describe your issue in detail...",
+  "issueDescriptionRequired": "Description is required",
+  "issueDescriptionTooShort": "Please provide at least 10 characters",
+  "issueSubmitBtn": "Submit Report",
+  "issueSubmittedTitle": "Report Submitted!",
+  "issueSubmittedBody": "Thank you for reaching out. Our support team will review your issue and respond as soon as possible.",
+  "issueDone": "Done",
+  "requestRefund": "Request Refund",
+  "refundAlreadyRequested": "Refund Requested",
+  "refundConfirmTitle": "Request Refund?",
+  "refundConfirmBody": "Are you sure you want to request a refund for this booking? Your wallet will be credited once the request is approved.",
+  "refundSubmitted": "Refund request submitted successfully.",
+  "refundRequesting": "Submitting refund request...",
+  "refundAccepted": "Refund Accepted",
+  "refundRejected": "Refund Rejected",
+  "expires": "Expires",
+  "expired": "Expired",
+  "cancelTripTitle": "Cancel this trip?",
+  "cancelTripMsg": "Your seat hold will be released and inventory restored. This cannot be undone.",
+  "keepIt": "Keep It",
+  "cancelTripBtn": "Cancel Trip",
+  "insufficientFunds": "Insufficient funds.",
+  "insufficientFundsDetail": "Insufficient funds. Your wallet balance is {balance} EGP, but checkout total is {total} EGP.",
+  "@insufficientFundsDetail": {
+    "placeholders": {
+      "balance": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "checkoutFailed": "Checkout failed",
+  "ticketAddedButCheckoutFailed": "Ticket added to cart, but checkout failed: {error}",
+  "@ticketAddedButCheckoutFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "originalPrice": "Original price: {price} {currency}",
+  "@originalPrice": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      },
+      "currency": {
+        "type": "String"
+      }
+    }
+  },
+  "seatsTakenError": "One or more selected seats were just taken. Please refresh the seat map.",
+  "chooseCompany": "Choose Company",
+  "allCompanies": "All companies",
+  "from": "From",
+  "to": "To",
+  "arrivalTime": "Arrival Time",
+  "identityDetails": "Identity Details",
+  "identityDetailsWarning": "Once set, identity details cannot be changed. Please make sure the entered details are correct.",
+  "nationalIdRequired": "National ID is required.",
+  "passportNumberRequired": "Passport number is required.",
+  "gender": "Gender",
+  "genderMale": "Male",
+  "genderFemale": "Female",
+  "enterPhoneNumber": "Enter phone number",
+  "selectCountryCode": "Select Country Code",
+  "searchCountryOrCode": "Search country or code...",
+  "selectDate": "Select date",
+  "deleteNotification": "Delete",
+  "notificationDeleted": "Notification deleted.",
+  "notificationDeleteFailed": "Couldn't delete notification. Please try again.",
+  "notificationNotFound": "Notification not found.",
+  "userNotAuthenticated": "Please sign in again.",
+  "noInternetConnection": "No internet connection. Please check your connection and try again."
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:transportation_app/core/l10n/app_localizations.dart';
 import 'package:transportation_app/core/theming/colors.dart';
 import 'package:transportation_app/features/profile/domain/entities/point_transaction.dart';
 
@@ -8,11 +9,64 @@ class PointTransactionTile extends StatelessWidget {
 
   const PointTransactionTile({super.key, required this.transaction});
 
+  /// Maps raw API source strings to localized display labels.
+  String _localizeSource(String source, AppLocalizations loc) {
+    switch (source) {
+      case 'ChallengeReward':
+        return loc.txChallengeReward;
+      case 'BookingEarned':
+        return loc.txBookingEarned;
+      case 'Deposit':
+        return loc.txDeposit;
+      case 'TicketPurchase':
+        return loc.txTicketPurchase;
+      case 'Redemption':
+        return loc.txRedemption;
+      case 'Reward':
+        return loc.txReward;
+      default:
+        return source;
+    }
+  }
+
+  /// Maps raw API status strings to localized display labels.
+  String _localizeStatus(String status, AppLocalizations loc) {
+    switch (status) {
+      case 'Available':
+        return loc.txStatusAvailable;
+      case 'Spent':
+        return loc.txStatusSpent;
+      case 'Expired':
+        return loc.txStatusExpired;
+      case 'Pending':
+        return loc.statusPending;
+      default:
+        return status;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
     final isEarned = transaction.isEarned;
     final color = isEarned ? ColorsManager.successGreen : Colors.redAccent;
-    final icon = isEarned ? Icons.arrow_upward_rounded : Icons.arrow_downward_rounded;
+    final icon = isEarned
+        ? Icons.arrow_upward_rounded
+        : Icons.arrow_downward_rounded;
+    final isArabic = Localizations.localeOf(context).languageCode == 'ar';
+    final description =
+        isArabic &&
+            transaction.descriptionAr != null &&
+            transaction.descriptionAr!.trim().isNotEmpty
+        ? transaction.descriptionAr!
+        : transaction.description;
+
+    final localizedSource = _localizeSource(transaction.source, loc);
+    final localizedStatus = _localizeStatus(transaction.status, loc);
+    final dateStr = DateFormat(
+      'MMM dd, yyyy',
+      Localizations.localeOf(context).toLanguageTag(),
+    ).format(transaction.createdAt);
 
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
@@ -35,23 +89,31 @@ class PointTransactionTile extends StatelessWidget {
           const SizedBox(width: 16),
           Expanded(
             child: Column(
+              // start = left in LTR, right in RTL — follows locale automatically
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  transaction.source,
-                  style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold),
+                  localizedSource,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  transaction.description,
+                  description,
                   style: const TextStyle(color: Colors.white70, fontSize: 13),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  '${DateFormat('MMM dd, yyyy').format(transaction.createdAt)} · ${transaction.status}',
-                  style: const TextStyle(color: ColorsManager.textMuted, fontSize: 12),
+                  '$dateStr · $localizedStatus',
+                  style: const TextStyle(
+                    color: ColorsManager.textMuted,
+                    fontSize: 12,
+                  ),
                 ),
               ],
             ),
@@ -59,7 +121,11 @@ class PointTransactionTile extends StatelessWidget {
           const SizedBox(width: 8),
           Text(
             '${isEarned ? '+' : ''}${transaction.amount}',
-            style: TextStyle(color: color, fontSize: 16, fontWeight: FontWeight.bold),
+            style: TextStyle(
+              color: color,
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ],
       ),

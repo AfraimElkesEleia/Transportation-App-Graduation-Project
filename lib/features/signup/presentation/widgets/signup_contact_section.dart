@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:transportation_app/core/l10n/app_localizations.dart';
 import 'package:transportation_app/core/validators/app_validators.dart';
 import 'package:transportation_app/core/widgets/app_text_form_field.dart';
 import 'package:transportation_app/features/signup/presentation/widgets/app_country_picker_field.dart';
@@ -32,11 +33,12 @@ class SignupContactSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Column(
       children: [
         AppTextFormField(
-          label: 'Email Address',
-          hint: 'Enter your email',
+          label: l10n.emailLabel,
+          hint: l10n.emailHint,
           prefixIcon: Icons.email_outlined,
           keyboardType: TextInputType.emailAddress,
           controller: emailController,
@@ -46,7 +48,7 @@ class SignupContactSection extends StatelessWidget {
         const SizedBox(height: 20),
 
         AppPhoneField(
-          label: 'Phone Number',
+          label: l10n.phoneNumberLabel,
           controller: phoneController,
           initialDialCode: selectedDialCode ?? '+20',
           onDialCodeChanged: onDialCodeChanged,
@@ -54,7 +56,7 @@ class SignupContactSection extends StatelessWidget {
         ),
         const SizedBox(height: 24),
         AppCountryPickerField(
-          label: 'Country',
+          label: l10n.countryLabel,
           selectedCode: countryCode,
           selectedName: countryName,
           onCountrySelected: onCountrySelected,

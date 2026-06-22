@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:transportation_app/features/home/domain/entities/search_params.dart';
 import 'package:transportation_app/features/search/domain/usecases/search_trips_usecase.dart';
@@ -62,9 +63,10 @@ class IndirectBookingCubit extends Cubit<IndirectBookingState> {
       )),
       (paged) => emit(state.copyWith(
         isLoadingLeg1: false,
-        leg1Results: paged.items,
+        leg1Results: _applyTimeFilters(paged.items, newParams),
         leg1CurrentPage: paged.currentPage,
         leg1TotalPages: paged.totalPages,
+        leg1SearchParams: newParams,
       )),
     );
   }
@@ -72,28 +74,12 @@ class IndirectBookingCubit extends Cubit<IndirectBookingState> {
   Future<void> loadMoreLeg1() async {
     if (isClosed) return;
     if (state.isFetchingMoreLeg1 || !state.hasMoreLeg1Pages) return;
+    final baseParams = state.leg1SearchParams;
+    if (baseParams == null) return;
 
     emit(state.copyWith(isFetchingMoreLeg1: true));
 
-    // The previous request params are the same as newParams above, but with pageNumber + 1.
-    final nextPage = state.leg1CurrentPage + 1;
-    final newParams = SearchParams(
-      fromStationId: state.leg1Results!.first.originStationId,
-      toStationId: state.leg1Results!.first.destinationStationId,
-      fromDisplayName: "", // Not strictly used by API, only by UI
-      toDisplayName: "", // Not strictly used by API
-      travelDate: state.leg1Results!.first.departureTime.toIso8601String().split('T').first,
-      passengers: state.requiredSeatCount,
-      transport: state.activeParams?.transport ?? TransportType.all,
-      sortBy: state.activeParams?.sortBy ?? SortBy.departureTime,
-      maxPrice: state.activeParams?.maxPrice,
-      preferredAgencies: state.activeParams?.preferredAgencies ?? const [],
-      departureFrom: state.activeParams?.departureFrom,
-      departureTo: state.activeParams?.departureTo,
-      arrivalFrom: state.activeParams?.arrivalFrom,
-      arrivalTo: state.activeParams?.arrivalTo,
-      pageNumber: nextPage,
-    );
+    final newParams = baseParams.copyWith(newPage: state.leg1CurrentPage + 1);
 
     final result = await searchTripsUseCase(newParams);
     if (isClosed) return;
@@ -101,14 +87,22 @@ class IndirectBookingCubit extends Cubit<IndirectBookingState> {
     result.fold(
       (failure) => emit(state.copyWith(isFetchingMoreLeg1: false)),
       (paged) {
-        final existingIds = state.leg1Results!.map((t) => t.tripOccurrenceId).toSet();
-        final newItems = paged.items.where((t) => !existingIds.contains(t.tripOccurrenceId)).toList();
+        final existingIds = (state.leg1Results ?? const <TripResultEntity>[])
+            .map((t) => t.tripOccurrenceId)
+            .toSet();
+        final newItems = _applyTimeFilters(paged.items, newParams)
+            .where((t) => !existingIds.contains(t.tripOccurrenceId))
+            .toList();
         
         emit(state.copyWith(
           isFetchingMoreLeg1: false,
-          leg1Results: [...state.leg1Results!, ...newItems],
+          leg1Results: [
+            ...(state.leg1Results ?? const <TripResultEntity>[]),
+            ...newItems,
+          ],
           leg1CurrentPage: paged.currentPage,
           leg1TotalPages: paged.totalPages,
+          leg1SearchParams: newParams,
         ));
       },
     );
@@ -119,14 +113,16 @@ class IndirectBookingCubit extends Cubit<IndirectBookingState> {
       selectedTripLeg1: trip,
       selectedClassLeg1: coachClass,
       selectedSeatsLeg1: const [], // reset
-      currentStep: IndirectBookingStep.seatLeg1,
+      selectedSeatsLeg2: const [],
+      clearLeg2Selection: true,
+      currentStep: IndirectBookingStep.searchLeg2,
     ));
   }
 
   void saveSeatsLeg1(List<String> seats) {
     emit(state.copyWith(
       selectedSeatsLeg1: seats,
-      currentStep: IndirectBookingStep.searchLeg2,
+      currentStep: IndirectBookingStep.seatLeg2,
     ));
   }
 
@@ -139,11 +135,14 @@ class IndirectBookingCubit extends Cubit<IndirectBookingState> {
     required String toDisplayName,
     required DateTime date,
     required DateTime leg1ArrivalTime,
+    SearchParams? activeParams,
   }) async {
+    final effectiveParams = activeParams ?? state.activeParams;
     emit(state.copyWith(
       isLoadingLeg2: true,
       clearLeg2Error: true,
       leg2Results: [],
+      activeParams: effectiveParams,
     ));
 
     final newParams = SearchParams(
@@ -153,14 +152,14 @@ class IndirectBookingCubit extends Cubit<IndirectBookingState> {
       toDisplayName: toDisplayName,
       travelDate: date.toIso8601String().split('T').first,
       passengers: state.requiredSeatCount,
-      transport: state.activeParams?.transport ?? TransportType.all,
-      sortBy: state.activeParams?.sortBy ?? SortBy.departureTime,
-      maxPrice: state.activeParams?.maxPrice,
-      preferredAgencies: state.activeParams?.preferredAgencies ?? const [],
-      departureFrom: state.activeParams?.departureFrom,
-      departureTo: state.activeParams?.departureTo,
-      arrivalFrom: state.activeParams?.arrivalFrom,
-      arrivalTo: state.activeParams?.arrivalTo,
+      transport: effectiveParams?.transport ?? TransportType.all,
+      sortBy: effectiveParams?.sortBy ?? SortBy.departureTime,
+      maxPrice: effectiveParams?.maxPrice,
+      preferredAgencies: effectiveParams?.preferredAgencies ?? const [],
+      departureFrom: effectiveParams?.departureFrom,
+      departureTo: effectiveParams?.departureTo,
+      arrivalFrom: effectiveParams?.arrivalFrom,
+      arrivalTo: effectiveParams?.arrivalTo,
     );
 
     final result = await searchTripsUseCase(newParams);
@@ -174,7 +173,7 @@ class IndirectBookingCubit extends Cubit<IndirectBookingState> {
       (paged) {
         final safeDepartureTime = leg1ArrivalTime.add(const Duration(minutes: 60));
 
-        final validTrips = paged.items.where((t) {
+        final validTrips = _applyTimeFilters(paged.items, newParams).where((t) {
           return t.departureTime.isAfter(safeDepartureTime);
         }).toList();
 
@@ -183,6 +182,7 @@ class IndirectBookingCubit extends Cubit<IndirectBookingState> {
           leg2Results: validTrips,
           leg2CurrentPage: paged.currentPage,
           leg2TotalPages: paged.totalPages,
+          leg2SearchParams: newParams,
         ));
       },
     );
@@ -191,27 +191,12 @@ class IndirectBookingCubit extends Cubit<IndirectBookingState> {
   Future<void> loadMoreLeg2(DateTime leg1ArrivalTime) async {
     if (isClosed) return;
     if (state.isFetchingMoreLeg2 || !state.hasMoreLeg2Pages) return;
+    final baseParams = state.leg2SearchParams;
+    if (baseParams == null) return;
 
     emit(state.copyWith(isFetchingMoreLeg2: true));
 
-    final nextPage = state.leg2CurrentPage + 1;
-    final newParams = SearchParams(
-      fromStationId: state.leg2Results!.first.originStationId,
-      toStationId: state.leg2Results!.first.destinationStationId,
-      fromDisplayName: "", 
-      toDisplayName: "", 
-      travelDate: state.leg2Results!.first.departureTime.toIso8601String().split('T').first,
-      passengers: state.requiredSeatCount,
-      transport: state.activeParams?.transport ?? TransportType.all,
-      sortBy: state.activeParams?.sortBy ?? SortBy.departureTime,
-      maxPrice: state.activeParams?.maxPrice,
-      preferredAgencies: state.activeParams?.preferredAgencies ?? const [],
-      departureFrom: state.activeParams?.departureFrom,
-      departureTo: state.activeParams?.departureTo,
-      arrivalFrom: state.activeParams?.arrivalFrom,
-      arrivalTo: state.activeParams?.arrivalTo,
-      pageNumber: nextPage,
-    );
+    final newParams = baseParams.copyWith(newPage: state.leg2CurrentPage + 1);
 
     final result = await searchTripsUseCase(newParams);
     if (isClosed) return;
@@ -219,20 +204,26 @@ class IndirectBookingCubit extends Cubit<IndirectBookingState> {
     result.fold(
       (failure) => emit(state.copyWith(isFetchingMoreLeg2: false)),
       (paged) {
-        final existingIds = state.leg2Results!.map((t) => t.tripOccurrenceId).toSet();
+        final existingIds = (state.leg2Results ?? const <TripResultEntity>[])
+            .map((t) => t.tripOccurrenceId)
+            .toSet();
         
         final safeDepartureTime = leg1ArrivalTime.add(const Duration(minutes: 60));
         
-        final newItems = paged.items.where((t) {
+        final newItems = _applyTimeFilters(paged.items, newParams).where((t) {
           if (existingIds.contains(t.tripOccurrenceId)) return false;
           return t.departureTime.isAfter(safeDepartureTime);
         }).toList();
         
         emit(state.copyWith(
           isFetchingMoreLeg2: false,
-          leg2Results: [...state.leg2Results!, ...newItems],
+          leg2Results: [
+            ...(state.leg2Results ?? const <TripResultEntity>[]),
+            ...newItems,
+          ],
           leg2CurrentPage: paged.currentPage,
           leg2TotalPages: paged.totalPages,
+          leg2SearchParams: newParams,
         ));
       },
     );
@@ -243,13 +234,13 @@ class IndirectBookingCubit extends Cubit<IndirectBookingState> {
       selectedTripLeg2: trip,
       selectedClassLeg2: coachClass,
       selectedSeatsLeg2: const [], // reset
-      currentStep: IndirectBookingStep.seatLeg2,
+      currentStep: IndirectBookingStep.seatLeg1,
     ));
   }
 
   void saveSeatsLeg2(List<String> seats) {
-    // Validate count matches leg 1
-    if (seats.length != state.requiredSeatCount) {
+    final requiredCount = state.selectedSeatsLeg1.length;
+    if (requiredCount == 0 || seats.length != requiredCount) {
       // Ignored for UI, but the UI should prevent proceeding if not equal
       return; 
     }
@@ -268,13 +259,52 @@ class IndirectBookingCubit extends Cubit<IndirectBookingState> {
     emit(state.copyWith(currentStep: IndirectBookingStep.seatLeg1));
   }
 
+  void goBackToLeg2Search() {
+    emit(state.copyWith(currentStep: IndirectBookingStep.searchLeg2));
+  }
+
   void clearLeg2Selection() {
     // Return completely back to changing Leg 2 Date / Choice, preserving Leg 1
     emit(state.copyWith(
-      selectedTripLeg2: null,
-      selectedClassLeg2: null,
       selectedSeatsLeg2: const [],
+      clearLeg2Selection: true,
       currentStep: IndirectBookingStep.searchLeg2,
     ));
   }
+
+  List<TripResultEntity> _applyTimeFilters(
+    List<TripResultEntity> trips,
+    SearchParams params,
+  ) {
+    if (!params.hasTimeFilters) return trips;
+
+    return trips.where((t) {
+      if (params.departureFrom != null || params.departureTo != null) {
+        final depMins = _minsFromDateTime(t.departureTime);
+        if (params.departureFrom != null &&
+            depMins < _mins(params.departureFrom!)) {
+          return false;
+        }
+        if (params.departureTo != null &&
+            depMins > _mins(params.departureTo!)) {
+          return false;
+        }
+      }
+      if (params.arrivalFrom != null || params.arrivalTo != null) {
+        if (t.arrivalTime == null) return false;
+        final arrMins = _minsFromDateTime(t.arrivalTime!);
+        if (params.arrivalFrom != null &&
+            arrMins < _mins(params.arrivalFrom!)) {
+          return false;
+        }
+        if (params.arrivalTo != null && arrMins > _mins(params.arrivalTo!)) {
+          return false;
+        }
+      }
+      return true;
+    }).toList();
+  }
+
+  int _mins(TimeOfDay t) => t.hour * 60 + t.minute;
+  int _minsFromDateTime(DateTime t) => t.hour * 60 + t.minute;
 }

@@ -123,7 +123,7 @@ class _ProfilePicturePickerState extends State<ProfilePicturePicker> {
         children: [
           CircleAvatar(
             radius: widget.radius,
-            backgroundColor: const Color(0xFF1AC8E8).withOpacity(0.3),
+            backgroundColor: const Color(0xFF1AC8E8).withValues(alpha: 0.3),
             backgroundImage: _pickedFile != null
                 ? FileImage(_pickedFile!)
                 : widget.currentImageUrl != null
@@ -197,7 +197,7 @@ class _PickerOption extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.07),
+          color: Colors.white.withValues(alpha: 0.07),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Row(

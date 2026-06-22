@@ -7,11 +7,16 @@ import 'package:transportation_app/core/validators/app_validators.dart';
 import 'package:transportation_app/core/widgets/app_gradient_button.dart';
 import 'package:transportation_app/core/widgets/app_text_form_field.dart';
 import 'package:transportation_app/core/widgets/auth_background.dart';
+import 'package:transportation_app/core/widgets/language_toggle_button.dart';
 import 'package:transportation_app/features/login/presentation/cubit/login_cubit/login_cubit.dart';
 import 'package:transportation_app/features/login/presentation/cubit/login_cubit/login_states.dart';
 import 'package:transportation_app/features/login/presentation/widgets/auth_headline.dart';
 import 'package:transportation_app/features/login/presentation/widgets/remember_me_row.dart';
 import 'package:transportation_app/features/login/presentation/widgets/sign_up_redirect.dart';
+import 'package:transportation_app/core/di/injection_container.dart';
+import 'package:transportation_app/core/notfications/signalr_service.dart';
+import 'package:transportation_app/core/utils/token_manager.dart';
+import 'package:transportation_app/core/l10n/locale_cubit.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -21,10 +26,10 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final _formKey           = GlobalKey<FormState>();
-  final _emailController   = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
+  final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  bool _rememberMe         = false;
+  bool _rememberMe = false;
 
   @override
   void dispose() {
@@ -38,10 +43,10 @@ class _LoginScreenState extends State<LoginScreen> {
     if (!(_formKey.currentState?.validate() ?? false)) return;
 
     context.read<LoginCubit>().login(
-      email:      _emailController.text.trim(),
-      password:   _passwordController.text,
+      email: _emailController.text.trim(),
+      password: _passwordController.text,
       deviceInfo: 'Flutter App',
-      rememberMe:_rememberMe
+      rememberMe: _rememberMe,
     );
   }
 
@@ -51,8 +56,19 @@ class _LoginScreenState extends State<LoginScreen> {
 
     return AuthBackground(
       child: BlocConsumer<LoginCubit, LoginState>(
-        listener: (context, state) {
+        listener: (context, state) async {
           if (state is LoginSuccess) {
+            final localeCubit = context.read<LocaleCubit>();
+            SignalrService.connect(
+              tokenFactory: () async =>
+                  await sl<TokenManager>().getAccessToken() ?? '',
+            );
+            final appliedProfileLanguage = await localeCubit
+                .applyPreferredLanguageFromProfile();
+            if (!appliedProfileLanguage) {
+              await localeCubit.syncLanguageWithBackend();
+            }
+            if (!context.mounted) return;
             context.pushNamedAndRemoveuntil(
               AppRoutes.homeScreen,
               predicate: (_) => false,
@@ -60,7 +76,7 @@ class _LoginScreenState extends State<LoginScreen> {
           } else if (state is LoginFailure) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(state.message),           // Text() wraps the string
+                content: Text(state.message), // Text() wraps the string
                 backgroundColor: Colors.red,
                 behavior: SnackBarBehavior.floating,
                 shape: RoundedRectangleBorder(
@@ -75,6 +91,11 @@ class _LoginScreenState extends State<LoginScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 50),
+              Align(
+                alignment: AlignmentDirectional.centerEnd,
+                child: const LanguageToggleButton(),
+              ),
+              const SizedBox(height: 8),
               const AuthAccentBar(),
               const SizedBox(height: 10),
               AuthHeadline(
@@ -87,21 +108,21 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: Column(
                   children: [
                     AppTextFormField(
-                      label:           l10n.emailLabel,
-                      hint:            l10n.emailHint,
-                      prefixIcon:      Icons.email,
-                      keyboardType:    TextInputType.emailAddress,
-                      controller:      _emailController,
+                      label: l10n.emailLabel,
+                      hint: l10n.emailHint,
+                      prefixIcon: Icons.email,
+                      keyboardType: TextInputType.emailAddress,
+                      controller: _emailController,
                       textInputAction: TextInputAction.next,
-                      validator:       AppValidators.email,
+                      validator: AppValidators.email,
                     ),
                     const SizedBox(height: 20),
                     AppTextFormField(
-                      label:           l10n.passwordLabel,
-                      hint:            l10n.passwordHint,
-                      prefixIcon:      Icons.lock,
-                      obscureText:     true,
-                      controller:      _passwordController,
+                      label: l10n.passwordLabel,
+                      hint: l10n.passwordHint,
+                      prefixIcon: Icons.lock,
+                      obscureText: true,
+                      controller: _passwordController,
                       textInputAction: TextInputAction.done,
                       onFieldSubmitted: (_) => _handleLogin(),
                       validator: (value) {
@@ -115,12 +136,12 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
               RememberMeRow(
-                value:     _rememberMe,
+                value: _rememberMe,
                 onChanged: (v) => setState(() => _rememberMe = v ?? false),
               ),
               const SizedBox(height: 20),
               AppGradientButton(
-                label:     l10n.signIn,
+                label: l10n.signIn,
                 onPressed: _handleLogin,
                 isLoading: state is LoginLoading,
               ),

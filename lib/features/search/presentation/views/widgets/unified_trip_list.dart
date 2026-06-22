@@ -12,20 +12,28 @@ class UnifiedTripList extends StatelessWidget {
   final SearchLoaded state;
   final ScrollController scrollController;
   final VoidCallback onSearchIndirect;
+  final VoidCallback onLoadMoreDirect;
 
   const UnifiedTripList({
     super.key,
     required this.state,
     required this.scrollController,
     required this.onSearchIndirect,
+    required this.onLoadMoreDirect,
   });
 
   @override
   Widget build(BuildContext context) {
+    _scheduleDirectPaginationIfNeeded();
+
     if (state.directItems.isEmpty &&
         !state.isFetchingMoreDirect &&
+        !state.hasMoreDirectPages &&
         !state.indirectSearched) {
-      return EmptyDirectView(onSearchIndirect: onSearchIndirect);
+      return EmptyDirectView(
+        onSearchIndirect: onSearchIndirect,
+        showIndirectOption: state.activeParams.activeFilterCount == 0,
+      );
     }
 
     // Build item list:
@@ -39,7 +47,8 @@ class UnifiedTripList extends StatelessWidget {
     }
 
     // Direct "load more" spinner
-    if (state.isFetchingMoreDirect) {
+    if (state.isFetchingMoreDirect ||
+        (state.directItems.isEmpty && state.hasMoreDirectPages)) {
       items.add(const _LoadingSpinnerItem());
     }
 
@@ -83,6 +92,23 @@ class UnifiedTripList extends StatelessWidget {
         return _buildItem(context, item);
       },
     );
+  }
+
+  void _scheduleDirectPaginationIfNeeded() {
+    if (!state.hasMoreDirectPages || state.isFetchingMoreDirect) return;
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!scrollController.hasClients) return;
+
+      final position = scrollController.position;
+      final isTooShortToScroll = position.maxScrollExtent <= 0;
+      final isNearBottom =
+          position.pixels >= position.maxScrollExtent - 300;
+
+      if (isTooShortToScroll || isNearBottom) {
+        onLoadMoreDirect();
+      }
+    });
   }
 
   Widget _buildItem(BuildContext context, _ListItem item) {

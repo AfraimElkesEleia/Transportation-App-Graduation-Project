@@ -7,15 +7,20 @@ class TripResultModel extends TripResultEntity {
     required super.tripOccurrenceId,
     required super.tripId,
     required super.agencyName,
+    super.agencyNameAr,
     required super.departureTime,
     required super.arrivalTime,
     required super.totalDurationMinutes,
     required super.originStationId,
     required super.originStationName,
+    super.originStationNameAr,
     required super.originGovernorate,
+    super.originGovernorateAr,
     required super.destinationStationId,
     required super.destinationStationName,
+    super.destinationStationNameAr,
     required super.destinationGovernorate,
+    super.destinationGovernorateAr,
     required super.availableClasses,
     required super.routeStops,
   });
@@ -38,17 +43,24 @@ class TripResultModel extends TripResultEntity {
       tripOccurrenceId: json['tripOccurrenceId'] as int,
       tripId: json['tripId'] as int,
       agencyName: json['agencyName'] as String? ?? '',
+      agencyNameAr: json['agencyNameAr'] as String?,
+      // UI departure/arrival fields intentionally use passenger-segment
+      // timetable values from the API, not occurrence-level trip times.
       departureTime: DateTime.parse(json['boardingTime'] as String),
-      arrivalTime: json['arrivalTime'] != null
+      arrivalTime: json['dropoffTime'] != null
           ? DateTime.parse(json['dropoffTime'] as String)
           : null,
       totalDurationMinutes: json['totalDurationMinutes'] as int?,
       originStationId: json['originStationId'] as int,
       originStationName: json['originStationName'] as String? ?? '',
+      originStationNameAr: json['originStationNameAr'] as String?,
       originGovernorate: json['originGovernorate'] as String? ?? '',
+      originGovernorateAr: json['originGovernorateAr'] as String?,
       destinationStationId: json['destinationStationId'] as int,
       destinationStationName: json['destinationStationName'] as String? ?? '',
+      destinationStationNameAr: json['destinationStationNameAr'] as String?,
       destinationGovernorate: json['destinationGovernorate'] as String? ?? '',
+      destinationGovernorateAr: json['destinationGovernorateAr'] as String?,
       availableClasses: classes,
       routeStops: stops,
     );

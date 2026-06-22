@@ -5,6 +5,7 @@ class WalletTransactionEntity extends Equatable {
   final double amount;
   final String type;
   final String description;
+  final String? descriptionAr;
   final int? bookingId;
   final DateTime createdAt;
 
@@ -13,6 +14,7 @@ class WalletTransactionEntity extends Equatable {
     required this.amount,
     required this.type,
     required this.description,
+    this.descriptionAr,
     this.bookingId,
     required this.createdAt,
   });

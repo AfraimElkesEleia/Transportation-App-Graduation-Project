@@ -3,12 +3,7 @@ import 'package:transportation_app/features/home/domain/entities/search_params.d
 import 'package:transportation_app/features/search/domain/entities/coach_class_entity.dart';
 import 'package:transportation_app/features/search/domain/entities/trip_result_entity.dart';
 
-enum RoundTripBookingStep {
-  searchOutbound,
-  searchReturn,
-  selectSeats,
-  summary,
-}
+enum RoundTripBookingStep { searchOutbound, searchReturn, selectSeats, summary }
 
 class RoundTripBookingState extends Equatable {
   final RoundTripBookingStep currentStep;
@@ -18,6 +13,7 @@ class RoundTripBookingState extends Equatable {
   final bool isLoadingOutbound;
   final String? outboundError;
   final List<TripResultEntity>? outboundResults;
+  final List<TripResultEntity>? unfilteredOutboundResults;
   final int outboundCurrentPage;
   final int outboundTotalPages;
   final bool isFetchingMoreOutbound;
@@ -30,6 +26,7 @@ class RoundTripBookingState extends Equatable {
   final bool isLoadingReturn;
   final String? returnError;
   final List<TripResultEntity>? returnResults;
+  final List<TripResultEntity>? unfilteredReturnResults;
   final int returnCurrentPage;
   final int returnTotalPages;
   final bool isFetchingMoreReturn;
@@ -37,6 +34,9 @@ class RoundTripBookingState extends Equatable {
   final TripResultEntity? selectedReturnTrip;
   final CoachClassEntity? selectedReturnClass;
   final List<String> selectedReturnSeats;
+
+  // ── Seats Phase ──
+  final int currentSeatLegIndex;
 
   // ── Booking Status ──
   final bool isAddingToCart;
@@ -48,7 +48,7 @@ class RoundTripBookingState extends Equatable {
   /// Number of passengers = each leg can have its own count.
   /// Exposed per-leg so the form can generate correct cards.
   int get outboundSeatCount => selectedOutboundSeats.length;
-  int get returnSeatCount   => selectedReturnSeats.length;
+  int get returnSeatCount => selectedReturnSeats.length;
 
   /// Total unique passengers = max of both legs (both legs are filled independently).
   int get requiredSeatCount {
@@ -64,28 +64,31 @@ class RoundTripBookingState extends Equatable {
   const RoundTripBookingState({
     this.currentStep = RoundTripBookingStep.searchOutbound,
     this.activeParams,
-    
+
     this.isLoadingOutbound = false,
     this.outboundError,
     this.outboundResults,
+    this.unfilteredOutboundResults,
     this.outboundCurrentPage = 1,
     this.outboundTotalPages = 1,
     this.isFetchingMoreOutbound = false,
-    
+
     this.selectedOutboundTrip,
     this.selectedOutboundClass,
     this.selectedOutboundSeats = const [],
-    
+
     this.isLoadingReturn = false,
     this.returnError,
     this.returnResults,
+    this.unfilteredReturnResults,
     this.returnCurrentPage = 1,
     this.returnTotalPages = 1,
     this.isFetchingMoreReturn = false,
-    
+
     this.selectedReturnTrip,
     this.selectedReturnClass,
     this.selectedReturnSeats = const [],
+    this.currentSeatLegIndex = 0,
 
     this.isAddingToCart = false,
     this.isBookingNow = false,
@@ -102,10 +105,11 @@ class RoundTripBookingState extends Equatable {
     String? outboundError,
     bool clearOutboundError = false,
     List<TripResultEntity>? outboundResults,
+    List<TripResultEntity>? unfilteredOutboundResults,
     int? outboundCurrentPage,
     int? outboundTotalPages,
     bool? isFetchingMoreOutbound,
-    
+
     TripResultEntity? selectedOutboundTrip,
     CoachClassEntity? selectedOutboundClass,
     List<String>? selectedOutboundSeats,
@@ -114,18 +118,22 @@ class RoundTripBookingState extends Equatable {
     String? returnError,
     bool clearReturnError = false,
     List<TripResultEntity>? returnResults,
+    List<TripResultEntity>? unfilteredReturnResults,
     int? returnCurrentPage,
     int? returnTotalPages,
     bool? isFetchingMoreReturn,
-    
+
     TripResultEntity? selectedReturnTrip,
     CoachClassEntity? selectedReturnClass,
     List<String>? selectedReturnSeats,
+    int? currentSeatLegIndex,
 
     bool? isAddingToCart,
     bool? isBookingNow,
     String? cartError,
     bool clearCartError = false,
+    bool clearOutboundSelection = false,
+    bool clearReturnSelection = false,
     bool? cartSuccess,
     bool? checkoutSuccess,
   }) {
@@ -134,26 +142,43 @@ class RoundTripBookingState extends Equatable {
       activeParams: activeParams ?? this.activeParams,
 
       isLoadingOutbound: isLoadingOutbound ?? this.isLoadingOutbound,
-      outboundError: clearOutboundError ? null : outboundError ?? this.outboundError,
+      outboundError: clearOutboundError
+          ? null
+          : outboundError ?? this.outboundError,
       outboundResults: outboundResults ?? this.outboundResults,
+      unfilteredOutboundResults:
+          unfilteredOutboundResults ?? this.unfilteredOutboundResults,
       outboundCurrentPage: outboundCurrentPage ?? this.outboundCurrentPage,
       outboundTotalPages: outboundTotalPages ?? this.outboundTotalPages,
-      isFetchingMoreOutbound: isFetchingMoreOutbound ?? this.isFetchingMoreOutbound,
-      
-      selectedOutboundTrip: selectedOutboundTrip ?? this.selectedOutboundTrip,
-      selectedOutboundClass: selectedOutboundClass ?? this.selectedOutboundClass,
-      selectedOutboundSeats: selectedOutboundSeats ?? this.selectedOutboundSeats,
+      isFetchingMoreOutbound:
+          isFetchingMoreOutbound ?? this.isFetchingMoreOutbound,
+
+      selectedOutboundTrip: clearOutboundSelection
+          ? null
+          : (selectedOutboundTrip ?? this.selectedOutboundTrip),
+      selectedOutboundClass: clearOutboundSelection
+          ? null
+          : (selectedOutboundClass ?? this.selectedOutboundClass),
+      selectedOutboundSeats:
+          selectedOutboundSeats ?? this.selectedOutboundSeats,
 
       isLoadingReturn: isLoadingReturn ?? this.isLoadingReturn,
       returnError: clearReturnError ? null : returnError ?? this.returnError,
       returnResults: returnResults ?? this.returnResults,
+      unfilteredReturnResults:
+          unfilteredReturnResults ?? this.unfilteredReturnResults,
       returnCurrentPage: returnCurrentPage ?? this.returnCurrentPage,
       returnTotalPages: returnTotalPages ?? this.returnTotalPages,
       isFetchingMoreReturn: isFetchingMoreReturn ?? this.isFetchingMoreReturn,
-      
-      selectedReturnTrip: selectedReturnTrip ?? this.selectedReturnTrip,
-      selectedReturnClass: selectedReturnClass ?? this.selectedReturnClass,
+
+      selectedReturnTrip: clearReturnSelection
+          ? null
+          : (selectedReturnTrip ?? this.selectedReturnTrip),
+      selectedReturnClass: clearReturnSelection
+          ? null
+          : (selectedReturnClass ?? this.selectedReturnClass),
       selectedReturnSeats: selectedReturnSeats ?? this.selectedReturnSeats,
+      currentSeatLegIndex: currentSeatLegIndex ?? this.currentSeatLegIndex,
 
       isAddingToCart: isAddingToCart ?? this.isAddingToCart,
       isBookingNow: isBookingNow ?? this.isBookingNow,
@@ -165,30 +190,33 @@ class RoundTripBookingState extends Equatable {
 
   @override
   List<Object?> get props => [
-        currentStep,
-        activeParams,
-        isLoadingOutbound,
-        outboundError,
-        outboundResults,
-        outboundCurrentPage,
-        outboundTotalPages,
-        isFetchingMoreOutbound,
-        selectedOutboundTrip,
-        selectedOutboundClass,
-        selectedOutboundSeats,
-        isLoadingReturn,
-        returnError,
-        returnResults,
-        returnCurrentPage,
-        returnTotalPages,
-        isFetchingMoreReturn,
-        selectedReturnTrip,
-        selectedReturnClass,
-        selectedReturnSeats,
-        isAddingToCart,
-        isBookingNow,
-        cartError,
-        cartSuccess,
-        checkoutSuccess,
-      ];
+    currentStep,
+    activeParams,
+    isLoadingOutbound,
+    outboundError,
+    outboundResults,
+    unfilteredOutboundResults,
+    outboundCurrentPage,
+    outboundTotalPages,
+    isFetchingMoreOutbound,
+    selectedOutboundTrip,
+    selectedOutboundClass,
+    selectedOutboundSeats,
+    isLoadingReturn,
+    returnError,
+    returnResults,
+    unfilteredReturnResults,
+    returnCurrentPage,
+    returnTotalPages,
+    isFetchingMoreReturn,
+    selectedReturnTrip,
+    selectedReturnClass,
+    selectedReturnSeats,
+    currentSeatLegIndex,
+    isAddingToCart,
+    isBookingNow,
+    cartError,
+    cartSuccess,
+    checkoutSuccess,
+  ];
 }

@@ -9,6 +9,7 @@ class StationModel extends StationEntity {
     required super.englishName,
     required super.slug,
     required super.city,
+    super.governorateAr,
   });
 
   factory StationModel.fromJson(Map<String, dynamic> json) {
@@ -18,6 +19,7 @@ class StationModel extends StationEntity {
       englishName: json['englishName'] as String? ?? '',
       slug:        json['slug']        as String? ?? '',
       city:        json['city']        as String? ?? '',
+      governorateAr: json['governorateAr'] as String?,
     );
   }
 }
@@ -25,6 +27,7 @@ class StationModel extends StationEntity {
 class StationGroupModel extends StationGroupEntity {
   const StationGroupModel({
     required super.governorate,
+    super.governorateAr,
     required super.stations,
   });
 
@@ -35,6 +38,7 @@ class StationGroupModel extends StationGroupEntity {
 
     return StationGroupModel(
       governorate: json['governorate'] as String? ?? '',
+      governorateAr: json['governorateAr'] as String?,
       stations:    stationsList,
     );
   }

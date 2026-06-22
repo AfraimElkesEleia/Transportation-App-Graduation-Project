@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:transportation_app/core/l10n/app_localizations.dart';
 import 'package:transportation_app/features/profile/presentation/cubit/profile_cubit/profile_cubit.dart';
@@ -9,13 +10,16 @@ class WalletSection extends StatelessWidget {
   const WalletSection({super.key, this.balance});
 
   void _showChargeSheet(BuildContext context) {
+    // Capture the parent ScaffoldMessenger before entering the modal route,
+    // so snackbars are shown on the underlying scaffold (not the sheet overlay).
+    final messenger = ScaffoldMessenger.of(context);
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (_) => BlocProvider.value(
         value: context.read<ProfileCubit>(),
-        child: const _ChargeWalletSheet(),
+        child: _ChargeWalletSheet(parentMessenger: messenger),
       ),
     );
   }
@@ -32,10 +36,10 @@ class WalletSection extends StatelessWidget {
           colors: [Color(0xFF0D2B5E), Color(0xFF1A4A8A)],
         ),
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Colors.white.withOpacity(0.12)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.3),
+            color: Colors.black.withValues(alpha: 0.3),
             blurRadius: 20,
             offset: const Offset(0, 8),
           ),
@@ -49,7 +53,7 @@ class WalletSection extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.1),
+                  color: Colors.white.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: const Icon(
@@ -74,10 +78,10 @@ class WalletSection extends StatelessWidget {
                   vertical: 4,
                 ),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF00E5FF).withOpacity(0.15),
+                  color: const Color(0xFF00E5FF).withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(
-                    color: const Color(0xFF00E5FF).withOpacity(0.4),
+                    color: const Color(0xFF00E5FF).withValues(alpha: 0.4),
                   ),
                 ),
                 child: Row(
@@ -86,7 +90,10 @@ class WalletSection extends StatelessWidget {
                     const SizedBox(width: 4),
                     Text(
                       l10n.walletActive,
-                      style: const TextStyle(color: Color(0xFF00E5FF), fontSize: 11),
+                      style: const TextStyle(
+                        color: Color(0xFF00E5FF),
+                        fontSize: 11,
+                      ),
                     ),
                   ],
                 ),
@@ -124,7 +131,10 @@ class WalletSection extends StatelessWidget {
                         padding: const EdgeInsets.only(bottom: 6, left: 6),
                         child: Text(
                           l10n.egp,
-                          style: const TextStyle(color: Colors.white60, fontSize: 14),
+                          style: const TextStyle(
+                            color: Colors.white60,
+                            fontSize: 14,
+                          ),
                         ),
                       ),
                     ],
@@ -193,9 +203,9 @@ class _ActionBtn extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 12),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.12),
+          color: color.withValues(alpha: 0.12),
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: color.withOpacity(0.35)),
+          border: Border.all(color: color.withValues(alpha: 0.35)),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -219,7 +229,8 @@ class _ActionBtn extends StatelessWidget {
 
 // ── Charge Bottom Sheet ──────────────────────────────────────────────
 class _ChargeWalletSheet extends StatefulWidget {
-  const _ChargeWalletSheet();
+  final ScaffoldMessengerState? parentMessenger;
+  const _ChargeWalletSheet({this.parentMessenger});
 
   @override
   State<_ChargeWalletSheet> createState() => _ChargeWalletSheetState();
@@ -255,20 +266,48 @@ class _ChargeWalletSheetState extends State<_ChargeWalletSheet> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final messenger = widget.parentMessenger ?? ScaffoldMessenger.of(context);
     return BlocListener<ProfileCubit, ProfileState>(
       listener: (context, state) {
         if (state is WalletDepositSuccess) {
           Navigator.pop(context);
-          ScaffoldMessenger.of(context).showSnackBar(
+          messenger.showSnackBar(
             SnackBar(
               content: Text(l10n.walletChargedSuccessfully),
               backgroundColor: Colors.green,
+              behavior: SnackBarBehavior.floating,
             ),
           );
         } else if (state is WalletDepositFailure) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(state.message), backgroundColor: Colors.red),
-          );
+          messenger
+            ..hideCurrentSnackBar()
+            ..showSnackBar(
+              SnackBar(
+                content: Row(
+                  children: [
+                    const Icon(
+                      Icons.error_outline,
+                      color: Colors.white,
+                      size: 18,
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        state.message,
+                        style: const TextStyle(color: Colors.white),
+                      ),
+                    ),
+                  ],
+                ),
+                backgroundColor: const Color(0xFFB00020),
+                behavior: SnackBarBehavior.floating,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                margin: const EdgeInsets.all(16),
+                duration: const Duration(seconds: 4),
+              ),
+            );
         }
       },
       child: DraggableScrollableSheet(
@@ -409,6 +448,11 @@ class _CardTab extends StatelessWidget {
                 label: l10n.expiry,
                 hint: 'MM/YY',
                 icon: Icons.date_range,
+                keyboardType: TextInputType.number,
+                inputFormatters: [
+                  LengthLimitingTextInputFormatter(5),
+                  _ExpiryDateFormatter(),
+                ],
                 validator: (v) {
                   if (v == null || !RegExp(r'^\d{2}/\d{2}$').hasMatch(v)) {
                     return l10n.formatMmYy;
@@ -421,11 +465,17 @@ class _CardTab extends StatelessWidget {
             Expanded(
               child: _SheetField(
                 controller: cvvCtrl,
-                label: 'CVV',
+                label: l10n.cvvLabel,
                 hint: '•••',
                 icon: Icons.lock_outline,
                 obscureText: true,
-                validator: (v) => (v?.length == 3) ? null : l10n.threeDigitsRequired,
+                keyboardType: TextInputType.number,
+                inputFormatters: [
+                  FilteringTextInputFormatter.digitsOnly,
+                  LengthLimitingTextInputFormatter(3),
+                ],
+                validator: (v) =>
+                    (v?.length == 3) ? null : l10n.threeDigitsRequired,
               ),
             ),
           ],
@@ -434,7 +484,7 @@ class _CardTab extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.05),
+            color: Colors.white.withValues(alpha: 0.05),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Row(
@@ -460,6 +510,7 @@ class _SheetField extends StatelessWidget {
   final TextInputType? keyboardType;
   final bool obscureText;
   final String? Function(String?)? validator;
+  final List<TextInputFormatter>? inputFormatters;
 
   const _SheetField({
     required this.controller,
@@ -469,6 +520,7 @@ class _SheetField extends StatelessWidget {
     this.keyboardType,
     this.obscureText = false,
     this.validator,
+    this.inputFormatters,
   });
 
   @override
@@ -479,6 +531,7 @@ class _SheetField extends StatelessWidget {
       obscureText: obscureText,
       style: const TextStyle(color: Colors.white),
       validator: validator,
+      inputFormatters: inputFormatters,
       decoration: InputDecoration(
         labelText: label,
         hintText: hint,
@@ -512,9 +565,25 @@ class _SheetField extends StatelessWidget {
 class _WalletHistorySheet extends StatelessWidget {
   const _WalletHistorySheet();
 
+  String _localizeType(String type, AppLocalizations l10n) {
+    switch (type.toUpperCase()) {
+      case 'DEPOSIT':
+        return l10n.txDeposit;
+      case 'TICKET_PURCHASE':
+        return l10n.txTicketPurchase;
+      case 'REDEMPTION':
+        return l10n.txRedemption;
+      case 'REWARD':
+        return l10n.txReward;
+      default:
+        return type;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final isArabic = Localizations.localeOf(context).languageCode == 'ar';
     return DraggableScrollableSheet(
       initialChildSize: 0.65,
       maxChildSize: 0.92,
@@ -580,14 +649,22 @@ class _WalletHistorySheet extends StatelessWidget {
                           const Divider(color: Colors.white12),
                       itemBuilder: (_, i) {
                         final t = state.transactions[i];
+                        final description =
+                            isArabic &&
+                                t.descriptionAr != null &&
+                                t.descriptionAr!.trim().isNotEmpty
+                            ? t.descriptionAr!
+                            : t.description;
                         return ListTile(
                           contentPadding: EdgeInsets.zero,
                           leading: Container(
                             padding: const EdgeInsets.all(10),
                             decoration: BoxDecoration(
                               color: t.isCredit
-                                  ? const Color(0xFF00C853).withOpacity(0.15)
-                                  : Colors.red.withOpacity(0.15),
+                                  ? const Color(
+                                      0xFF00C853,
+                                    ).withValues(alpha: 0.15)
+                                  : Colors.red.withValues(alpha: 0.15),
                               shape: BoxShape.circle,
                             ),
                             child: Icon(
@@ -601,7 +678,7 @@ class _WalletHistorySheet extends StatelessWidget {
                             ),
                           ),
                           title: Text(
-                            t.type,
+                            _localizeType(t.type, l10n),
                             style: const TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.w600,
@@ -609,7 +686,7 @@ class _WalletHistorySheet extends StatelessWidget {
                             ),
                           ),
                           subtitle: Text(
-                            t.description,
+                            description,
                             style: const TextStyle(
                               color: Colors.white54,
                               fontSize: 11,
@@ -618,7 +695,7 @@ class _WalletHistorySheet extends StatelessWidget {
                             overflow: TextOverflow.ellipsis,
                           ),
                           trailing: Text(
-                            '${t.isCredit ? '+' : ''}${t.amount.toStringAsFixed(2)} EGP',
+                            '${t.isCredit ? '+' : ''}${t.amount.toStringAsFixed(2)} ${l10n.egp}',
                             style: TextStyle(
                               color: t.isCredit
                                   ? const Color(0xFF00C853)
@@ -639,6 +716,39 @@ class _WalletHistorySheet extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+class _ExpiryDateFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    final newText = newValue.text;
+
+    if (oldValue.text.length >= newText.length) {
+      return newValue;
+    }
+
+    var digitsOnly = newText.replaceAll(RegExp(r'[^\d]'), '');
+    if (digitsOnly.length > 4) {
+      digitsOnly = digitsOnly.substring(0, 4);
+    }
+
+    final buffer = StringBuffer();
+    for (int i = 0; i < digitsOnly.length; i++) {
+      buffer.write(digitsOnly[i]);
+      if (i == 1 && digitsOnly.length >= 2) {
+        buffer.write('/');
+      }
+    }
+
+    final string = buffer.toString();
+    return TextEditingValue(
+      text: string,
+      selection: TextSelection.collapsed(offset: string.length),
     );
   }
 }

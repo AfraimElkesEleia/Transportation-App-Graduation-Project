@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:transportation_app/core/l10n/app_localizations.dart';
 
 /// Error view shown when the seat map fails to load.
 class SeatMapErrorView extends StatelessWidget {
-  final String       message;
+  final String message;
   final VoidCallback onRetry;
 
   const SeatMapErrorView({
@@ -23,14 +24,14 @@ class SeatMapErrorView extends StatelessWidget {
             const SizedBox(height: 16),
             Text(
               message,
-              style:     const TextStyle(color: Colors.white54),
+              style: const TextStyle(color: Colors.white54),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 24),
             ElevatedButton.icon(
               onPressed: onRetry,
-              icon:      const Icon(Icons.refresh),
-              label:     const Text('Retry'),
+              icon: const Icon(Icons.refresh),
+              label: Text(AppLocalizations.of(context)!.retry),
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF1A2E4A),
               ),

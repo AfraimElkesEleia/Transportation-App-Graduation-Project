@@ -1,26 +1,39 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:transportation_app/core/theming/colors.dart';
-import 'package:transportation_app/features/profile/domain/entities/ticket_entity.dart';
+import 'package:transportation_app/features/my_tickets/presentation/cubit/my_tickets_cubit.dart';
+import 'package:transportation_app/features/my_tickets/domain/entities/ticket_entity.dart';
 import 'package:transportation_app/core/helper/extensions.dart';
 import 'package:transportation_app/core/routing/routes.dart';
+import 'package:transportation_app/core/l10n/app_localizations.dart';
+import 'package:transportation_app/core/utils/localized_time_formatter.dart';
 
 class TicketDetailCard extends StatelessWidget {
   final TicketEntity ticket;
   final bool showUrgency;
 
-  const TicketDetailCard({super.key, required this.ticket, this.showUrgency = false});
+  const TicketDetailCard({
+    super.key,
+    required this.ticket,
+    this.showUrgency = false,
+  });
 
   Color get _agencyColor {
     final n = ticket.agencyName.toLowerCase();
     if (n.contains('gobus')) return ColorsManager.agencyGoBus;
     if (n.contains('blue')) return ColorsManager.agencyBlueBus;
-    if (n.contains('rail') || n.contains('train'))
+    if (n.contains('rail') || n.contains('train')) {
       return ColorsManager.agencyRailway;
+    }
     if (n.contains('horus')) return ColorsManager.agencyHorus;
     return ColorsManager.agencyDefault;
   }
 
   Color get _statusColor {
+    if (ticket.refundStatus == 'Accepted' ||
+        ticket.refundStatus == 'Approved') {
+      return Colors.red;
+    }
     switch (ticket.status.toLowerCase()) {
       case 'confirmed':
         return ColorsManager.successGreen;
@@ -33,41 +46,52 @@ class TicketDetailCard extends StatelessWidget {
     }
   }
 
-  String _fmtDate(DateTime d) {
-    const months = [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec',
-    ];
-    final h = d.hour.toString().padLeft(2, '0');
-    final m = d.minute.toString().padLeft(2, '0');
-    return '${d.day.toString().padLeft(2, '0')} ${months[d.month - 1]}  $h:$m';
+  String _getLocalizedStatus(BuildContext context, String status) {
+    final l10n = AppLocalizations.of(context);
+    if (l10n == null) return status;
+    if (ticket.refundStatus == 'Accepted' ||
+        ticket.refundStatus == 'Approved') {
+      return l10n.statusCancelled;
+    }
+    switch (status.toLowerCase()) {
+      case 'confirmed':
+        return l10n.statusConfirmed;
+      case 'pending':
+        return l10n.statusPending;
+      case 'completed':
+        return l10n.statusCompleted;
+      case 'cancelled':
+        return l10n.statusCancelled;
+      default:
+        return status;
+    }
+  }
+
+  String _fmtDate(BuildContext context, DateTime d) {
+    return formatTicketDateTime(context, d, datePattern: 'dd MMM');
   }
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        context.pushNamed(AppRoutes.ticketDetailsScreen, arguments: ticket);
+        context.pushNamed(
+          AppRoutes.ticketDetailsScreen,
+          arguments: {
+            'ticket': ticket,
+            'cubit': context.read<MyTicketsCubit>(),
+          },
+        );
       },
       child: Container(
         margin: const EdgeInsets.only(bottom: 14),
         decoration: BoxDecoration(
           color: ColorsManager.cardBg,
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: Colors.white.withOpacity(0.07)),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.07)),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.2),
+              color: Colors.black.withValues(alpha: 0.2),
               blurRadius: 12,
               offset: const Offset(0, 4),
             ),
@@ -80,55 +104,71 @@ class TicketDetailCard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               decoration: BoxDecoration(
-                color: _agencyColor.withOpacity(0.12),
+                color: _agencyColor.withValues(alpha: 0.12),
                 borderRadius: const BorderRadius.vertical(
                   top: Radius.circular(20),
                 ),
               ),
               child: Row(
                 children: [
-                  Flexible(
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: _agencyColor.withOpacity(0.25),
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(
-                          color: _agencyColor.withOpacity(0.6),
+                  Expanded(
+                    child: Row(
+                      children: [
+                        Flexible(
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: _agencyColor.withValues(alpha: 0.25),
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(
+                                color: _agencyColor.withValues(alpha: 0.6),
+                              ),
+                            ),
+                            child: Text(
+                              context.isArabic
+                                  ? (ticket.agencyNameAr ?? ticket.agencyName)
+                                  : ticket.agencyName,
+                              style: TextStyle(
+                                color: _agencyColor,
+                                fontSize: 11,
+                                fontWeight: FontWeight.bold,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ),
                         ),
-                      ),
-                      child: Text(
-                        ticket.agencyName,
-                        style: TextStyle(
-                          color: _agencyColor,
-                          fontSize: 11,
-                          fontWeight: FontWeight.bold,
-                          overflow: TextOverflow.ellipsis,
+                        const SizedBox(width: 8),
+                        Flexible(
+                          child: Text(
+                            context.isArabic
+                                ? (ticket.classNameAr ?? ticket.className)
+                                : ticket.className,
+                            style: const TextStyle(
+                                color: Colors.white54, fontSize: 12),
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ),
-                      ),
+                      ],
                     ),
                   ),
                   const SizedBox(width: 8),
-                  Text(
-                    ticket.className,
-                    style: const TextStyle(color: Colors.white54, fontSize: 12),
-                  ),
-                  const Spacer(),
                   Container(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 10,
                       vertical: 4,
                     ),
                     decoration: BoxDecoration(
-                      color: _statusColor.withOpacity(0.15),
+                      color: _statusColor.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: _statusColor.withOpacity(0.4)),
+                      border: Border.all(
+                        color: _statusColor.withValues(alpha: 0.4),
+                      ),
                     ),
                     child: Text(
-                      ticket.status,
+                      _getLocalizedStatus(context, ticket.status),
                       style: TextStyle(
                         color: _statusColor,
                         fontSize: 11,
@@ -150,7 +190,18 @@ class TicketDetailCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          ticket.originGovernorate,
+                          AppLocalizations.of(context)?.from ?? 'From',
+                          style: const TextStyle(
+                            color: Colors.white54,
+                            fontSize: 10,
+                          ),
+                        ),
+                        Text(
+                          (context.isArabic
+                                  ? (ticket.originGovernorateAr ??
+                                        ticket.originGovernorate)
+                                  : ticket.originGovernorate)
+                              .toLocalizedGov(context),
                           style: const TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.w900,
@@ -170,7 +221,11 @@ class TicketDetailCard extends StatelessWidget {
                             const SizedBox(width: 4),
                             Expanded(
                               child: Text(
-                                ticket.originStation,
+                                (context.isArabic
+                                        ? (ticket.originStationNameAr ??
+                                              ticket.originStation)
+                                        : ticket.originStation)
+                                    .toLocalizedStation(context),
                                 style: const TextStyle(
                                   color: ColorsManager.accentCyan,
                                   fontWeight: FontWeight.w500,
@@ -183,7 +238,7 @@ class TicketDetailCard extends StatelessWidget {
                         ),
                         const SizedBox(height: 6),
                         Text(
-                          _fmtDate(ticket.boardingTime),
+                          _fmtDate(context, ticket.boardingTime),
                           style: const TextStyle(
                             color: Colors.white54,
                             fontSize: 11,
@@ -203,7 +258,7 @@ class TicketDetailCard extends StatelessWidget {
                         margin: const EdgeInsets.symmetric(vertical: 4),
                         height: 1.5,
                         width: 48,
-                        color: ColorsManager.accentCyan.withOpacity(0.4),
+                        color: ColorsManager.accentCyan.withValues(alpha: 0.4),
                       ),
                       const Icon(
                         Icons.flight_land,
@@ -217,7 +272,18 @@ class TicketDetailCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
                         Text(
-                          ticket.destinationGovernorate,
+                          AppLocalizations.of(context)?.to ?? 'To',
+                          style: const TextStyle(
+                            color: Colors.white54,
+                            fontSize: 10,
+                          ),
+                        ),
+                        Text(
+                          (context.isArabic
+                                  ? (ticket.destinationGovernorateAr ??
+                                        ticket.destinationGovernorate)
+                                  : ticket.destinationGovernorate)
+                              .toLocalizedGov(context),
                           style: const TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.w900,
@@ -239,7 +305,11 @@ class TicketDetailCard extends StatelessWidget {
                             const SizedBox(width: 4),
                             Flexible(
                               child: Text(
-                                ticket.destinationStation,
+                                (context.isArabic
+                                        ? (ticket.destinationStationNameAr ??
+                                              ticket.destinationStation)
+                                        : ticket.destinationStation)
+                                    .toLocalizedStation(context),
                                 style: const TextStyle(
                                   color: ColorsManager.accentCyan,
                                   fontWeight: FontWeight.w500,
@@ -253,7 +323,7 @@ class TicketDetailCard extends StatelessWidget {
                         ),
                         const SizedBox(height: 6),
                         Text(
-                          _fmtDate(ticket.dropoffTime),
+                          _fmtDate(context, ticket.dropoffTime),
                           style: const TextStyle(
                             color: Colors.white54,
                             fontSize: 11,
@@ -289,16 +359,18 @@ class TicketDetailCard extends StatelessWidget {
                 children: [
                   _InfoChip(
                     icon: Icons.event_seat,
-                    label: '${ticket.seatsBooked} seat(s)',
+                    label:
+                        '${ticket.seatsBooked} ${AppLocalizations.of(context)?.seat ?? "seat(s)"}',
                   ),
                   const SizedBox(width: 8),
                   _InfoChip(
                     icon: Icons.people_alt_outlined,
-                    label: '${ticket.passengers.length} pax',
+                    label:
+                        '${ticket.passengers.length} ${AppLocalizations.of(context)?.pax ?? "pax"}',
                   ),
                   const Spacer(),
                   Text(
-                    '${ticket.totalPrice.toStringAsFixed(0)} EGP',
+                    '${ticket.totalPrice.toStringAsFixed(0)} ${AppLocalizations.of(context)?.egp ?? "EGP"}',
                     style: const TextStyle(
                       color: ColorsManager.accentCyan,
                       fontWeight: FontWeight.bold,
@@ -367,13 +439,7 @@ class _UrgencyBannerState extends State<_UrgencyBanner> {
   }
 
   String _fmt(Duration d) {
-    if (d.isNegative) return 'Boarding now';
-    if (d.inHours > 0) {
-      final h = d.inHours;
-      final m = d.inMinutes.remainder(60);
-      return 'Departing in ${h}h ${m}m';
-    }
-    return 'Departing in ${d.inMinutes}m';
+    return 'Boarding now';
   }
 
   @override
@@ -383,25 +449,28 @@ class _UrgencyBannerState extends State<_UrgencyBanner> {
       initialData: _remaining,
       builder: (context, snap) {
         final diff = snap.data ?? _remaining;
+        final text = _fmt(diff);
         final isUrgent = diff.inMinutes <= 60;
         final color = isUrgent ? Colors.orange : Colors.amber;
         return Container(
           width: double.infinity,
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
           decoration: BoxDecoration(
-            color: color.withOpacity(0.12),
+            color: color.withValues(alpha: 0.12),
             borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
           ),
           child: Row(
             children: [
               Icon(
-                isUrgent ? Icons.directions_run_rounded : Icons.schedule_rounded,
+                isUrgent
+                    ? Icons.directions_run_rounded
+                    : Icons.schedule_rounded,
                 color: color,
                 size: 16,
               ),
               const SizedBox(width: 8),
               Text(
-                _fmt(diff),
+                text,
                 style: TextStyle(
                   color: color,
                   fontSize: 13,

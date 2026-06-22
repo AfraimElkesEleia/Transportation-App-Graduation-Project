@@ -19,6 +19,7 @@ abstract class ColorsManager {
   static const resellPrimaryBg = Color(0xFF0D1B4E);
   static const resellSurfaceTeal = Color(0xFF0D3E4F);
   static const successGreen = Color(0xFF00C853);
+  static const error = Color(0xFFE5484D);
   static const accentCyan = Color(0xFF00E5FF);
 
   // Navigation bar
@@ -54,4 +55,9 @@ abstract class ColorsManager {
   static const agencyRailway = Color(0xFF1A3A6B);
   static const agencyHorus = Color(0xFF1A5C3A);
   static const agencyDefault = Color(0xFF235272);
+
+  // Notification feature
+  static const cardUnread = Color(0xFF1A2E5A);
+  static const cardBorderUnread = Color(0xFF2D4B8A);
+  static const textSecondary = Color(0xFF8BA0B8);
 }

@@ -1,23 +1,42 @@
 import 'package:flutter/material.dart';
 import 'package:transportation_app/core/theming/colors.dart';
 import 'package:transportation_app/features/home/domain/entities/search_params.dart';
+import 'package:transportation_app/core/helper/extensions.dart';
 
 class SearchHeader extends StatelessWidget {
   final SearchParams? params;
   final int filterCount;
   final VoidCallback? onFilter;
+  final bool showFilterButton;
 
   const SearchHeader({
     super.key,
     this.params,
     this.filterCount = 0,
     this.onFilter,
+    this.showFilterButton = true,
   });
 
   @override
   Widget build(BuildContext context) {
-    final from = params?.fromDisplayName ?? '—';
-    final to = params?.toDisplayName ?? '—';
+    final isAr = context.isArabic;
+
+    // Arabic: prefer the stored Arabic name (station or gov) directly.
+    // English: apply toLocalizedGov + toLocalizedStation extensions.
+    final fromRaw = params?.fromDisplayName ?? '—';
+    final from = fromRaw == '—'
+        ? '—'
+        : (isAr && params?.fromDisplayNameAr != null)
+            ? params!.fromDisplayNameAr!
+            : fromRaw.toLocalizedGov(context).toLocalizedStation(context);
+
+    final toRaw = params?.toDisplayName ?? '—';
+    final to = toRaw == '—'
+        ? '—'
+        : (isAr && params?.toDisplayNameAr != null)
+            ? params!.toDisplayNameAr!
+            : toRaw.toLocalizedGov(context).toLocalizedStation(context);
+
     final date = params?.travelDate ?? '';
 
     return Padding(
@@ -84,7 +103,10 @@ class SearchHeader extends StatelessWidget {
           const SizedBox(width: 12),
 
           // Filter button with active badge
-          _FilterButton(filterCount: filterCount, onFilter: onFilter),
+          if (showFilterButton)
+            _FilterButton(filterCount: filterCount, onFilter: onFilter)
+          else
+            const SizedBox(width: 44, height: 44),
         ],
       ),
     );

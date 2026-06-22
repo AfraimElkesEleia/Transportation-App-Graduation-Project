@@ -11,6 +11,7 @@
   "loading": "جاري التحميل...",
   "error": "خطأ",
   "noData": "لا توجد بيانات متاحة",
+  "unknown": "غير معروف",
   "no": "لا",
   "onboardingSubtitle1": "سافر بذكاء",
   "onboardingTitle1": "اكتشف مصر",
@@ -21,6 +22,7 @@
   "onboardingSubtitle3": "سافر بثقة",
   "onboardingTitle3": "آمن وموثوق",
   "onboardingDesc3": "احجز بثقة...",
+  "getStarted": "ابدأ الآن",
   "loginTitle": "مرحباً \nبعودتك.",
   "loginSubtitle": "ادخل مستقبل السفر",
   "emailLabel": "البريد الإلكتروني",
@@ -46,8 +48,9 @@
   "signOutBtn": "تسجيل الخروج",
   "language": "اللغة",
   "recentSearches": "البحث الأخير",
+  "noRecentSearches": "لا توجد عمليات بحث سابقة",
   "myTickets": "تذاكري",
-  "digitalWallet": "محفظة رحلاتك الرقمية",
+  "digitalWallet": "أدر تذاكرك بسهولة",
   "tabUpcoming": "القادمة",
   "tabActive": "النشطة",
   "tabPast": "السابقة",
@@ -69,7 +72,7 @@
   "totalPrice": "الإجمالي:",
   "sell": "بيع",
   "listForSale": "أضف التذكرة للبيع",
-  "askingPrice": "سعر الطلب (حد أقصى {n} جنيه)",
+  "askingPrice": "سعر الطلب",
   "listTicketBtn": "أدرج التذكرة",
   "cancelListing": "إلغاء الإدراج",
   "cancelListingMsg": "هذا الحجز مُدرج حالياً في السوق...",
@@ -159,6 +162,11 @@
   "txTicketPurchase": "شراء تذكرة",
   "txRedemption": "استرداد",
   "txReward": "مكافأة",
+  "txChallengeReward": "مكافأة تحدي",
+  "txBookingEarned": "مكافأة حجز",
+  "txStatusAvailable": "متاح",
+  "txStatusSpent": "مُستخدم",
+  "txStatusExpired": "منتهي الصلاحية",
   "welcome": "!مرحباً",
   "whereToGoToday": "أين تريد الذهاب اليوم؟",
   "searchTrip": "بحث عن رحلة",
@@ -183,7 +191,15 @@
   "marketplace": "السوق",
   "quickActions": "إجراءات سريعة",
   "editProfile": "تعديل الملف الشخصي",
-  "loyaltyHub": "مركز الولاء",
+  "profileTripsCount": "{count} رحلة",
+  "@profileTripsCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "loyaltyHub": "مركز التحديات والمكافآت",
   "signOut": "تسجيل الخروج",
   "signOutConfirm": "تسجيل الخروج؟",
   "signOutBody": "ستحتاج إلى تسجيل الدخول مجدداً للوصول إلى حسابك.",
@@ -194,10 +210,32 @@
   "enterValidAmount": "أدخل مبلغاً صحيحاً",
   "amountMustBeRange": "يجب أن يكون المبلغ بين 10 و 10000 جنيه",
   "cardNumber": "رقم البطاقة",
+  "cvvLabel": "CVV",
   "mustBe16Digits": "يجب أن يكون 16 رقماً",
   "expiry": "تاريخ انتهاء الصلاحية",
   "formatMmYy": "الصيغة: شش/سس",
   "threeDigitsRequired": "مطلوب 3 أرقام",
+  "loyaltyPoints": "نقاط المكافآت",
+  "pts": "نقطة",
+  "noExpiringPoints": "لا توجد نقاط تنتهي صلاحيتها حالياً",
+  "ptsExpired": "انتهت صلاحية {n} نقطة",
+  "ptsExpireTomorrow": "تنتهي صلاحية {n} نقطة غداً",
+  "ptsExpireInDays": "تنتهي صلاحية {n} نقطة خلال {d} يوم",
+  "ptsExpireInMonthsDays": "تنتهي صلاحية {n} نقطة خلال {m} و {d}",
+  "ptsExpireInMonths": "تنتهي صلاحية {n} نقطة خلال {m}",
+  "oneMonth": "شهر واحد",
+  "monthsPlural": "{m} أشهر",
+  "oneDay": "يوم واحد",
+  "daysPlural": "{d} أيام",
+  "pointsPending": "تظل النقاط معلقة حتى المغادرة وتنتهي صلاحيتها بعد 4 أشهر من المغادرة.",
+  "profile": "الملف الشخصي",
+  "manageAccount": "إدارة حسابك",
+  "planYourJourney": "خطط لرحلتك",
+  "departureDate": "تاريخ الانطلاق",
+  "subCityOptional": "مدينة فرعية (اختياري — أي محطة)",
+  "govHint": "{title} (مثل القاهرة، الأقصر)",
+  "popularRoutes": "مسارات شائعة",
+  "latestNews": "أحدث الأخبار",
   "gov_Cairo": "القاهرة",
   "gov_Alexandria": "الإسكندرية",
   "gov_Giza": "الجيزة",
@@ -218,6 +256,572 @@
   "gov_Qalyubia": "القليوبية",
   "gov_Ismailia": "الإسماعيلية",
   "gov_Suez": "السويس",
+  "gov_Damietta": "دمياط",
+  "gov_Matrouh": "مطروح",
   "gov_PortSaid": "بورسعيد",
-  "gov_Damietta": "دمياط"
+  "challenges": "التحديات",
+  "pointsHistory": "سجل النقاط",
+  "noChallengesFound": "لا توجد تحديات.",
+  "noPointHistory": "لا يوجد سجل للنقاط.",
+  "activeChallenges": "نشطة",
+  "completedChallenges": "مكتملة",
+  "uploadingPhoto": "جاري رفع الصورة...",
+  "photoUploaded": "تم رفع الصورة",
+  "photoUploadFailed": "فشل رفع الصورة: {msg}",
+  "skipAndSave": "تخطي وحفظ",
+  "profileUpdatedSuccessfully": "تم تحديث الملف الشخصي بنجاح",
+  "firstName": "الاسم الأول",
+  "firstNameHint": "أدخل الاسم الأول",
+  "firstNameRequired": "الاسم الأول مطلوب",
+  "lastName": "الاسم الأخير",
+  "lastNameHint": "أدخل الاسم الأخير",
+  "lastNameRequired": "الاسم الأخير مطلوب",
+  "familyName": "اسم العائلة",
+  "familyNameHint": "أدخل اسم العائلة / القبيلة",
+  "emailAddressValid": "أدخل بريد إلكتروني صحيح",
+  "phoneNumberRequired": "رقم الهاتف مطلوب",
+  "phoneNumberLabel": "رقم الهاتف",
+  "fixedDetails": "تفاصيل ثابتة",
+  "countryLabel": "الدولة",
+  "countryCannotBeChanged": "لا يمكن تغيير الدولة.",
+  "saveChanges": "حفظ التعديلات",
+  "saving": "جاري الحفظ...",
+  "pointsBalanceIs": "رصيد النقاط: {n}",
+  "expiringSoonCard": "تنتهي قريباً: {n} نقطة ({date})",
+  "earnedPointsPending": "النقاط المكتسبة معلقة حتى المغادرة وتنتهي صلاحيتها بعد 4 أشهر من المغادرة.",
+  "myCart": "عربة التسوق",
+  "yourCartIsEmpty": "عربة التسوق فارغة",
+  "addTripsToCart": "أضف رحلات إلى عربة التسوق للدفع لاحقاً.",
+  "checkoutWallet": "إتمام الدفع (بالمحفظة)",
+  "checkoutSuccess": "تم الدفع بنجاح!\nتم الخصم من محفظتك.",
+  "backToHome": "العودة للرئيسية",
+  "nationalIdOptional": "رقم البطاقة القومية (اختياري)",
+  "nationalIdHint": "مثال: 29901011234567",
+  "dateOfBirthLabel": "تاريخ الميلاد",
+  "createPasswordHint": "أنشئ كلمة مرور قوية",
+  "confirmPasswordLabel": "تأكيد كلمة المرور",
+  "confirmPasswordHint": "أعد إدخال كلمة المرور",
+  "directTrip": "مباشر",
+  "stopsCount": "{count} توقف",
+  "@stopsCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "hideStops": "إخفاء المحطات",
+  "showStops": "عرض المحطات",
+  "routeStops": "محطات الرحلة",
+  "howManyPassengers": "كم عدد المسافرين؟",
+  "perSeat": "لكل مقعد",
+  "seatsAvailable": "{n} مقاعد متاحة",
+  "@seatsAvailable": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "continueWithNPassengers": "متابعة مع {n} مسافر",
+  "@continueWithNPassengers": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "checkoutAction": "إتمام الدفع",
+  "ticketPrice": "سعر التذكرة",
+  "pointsDiscount": "خصم النقاط",
+  "useLoyaltyPointsTitle": "استخدم نقاط الولاء",
+  "youHavePoints": "لديك {points} نقطة",
+  "@youHavePoints": {
+    "placeholders": {
+      "points": {
+        "type": "String"
+      }
+    }
+  },
+  "pointsConversionHint": "20 نقطة = 1 جنيه",
+  "useLoyaltyPoints": "💎 استخدم نقاط الولاء",
+  "noPointsYet": "ليس لديك أي نقاط بعد. أكمل رحلات لكسب النقاط!",
+  "pointsCantBeApplied": "لا يمكن تطبيق النقاط - إجمالي السلة منخفض جداً (الحد الأدنى 10 جنيهات).",
+  "needMorePoints": "تحتاج إلى 20 نقطة على الأقل للخصم (= خصم 1 جنيه). لديك حالياً {points} نقطة. استمر في الحجز لكسب المزيد!",
+  "@needMorePoints": {
+    "placeholders": {
+      "points": {
+        "type": "String"
+      }
+    }
+  },
+  "ptsLabel": "نقطة",
+  "pointsInfo": "ℹ️ 20 نقطة = 1 جنيه",
+  "pointsUsed": "النقاط المستخدمة",
+  "discount": "الخصم",
+  "remainingAfter": "المتبقي بعد الخصم",
+  "finalTotal": "الإجمالي النهائي",
+  "ptsValue": "{n} نقطة",
+  "@ptsValue": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "from": "من",
+  "book": "حجز",
+  "fullSeats": "مكتمل",
+  "skip": "تخطي",
+  "ticketDetails": "تفاصيل التذكرة",
+  "downloadPdf": "تنزيل PDF",
+  "boardingPassTitle": "بطاقة الصعود",
+  "boardingPassPassengerLabel": "مسافر",
+  "boardingPassSeatLabel": "مقعد",
+  "boardingPassClassLabel": "الدرجة",
+  "boardingPassDateLabel": "التاريخ",
+  "ticketClass": "درجة {className}",
+  "@ticketClass": {"placeholders": {"className": {"type": "String"}}},
+  "to": "إلى",
+  "departure": "المغادرة",
+  "arrival": "الوصول",
+  "bookingRef": "رقم الحجز",
+  "passengersAndSeats": "المسافرون والمقاعد",
+  "tapPassengerInfo": "انقر على المسافر لعرض بطاقة الصعود",
+  "idNum": "الرقم القومي: {id}",
+  "@idNum": {"placeholders": {"id": {"type": "String"}}},
+  "seatNum": "مقعد {seat}",
+  "@seatNum": {"placeholders": {"seat": {"type": "String"}}},
+  "seat": "مقعد",
+  "pax": "مسافر",
+  "passengerDetails": "بيانات المسافرين",
+  "fullName": "الاسم الكامل",
+  "nationalId": "الرقم القومي",
+  "emailOptional": "البريد الإلكتروني (اختياري)",
+  "requiredField": "مطلوب",
+  "addToCart": "أضف إلى السلة",
+  "bookNow": "احجز الآن",
+  "passengerN": "مسافر {n}",
+  "@passengerN": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "seatLabel": "المقعد: {n}",
+  "@seatLabel": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "passengersCount": "{n} مسافر",
+  "@passengersCount": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "selectSeats": "اختر المقاعد",
+  "selectedSeatsLabel": "المحدد: ",
+  "seatsCount": "{n} مقاعد",
+  "@seatsCount": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "totalLabel": "الإجمالي",
+  "continueBtn": "متابعة",
+  "noSeatsSelected": "لم يتم اختيار مقاعد",
+  "travellingWithFamily": "هل تسافر مع العائلة؟",
+  "autoFill": "تعبئة تلقائية",
+  "autoFilled": "تم التعبئة ✔",
+  "reFill": "إعادة التعبئة",
+  "fillSeat1Info": "أكمل المقعد الأول، ثم انسخ الاسم والهاتف للمقاعد الأخرى.",
+  "addEntireJourneyToCart": "أضف الرحلة بالكامل إلى السلة",
+  "bookEntireJourneyNow": "احجز الرحلة بالكامل الآن",
+  "buildJourney": "ابنِ رحلتك",
+  "multiDestination": "وجهات متعددة",
+  "selectTripForLeg": "اختر رحلة للجزء {n}",
+  "@selectTripForLeg": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "selectSeatsForLeg": "اختر مقاعد الجزء {n}",
+  "@selectSeatsForLeg": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "reviewCheckout": "مراجعة وإتمام",
+  "noTripsFoundForLeg": "لا توجد رحلات لهذا الجزء.",
+  "tryAdjustingFilters": "حاول تعديل الفلاتر أعلاه.",
+  "suggestedTransferRoute": "مسار التحويل المقترح",
+  "transferAt": "تحويل في",
+  "journeySummary": "ملخص الرحلة",
+  "journeyOverview": "نظرة عامة على الرحلة",
+  "connectionLayover": "مدة الانتظار بين الرحلتين",
+  "totalJourneyDuration": "المدة الإجمالية للرحلة",
+  "routeLabel": "المسار",
+  "durationLabel": "المدة",
+  "pricePerSeat": "سعر المقعد",
+  "legTotal": "إجمالي الجزء",
+  "selectedSeats": "المقاعد المختارة",
+  "noArrivalTime": "وقت الوصول غير متاح",
+  "durationHoursMinutes": "{hours} س {minutes} د",
+  "@durationHoursMinutes": {
+    "placeholders": {
+      "hours": {
+        "type": "String"
+      },
+      "minutes": {
+        "type": "String"
+      }
+    }
+  },
+  "durationMinutes": "{minutes} د",
+  "@durationMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "String"
+      }
+    }
+  },
+  "legsCount": "{n} أجزاء",
+  "@legsCount": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "legN": "الجزء {n}",
+  "@legN": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "journeyAddedToCart": "تمت إضافة الرحلة إلى السلة بنجاح!",
+  "bookingSuccessful": "تم الحجز بنجاح!",
+  "indirectTripAddedToCart": "تمت إضافة الرحلة غير المباشرة إلى السلة بنجاح!",
+  "pleaseSelectSeat": "الرجاء اختيار مقعد",
+  "selectExactlyNSeats": "الرجاء اختيار {n} مقاعد بالضبط",
+  "@selectExactlyNSeats": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "canOnlySelectNSeats": "يمكنك اختيار {n} مقعد فقط لهذا الجزء.",
+  "@canOnlySelectNSeats": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "pleaseSelectNPassengers": "الرجاء اختيار {n} مسافرين بالضبط",
+  "@pleaseSelectNPassengers": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "fillNamePhoneFirst": "الرجاء تعبئة الاسم والهاتف للمسافر الأول أولاً.",
+  "filledNSeats": "تمت تعبئة {n} مقعد بـ \"{name}\"",
+  "@filledNSeats": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      },
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "requiredCountSeats": "مطلوب: {n} مقاعد. تم اختيار: {m}",
+  "@requiredCountSeats": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      },
+      "m": {
+        "type": "String"
+      }
+    }
+  },
+  "idTypeLabel": "نوع الهوية",
+  "idTypeNationalId": "بطاقة قومية",
+  "idTypePassport": "جواز سفر",
+  "idNumberLabel": "رقم البطاقة القومية",
+  "passportNumberLabel": "رقم جواز السفر",
+  "activeChallengesTitle": "التحديات النشطة",
+  "challengeProgressLabel": "{current} / {goal} رحلة",
+  "@challengeProgressLabel": {
+    "placeholders": {
+      "current": {
+        "type": "String"
+      },
+      "goal": {
+        "type": "String"
+      }
+    }
+  },
+  "challengeRewardLabel": "المكافأة: {points} نقطة",
+  "@challengeRewardLabel": {
+    "placeholders": {
+      "points": {
+        "type": "String"
+      }
+    }
+  },
+  "challengeMonthly": "شهري",
+  "challengeOneTime": "مرة واحدة",
+  "challengePts": "+{pts} نقطة",
+  "@challengePts": {
+    "placeholders": {
+      "pts": {
+        "type": "String"
+      }
+    }
+  },
+  "challengeProgress": "{current} / {goal}",
+  "@challengeProgress": {
+    "placeholders": {
+      "current": {
+        "type": "String"
+      },
+      "goal": {
+        "type": "String"
+      }
+    }
+  },
+  "amLabel": "ص",
+  "pmLabel": "م",
+  "floorLabel": "الطابق {n}",
+  "@floorLabel": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "standardClass": "عادي",
+  "popularRoutes": "🔥 رحلات شائعة",
+  "dateCannotBeToday": "لا يمكن أن يكون تاريخ السفر اليوم. يرجى اختيار تاريخ مستقبلي.",
+  "selectTravelDate": "اختر تاريخ السفر",
+  "search": "بحث",
+  "notifications": "الإشعارات",
+  "notificationPermissionTitle": "ابقَ على اطلاع",
+  "notificationPermissionBody": "فعّل الإشعارات لتصلك عروض التذاكر، وتذكيرات الصعود، وتنبيهات انتهاء السلة، والتحديثات المهمة لرحلاتك.",
+  "notificationPermissionNotNow": "ليس الآن",
+  "notificationPermissionOpenSettings": "فتح الإعدادات",
+  "markAllRead": "تحديد الكل كمقروء",
+  "filterAll": "الكل",
+  "filterUnread": "غير مقروء",
+  "filterMarketplace": "السوق",
+  "filterBoarding": "الصعود",
+  "filterGamification": "المكافآت",
+  "filterRefunds": "الاسترداد",
+  "dismiss": "إغلاق",
+  "tryAgain": "حاول مرة أخرى",
+  "todayLabel": "اليوم",
+  "yesterdayLabel": "أمس",
+  "justNow": "الآن",
+  "minutesAgo": "منذ {count} دقيقة",
+  "@minutesAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "hoursAgo": "منذ {count} ساعة",
+  "@hoursAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "notificationGeneral": "عام",
+  "emptyMarketplaceTitle": "لا يوجد نشاط في السوق بعد",
+  "emptyMarketplaceSubtitle": "ستظهر إشعارات العروض والمبيعات هنا.",
+  "emptyUnreadTitle": "أنت مطلع على كل شيء!",
+  "emptyUnreadSubtitle": "لا توجد إشعارات غير مقروءة حالياً.",
+  "emptyBoardingTitle": "لا توجد تنبيهات صعود",
+  "emptyBoardingSubtitle": "ستظهر تذكيرات الرحلات القادمة هنا.",
+  "emptyGamificationTitle": "لا يوجد نشاط مكافآت",
+  "emptyGamificationSubtitle": "ستظهر إشعارات النقاط والتحديات هنا.",
+  "emptyRefundTitle": "لا توجد تحديثات استرداد",
+  "emptyRefundSubtitle": "ستظهر هنا إشعارات قبول أو رفض طلبات الاسترداد.",
+  "emptyNotificationsTitle": "لا توجد إشعارات بعد",
+  "emptyNotificationsSubtitle": "ستظهر هنا التحديثات المهمة حول رحلاتك ونشاط السوق.",
+  "seatLegendAvailable": "متاح",
+  "seatLegendSelected": "محدد",
+  "seatLegendTaken": "محجوز",
+  "idTypeNone": "بدون",
+  "passportNumberHint": "مثال: A12345678",
+  "signupTitle": "إنشاء\nحساب.",
+  "joinFutureOfTravel": "انضم إلى مستقبل السفر",
+  "ticketMarketplace": "سوق التذاكر",
+  "findDealsFromTravelers": "ابحث عن أفضل العروض من المسافرين",
+  "filtersActive": "تصفية (مفعّلة)",
+  "avgDiscount": "متوسط الخصم",
+  "totalListings": "إجمالي العروض",
+  "noListingsFound": "لا توجد عروض.",
+  "tryRemovingFilters": "حاول إزالة بعض الفلاتر.",
+  "clearFilters": "مسح الفلاتر",
+  "buyTicket": "شراء التذكرة",
+  "buyNow": "اشترِ الآن",
+  "trainBooking": "حجز قطار",
+  "busBooking": "حجز حافلة",
+  "trainPassengerRequirements": "الاسم ونوع الهوية ورقمها مطلوبة لكل مسافر",
+  "busPassengerRequirements": "الاسم ورقم الهاتف مطلوبان لكل مسافر",
+  "agencyLabel": "الوكالة",
+  "originLabel": "نقطة الانطلاق",
+  "destinationLabel": "الوجهة",
+  "dateLabel": "التاريخ",
+  "timeLabel": "الوقت",
+  "classLabel": "الدرجة",
+  "sellerLabel": "البائع",
+  "priceLabel": "السعر",
+  "areYouSureBuyTicket": "هل أنت متأكد من شراء هذه التذكرة؟",
+  "ticketPurchasedSuccessfully": "تم شراء التذكرة بنجاح!",
+  "listingCancelledSuccessfully": "تم إلغاء الإدراج بنجاح!",
+  "filterFrom": "من: {gov}",
+  "@filterFrom": {
+    "placeholders": {
+      "gov": {
+        "type": "String"
+      }
+    }
+  },
+  "filterTo": "إلى: {gov}",
+  "@filterTo": {
+    "placeholders": {
+      "gov": {
+        "type": "String"
+      }
+    }
+  },
+  "filterDate": "التاريخ: {date}",
+  "@filterDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "filterListings": "تصفية العروض",
+  "resetAll": "إعادة ضبط الكل",
+  "originGovernorate": "محافظة الانطلاق",
+  "destinationGovernorate": "محافظة الوجهة",
+  "travelDateFilter": "تاريخ السفر",
+  "anyDate": "أي تاريخ",
+  "applyFilters": "تطبيق الفلاتر",
+  "hintCairo": "مثال: القاهرة",
+  "hintAlexandria": "مثال: الإسكندرية",
+  "forgotPasswordSubtitle": "أدخل بريدك الإلكتروني وسنرسل لك رابط إعادة التعيين",
+  "sendResetLink": "إرسال رابط الإعادة",
+  "emailSentTitle": "تحقق من بريدك الوارد!",
+  "emailSentMessage": "إذا كان بريدك الإلكتروني مسجلاً، ستستقبل رابط إعادة تعيين كلمة المرور قريباً.",
+  "emailSendError": "تعذّر إرسال البريد الإلكتروني",
+  "backToLogin": "العودة لتسجيل الدخول",
+  "idTypeLabel": "نوع الهوية",
+  "idTypeNationalId": "بطاقة هوية وطنية",
+  "idTypePassport": "جواز سفر",
+  "idNumberLabel": "رقم بطاقة الهوية",
+  "passportNumberLabel": "رقم جواز السفر",
+  "supportTickets": "تذاكر الدعم",
+  "noSupportTickets": "لا توجد تذاكر دعم حتى الآن",
+  "supportTicketsEmptyBody": "ستظهر المشكلات المرسلة هنا.",
+  "supportCategoryPayment": "الدفع",
+  "supportCategoryTripExperience": "تجربة الرحلة",
+  "supportCategoryAppBug": "خطأ في التطبيق",
+  "supportCategoryAccountIssue": "مشكلة في الحساب",
+  "supportCategoryOther": "أخرى",
+  "supportStatusOpen": "مفتوحة",
+  "supportStatusInProgress": "قيد المعالجة",
+  "supportStatusResolved": "تم حلها",
+  "supportStatusClosed": "مغلقة",
+  "untitledTicket": "تذكرة بدون عنوان",
+  "noDescriptionProvided": "لا يوجد وصف.",
+  "reportIssue": "الإبلاغ عن مشكلة",
+  "reportIssueTitle": "الإبلاغ عن مشكلة",
+  "reportIssueHeaderTitle": "نحن هنا للمساعدة",
+  "reportIssueHeaderSubtitle": "صف مشكلتك وسيتواصل معك فريقنا في أقرب وقت.",
+  "issueCategoryLabel": "فئة المشكلة",
+  "issueCategoryPayment": "الدفع",
+  "issueCategoryTrip": "تجربة الرحلة",
+  "issueCategoryAppBug": "خطأ في التطبيق",
+  "issueCategoryAccount": "مشكلة في الحساب",
+  "issueCategoryOther": "أخرى",
+  "issueTitleLabel": "العنوان",
+  "issueTitleHint": "ملخص قصير لمشكلتك",
+  "issueTitleRequired": "العنوان مطلوب",
+  "issueDescriptionLabel": "الوصف",
+  "issueDescriptionHint": "يرجى وصف مشكلتك بالتفصيل...",
+  "issueDescriptionRequired": "الوصف مطلوب",
+  "issueDescriptionTooShort": "يرجى كتابة 10 أحرف على الأقل",
+  "issueSubmitBtn": "إرسال التقرير",
+  "issueSubmittedTitle": "تم إرسال التقرير!",
+  "issueSubmittedBody": "شكراً لتواصلك معنا. سيقوم فريق الدعم بمراجعة مشكلتك والرد عليك في أقرب وقت ممكن.",
+  "issueDone": "تم",
+  "requestRefund": "طلب استرداد",
+  "refundAlreadyRequested": "تم طلب الاسترداد",
+  "refundConfirmTitle": "طلب استرداد المبلغ؟",
+  "refundConfirmBody": "هل أنت متأكد من طلب استرداد المبلغ لهذا الحجز؟ سيتم إضافة المبلغ إلى محفظتك بعد الموافقة على الطلب.",
+  "refundSubmitted": "تم إرسال طلب الاسترداد بنجاح.",
+  "refundRequesting": "جاري إرسال طلب الاسترداد...",
+  "refundAccepted": "تم قبول الاسترداد",
+  "refundRejected": "تم رفض الاسترداد",
+  "expires": "ينتهي خلال",
+  "expired": "منتهية",
+  "cancelTripTitle": "إلغاء هذه الرحلة؟",
+  "cancelTripMsg": "سيتم إلغاء حجز المقعد واستعادة المخزون. لا يمكن التراجع عن هذا الإجراء.",
+  "keepIt": "الاحتفاظ بها",
+  "cancelTripBtn": "إلغاء الرحلة",
+  "insufficientFunds": "رصيد غير كافٍ.",
+  "insufficientFundsDetail": "رصيد غير كافٍ. رصيد محفظتك هو {balance} جنيه، ولكن إجمالي الدفع هو {total} جنيه.",
+  "checkoutFailed": "فشل إتمام الدفع",
+  "ticketAddedButCheckoutFailed": "تمت إضافة التذكرة إلى السلة، ولكن فشل إتمام الدفع: {error}",
+  "originalPrice": "السعر الأصلي: {price} {currency}",
+  "seatsTakenError": "تم حجز واحد أو أكثر من المقاعد المختارة للتو. يرجى تحديث خريطة المقاعد.",
+  "chooseCompany": "اختر الشركة",
+  "allCompanies": "كل الشركات",
+  "from": "من",
+  "to": "إلى",
+  "arrivalTime": "وقت الوصول",
+  "identityDetails": "تفاصيل الهوية",
+  "identityDetailsWarning": "بمجرد التعيين، لا يمكن تغيير تفاصيل الهوية. يرجى التأكد من صحة البيانات المدخلة.",
+  "nationalIdRequired": "الرقم القومي مطلوب.",
+  "passportNumberRequired": "رقم جواز السفر مطلوب.",
+  "gender": "الجنس",
+  "genderMale": "ذكر",
+  "genderFemale": "أنثى",
+  "enterPhoneNumber": "أدخل رقم الهاتف",
+  "selectCountryCode": "اختر رمز الدولة",
+  "searchCountryOrCode": "البحث عن الدولة أو الرمز...",
+  "selectDate": "اختر التاريخ",
+  "deleteNotification": "حذف",
+  "notificationDeleted": "تم حذف الإشعار.",
+  "notificationDeleteFailed": "تعذّر حذف الإشعار. يرجى المحاولة مرة أخرى.",
+  "notificationNotFound": "الإشعار غير موجود.",
+  "userNotAuthenticated": "يرجى تسجيل الدخول مرة أخرى.",
+  "noInternetConnection": "لا يوجد اتصال بالإنترنت. يرجى التحقق من الاتصال والمحاولة مرة أخرى."
 }

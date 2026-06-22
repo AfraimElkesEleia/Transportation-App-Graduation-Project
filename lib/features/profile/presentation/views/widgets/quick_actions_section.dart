@@ -50,6 +50,22 @@ class QuickActionsSection extends StatelessWidget {
             );
           },
         ),
+        _buildActionTile(
+          context: context,
+          icon: Icons.support_agent_rounded,
+          title: l10n.reportIssue,
+          onTap: () {
+            Navigator.pushNamed(context, AppRoutes.reportIssueScreen);
+          },
+        ),
+        _buildActionTile(
+          context: context,
+          icon: Icons.assignment_outlined,
+          title: l10n.supportTickets,
+          onTap: () {
+            Navigator.pushNamed(context, AppRoutes.supportTicketsScreen);
+          },
+        ),
         BlocBuilder<LocaleCubit, Locale>(
           builder: (context, locale) {
             final isArabic = locale.languageCode == 'ar';
@@ -66,11 +82,11 @@ class QuickActionsSection extends StatelessWidget {
                 fillColor: Colors.cyan.withValues(alpha: 0.2),
                 selectedColor: Colors.cyan,
                 color: Colors.white54,
-                children: const [Text('EN'), Text('ع')],
                 isSelected: [!isArabic, isArabic],
                 onPressed: (i) {
                   context.read<LocaleCubit>().setLocale(i == 0 ? 'en' : 'ar');
                 },
+                children: const [Text('EN'), Text('ع')],
               ),
             );
           },

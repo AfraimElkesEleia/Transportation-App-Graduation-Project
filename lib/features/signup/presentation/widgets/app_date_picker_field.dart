@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:transportation_app/core/l10n/app_localizations.dart';
 
 class AppDatePickerField extends StatelessWidget {
   const AppDatePickerField({
@@ -22,7 +23,6 @@ class AppDatePickerField extends StatelessWidget {
   final DateTime? lastDate;
   final String dateFormat;
 
-  static const _cyan    = Color(0xff1AC8E8);
   static const _white20 = Color(0x33FFFFFF);
 
   @override
@@ -55,9 +55,7 @@ class AppDatePickerField extends StatelessWidget {
               color: Colors.white.withValues(alpha: 0.04),
               borderRadius: BorderRadius.circular(20),
               border: Border.all(
-                color: errorText != null
-                    ? Colors.redAccent
-                    : _white20,
+                color: errorText != null ? Colors.redAccent : _white20,
                 width: 1,
               ),
             ),
@@ -67,7 +65,7 @@ class AppDatePickerField extends StatelessWidget {
                 const SizedBox(width: 14),
                 Expanded(
                   child: Text(
-                    formatted ?? 'Select date',
+                    formatted ?? AppLocalizations.of(context)!.selectDate,
                     style: TextStyle(
                       color: formatted != null
                           ? Colors.white
@@ -114,7 +112,9 @@ class AppDatePickerField extends StatelessWidget {
               surface: Color(0xff0B1F3A),
               onSurface: Colors.white,
             ),
-            dialogBackgroundColor: const Color(0xff081A33),
+            dialogTheme: DialogThemeData(
+              backgroundColor: const Color(0xff081A33),
+            ),
           ),
           child: child!,
         );
